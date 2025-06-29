@@ -1,0 +1,351 @@
+/**
+* @file     vcu.proto
+* @author   dengpeng
+* @details  
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>dengpeng 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	VcuProto;
+
+/**
+* @brief Vcu
+* @detail Vcu
+*/
+message Vcu{ 
+	///<BusVcuPedl：[/],(/,/,/),[32],(1,0),
+    BusVcuPedl vcu_pedl = 1;
+	
+	///< BusVcuEngine：[/],(/,/,/),[32],(1,0),
+    BusVcuEngine vcu_engine = 2;
+	
+	///< BusVcuTransmission：[/],(/,/,/),[32],(1,0),
+    BusVcuTransmission vcu_trans_mission = 3;
+
+	///< BusVcuSwitchSts：[/],(/,/,/),[32],(1,0),
+    BusVcuSwitchSts vcu_switch_sts = 4;    
+
+	///< BusVCUSecOC：[/],(/,/,/),[32],(1,0),
+    BusVCUSecOC vcu_secoc = 5;     
+} 
+
+/**
+* @brief Vcu10ms
+* @detail Vcu10ms
+*/
+message Vcu10ms{ 
+	///<BusVcuPedl：[/],(/,/,/),[32],(1,0),
+    BusVcuPedl vcu_pedl = 1;
+	
+	///< BusVcuEngine：[/],(/,/,/),[32],(1,0),
+    BusVcuEngine vcu_engine = 2;
+	
+	///< BusVCUSecOC：[/],(/,/,/),[32],(1,0),
+    BusVCUSecOC vcu_secoc = 3;
+} 
+
+/**
+* @brief BusVcuEngine
+* @detail BusVcuEngine
+*/
+message BusVcuEngine{ 
+
+	///< 加速踏板屏蔽响应：[/],(nan,0,1),[/],(1,0),0x0:Unshield 0x1:Shield 0xff:invalid
+    uint32 vcu_acc_ped_shield = 1;
+	
+	///< APA控制使能：[/],(nan,0,3),[/],(1,0),0x0:no request 0x1:Control enabled 0x2:Control disable 0x3:invalid 0xff:invalid
+    uint32 vcu_apa_request_enable = 2;
+	
+	///< 加速模式：[/],(nan,0,7),[/],(1,0),0x0:invalid 0x1:Normal 0x2:Fast 0x3:Slow
+    uint32 vcu_accr_mod = 3;
+	
+	///< 当前可以响应APA的扭矩请求：[/],(nan,0,1),[/],(1,0),0x0:not available 0x1:available
+    uint32 vcu_apa_torq_request_available = 4;
+	
+	///< 信息错误状态：[/],(nan,0,3),[/],(1,0),0x0:no error 0x1:reversible error 0x2:irreversible error 0x3:not defined 
+    uint32 vcu_com_flt_sts = 5;
+	
+	///< 能量回收模式：[/],(nan,0,127),[/],(1,0),0x0:Not set 0x1:normal 0x2:strong 0x3~0x67：0%~100%
+    uint32 vcu_eny_recycl_mod = 6;
+	
+	///< 超越模式请求：[/],(nan,0,1),[/],(1,0),0x0:Not override 0x1:Override 0xff:invalid
+    uint32 vcu_ovrd_mod_req = 7;
+	
+	///< 动力总成最大允许输出扭矩：[Nm],(nan,-32768,32767),[/],(1,0),
+    int32 vcu_pt_tq_lim_max = 8;
+	
+	///< 动力总成最大允许输出扭矩有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 
+    uint32 vcu_pt_tq_lim_max_vld = 9;
+	
+	///< 动力总成最小允许输出扭矩：[Nm],(nan,-32768,32767),[/],(1,0),
+    int32 vcu_pt_tq_lim_min = 10;
+	
+	///< 动力总成最小允许输出扭矩有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 
+    uint32 vcu_pt_tq_lim_min_vld = 11;
+	
+	///< 动力总成真实轮端扭矩：[Nm],(nan,-32768,32767),[/],(1,0),0xff:invalid
+    int32 vcu_pt_tq_real = 12;
+	
+	///< 动力总成真实轮端扭矩有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid  0xff:invalid
+    uint32 vcu_pt_tq_real_vld = 13;
+	
+	///< 动力系统扭矩可用状态：[/],(nan,0,3),[/],(1,0),0x0:not available 0x1:available 0x2:available degraded 0xff:invalid
+    uint32 vcu_pt_tq_req_avl = 14;
+	
+	///< 整车可行驶状态：[/],(nan,0,1),[/],(1,0),0x0:no Ready 0x1:Ready
+    uint32 vcu_rdy_sts = 15;
+	
+	///< 整车需求轮端扭矩：[Nm],(nan,-32768,32767),[/],(1,0),
+    int32 vcu_veh_whl_req_tq = 16;
+	
+	///< 整车需求轮端扭矩有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 
+    uint32 vcu_veh_whl_req_tq_vld = 17;
+	
+	///< 模拟EPB开关状态：[/],(nan,0,3),[/],(1,0),0x0:no request 0x1:apply
+    uint32 vcu_simn_epb_swt_sts = 18;
+	
+	///< 模拟EPB开关状态有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 
+    uint32 vcu_simn_epb_swt_sts_vld = 19;
+	
+	///< 铅蓄电池电压：[V],(nan,0,25.5),[/],(1,0),
+    double vcu_battlowu = 20;
+	///< 整车续驶里程：[/],(0,0,2047),[/],(1,0),标识161	,0xFFFF:invalid(E2E/signalvalid)
+	uint32 vcuresimilg = 21; 
+	///< PMU闭合前主回路电压：[V],(nan,0,25.5),[/],(1,0),标识223 ,0xFF:invalid(E2E/signalvalid)
+	double pmumainloopubeforeswtoff = 22;
+	///< PMU闭合前辅助回路电压：[V],(nan,0,25.5),[/],(1,0),标识223 ,0xFF:invalid(E2E/signalvalid)
+	double pmusubsidaryloopubeforeswtoff = 23;
+	///< PMU开关自检状态：[/],(nan,0,7),[/],(1,0), 0x0:Init 0x1:NO failure 0x2:Diagnosis ongoing  0x3:Fail to open  0x4:Fail to close,0xFF:invalid(E2E/signalvalid)
+	uint32 pmufailurestatus = 24;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 25;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 26;
+
+    ///< 整车累计行驶总里程：[/],(0,0,4294967295),[/],(1,0),通知计算的累计行驶总里程，精度100m
+    uint32 vcu_total_milg = 27;
+
+    ///< 拖车模式激活状态：[/],(0,0x0,0x3),[/],(1,0),0x0: Invalid 无效 0x1: NotActive 未激活 0x2: active 激活 0x3: Reserved 预留
+    uint32 vcu_trlr_mod_actv_sts = 28;
+
+    ///< VIU超级省电模式提示状态：[/],(0,0x0,0x2),[/],(1,0),0x0: NoReques NoRequest 0x1: RequestOn RequestOn 0x2: RequestOff RequestOff
+    uint32 viu_sup_eco_remd_sts = 29;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 30;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 31;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 32;	
+	
+} 
+/**
+* @brief BusVcuPedl
+* @detail BusVcuPedl
+*/
+message BusVcuPedl{ 
+	///< 加速踏板实际位置：[%],(nan,0,102.3),[/],(0.1,0),0xff:invalid
+    double vcu_accr_pedl_posn = 1;
+	
+	///< 加速踏板实际位置有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 vcu_accr_pedl_posn_vld = 2;
+	
+	///< 虚拟加速踏板位置：[%],(nan,0,102.3),[/],(0.1,0),0xff:invalid
+    double vcu_calcn_accr_pedl_posn = 3;
+	
+	///< 虚拟加速踏板位置有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 vcu_calcn_accr_pedl_posn_vld = 4;
+	
+	///< IB制动踏板状态(国标)：[%],(0x0,0,255),[/],(1,0),0x0:制动未踩下 0x65:制动踩下
+    uint32 ib_brk_pedl_sts_gb = 5;
+	
+	///< IB制动踏板状态有效：[/],(0x0,0,2),[/],(1,0),0x0:NotInitialized 0x1:Normal 0x2:Invalid
+    uint32 ib_brk_pedl_sts_gb_vld = 6;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 7;
+	
+	///< IB制动踏板状态(国标)：[%],(0x0,0,255),[/],(1,0),0x0:制动未踩下 0x65:制动踩下,0xFF:invalid(E2E/signalvalid)
+	uint32 rcan_ib_brk_pedl_sts_gb = 8;
+
+	///< IB制动踏板机械行程: [/],(0x0,0,/),[/],(/,/),/
+    ///< factor：0.01563；
+    ///< offset：-5；
+    ///< min：-5；
+    ///< max：47；
+	double dcan_ibbrkpedltrvldrvr = 9;
+
+	///< IB制动踏板机械行程有效: [/],(0x0,0,2),[/],(/,/),IB制动踏板机械行程有效,0x0:NotInitialized 0x1:Normal 0x2:Invalid 0xFF:invalid(E2E/signalvalid)
+	uint32 dcan_ibbrkpedltrvldrvrvld = 10;	
+	
+	///< ESP1_制动踏板模式切换可用: [/],(0x0,0,1),[/],(/,/),ESP1_制动踏板模式切换可用,0x0:display 0x1:No display 0xFF:invalid(E2E/signalvalid)
+	uint32 esp1_brakepedalmodelswtavl = 11;
+	
+	///< ESP1_制动踏板模式: [/],(0x0,0,3),[/],(/,/),ESP1_制动踏板模式,0x0:舒适模式 0x1:运动模式 0x2:Reserved 0x3:Reserved 0xFF:invalid(E2E/signalvalid)
+	uint32 esp1_brakepedalmodelsts = 12;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 13;
+
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 14;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 15;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 16;	
+	
+} 
+/**
+* @brief BusVcuSwitchSts
+* @detail BusVcuSwitchSts
+*/
+message BusVcuSwitchSts{ 
+	///< 巡航时距加开关状态：[/],(nan,0,3),[/],(1,0),0x0:按键未按下 0x1:按键按下 0x2:预留 0x3:Error
+    uint32 vcu_crs_dst_swt_plus_sts = 1;
+	
+	///< 巡航时速度加/恢复开关状态：[/],(nan,0,3),[/],(1,0),0x0:按键未按下 0x1:按键按下 0x2:预留 0x3:Error
+    uint32 vcu_crs_resu_swt_sts = 2;
+	
+	///< 巡航时速度减/设置开关状态：[/],(nan,0,3),[/],(1,0),0x0:按键未按下 0x1:按键按下 0x2:预留 0x3:Error
+    uint32 vcu_crs_set_swt_sts = 3;
+	
+	///< 巡航开关诊断信号：[/],(nan,0,7),[/],(1,0),0x0:Reset 0x1:Variants of wrong information(变种信息错误) 0x2:voltage is higher than 16V(电源高于16V) 0x3:voltage is lower than 9V(电源低于9V) 0x7:invalid
+    uint32 vcu_crs_swt_diag_info = 4;
+	
+	///< 巡航时距减开关状态：[/],(nan,0,3),[/],(1,0),0x0:按键未按下 0x1:按键按下 0x2:预留 0x3:Error
+    uint32 vcu_crs_dst_swt_reduce_sts = 5;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 6;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+} 
+/**
+* @brief BusVcuTransmission
+* @detail BusVcuTransmission
+*/
+message BusVcuTransmission{ 
+	///< 驾驶员干预换挡：[/],(nan,0,3),[/],(1,0),0x0:Valid 0x1:Invalid
+    uint32 vcuap_adriver_interruption = 1;
+	
+	///< 换挡器位置有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Invalid
+    uint32 vcu_shift_postion_valid = 2;
+	
+	///< 整车实际挡位：[/],(nan,0,7),[/],(1,0),0x0:Invalid 0x1:P 0x2:R 0x3:N 0x4:D 0x5:reserved 0xff:invalid
+    uint32 vcu_gear_posn = 3;
+	
+	///< 电子换挡器挡位请求：[/],(nan,0,15),[/],(1,0),0x0:Center 0x1:Up 0x2:Down 0x3:Up,Up 0x4:Down,Down 0xF:Invalid
+    uint32 vcu_shift_lvl_posn = 4;
+	
+	///< 整车实际挡位有效：[/],(nan,0,1),[/],(1,0),0x0:Valid 0x1:Error 0xff:invalid
+    uint32 vcu_veh_gear_posn_vld = 5;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 6;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+	///< 驾驶员目标档位：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0: NotOperation 未操作
+    ///< 0x1: P P挡
+    ///< 0x2: R R挡
+    ///< 0x3: N N挡
+    ///< 0x4: D D挡
+    uint32 vcu_drvr_gear_dmd = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+} 
+
+/**
+* @brief BusVCUSecOC
+* @detail BusVCUSecOC
+*/
+message BusVCUSecOC{ 
+	///< 1AD_行程计数器: [/],(nan,0,3),[/],(1,0),1AD_行程计数器,0xFF:invalid(E2E/signalvalid)
+    uint32 gw_tripcounter_1ad = 1;
+	
+	///< 1AD_复位计数器: [/],(nan,0,1),[/],(1,0),1AD_复位计数器,0xFF:invalid(E2E/signalvalid)
+    uint32 gw_resetcounter_1ad = 2;
+	
+	///< 1AD_授权值：[/],(nan,0,7),[/],(1,0),1AD_授权值,0xFF:invalid(E2E/signalvalid)
+    uint32 gw_authernticator_1ad = 3;
+
+	///< 网关_ADS信息校验失败标志：[/],(nan,0,1),[/],(1,0),ADS信息校验失败标志 0x0:Not Failure 0x1:Failure,0xFF:invalid(E2E/signalvalid)
+	uint32 gw_adsverifyfailflag = 4;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 5;
+}
+
+ 

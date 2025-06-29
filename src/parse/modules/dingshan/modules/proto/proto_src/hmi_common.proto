@@ -1,0 +1,515 @@
+/**
+
+* @file     hmi_common.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-通用接口定义
+* @date     2022-08-22
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述 
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则 :[/],(/,/,/),[/],(/,/), same description 
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>汪哲文
+* <table>
+
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+/**
+* @brief 目标参考点类型
+* @details 识别到的目标点位置
+*/
+enum ObjectReferPointType
+{
+	///<参考点未知 :[/],(/,/,/),[/],(/,/), same description  
+	POINT_TYPE_UNKNOWN = 0;
+	///<后方左角点 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_REAR_LEFT = 1;
+	///<后方中心 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_REAR_CENTER = 2;
+	///<后方右角点 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_REAR_RIGHT = 3;
+	///<左边中心 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_CENTER_LEFT = 4;
+	///<中心 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_CENTER = 5;
+	///<右边中心 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_CENTER_RIGHT = 6;
+	///<前方左角点 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_FRONT_LEFT = 7;
+	///<前方中心 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_FRONT_CENTER = 8;
+	///<前方右角点 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_FRONT_RIGHT = 9;
+	///<前轮 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_FRONT_WHEEL = 10;
+	///<后轮 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_BACK_WHEEL = 11;
+	///<内部轮参考点未知 :[/],(/,/,/),[/],(/,/), same description 
+	POINT_TYPE_UNKNOWN_WHEEL = 12;
+}
+
+/**
+* @brief 目标类型
+* @details 上游获取到的目标对应类型，以及用于具体预测算法的目标类型
+*/
+enum ObjectType
+{
+	///<未知目标 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_UNKNOWN = 0;
+	///<汽车 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_CAR = 1;
+	///<SUV :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_SUV = 2;
+	///<卡车 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_TRUCK = 3;
+	///<巴士 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_BUS = 4;
+	///<两轮车 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_BICYCLE = 5;
+	///<三轮车 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_TRICYCLE = 6;
+	///<行人 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_PEDESTRIAN = 7;
+	///<动物 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_ANIMAL = 8;
+	///<水马 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_WATER_HORSE = 9;
+	///<锥形桶 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_CONE = 10;
+	///<减速带 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_SPEED_BUMP = 11;
+	///<方柱 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_SQUARE_COLIMN = 12;
+	///<圆柱 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_COLIMN = 13;
+	///<墙体 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_WALL = 14;
+	///<防撞柱 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_COLLISION_POST = 15;
+	///<隔离带 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_ISOLATION_STRIP = 16;
+	///<其他标识牌 :[/],(/,/,/),[/],(/,/), same description 
+	OBJECT_CLASS_OTHER_BOARD = 17;
+	///<购物车 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_HANDCART = 18;
+	///<滑板车 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_SCOOTER = 19;
+	///<道闸 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_BARRIER_GATE = 20;
+	///<未知类型物体 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_UNKNOWN_OBJECT = 21;
+	///<施工标示 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_CONSTRUCTION = 22;
+	///<三角警示牌 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_TRIANGLE_SIGN = 23;
+	///<车位限位桩 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_PARKING_LIMIT_PILE = 24;
+    ///<地锁 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_PARKING_LOCK = 25;
+	///<禁停牌 :[/],(/,/,/),[/],(/,/), same description 
+    OBJECT_CLASS_FORBID_BRAND = 26;
+}
+
+/**
+* @brief 目标运动状态
+* @details 识别到的目标运动状态
+*/
+enum ObjectStatus
+{
+	///<运动状态未知 :[/],(/,/,/),[/],(/,/), same description 
+	STATUS_UNKNOWN = 0;
+	///<运动 :[/],(/,/,/),[/],(/,/), same description 
+	STATUS_MOVING = 1;
+	///<静止 :[/],(/,/,/),[/],(/,/), same description 
+	STATUS_STATIONARY = 2;
+	///<运动到静止 :[/],(/,/,/),[/],(/,/), same description 
+	STATUS_STOP = 3;
+	///<缓慢移动 :[/],(/,/,/),[/],(/,/), same description 
+	STATUS_SLOW = 4;
+}
+
+/**
+* @brief 目标cut-in状态
+* @details 识别到的目标切入切出状态
+*/
+enum ObjectCutStatus
+{
+    ///<未知 :[/],(/,/,/),[/],(/,/), same description 
+    CUT_STATUS_UNKNOWN = 0;
+    ///<正常 :[/],(/,/,/),[/],(/,/), same description 
+    CUT_STATUS_NORMAL = 1;
+    ///<正在切入 :[/],(/,/,/),[/],(/,/), same description 
+    CUT_STATUS_CUTIN = 2;
+    ///<正在切出 :[/],(/,/,/),[/],(/,/), same description 
+    CUT_STATUS_CUTOUT = 3;
+}
+
+/**
+* @brief 目标识别情况
+* @details acc等功能的识别目标
+*/
+enum ObjectDetectionStatus
+{
+    ///<未检测到 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_NOT_DETECTED = 0;
+    ///<显示 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_IP_DISPLAY = 1;
+    ///<前方目标 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_FRONT_TARGET = 2;
+    ///<iacc目标 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_IACC_TARGET = 3;
+	///<aeb目标 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_AEB_TARGET = 4;
+	///<危险目标 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_DANGEROUS_TARGET = 5;
+	///<其他目标 :[/],(/,/,/),[/],(/,/), same description 
+    DETECTION_OTHER_TARGET = 6;
+}
+
+/**
+* @brief 目标运动方向
+* @details 目标运动方向
+*/
+enum ObjectDirection
+{
+    ///<向前 :[/],(/,/,/),[/],(/,/), same description 
+    DIRECTION_FORWARD = 0;
+    ///<对向 :[/],(/,/,/),[/],(/,/), same description 
+    DIRECTION_ONCOMING = 1;
+	///<左转 :[/],(/,/,/),[/],(/,/), same description 
+	DIRECTION_LEFT = 2;
+	///<右转 :[/],(/,/,/),[/],(/,/), same description 
+	DIRECTION_RIGHT = 3;
+	///<未知 :[/],(/,/,/),[/],(/,/), same description 
+	DIRECTION_UNKNOWN = 4;
+	///<不显示 :[/],(/,/,/),[/],(/,/), same description 
+	DIRECTION_NO_DISPLAY = 5;
+}
+/**
+* @brief TurnLightStatus
+* @details TurnLightStatus
+*/
+enum TurnLightStatus
+{
+    ///<关闭 :[/],(/,/,/),[/],(/,/), same description 
+    TURN_OFF = 0;
+    ///<打开 :[/],(/,/,/),[/],(/,/), same description 
+    TURN_ON = 1;
+	///<左转 :[/],(/,/,/),[/],(/,/), same description 
+	TURN_LEFT = 2;
+	///<右转 :[/],(/,/,/),[/],(/,/), same description 
+	TURN_RIGHT = 3;
+	///<无效 :[/],(/,/,/),[/],(/,/), same description 
+	INVALID = 4;
+}
+/**
+* @brief LineDetection
+* @details LineDetection
+*/
+enum LineDetection
+{
+    ///<未检测到 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_NOT_DETECTED = 0;
+    ///<检测到 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_DETECTED = 1;
+	///<实线 :[/],(/,/,/),[/],(/,/), same description 
+	LINE_SOLID = 2;
+	///<栅栏 :[/],(/,/,/),[/],(/,/), same description 
+	LINE_FENCE = 3;
+}
+/**
+* @brief LineType
+* @details LineType
+*/
+enum LineType
+{
+    ///< 实线、重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_SOLID = 0;
+    ///< 虚线、重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DASHED = 1;
+    ///< 双虚线、重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DASHED_DASHED = 2;
+    ///< 虚实线、重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DASHED_SOLID = 3;
+    ///< 实虚线 、重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_SOLID_DASHED = 4;
+    ///< 双实线、 重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_SOLID_SOLID = 5;
+    ///< 0x6 = multiple（Eu&USA）； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_MULTIPLE = 6;
+    ///< 0x7=multiple_warning（Eu&USA）； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_MULTIPLE_WARNING = 7;
+    ///< 0x8 =car_pool； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_CAR_POOL = 8;
+    ///< 0x9 =asphalt_joint（USA）； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_ASPHALT_JOINT = 9;
+    ///< 0xA=Bot-Dott（USA）； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_BOT_DOTT = 10;
+    ///< 路沿；  :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_ROAD_EDGE = 11;
+    ///< 护栏； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_GUARDRAIL = 12;
+    ///< 0xD =curbstone； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_CURBSTONE = 13;
+    ///< 墙面线； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_WALL = 14;
+    ///< 锥形筒线； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_TRAFFIC_CONE = 15;
+    ///< 0x10=delineator_post； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DELINEATOR_POST = 16;
+    ///< 0x11 =parking_car； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_PARKING_CAR = 17;
+    ///< 0x12=unknown_raised； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_UNKNOWN_RAISED = 18;
+    ///< 鱼骨线； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_FISHBONE = 19;
+    ///< 未知； :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_UNKNOWN = 20;
+    ///< 内分岔 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DIVERSION_INSIDE = 21;
+    ///< 外分岔 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_DIVERSION_OUTSIDE = 22;
+    ///< 宽虚线（匝道的）、 重要 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_TYPE_WIDE_DASHED = 23;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum LineColor
+{
+    ///< 颜色未检测到 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_COLOR_NOT_DETECTED = 0;
+    ///< 白色 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_COLOR_WHITE = 1;
+    ///< 黄色 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_COLOR_YELLOW = 2;
+    ///< 白加黄 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_COLOR_WHITE_PLUS_YELLOW = 3;
+    ///< 颜色未知 :[/],(/,/,/),[/],(/,/), same description 
+    LINE_COLOR_UNKNOWN = 4;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TrafficLightDirection
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_NO_DISPLAY = 0;
+    ///< 直行 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_FORWARD = 1;
+    ///< 左转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_LEFT = 2;
+    ///< 直行+左转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_FORWARD_LEFT = 3;
+    ///< 右转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_RIGHT = 4;
+	///< 直行+右转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_FORWARD_RIGHT = 5;
+	///< 右转+左转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_RIGHT_LEFT = 6;
+	///< 左转+直行+右转 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_LEFT_FORWARD_RIGHT = 7;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TrafficLightColor
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_COLOR_NO_DISPLAY = 0;
+    ///< 红色 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_COLOR_RED = 1;
+    ///< 黄色 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_COLOR_YELLOW = 2;
+    ///< 绿色 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_COLOR_GREEN = 3;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TrafficLightStatus
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_STATUS_NO_DISPLAY = 0;
+    ///< 发光 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_STATUS_LIGHTING = 1;
+    ///< 闪烁 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_STATUS_FLASHING = 2;
+    ///< 消失 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_STATUS_DISAPPEAR = 3;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TrafficLightType
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_TYPE_NO_DISPLAY = 0;
+    ///< 圆灯 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_TYPE_ROUND = 1;
+    ///< 箭头 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_TYPE_ARROW = 2;
+    ///<  :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_TYPE_TURN_ROUND = 3;
+	///<  :[/],(/,/,/),[/],(/,/), same description 
+	LIGHT_TYPE_X_TYPE = 4;
+	///<  :[/],(/,/,/),[/],(/,/), same description 
+	LIGHT_TYPE_ARROW_TURN = 5;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TrafficLightLevel
+{
+    ///< 不报警 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_LEVEL_NO_WARNING = 0;
+    ///< 等级1 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_LEVEL_ONE = 1;
+    ///< 等级2 :[/],(/,/,/),[/],(/,/), same description 
+    LIGHT_LEVEL_TWO = 2;
+    ///< 等级3 :[/],(/,/,/),[/],(/,/), same description 
+	LIGHT_LEVEL_THREE = 3;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum SpeedLimitType
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    SPEED_LIMIT_NO_DISPLAY = 0;
+    ///< 电子眼 :[/],(/,/,/),[/],(/,/), same description 
+    SPEED_LIMIT_ELECTRONIC_EYE = 1;
+    ///< 区间限速 :[/],(/,/,/),[/],(/,/), same description 
+    SPEED_LIMIT_SPEED_RANGE = 2;
+    ///< 限速牌 :[/],(/,/,/),[/],(/,/), same description 
+	SPEED_LIMIT_SPEED_LIMIT = 3;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum RoadSignType
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    ROAD_SIGN_NOT_DETECTED = 0;
+    ///< 直行箭头 :[/],(/,/,/),[/],(/,/), same description 
+    ROAD_SIGN_ARROW_STRAIGHT = 1;
+    ///< 右转箭头 :[/],(/,/,/),[/],(/,/), same description 
+    ROAD_SIGN_ARROW_TURN_RIGHT = 2;
+    ///< 左转箭头 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_ARROW_TURN_LEFT = 3;
+    ///< 直行加右转箭头 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_ARROW_STRAIGHT_RIGHT = 4;
+    ///< 直行加左转箭头 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_ARROW_STRAIGHT_LEFT = 5;
+    ///< 对向箭头 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_ARROW_ONCOMMING = 6;
+    ///< 中文字 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_CHINESE_CHARACTERISTICS = 7;
+    ///< 数字 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_NUMBER = 8;
+    ///< 交通指示区 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_TRAFFIC_GUIDANCE_ZONE = 9;
+    ///< 未定 :[/],(/,/,/),[/],(/,/), same description 
+	ROAD_SIGN_UNDECIDED = 10;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum RampInfo
+{
+    ///< 不存在匝道 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_INFO_NOT_THROUGH_RAMP = 0;
+    ///< 存在匝道 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_INFO_THROUGH_RAMP = 1;
+    ///< 无效 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_INFO_INVALID = 2;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum RampSide
+{
+    ///< 无效 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_SIDE_INVALID = 0;
+    ///< 匝道在右侧 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_SIDE_ON_RIGHT = 1;
+    ///< 匝道在左侧 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_SIDE_ON_LEFT = 2;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum RampStatus
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_STATUS_NO_DISPLAY = 0;
+    ///<  :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_STATUS_NEAR_RAMP = 1;
+    ///<  :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_STATUS_RAMP_IN = 2;
+    ///<  :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_STATUS_IN_RAMP = 3;
+    ///<  :[/],(/,/,/),[/],(/,/), same description 
+    RAMP_STATUS_RAMP_OUT = 4;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum TunnelStatus
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    TUNNEL_STATUS_NO_DISPLAY = 0;
+    ///< 靠近隧道 :[/],(/,/,/),[/],(/,/), same description 
+    TUNNEL_STATUS_NEAR_TUNNEL = 1;
+    ///< 隧道内 :[/],(/,/,/),[/],(/,/), same description 
+    TUNNEL_STATUS_IN_TUNNEL = 2;
+}
+/**
+* @brief HMI Common
+* @details HMI Common
+*/
+enum PathStatus
+{
+    ///< 不显示 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_NO_DISPLAY = 0;
+    ///< 换道等待 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_LANE_CHANGE_TRY = 1;
+    ///< 换道过程 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_NORMAL_LANE_CHANGE = 2;
+    ///< 换道回退 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_LANE_CHANGE_RETURN = 3;
+    ///< 换道等待或保持本车道行驶 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_CANNOT_LANE_CHANGE = 4;
+    ///< 智慧偏移 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_SMART_BIAS = 5;
+    ///< 跟车行驶 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_FOLLOW_DRIVE = 6;
+    ///< 推荐路径 :[/],(/,/,/),[/],(/,/), same description 
+    RATH_STATUS_RECOMMEND = 7;
+}

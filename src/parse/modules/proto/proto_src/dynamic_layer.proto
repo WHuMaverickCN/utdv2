@@ -1,0 +1,346 @@
+/**
+
+* @file     dynamic_layer.proto
+* @author   zhanghongjie
+* @details  BEV 动态层相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+syntax = "proto3";
+
+import "vp_ndm_base_v2.proto";
+import "vp_obstacle.proto";
+
+package VpNdmProtoV2;
+
+/**
+* @brief 目标属性信息
+* @detail TODO
+*/
+message ObjectAttribute {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated uint32 rgb = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Point lwh = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Point key_points = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Point polygon_points = 6;      
+  
+  /**
+  * @brief 目标属性信息
+  * @detail TODO
+  */
+  enum ObjectType {
+    ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+    UNKNOWN     = 0;
+    ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+    VEHICLE     = 1;
+    ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+    TWOWHEEL    = 2;
+    ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+    PEDESTRIAN  = 3;
+  }
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ObjectType type = 30;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 class_ind = 31;            //fine class
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 action_ind = 32;           //action, second level
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 behavior_ind = 33;         //behavior, ten seconds leveli
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 intention_ind = 34;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string identity = 40;             //vehicle, pedestrian identification number
+}
+
+
+/**
+* @brief  信号信息
+* @detail 无
+*/
+message Signal {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 signal = 10; 
+}
+
+
+/**
+* @brief  信号序列信息
+* @detail 无
+*/
+message SignalSequence {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Signal signals = 10;
+}
+
+
+/**
+* @brief  运动物体信息
+* @detail 无
+*/
+message MoveableObject {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;                   // one object use the same id at different time
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;                // ms, current time
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;             // life time, start_time = stamp - life
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ObjectAttribute attr = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Trajectory trajectory = 10;            // 历史轨迹
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Trajectory predict_trajectorys = 11;   // 预测轨迹
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional SignalSequence signal_seq = 12; 
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated SignalSequence predict_signal_seqs = 13; 
+}
+
+/**
+* @brief  交通灯状态信息
+* @detail 无
+*/
+message TrafficLightBulbState {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 color = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool is_flashing = 11;
+}
+
+/**
+* @brief  交通灯信息
+* @detail 无
+*/
+message TrafficLightBulbSequence {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string associate_trafficlightbulb_id = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficLightBulbState bulb_states = 10;
+}
+
+/**
+* @brief  交通灯动态信息
+* @detail 无
+*/
+message TrafficLightDynamicState {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2; 
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string associate_trafficlight_id = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficLightBulbSequence bulb_seqs = 10;      /// for inference period
+}
+
+/**
+* @brief  停车位信息
+* @detail 无
+*/
+message ParkingSlotState {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string associate_parkingslot_id = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool is_occupied = 10;
+}
+
+
+/**
+* @brief  锥筒信息
+* @detail 无
+*/
+message TrafficCone {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Polygon border = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Number height = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 type = 4;
+}
+
+/**
+* @brief  施工区域信息
+* @detail 无
+*/
+message ConstructionZone {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Polygon border = 10; 
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated string associate_ids = 11;
+}
+
+/**
+* @brief  限制区域信息
+* @detail 无
+*/
+message RestrictedZone {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 seq_id = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float life_time = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Polygon border = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated string associate_ids = 11;
+}
+
+/**
+* @brief // ODD信息
+* @detail 无
+*/
+message StaticODD {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool is_odd = 2;     // 是否属于ODD范围(true: ODD; false: Not ODD)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 type = 3;     // 类型(0: General; 255: Unknown)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 action = 4;   // 行动(255: Unknown)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 reason = 5;   // 非ODD原因(Uint64最大值: Unknown)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Link links = 6;      // ODD信息关联的section link序列
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float conf = 7;      // 非ODD区域置信度
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint64 stamp = 8;    // 非ODD区域最后更新时间
+}
+
+/**
+* @brief 交通事件信息
+* @detail 无
+*/
+message TrafficEvent {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+
+  //optional TrafficEventType event_type = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 reliability = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Link links = 4;  // 交通事件关联的section link序列
+}
+
+/**
+* @brief 交通流状态信息
+* @detail 无
+*/
+message TrafficFlow {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string id = 1;
+  
+  //optional TrafficFlowStatus flow_status = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 reliability = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Link links = 4;  // 交通状态关联的section link序列
+}
+
+/**
+* @brief BEV 动态层信息
+* @detail 无
+*/
+message DynamicLayer {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated MoveableObject moveable_objects = 1;  
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficLightDynamicState trafficlight_states = 2;      
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated ParkingSlotState parkingslot_states = 3;                  //停车位状态
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated ConstructionZone construction_zones = 4;                  //施工区域状态及关联目标
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated RestrictedZone restricted_zone = 5;                       //限制区
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficCone cones = 6;                                    //锥形桶区域
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated StaticODD static_odds = 7;                                //静态ODD区域
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficEvent traffic_events = 8;                          //交通事件状态
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficFlow traffic_flows = 9;                            //交通流状态
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated VpObstacleProto.Obstacle obstacles = 10;                    //障碍物
+}

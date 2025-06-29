@@ -1,0 +1,405 @@
+/**
+
+* @file     uss_sda.proto
+* @author   shiquan Lan
+* @details  uss 相关信号的输出接口定义
+* @date     2023-06-02
+* @version  V1.0
+* @copyright(C), changan, 2023
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>         <th>               <th><> 
+
+* <table>
+
+*/
+syntax = "proto3";
+
+package UssSDA;
+import "seq_header.proto";
+
+/**
+* @brief 数据头信息
+* @detail xxxxxxxx
+*/
+message Header {
+  ///< 数据时间戳:[s],(/,/,/),[/],(/,/),标识数据时间戳
+  uint64 time_stamp = 1;
+
+  ///< 数据帧号:[s],(/,/,/),[/],(/,/),标识数据帧号
+  uint32 seq = 2;
+
+  ///< 坐标系名称:[s],(/,/,/),[/],(/,/),标识坐标系名称
+  string frame_id = 3;
+}
+
+/**
+* @brief SensorInfo 
+* @detail 超声传感器输出数据
+*/
+
+message SensorInfo {
+    ///< 距离对应的雷达通道直接或间接：[/],(/,/,/),[/],(/,/),RLORLS--RLO发 RLS 收
+    ///< 0x00: RLS
+    ///< 0x01: RLO
+    ///< 0x02: RLM
+    ///< 0x03: RRM
+    ///< 0x04: RRO
+    ///< 0x05: RRS
+    ///< 0x06: FLS
+    ///< 0x07: FLO
+    ///< 0x08: FLM
+    ///< 0x09: FRM
+    ///< 0x0A: FRO
+    ///< 0x0B: FRS
+    ///< 0x0C: RLORLS
+    ///< 0x0D: RLSRLO
+    ///< 0x0E: RLMRLO
+    ///< 0x0F: RLORLM
+    ///< 0x10: RRMRLM
+    ///< 0x11: RLMRRM
+    ///< 0x12: RRORRM
+    ///< 0x13: RRMRRO
+    ///< 0x14: RRSRRO
+    ///< 0x15: RRORRS
+    ///< 0x16: FLOFLS
+    ///< 0x17: FLSFLO
+    ///< 0x18: FLMFLO
+    ///< 0x19: FLOFLM
+    ///< 0x1A: FRMRLM
+    ///< 0x1B: FLMFRM
+    ///< 0x1C: FROFRM
+    ///< 0x1D: FRMFRO
+    ///< 0x1E: FRSFRO
+    ///< 0x1F: FROFRS
+    uint32 sensor_id_number = 1;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[us],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    uint64 send_timestamp = 2;
+    ///< 雷达故障标志：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//正常 0x1:invalid//故障" 
+    uint32 error_status = 3;
+    ///< 雷达回波距离，探头表面到障碍物距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    float distance = 4;
+}
+
+/**
+* @brief UssSensorInfo
+* @detail 超声对应雷达通道数据
+*/
+message UssSensorInfo {
+    ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+    Header header = 1;
+    ///< 距离对应的雷达通道数据：[/],(/,/,/),[32],(/,/),/
+    repeated SensorInfo sensor_infos = 2;
+}
+
+/**
+* @brief UssDistanceInfo
+* @detail 超声距离输出数据
+*/
+message UssDistanceInfo { 
+    ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+    Header header = 1;
+    ///< 超声输出PDC距离：[mm],(5110,0,5110),[16],(/,/),/
+    ///< index 0: FLC 前左角
+    ///< index 1: FLM 前左中
+    ///< index 2: FRM 前右中
+    ///< index 3: FRC 前右角
+    ///< index 4: FRO 前右边
+    ///< index 5: FRS 前右侧（reserved）
+    ///< index 6: RRS 后右侧（reserved）
+    ///< index 7: RRO 后右边
+    ///< index 8: RRC 后右角
+    ///< index 9: RRM 后右中
+    ///< index 10: RLM 后左中
+    ///< index 11: RLC 后左角
+    ///< index 12: RLO 后左边
+    ///< index 13: RLS 后左侧（reserved）
+    ///< index 14: FLS 前左侧（reserved）
+    ///< index 15: FLO 前左边
+    repeated uint32 pdc_distance = 2; 
+    ///< 超声输出PDC距离：[mm],(5110,0,5110),[16],(/,/),/
+    ///< index 0: FLC 前左角
+    ///< index 1: FLM 前左中
+    ///< index 2: FRM 前右中
+    ///< index 3: FRC 前右角
+    ///< index 4: FRO 前右边
+    ///< index 5: FRS 前右侧（reserved）
+    ///< index 6: RRS 后右侧（reserved）
+    ///< index 7: RRO 后右边
+    ///< index 8: RRC 后右角
+    ///< index 9: RRM 后右中
+    ///< index 10: RLM 后左中
+    ///< index 11: RLC 后左角
+    ///< index 12: RLO 后左边
+    ///< index 13: RLS 后左侧（reserved）
+    ///< index 14: FLS 前左侧（reserved）
+    ///< index 15: FLO 前左边
+    repeated uint32 sector = 3; 
+}
+
+/**
+* @brief UpsPoint
+* @detail 超声点云数据
+*/
+message UpsPoint{
+    ///< x：[m],(/,/,/),[/],(1,0),聚类点云坐标横向距离
+    float x = 1; 
+    ///< y：[m],(/,/,/),[/],(1,0),聚类点云坐标纵向距离
+    float y = 2; 
+}
+
+/**
+* @brief LineStrip
+* @detail 超声点云聚类线段
+*/
+message LineStrip {
+    ///< 聚类成线的起点：[/],(/,/,/),[/],(/,/),/
+    UpsPoint p0 = 1;
+    ///< 聚类成线的终点：[/],(/,/,/),[/],(/,/),/
+    UpsPoint p1 = 2;
+    ///< height：[/],(/,/,/),[/],(1,0),高低属性
+    ///< 0x00: Unknown
+    ///< 0x01: high
+    ///< 0x02: mid
+    ///< 0x03: low
+    uint32 height = 3; 
+}
+
+/**
+* @brief UpsCluster
+* @detail 超声点云聚类数据
+*/
+message UpsCluster {
+    ///< 数据服务模块收到本数据包时的系统时间戳：[us],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    uint64 timestamp = 1;
+    ///< height：[/],(/,/,/),[/],(1,0),高低属性
+    ///< 0x00: Unknown
+    ///< 0x01: high
+    ///< 0x02: mid
+    ///< 0x03: low
+    uint32 height = 2; 
+    ///< type : [/],(/,/,/),[/],(1,0),障碍物类型
+    uint32 type = 3; 
+    ///< 聚类成线的起点：[/],(/,/,/),[/],(/,/),/
+    UpsPoint p0 = 4;
+    ///< 聚类成线的终点：[/],(/,/,/),[/],(/,/),/
+    UpsPoint p1 = 5; 
+}
+
+
+/**
+* @brief UpsObjects
+* @detail 超声点云聚类数据
+*/
+message UpsObjects {
+    ///< id：[/],(/,0,/),[/],(1,0), 目标对象id
+    uint32 id = 1;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[us],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    uint64 timestamp = 2;
+    ///< type：[/],(/,0,/),[/],(1,0),障碍物类型
+    ///< 0: unknown
+    ///< 50: curb
+    uint32 type = 3; 
+    ///< status：[/],(/,/,/),[/],(1,0),聚类状态
+    ///< 0x00: updating
+    ///< 0x01: tracking 
+    ///< 0x02: reserved
+    ///< 0x03: delete
+    uint32 status_ = 4;
+    ///< lines_：[/],(/,/,/),[/],(/,/),/
+    repeated LineStrip lines_ = 5;
+}
+
+/**
+* @brief UpsClusterInfo
+* @detail 超声点云聚类数据(复数)
+*/
+message UpsClusterInfo {
+    ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+    Header header = 1;
+    ///< 超声点云聚类数据：[/],(/,/,/),[/],(/,/),/
+    repeated UpsCluster clusters = 2;
+    ///< 超声点云聚类数据：[/],(/,/,/),[/],(/,/),/
+    repeated UpsObjects objects = 3;
+}
+
+/**
+* @brief SlotSideType
+* @detail 车位边的属性
+*/
+enum SlotSideType
+{
+    ///< SIDE_REAL：[/],(/,/,/),[/],(/,/),边界有障碍物
+    SIDE_REAL = 0;
+    ///< SIDE_VIRTUAL：[/],(/,/,/),[/],(/,/),边界未探测到障碍物
+    SIDE_VIRTUAL = 1;
+    ///< SIDE_VIRTUAL：[/],(/,/,/),[/],(/,/),边界属性未知
+    SIDE_UNKOWN = 2;
+}
+
+/**
+* @brief BottomHeightType
+* @detail 车位底边类型
+*/
+enum BottomHeightType
+{
+    ///< BOTTOM_LOW：[/],(/,/,/),[/],(/,/),底边有低障碍物
+    BOTTOM_LOW = 0;
+    ///< BOTTOM_HIGH：[/],(/,/,/),[/],(/,/),底边有高障碍物
+    BOTTOM_HIGH = 1;
+    ///< BOTTOM_CURB：[/],(/,/,/),[/],(/,/),底边有路沿
+    BOTTOM_CURB = 2;
+    ///< BOTTOM_UNKOWN：[/],(/,/,/),[/],(/,/),底边属性未知
+    BOTTOM_UNKOWN = 3;
+}
+
+/**
+* @brief UssSlot
+* @detail 超声车位
+*/
+message UssSlot {
+    ///< 数据服务模块收到本数据包时的系统时间戳：[us],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    uint64 timestamp = 1;
+    ///< vertex1：[/],(/,/,/),[/],(/,/),自车坐标系下车位角点坐标
+    UpsPoint vertex1 = 2;
+    ///< vertex2：[/],(/,/,/),[/],(/,/),自车坐标系下车位角点坐标
+    UpsPoint vertex2 = 3;
+    ///< vertex3：[/],(/,/,/),[/],(/,/),自车坐标系下车位角点坐标
+    UpsPoint vertex3 = 4;
+    ///< vertex4：[/],(/,/,/),[/],(/,/),自车坐标系下车位角点坐标
+    UpsPoint vertex4 = 5;
+    ///< nIndex:[/],(/,/,/),[/],(1,0),车位ID
+    uint32 index = 6;
+    ///< 车位类型:[/],(0x0,0,2),[/],(1,0),0x0:垂直 0x1:水平 0x2:斜列
+    uint32 type = 7;
+    ///< SlotSideType:[/],(/,/,/),[4],(/,/),车位俩侧边的边界属性(真实/虚拟)0~3 依 次代表24,43,31,12 的边界属性
+    repeated SlotSideType slot_line_type = 8;
+    ///< BottomHeightType：[/],(/,/,/),[/],(/,/),车位底部障碍物高度信息(路沿、墙壁、低矮障碍物、高的障碍物等
+    BottomHeightType bottom_height_type = 9;
+}
+
+/**
+* @brief UssSlot
+* @detail 超声车位（复数）
+*/
+message UssSlotInfo {
+    ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+    Header header = 1;
+    ///< UssSlot:[/],(/,/,/),[/],(/,/),超声车位
+    repeated UssSlot uss_slots = 2;
+}
+
+/**
+* @brief uss debug 数据
+* @detail uss debug 数据记录
+*/
+message UssDebugData
+{
+	///< gptp时间戳：[S],(/,/,/),[/],(1,0),标识接收时刻gptp时间同步服务的时间戳
+    double time_stamp = 1;
+    ///< uss数据：[/],(/,/,/),[/],(/,/),uss 组件debug数据
+    bytes debug_data = 2;
+    ///< 数据长度：[Byte],(/,/,/),[/],(1,0),标识debug_data数据长度
+    int32 data_len = 3;
+}
+
+/**
+* @brief uss 发给mcu 数据
+* @detail uss 发给mcu 数据记录
+*/
+message UssMsgData
+{
+	///< gptp时间戳：[S],(/,/,/),[/],(1,0),标识接收时刻gptp时间同步服务的时间戳
+    double time_stamp = 1;
+    ///< uss数据：[/],(/,/,/),[/],(/,/), uss发送给mcu的数据
+    bytes msg_data = 2;
+    ///< 数据长度：[Byte],(/,/,/),[/],(1,0),标识msg_data数据长度
+    int32 data_len = 3;
+}
+
+/**
+* @brief uss 版本信息
+* @detail 超声组件和超声驱动的版本信息
+*/
+message UssVersionMsg
+{
+    ///< 时间戳：[us],(/,/,/),[/],(1,0),标识发送数据的时间戳
+    double time_stamp = 1;
+    ///< 超声版本:[s],(/,/,/),[/],(/,/),超声版本名称
+    string version = 2;
+    ///< 车型:[s],(/,/,/),[/],(/,/),车型名称
+    string car_instance = 3;
+    ///< 超声算法版本:[s],(/,/,/),[/],(/,/),超声算法版本名称
+    string strategy = 4;
+    ///< 强制模式切换功能:[s],(/,/,/),[/],(1,0),强制模式切换功能
+    ///< 0:关闭
+    ///< 1:打开
+    int32 am_chirp_force_enable = 5;
+    ///< 超声模式:[s],(/,/,/),[/],(/,/),超声工作模式
+    int32 am_chirp_force_mode = 6;
+    ///< 超声节点版本:[s],(/,/,/),[/],(/,/),超声节点版本号
+    string node_version = 7;
+    ///< 驱动版本:[s],(/,/,/),[/],(/,/),驱动版本号
+    uint32 driver_version = 8;
+    ///< 传感器版本：[s],(/,/,/),[/],(/,/),传感器版本号
+    repeated uint32 sensor_version = 9;
+    ///< agent版本：[s],(/,/,/),[/],(/,/),agent版本说明
+    string uss_agent_version = 10;
+    ///< ups版本：[s],(/,/,/),[/],(/,/),ups版本说明
+    string ups_version = 11;
+}
+
+/**
+* @brief 诊断信息
+* @detail 包含时间戳，故障类型等信息
+*/
+message UssDiagnosis
+{
+  ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+  ///< 心跳监控数据头:[/],(/,/,/),[/],(/,/),心跳监控所用数据
+  SeqHeaderProto.SeqHeader seq_header = 2;
+
+  ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+  ///< bit编码：使用32个bit编码,0000 0010 0000 0010 0000 0000 0000 0000
+  ///< 如果所有bit都是0：则表示无故障。
+  ///< bit 0：ins丢失 error
+  ///< bit 1：sab丢失 error
+  ///< bit 2：uss功能延时过高
+  ///< bit 3：车速信息超时（连续5帧无数据）
+  ///< bit 4：档位信息超时 (连续5帧无数据)
+  ///< bit 5：车速FFF校验
+  ///< bit 6：档位FFF校验
+  ///< bit 7：车速合理性
+  ///< bit 8：dr和ins时间不同步
+  ///< bit 9：cpu负载异常error
+  ///< bit 10：内存占用异常error
+  uint32 diagnosis_code = 3;
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+  ///< 时间不同步：超声驱动数据时间和dr时间不同步
+  string diagnosis_info = 4;
+  ///< 心跳信号：[/],(0,0,255),[/],(/,/)，专递心跳信号
+  uint32 heartbeat = 5; 
+}
+
+
+/**
+* @brief 状态切换反馈信号
+* @detail 状态机切换状态
+*/
+message UssStateSwitchRsp
+{
+	///< 状态机反馈信号: [],(/,/,/),[/],(1,0),状态机反馈信号
+	///< 0x0 : 无效值
+	///< 0x1 : 开始状态
+	///< 0x2 : 关闭状态
+	uint32 uss_sts_feedback = 1;
+}
+
+
+
+
+

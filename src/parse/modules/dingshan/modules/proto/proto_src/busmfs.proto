@@ -1,0 +1,272 @@
+/**
+* @file     busmfs.proto
+* @author   ganlichu
+* @details
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位],(默认值、最小值、最大值),[repeated最大值],（因数，偏移量）,信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>ganlichu 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	BusmfsProto;
+
+/**
+* @brief Busmfs
+* @detail Busmfs
+*/
+message Busmfs{ 
+	///<BusMfsHod：[/],(/,/,/),[32],(1,0),
+    BusMfsHod mfs_hod = 1;
+	
+	///< BusMfsSwitch：[/],(/,/,/),[32],(1,0),
+    BusMfsSwitch mfs_switch = 2;
+} 
+/**
+* @brief BusMfsHod
+* @detail BusMfsHod 40ms
+*/
+message BusMfsHod{ 
+	///< 离手接管能力检测：[/],(0x0,0,7),[/],(1,0),0x0:hands off 0x1:hands on without takeover ability 0x2:hands on with takeover ability 0x3:unkown
+    uint32 gw_mfs_handsoff_ability_detect = 1;
+	
+	///< 离手检测结果：[/],(0x0,0,7),[/],(1,0),0x0:no Touch 0x1:Left Wheel Touch 0x2:Right Wheel Touch 0x3:Rear Wheel Touch 0x4:Left Wheel Grip 0x5:Right Wheel Grip 0x6:Both side touch 0x7: Both side Grip
+    uint32 gw_mfs_handsoff_detect_result = 2;
+	
+	///< 离手检测软件故障状态：[/],(0x0,0,1),[/],(1,0),0x0:no fault 0x1:fault
+    uint32 gw_mfs_hod_app_status = 3;
+	
+	///< 离手检测标定状态：[/],(0x1,0,1),[/],(1,0),0x0:Not Calibrated 0x1:Calibrated
+    uint32 gw_mfs_hod_calibrated_status = 4;
+	
+	///< 离手检测LIN故障状态：[/],(0x0,0,1),[/],(1,0),0x0:no fault 0x1:fault
+    uint32 gw_mfs_hod_lin_status = 5;
+	
+	///< 离手检测传感器故障状态：[/],(0x0,0,1),[/],(1,0),0x0:no fault 0x1:fault
+    uint32 gw_mfs_hod_senser_status = 6;
+	
+	///< 离手检测功能状态：[/],(0x0,0,7),[/],(1,0),0x0:no fault 0x1:fault 0x2:block
+    uint32 gw_mfs_hod_system_status = 7;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 8;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 9;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 10;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 11;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 12;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 13;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 14;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 15;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 16;	
+} 
+
+/**
+* @brief BusMfsSwitch
+* @detail BusMfsSwitch 40ms
+*/
+message BusMfsSwitch{ 
+	///< 多功能方向盘仪表五向键左：[/],(0x0,0,3),[/],(1,0),
+    ///< Unpressed：0x00 未按下；
+    ///< Pressed：0x01 按下；
+    ///< False： Pressed 0x02 假按键；
+    ///< Error： 0x03 故障；
+    uint32 gw_mfs_left_switch = 1;
+	
+	///< 多功能方向盘仪表五向键右：[/],(0x0,0,3),[/],(1,0),
+    ///< Unpressed：0x00 未按下；
+    ///< Pressed：0x01 按下；
+    ///< False： Pressed 0x02 假按键；
+    ///< Error： 0x03 故障；
+    uint32 gw_mfs_right_switch = 2;
+	
+	///< 多功能方向盘仪表五向键上：[/],(0x0,0,3),[/],(1,0),
+    ///< Unpressed：0x00 未按下；
+    ///< Pressed：0x01 按下；
+    ///< False： Pressed 0x02 假按键；
+    ///< Error： 0x03 故障；
+    uint32 gw_mfs_up_switch = 3;
+	
+	///< 多功能方向盘仪表五向键下：[/],(0x0,0,3),[/],(1,0),
+    ///< Unpressed：0x00 未按下；
+    ///< Pressed：0x01 按下；
+    ///< False： Pressed 0x02 假按键；
+    ///< Error： 0x03 故障；
+    uint32 gw_mfs_down_switch = 4;
+	
+	///< 多功能方向盘仪表五向键确认：[/],(0x0,0,3),[/],(1,0),
+    ///< Unpressed：0x00 未按下；
+    ///< Pressed：0x01 按下；
+    ///< False： Pressed 0x02 假按键；
+    ///< Error： 0x03 故障；
+    uint32 gw_mfs_ok_switch = 5;
+	
+	///< 多功能方向盘语音控制：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_speech_switch = 6;
+	
+	///< 多功能方向盘多媒体模式切换：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_mode_switch = 7;
+	
+	///< 多功能方向盘DVR紧急保存：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_dvr_switch = 8;
+	
+	///< 多功能方向盘用户自定义：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_cust_switch = 9;
+	
+	///< 多功能方向盘音量加：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_vol_plus_switch = 10;
+	
+	///< 多功能方向盘音量减：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_vol_reduce_switch = 11;
+	
+	///< 多功能方向盘静音：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_mute_switch = 12;
+	
+	///< 多功能方向盘下一曲/接听：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_seek_plus_switch = 13;
+	
+	///< 多功能方向盘上一曲/挂断：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_seek_reduce_switch = 14;
+	
+	///< 多功能方向盘诊断：[/],(0x0,0,7),[/],(1,0),0xff:invalid
+    ///< Reset：0x00 复位；正常的情况发0X0；
+    ///< DiagInfoError： 0x01 变种信息错误；按键内部左边按键电路与右边按键电路通信断开；
+    ///< HightPower： 0x02 源高于16V；电源高压高
+    ///< LowPower： 0x03 电源低于9V；电源电压低
+    ///< TJPerror： 0x04 TJP按键PCB板问题导致按键短路故障
+    ///< reversed1： 0x05 预留  
+    ///< reversed2： 0x06 预留
+    ///< invalid： 0x07
+    uint32 gw_mfs_diag_info_sw_38a = 15;
+	
+	///< 多功能方向盘挂电话：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_hungup_switch_signal = 16;
+	
+	///< 多功能方向盘接电话：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_answer_switch_signal = 17;
+	
+	///< 多功能方向盘全景影像开关：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_avm_switch = 18;
+	
+	///< 多功能方向盘巡航开启：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_crusie_switch_signal = 19;
+	
+	///< 多功能方向盘巡航取消：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_cancle_switch_signal = 20;
+	
+	///< 多功能方向盘巡航速度加/恢复：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_res_plus_switch_signal = 21;
+	
+	///< 多功能方向盘巡航速度减/设置：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_set_reduce_switch_signal = 22;
+	
+	///< 多功能方向盘巡航时距调节：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_dist_switch_signal = 23;
+	
+	///< 多功能方向盘巡航整车限速：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_lim_switch_signal = 24;
+	
+	///< 多功能方向盘IACC使能：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_iacc_enable_switch_signal = 25;
+	
+	///< 多功能方向盘能量回收加：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_ers_plus_switch = 26;
+	
+	///< 多功能方向盘能量回收减：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_ers_reduce_switch = 27;
+	
+	///< 多功能方向盘换挡拨片挡位加：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_gearshift_plus_switch = 28;
+	
+	///< 多功能方向盘换挡拨片挡位减：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_gearshift_reduce_switch = 29;
+	
+	///< 微信按键：[/],(0x0,0,3),[/],(1,0),
+    uint32 gw_mfs_we_chat_switch_signal = 30;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 31;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 32;
+
+	///< 多功能方向盘左侧滚轮上滚：[/],(0x0,0,3),[/],(1,0),滚动状态: 0x00:NoRoll 未滚动 0x01:SlowRoll 慢滚 0x02:QuikRoll 快滚 0xFF:Invalid 无效值
+    uint32 mfs_swt_roll_lu = 33;
+
+	///< 多功能方向盘左侧滚轮下滚：[/],(0x0,0,3),[/],(1,0),滚动状态: 0x00:NoRoll 未滚动 0x01:SlowRoll 慢滚 0x02:QuikRoll 快滚 0xFF:Invalid 无效值
+    uint32 mfs_swt_roll_lp = 34;
+	
+	///< Lone按压状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x00: SingPress//单击
+    ///< 0x01: LongPress//长按
+    ///< 0x02: DoublePress//双按
+    ///< 0xFF: Invalid
+    uint32 mfs_swt_lone_press_sts = 35;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 36;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 37;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 38;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 39;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 40;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 41;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 42;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 43;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 44;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 45;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 46;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 47;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 48;	
+	
+} 

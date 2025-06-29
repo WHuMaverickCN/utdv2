@@ -1,0 +1,277 @@
+/**
+ * @file     dnp.proto
+ * @brief    决策规划统一对外输出proto文件
+ * @author   tan,lian
+ * @details  主要包含轨迹选择信息
+ * @date     2022-07-11
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2022.07.11 <th>V2.2         <th>tan,lian    <th>创建初始版本
+ * <tr><th>2022.10.13 <th>V2.9         <th>tan,lian    <th>update2.9
+ * <tr><th>2022.12.1  <th>V3.3         <th>tan,lian    <th>更新控制信号
+ * <table>
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package dnp;
+
+import "dnp_common.proto";
+import "dnp_debug.proto";
+import "seq_header.proto";
+
+/**
+ * @brief dnp
+ * @detail Dnp
+ */
+message Dnp {
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1;
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/), 标识延时统计消息头
+  SeqHeaderProto.SeqHeader seq_header = 2;
+  ///< 轨迹ID：[/],(0,-2147483647,2147483647),[/],(/,/),标识轨迹ID
+  int32 id = 3;
+  ///< 车道id：[/],(0,-20,9223372036854775807),[/],(/,/),标识车道id
+  uint64 lane_id = 4;
+  ///< 横向规划信息：[/],(/,/,/),[/],(/,/), 标识横向规划信息
+  dnp.PlanningPath path = 5;
+  ///< 纵向规划信息：[/],(/,/,/),[/],(/,/), 标识纵向规划信息
+  dnp.DpqpVelPlanProto velocity = 6;
+  ///< 其它信息（打灯信息）：[/],(/,/,/),[/],(/,/), 标识其它信息（打灯信息）
+  dnp.OtherInfo other_info = 7;
+  ///< 横向规划模式信息：[/],(/,/,/),[/],(/,/), 标识横向规划模式信息
+  PlanningPathInfo planning_path_info = 8;
+}
+
+/**
+ * @brief LatControlPre
+ * @detail LatControlPre
+ */
+message LatControlPre {
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/),标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 1;
+  ///< 横向上层控制版本号:[/],(0,0,65535),[/],(1,0),标识横向上层控制版本号
+  uint32 version_num = 2; 
+  ///< 心跳信号:[/],(0,0,15),[/],(1,0),标识心跳信号
+  uint32 heart_beats = 3; 
+  ///< 上层模块时间戳:[/],(0,0,30240000),[/],(1,0),标识上层模块时间戳
+  double frontswc_timestamp = 4; 
+  ///< 曲率期望补偿:[1/m],(0,-1,1),[/],(/,0),标识曲率期望补偿
+  double opt_expcurv = 5; 
+  ///< 基于横向位置偏差的曲率期望补偿:[1/m],(0,-1,1),[/],(/,0),标识基于横向位置偏差的曲率期望补偿
+  double opt_expcurv_epos = 6; 
+  ///< 基于航向角偏差的曲率期望补偿:[1/m],(0,-1,1),[/],(/,0),标识基于航向角偏差的曲率期望补偿
+  double opt_expcurv_eyaw = 7; 
+  ///< 规划轨迹点的个数:[/],(0,0,30240000),[/],(1,0),标识规划轨迹点的个数
+  uint32 plan_numpoints = 8; 
+  ///< 轨迹点数是否达到有效数:[/],(0,0,1),[/],(1,0),标识轨迹点数是否达到有效数, 0-无效, 1-有效
+  bool path_valid = 9; 
+  ///< 当前点匹配状态:[/],(0,0,1),[/],(1,0),标识当前点匹配状态, 0-无效, 1-有效
+  bool cur_matchsts = 10; 
+  ///< 当前匹配点id:[/],(0,0,30240000),[/],(1,0),标识当前匹配点id
+  uint32 cur_index_id = 11; 
+  ///< 预瞄匹配点id:[/],(0,0,30240000),[/],(1,0),标识预瞄匹配点id
+  uint32 prv_index_id = 12; 
+  ///< 当前横向位置偏差:[m],(0,-10,10),[/],(/,0),标识当前横向位置偏差
+  double cur_epos = 13; 
+  ///< 当前航向角偏差:[rad],(0,-1,1),[/],(/,0),标识当前航向角偏差
+  double cur_eyaw = 14; 
+  ///< 当前轨迹曲率:[1/m],(0,-1,1),[/],(/,0),标识当前轨迹曲率
+  double cur_trajcurv = 15; 
+  ///< 当前轨迹曲率变化率:[1/m],(0,-1,1),[/],(/,0),标识当前轨迹曲率变化率
+  double cur_trajcurvrate = 16; 
+  ///< 轨迹范围内最大曲率:[1/m],(0,-1,1),[/],(/,0),标识轨迹范围内最大曲率
+  double max_trajcurv = 17; 
+  ///< 预瞄处对应的轨迹曲率:[1/m],(0,0,1),[/],(/,0),标识预瞄处对应的轨迹曲率
+  double far_trajcurv = 18; 
+  ///< 前视距离:[m],(0,0,100),[/],(/,0),标识前视距离
+  double lookaheaddist = 19; 
+  ///< 预瞄距离:[m],(0,0,100),[/],(/,0),标识预瞄距离
+  double prv_poslon = 20; 
+  ///< 预瞄偏差:[m],(0,-10,10),[/],(/,0),标识预瞄偏差
+  double prv_poslat = 21; 
+  ///< 预瞄有效状态:[/],(0,0,1),[/],(1,0),标识预瞄有效状态, 0-预瞄无效(超出轨迹范围)；1-预瞄有效
+  bool prv_errinfo = 22; 
+  ///< 参考点处横向偏差:[m],(0,-10,10),[/],(/,0),标识参考点处横向偏差
+  double refpoint_epos = 23; 
+  ///< 参考点处轨迹曲率:[1/m],(0,0,1),[/],(/,0),标识参考点处轨迹曲率
+  double refpoint_trajcurv = 24; 
+  ///< PCS规划跟图或跟线模式:[/],(0,0,1),[/],(1,0),标识PCS规划跟图或跟线模式, 0-车道线, 1-地图
+  int32 path_planning_mode = 25; 
+  ///< 换道状态:[/],(0,-2,2),[/],(1,0),标识换道状态, 0-无, 1-左换道, 2-右换道, -1-左回退, -2-右回退
+  int32 lane_change_state = 26; 
+  ///< 偏移状态:[/],(0,0,2),[/],(1,0),标识偏移状态, 0-无偏移, 1-左偏移, 2-右偏移 
+  int32 offset_state = 27; 
+  ///< 跟车跟线状态:[/],(0,0,3),[/],(1,0),标识跟车跟线状态, 0-跟线, 1-跟车
+  int32 follow_car_state = 28; 
+  ///< 绕障状态:[/],(0,0,100),[/],(1,0),标识绕障状态, 0-无, 1-有
+  int32 avoid_obstacle_state = 29; 
+  ///< 预瞄时间:[s],(0,0,10),[/],(/,0),标识预瞄时间
+  double prvtime = 30; 
+  ///< 最小预瞄距离:[m],(0,0,100),[/],(/,0),标识最小预瞄距离
+  double minprvdis = 31; 
+  ///< 进出弯状态:[/],(0,0,3),[/],(1,0),标识进出弯状态, 0-直道上, 1-正在进弯, 2-弯道内, 3-正在出弯
+  uint32 curv_inoutflag = 32; 
+  ///< 轨迹突变状态:[/],(0,0,1),[/],(1,0),标识轨迹突变状态, 0-无突变, 1-有突变
+  bool traj_suddchg = 33; 
+  ///< 控制平滑标志:[/],(0,0,2),[/],(1,0),标识控制平滑标志, 0-无平滑, 1-平滑中, 2-平滑计时初始化
+  uint32 smooth_flag = 34; 
+  ///< 输入的预瞄时间:[s],(0,0,10),[/],(/,0),标识输入的预瞄时间
+  double input_prvtime = 35; 
+  ///< 输入的最小预瞄距离:[m],(0,0,100),[/],(/,0),标识输入的最小预瞄距离
+  double input_minprvdis = 36; 
+  ///< 横向激活:[/],(0,0,1),[/],(/,0),标识横向激活
+  bool input_latactive = 37; 
+  ///< 横向激活模式:[/],(0,0,3),[/],(/,0),标识横向激活模式, 0-无, 1-泊车, 2-行车, 3-安全辅助
+  uint32 input_latactivemode = 38; 
+  ///< 预留接口:[/],(0,/,/),[100],(/,0),标识预留接口
+  repeated double debug1 = 39;
+  ///< 预留接口:[/],(0,/,/),[100],(/,0),标识预留接口
+  repeated uint32 debug2 = 40;
+}
+
+/**
+ * @brief LonControlPre
+ * @detail LonControlPre
+ */
+message LonControlPre {
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/),标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 1;
+  ///< 纵向速度规划状态：[/],(0,0,2)),[/],(/,/),标识纵向速度规划状态正常（1）,故障（0）
+  uint32 lnp_velplan_status = 2;
+  ///< 纵向二次规划位置多项式系数：[/],(/,/,/)),[8],(/,/),标识纵向二次规划位置多项式系数
+  repeated dnp.LnpPathCoeffProto path_coeff = 3;
+  ///< 坡道加速度输出：[m/s²],(0,-10,10),[/],(/,/),标识坡道加速度输出
+  double road_grade_mpss = 4;
+}
+
+/**
+ * @brief dnp_debug
+ * @detail DecisionResult 决策输出信息
+ */
+ message DecisionResult {
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1; // 消息头
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  SeqHeaderProto.SeqHeader seq_header = 2;
+  ///< 决策信息：[/],(/,/,/),[3],(/，/),标识决策信息
+  repeated dnp.Decision decisions = 3;
+  ///< 平滑信息：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.SlotInfo slot_info = 4;
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.MainDecision main_decision = 5;
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  int32 is_limp_mode = 6; // 是否是跛行模式：0x0 = 不是跛行; 0x1 = 是跛行;
+  ///< 决策安全停车：[/],(/,/,/),[/],(/，/),标识决策安全停车 0x0 = 不能安全停车; 0x1 = 能安全停车
+  uint32 decision_safe_stop = 7;
+  ///< 自车当前的限速牌限速值：[/],(/,/,/),[/],(/，/),仅包括区间限速，电子眼，限速牌的限速值，给安全辅助模块用于超速报警
+  uint32 decision_host_speed_limit = 8;
+  ///< 纵向标签：[/],(/,/,/),[/],(/，/),标识纵向标签
+  dnp.LonObjects lon_tag_objects = 9;
+  ///< 决策状态机标签：[/],(/,/,/),[/],(/，/),标识决策状态机
+  dnp.LatLonObjects lat_lon_tag_objects = 10;
+  ///< 自车巡航速度类型：[/],(/,/,/),[/],(/，/),自车巡航速度类型
+  uint32 speed_type = 11;
+  ///< 自车巡航速度来源：[/],(/,/,/),[/],(/，/),自车巡航速度来源
+  uint32 speed_source = 12;
+  ///< 道路融合限速值有效：[/],(/,/,/),[/],(/，/),道路融合限速值有效
+  uint32 fusion_speed_valid = 13;
+  ///< 道路融合速度来源：[/],(/,/,/),[/],(/，/),道路融合速度来源
+  uint32 fusion_speed_source = 14;
+}
+
+/**
+ * @brief dnp_debug
+ * @detail DecisionResultFast 决策按键相关输出信息
+ */
+ message DecisionResultFast{
+  ///< set_speed_dnp：[/],(/,/,/),[/],(/，/),
+  uint32 set_speed_dnp = 1;//dnp模块的设定车速
+  ///< enable_set_speed_dnp_f：[/],(/,/,/),[/],(/，/),
+  bool enable_set_speed_dnp_f = 2; //使用dnp模块的设定车速  
+  ///< memory_set_speed：[/],(/,/,/),[/],(/，/),记忆的set speed
+  uint32 memory_set_speed = 3;
+  ///< set_timegap_level：[/],(/,/,/),[/],(/，/),时距等级
+  uint32 set_timegap_level = 4;
+  ///< 备用信号：[/],(0,0,5),[/],(/，/), 标识备用信号
+  double reserve_var1 = 5;
+  ///< 备用信号：[/],(0,0,5),[/],(/，/), 标识备用信号
+  double reserve_var2 = 6;
+  ///< 备用信号：[/],(0,0,5),[/],(/，/), 标识备用信号
+  double reserve_var3 = 7;
+}
+
+ /**
+ * @brief safe_warning
+ * @detail DNP输出的安全辅助预警信息
+ */
+ message SafeWarning {
+  ///< 起步提醒标志位： [/],(0x0,0,1),[/],(1,0)，/
+  ///<0:无效值
+  ///<1:开启
+  int32 stop_and_go_warning = 1;  
+  ///< 闯红灯提醒标志位： [/],(0x0,0,1),[/],(1,0)，/
+  ///<0:无效值
+  ///<1:开启
+  int32 run_red_light_waring = 2;  
+  ///< 超速预警图像报警标志位： [/],(0x0,0,1),[/],(1,0)，/
+  ///<0:无效值
+  ///<1:开启
+  int32 over_speed_visual_warning = 3;  
+  ///< 超速预警声音报警标志位： [/],(0x0,0,1),[/],(1,0)，/
+  ///<0:无效值
+  ///<1:开启
+  int32 overspeed_sound_warning = 4;  
+ }
+
+ /**
+* @brief  dnp工作状态反馈
+* @details  反馈dnp模块工作状态
+*/
+message DnpStateSwitchRsp{
+  ///<时间戳:[s],(0,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+
+  ///<诊断信息:[/],(0x0,0,2),[/],(1,0),反馈dnp模块工作状态
+  ///<0:无效值
+  ///<1:开启状态
+  ///<2:关闭状态
+  uint32 dnp_sts_feedback = 2;
+}
+
+ /**
+* @brief  简化版dnp信息
+* @details  简化版dnp信息
+*/
+message SimplifiedDnp{
+  ///< 闯红灯标志位：[0x0],(0x0,0,1),[/],(1，0),标识闯红灯标志位
+  ///< 0x0:noWarning
+  ///< 0x1:Warning
+  int32 ad_runredlight_warning = 1;
+  ///< 换道模式提示信号：[0x0],(0x0,0,5),[/],(1，0), 标识换道模式提示信号
+  uint32 lane_change_model = 2; // 0x0=未换道，0x1=自动换道，0x2=强制换道，0x3=udlc换道，0x4=借道绕障
+  ///< 换道过程状态信号：[0x0],/(0x0,0,10),[/],(1，0),标识换道状态
+  LaneChangeStatus lane_change_status = 3;  
+  ///<< 规划报警标志: [0x0], (0x0，0,1),[/],(1,0),规划报警标志
+  ///<< 0：未报警
+  ///<< 1：报警
+  uint32 pathplanning_warningsts = 4;
+  ///< 路径规划状态：[0x0],(0,-2,1),[/],(1,0),路径规划状态
+  ///< 0：不正常
+  ///< 1: 正常
+  ///< -2: 求解失败
+  int32 path_status = 5;
+  ///< 对应变道类型：[0x0],(0x0,0,3),[/],(1,0),对应变道类型
+  dnp.LaneChangeType lane_change_type = 6;
+  ///< 备用信号：[/],(0,0,5),[100],(1,0), 标识备用信号
+  repeated uint32 reserve_var = 7;
+  ///< 备用信号：[/],(0,0,5),[100],(1,0), 标识备用信号
+  repeated double reserve_var2 = 8;
+}

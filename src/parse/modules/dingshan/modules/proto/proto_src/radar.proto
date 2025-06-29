@@ -1,0 +1,372 @@
+/**
+* @file     radar.proto
+* @author   zhangpeng
+* @details  雷达输出Proto信息
+* @date     2022-03-09
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.2.27          <th>1.0                 <th>zhangzhirui 
+* <table>
+**********************************************************************************
+*/
+
+
+syntax="proto3";
+package RadarProto;
+import "sabcommon.proto";
+import "seq_header.proto";
+
+/**
+* @brief 雷达点云
+* @detail 雷达点云信息
+*/
+message RadarDetection
+{
+	///< 纵向距离：[m],(0,-90,300),[/],(1,0),标识纵向距离
+    double longitudinal_distance = 1; 
+	///< 横向距离：[m],(0,-30,30),[/],(1,0),标识横向距离
+    double lateral_distance = 2; 
+	///< 垂直距离：[m],(0,0,30),[/],(1,0),标识垂直距离
+    double vertical_distance = 3;
+	///< 方位角：[rad],(0,-2,2),[/],(1,0),标识方位角
+	double azimuth = 4; 
+	///< 俯仰角：[rad],(0,-1,1),[/],(1,0),标识俯仰角
+    double elevation_angle = 5; 
+	///< 俯仰角是否有效：[rad],(false,/,/),[/],(1,0),标识俯仰角是否有效
+	///< true：有效
+    ///< false: 无效
+	bool elevation_validy = 6;
+	///< 径向加速度：[m/s^2],(0,-20,20),[/],(1,0),标识径向加速度	
+	double radial_acceleration = 7;
+	///< 径向速度：[m/s],(0,-100,100),[/],(1,0),标识径向速度   
+	double radial_velocity = 8; 
+	///< 径向距离：[m],(0,0,300),[/],(1,0),标识径向距离    
+	double radius = 9; 
+	///< 反射强度：[dbsm],(0,0,100),[/],(1,0),标识反射强度    
+	double rcs = 10;
+	///< 信噪比：[db],(0,0,100),[/],(1,0),标识信噪比    
+	double snr = 11;
+	///< 点id：[/],(0,0,20000),[/],(1,0),标识点   
+	int32 point_id = 12;
+ 	///< 所属目标ID：[/],(0,1,32),[/],(1,0),标识所属目标ID   
+	int32 obj_id = 13;
+  	///< 点运动类型：[/],(/,/,/),[/],(1,0),标识点运动类型  
+	SabCommonProto.PointMotionState motion_status = 14; 
+	///< 点是否有效：[/],(/,/,/),[/],(1,0),标识点是否有效，0x0：Invalid 0x1：valid
+    uint32 validity = 15;
+	///< 点质量：[/],(/,/,/),[/],(1,0),标识点质量
+    uint32 qly = 16;
+	
+	///< 用于区分角雷达在左还是右：[/],(/,/,/),[/],(1,0),用于区分角雷达在左还是右: 0x0：Invalid 0x1：左侧 0x2：右侧
+    uint32 position = 17;
+
+}
+
+/**
+* @brief 雷达可行驶区域
+* @detail 雷达可行驶区域信息
+*/
+message RadarFsPoint
+{
+    ///< freespace点类型：[/],(/,/,/),[/],(1,0),标识freespace点类型
+	SabCommonProto.PointType type = 1;
+    ///< Freeespace点位置：[/],(/,/,/),[/],(1,0),标识Freeespace点位置
+	SabCommonProto.Point2DPosition position = 2;
+	///< Freeespace点运动类型：[/],(/,/,/),[/],(1,0),标识Freeespace点运动类型
+    SabCommonProto.PointMotionState motion_state = 3;
+    ///< Freespace扇区置信度：[/],(/,/,/),[/],(1,0),/
+    SabCommonProto.PointConRidence con_ridence = 4;
+}
+
+
+/**
+* @brief 雷达目标
+* @detail 雷达目标信息
+*/
+message RadarObject
+{
+	///< 目标跟踪ID：[/],(0,1,32),[/],(1,0),标识目标跟踪ID
+    int32 track_id = 1;
+	///< 纵向距离：[m],(0,-90,200),[/],(1,0),标识纵向距离
+    double longitudinal_distance = 2;
+	///< 横向距离：[m],(0,-10,10),[/],(1,0),标识横向距离
+    double lateral_distance = 3;
+	///< 垂直距离：[m],(0,0,5),[/],(1,0),标识垂直距离
+    double vertical_distance = 4;
+	///< 纵向绝对速度：[m/s],(0,-50,50),[/],(1,0),标识纵向绝对速度
+    double longitudinal_absolute_velocity = 5;
+	///< 横向绝对速度：[/],(0,-50,50),[/],(1,0),标识横向绝对速度
+    double lateral_absolute_velocity = 6;
+	///< 纵向相对速度：[m/s],(0,-100,50),[/],(1,0),纵向相对速度
+    double longitudinal_relative_velocity = 7;
+	///< 横向相对速度：[m/s],(0,-50,50),[/],(1,0),标识横向绝对速度
+    double lateral_relative_velocity = 8;
+	///< 纵向绝对加速度：[m/s^2],(0,-20,20),[/],(1,0),标识纵向绝对加速度
+    double longitudinal_absolute_acceleration = 9;
+	///< 横向绝对加速度：[m/s^2],(0,-20,20),[/],(1,0),标识横向绝对加速度	
+    double lateral_absolute_acceleration = 10;
+	///< 纵向相对加速度：[m/s^2],(0,-20,20),[/],(1,0),标识纵向相对加速度
+    double longitudinal_relative_acceleration = 11;
+	///< 横向相对加速度：[m/s^2],(0,-20,20),[/],(1,0),标识横向相对加速度
+    double lateral_relative_acceleration = 12;
+	///< 目标长度：[m],(0,0,32),[/],(1,0),标识目标长度
+    double length = 13; 
+	///< 目标宽度：[m],(0,0,4),[/],(1,0),标识目标宽度
+    double width = 14;
+	///< 目标高度：[m],(0,1,5),[/],(1,0),标识目标高度
+    double height = 15;
+	///< 航向角：[rad],(0,-2,2),[/],(1,0),标识航向角
+    double heading_angle = 16;
+	///< 目标类别：[/],(/,/,/),[/],(1,0),标识目标类别
+    SabCommonProto.ObjectClass classfication = 17;
+	///< 目标存在概率：[%],(0,0,100),[/],(1,0),标识目标存在概率
+    double exist_prob = 18;
+	///< 障碍物概率：[%],(0,0,100),[/],(1,0),标识障碍物概率
+    double obstacle_prob = 19;
+	///< 目标丢失帧数：[/],(0,0,30),[/],(1,0),标识目目标丢失帧数
+    int32 loss_num = 20;
+	///< 目标包含点云数量：[/],(0,1,4096),[/],(1,0),标识目标包含点云数量
+    int32 points_count = 21;
+	///< 目标存在帧数：[/],(0,1,30),[/],(1,0),标识目标存在帧数
+    int32 age = 22;
+	///< 目标区域ID：[/],(0,0,11),[/],(1,0),标识目标区域ID
+    int32 region_id = 23;
+	///< 目标测量参考点：[/],(/,/,/),[4],(1,0),标识目标测量参考点
+    repeated SabCommonProto.Point2DPosition obj_refer_points = 24;    
+	///< 目标运动状态：[/],(0,0,7),[/],(1,0),目标运动状态,0x0:unknown 0x1:moving 0x2:stopped 0x3:stationary 0x3:crossing 0x4-0x7:reserve
+    int32 motionstatus = 25;
+    ///< 目标置信度：[/],(/,/,/),[4],(1,0)，标识目标置信度
+    double class_conf = 26;
+    ///< 目标离地距离：[/],(/,/,/),[/],(1,0),目标离地距离
+    double height_ground = 27;
+    ///< 相对本车道位置: [/],(/,/,/),[/],(1,0),标识相对本车道位置,0x0:unknown 0x1:Left Lane 0x2:Right  Lane 0x3:Ego Lane
+    double location = 28;
+    ///< 目标是被真实测量到的还是被预测到的: [/],(0,0,3),[/],(1,0),标识目标是被真实测量到的还是被预测到的,0x0:unknown 0x1:Measured 0x2:Predicted 0x3:Reserved
+    uint32 measured = 29;
+    ///< 参考点横向位置: [/],(/,/,/),[/],(1,0),标识参考点横向位置
+    double refpointdy = 30;
+    ///< 参考点纵向位置: [/],(/,/,/),[/],(1,0),标识参考点纵向位置
+    double refpointdx = 31;
+    ///< 参考点位置: [/],(/,/,/),[/],(1,0),标识参考点位置
+    double refpointloc = 32;
+    ///< 横向距离的方差: [/],(/,/,/),[/],(1,0),标识横向距离的方差
+    double dy_vnce = 33;
+    ///<运动状态置信度: [/],(/,/,/),[/],(1,0),标识运动状态置信度
+    double motionstatusconf = 34;
+    ///< 纵向距离的方差: [/],(/,/,/),[/],(1,0),标识纵向距离的方差
+    double dx_vnce = 35;
+    ///< 横向距离的标准差: [/],(/,/,/),[/],(1,0),标识纵向距离的方差
+    double relvy_std = 36;
+    ///< 纵向速度标准差: [/],(/,/,/),[/],(1,0),标识纵向速度标准差
+    double relvx_std = 37;
+    ///< 目标有效: [/],(/,/,/),[/],(1,0),标识目标有效,0x0 valid 0x1 Invalid 0xFFFF:invalid(E2E/signalvalid) else:Reserved
+    int32 valid = 38;   
+    ///< 目标延迟时间: [/],(/,/,/),[/],(1,0),/
+    uint32 delay_time = 39;
+}
+
+/**
+* @brief 雷达点云集
+* @detail 雷达点云集信息
+*/
+message RadarDetections
+{	
+	///< 时间戳：[s],(0,0,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+	///< 点云集：[/],(/,/,/),[4096],(1,0),标识点云集
+    repeated RadarDetection detections = 2;
+	///< 传感参数：[/],(/,/,/),[4],(1,0),标识传感参数
+    repeated SabCommonProto.SensorParameters sensors_parameters = 3;
+	///< 数据帧索引：[/],(0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 4;
+    ///< 目标时间同步确认：[/],(/,/,/),[/],(1,0),前雷达目标时间同步确认,Flag ,set to 1 ,once sync complete 0xFF:invalid(E2E/signalvalid) else:Reserved
+	int32 ti_bas = 5;
+    ///< 目标时间同步差值确认：[/],(/,/,/),[/],(1,0),前雷达目标时间同步差值确认,For stbm 0xFF:invalid(E2E/signalvalid) else:Reserved
+	int32 ti_leap = 6;
+    ///< 目标时间同步超时：[/],(/,/,/),[/],(1,0),前雷达目标时间同步超时,0x0:no timeout 0x1:timeout 0xFF:invalid(E2E/signalvalid) else:Reserved
+	int32 ti_out = 7;
+    ///< 同步误差信号：[/],(/,/,/),[/],(1,0),同步误差信号
+	int32 difftime_time_us = 8;
+    ///< 传感器状态：[/],(/,/,/),[/],(1,0),传感器状态	
+    int32 sensors_status = 9;
+	///< 备用时间戳：[s],(0,0,/),[/],(1,0),标识备用时间戳
+    double time_stamp_res = 10;
+}
+
+/**
+* @brief 雷达目标集
+* @detail 雷达目标集信息
+*/
+message RadarObjects
+{ 
+	///< 时间戳：[s],(0,0,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+	///< 目标集：[/],(/,/,/),[32],(1,0),标识目标集
+    repeated RadarObject objs = 2;
+	///< 传感参数：[/],(/,/,/),[4],(1,0),标识传感参数
+    repeated SabCommonProto.SensorParameters sensors_parameters = 3;
+	///< 数据帧索引：[/],(0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 4;
+	///< 统计数据帧与时间戳信息：[/],(0x0,0,/),[/],(/,/),    
+	SeqHeaderProto.SeqHeader seqheader = 5;
+    ///< 传感器状态：[/],(/,/,/),[/],(1,0),传感器状态	
+    int32 sensors_status = 6;
+	///< 备用时间戳：[s],(0,0,/),[/],(1,0),标识备用时间戳
+    double time_stamp_res = 7;
+}
+
+/**
+* @brief 雷达可行驶区域集
+* @detail 雷达可行驶区域集信息
+*/
+message RadarFreeSpace
+{	
+	///< 时间戳：[s],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+	///< freespace点集：[/],(/,/,/),[1024],(1,0),标识freespace点集
+    repeated RadarFsPoint points = 2;
+	///< 传感参数：[/],(/,/,/),[4],(1,0),标识传感参数
+    repeated SabCommonProto.SensorParameters sensors_parameters = 3;
+	///< 数据帧索引：[/],(0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 4;
+    ///< 传感器状态：[/],(/,/,/),[/],(1,0),传感器状态	
+    int32 sensors_status = 5;
+	///< 备用时间戳：[s],(0,0,/),[/],(1,0),标识备用时间戳
+    double time_stamp_res = 6;
+}
+
+/**
+* @brief 行人遮挡检测
+* @detail 行人遮挡检测信息
+*/
+message RadarPedData
+{
+    ///< 时间戳：[s],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+    ///< 遮挡行人存在标志位：[/],(/,0,255),[/],(1,0),标识遮挡行人存在标志位,0x0:无人 0x1:有人 0xFF:invalid(E2E/signalvalid) else:Reserved
+    int32 ped_result = 2;
+    ///< 遮挡行人方位标志位：[/],(/,0,255),[/],(1,0),标识遮挡行人方位标志位,0x0:未识别 0x1:左侧 0x2:右侧 0xFF:invalid(E2E/signalvalid) else:Reserved
+    int32 ped_azi = 3;
+    ///< 保留：[m],(/,/,/),[/],(1,0),保留
+    double reserved_0 = 4;
+    ///< 遮挡行人纵向距离值：[m],(/,/,/),[/],(1,0),标识遮挡行人纵向距离
+    double ped_xm = 5;
+    ///< 遮挡行人置信度: [/],(/,/,/),[/],(1,0),标识遮挡行人置信度 
+    double ped_confidence = 6;
+    ///< 遮挡行人横向距离值: [/],(/,/,/),[/],(1,0),标识遮挡行人横向距离值
+    double ped_ym = 7;
+	///< 本地时间戳：[/],(/,/,/),[/],(1,0),标识本地时间戳
+	double time_stamp_local = 8;
+}
+
+/**
+* @brief 护栏
+* @detail 护栏信息
+*/
+message RadarGuardrail
+{
+    ///< 左右护栏信息：[s],(/,/,/),[/],(1,0),左右护栏信息
+    repeated RadarGuardrailInfo guardrail_info = 1;
+
+    ///< 时间戳：[s],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 9;
+}
+
+/**
+* @brief 护栏具体参数
+* @detail 护栏具体参数信息
+*/
+message RadarGuardrailInfo
+{
+    ///< 护栏方程系数c0: [m],(0,0,0),[/],(1,0)),标识护栏方程系数c0
+    double guardrailc0 = 1;
+
+///< 护栏方程系数c1: [m],(0,0,0),[/],(1,0)),标识护栏方程系数c1
+double guardrailc1 = 2;
+
+///< 护栏方程系数c2: [m],(0,0,0),[/],(1,0)),标识护栏方程系数c2
+double guardrailc2 = 3;
+
+///< 护栏方程系数c3: [m],(0,0,0),[/],(1,0)),标识方程系数c3
+double guardrailc3 = 4;
+
+///< 近端到本车前保中心纵向距离: [m],(0,0,0),[/],(1,0)),标识近端到本车前保中心纵向距离
+double start = 5;
+
+///< 置信度: [m],(0,0,0),[/],(1,0)),标识置信度
+double confidence = 6;
+
+///< 远端到本车前保中心纵向距离: [m],(0,0,0),[/],(1,0)),标识远端到本车前保中心纵向距离
+double end = 7;
+
+///< 护栏类型: [m],(0,0,0),[/],(1,0)),标识护栏类型
+SabCommonProto.GuardrailType guardrailtype = 8;
+}
+
+/**
+* @brief 雷达功能信息
+* @detail 功能信息
+*/
+message RadarFunInfo
+{
+    ///< 时间戳：[s],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+	
+	///< 工作模式: [/],(0,0,0),[/],(1,0)),标识工作模式
+	///< 0x0：Initial Value 
+	///< 0x1：行车模式 
+	///< 0x2：泊车模式,
+	///< 0x3:切换中
+	uint32 work_mode = 2;
+
+	///< 场景模式: [/],(0,0,0),[/],(1,0)),标识场景模式
+	///< 0x0：unkown
+	///< 0x1：地库模式
+	///< 0x2：非地库模式
+	///< 0x3：预留
+	uint32 sence_mode = 3;
+
+    ///< 雷达失效状态: [/],(0,0,0),[/],(1,0)),/
+    ///< 0x0: 未失效
+    ///< 0x1: 全部失效
+    ///< 0x2: 部分失效
+    uint32 failure_status = 4;
+
+    ///< 雷达校准状态: [/],(0,0,0),[/],(1,0)),/
+    ///< 0x0: Calibration is ok
+    ///< 0x1: Calibration In Process
+    ///< 0x2: Calibration never done
+    ///< 0x3: Calibration Failed
+    uint32 calibration_status = 5;
+
+    ///< 工作场景模式: [/],(0,0,0),[/],(1,0)),/
+    ///< 0x0: 非地库模式
+    ///< 0x1: 地库模式
+    ///< 0x2: 切换中
+    uint32 work_sence_mode = 6;
+
+    ///< 雷达偏离状态: [/],(0,0,0),[/],(1,0)),/
+    ///< 0x0: Initial Value
+    ///< 0x1: 未偏离
+    ///< 0x2: 方位角偏离
+    uint32 mis_alignment = 7;
+
+    ///< 探测到的目标数量: [/],(0,0,0),[/],(1,0)),/
+    uint32 obj_count = 8;
+
+    ///< 数据处理时间(ms): [/],(0,0,0),[/],(1,0)),/
+    uint32 hame_time = 9;
+    
+    ///< 雷达帧计数: [/],(0,0,0),[/],(1,0)),/
+    uint32 hanme_count = 10;
+}

@@ -1,0 +1,123 @@
+/**
+
+* @file     idmap_hmi.proto
+* @author   jianghongyue
+* @details  智能驾驶地图输出到座舱的接口定义，提供一定范围内的所有地图信息
+* @date     2023-03-06
+* @version  1.9
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  GCJ02
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.12.30         <th>1.8                 <th>jianghongyue
+* <tr><th>2023.03.06         <th>1.9                 <th>jianghongyue
+* <tr><th>2023.07.10         <th>2.3                 <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax="proto3";
+
+import "idmap_common.proto";
+import "idmap_static.proto";
+package idmap;
+
+
+/**
+* @brief 响应提供的信息
+* @details  提供半径2km的范围以内数据，范围可缩小，请求点为范围中心点，不分层级全部提供
+*/
+message HMIIDMapInfo
+{
+    ///<请求者身份标识:[/],(/,/,/),[/],(/,/),/
+    string from_who = 1;
+
+    ///<请求流水号:[/],(/,/,/),[/],(/,/),/
+    uint32 request_serial_number = 2;
+
+    ///<错误码:[/],(0,0,3),[/],(1,0),/
+    ///<0:成功
+    ///<1:失败
+    ///<2:数据未完成准备
+    ///<3:超时
+    uint32 error_code = 3;
+
+    ///<提供座舱信息集合:[/],(/,/,/),[/],(/,/),/
+    HMIIDMap idmap_info = 4;
+}
+
+
+/**
+* @brief 提供座舱信息集合
+* @details  提供最大半径2km的范围数据，请求点为范围中心点
+*/
+message HMIIDMap
+{
+    ///<锚点坐标:[/],(/,/,/),[/],(/,/),请求定位点坐标
+	Gnss anchor_pos = 1;
+
+    ///<请求半径：[m],(2000,10,2000),[/],(/,/),请求范围为半径2km的数据
+    int32 circle_radius = 2;
+
+    ///<智驾地图状态信息:[/],(/,/,/),[/],(/,/),/
+    StaticIDMapInfo static_map_info = 3;
+
+    ///<车道与左右边界线关系:[/],(/,/,/),[/],(/,/),/
+    repeated RelativePositionRelation relation = 4;
+
+    ///<车道组信息:[/],(/,/,/),[/],(/,/),提供道路面构成
+    repeated LaneGroup lane_group = 5;
+}
+
+
+/**
+* @brief 车道中心线与车道边界线、道路边界线关系
+* @details  保证80%的准确率
+*/
+message RelativePositionRelation
+{
+    ///<车道id:[/],(0,0,/),[/],(1,0),车道中心线id
+    uint64 hmi_lane_id = 1;
+
+    ///<左边车道线id:[/],(0,0,/),[/],(1,0),后续可能存在颜色变化线形不变化场景
+    repeated uint64 left_line_id = 2;
+
+    ///<右边车道线id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 right_line_id = 3;
+
+    ///<最近左道路边界线id:[/],(0,0,/),[/],(1,0),20230306修改为区分左右
+    uint64 nearest_left_boundary_id = 4;
+
+    ///<最近右道路边界线id:[/],(0,0,/),[/],(1,0),20230306修改为区分左右
+    uint64 nearest_right_boundary_id = 5;
+}
+
+
+/**
+* @brief 车道组
+* @details  仅高速城快具备
+*/
+message LaneGroup
+{
+    ///<车道组id:[/],(0,0,/),[/],(1,0),/
+    uint64 lane_group_id = 1;
+
+    ///<组内车道id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 lane_id_list = 2;
+
+    ///<组内道路边界id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 hmi_boundary_id = 3;
+
+    ///<组内车道边线id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 hmi_line_id = 4;
+}
+

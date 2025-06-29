@@ -1,0 +1,97 @@
+/**
+
+* @file     idmap_to_edcmc.proto
+* @author   jianghongyue
+* @details  领航路线建图、编辑、删除等动作反馈，edcmc为EDC的地图中心模块，EDC-MapCenter模块
+* @date     2023-10-19
+* @version  1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  GCJ02
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.10.19        <th>2.4                 <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax="proto3";
+import "idmap_cr_points.proto";
+
+package idmap;
+
+/**
+* @brief 反馈众包建图进度
+* @details  收到请求后反馈用户路线上众包覆盖情况
+*/
+message RespRequestToMC
+{
+    ///<请求状态:[/],(0,0,/),[/],(1,0),EDC发起请求后C2响应的状态，20230921新增
+    ///<0:成功
+    ///<1:失败，新增路线外的请求反馈此值
+    ///<2:新增路线失败，所有路线总里程超限（超600km）
+    ///<3:新增路线失败，其它原因
+    uint32 resp_status = 1;
+
+    ///<请求反馈路线信息:[/],(/,/,/),[/],(/,/),/
+    repeated RespRequestCSMapProgress resp_paths_info = 2;
+}
+
+
+/**
+* @brief 反馈众包建图进度
+* @details  收到请求后反馈用户路线上众包覆盖情况
+*/
+message RespRequestCSMapProgress
+{
+    ///<返回众包路线ID:[/],(/,/,/),[/],(/,/),用于区分不同路线
+    uint64 resp_csmap_path_id = 1;
+
+    ///<建图情况反馈:[/],(/,/,/),[/],(/,/),跟sd_path一一对应,简略查询不提供
+    CRInfo csmap_progress_cr = 2;
+
+    ///<路线信息:[/],(/,/,/),[/],(/,/),20230921新增
+    PathToMC path_to_mapcenter = 3;
+}
+
+
+/**
+* @brief 路线信息，20230921新增
+* @details  反馈EDC地图中心模块MapCenter
+*/
+message PathToMC
+{
+    ///<路线名称:[/],(/,/,/),[/],(/,/),需要编码为UTF-8或底软支持转码
+    ///<备注：存储EDC的输出内容
+    string sd_path_name = 1;
+
+    ///<出发地名称:[/],(/,/,/),[/],(/,/),导航路线起点，仅查询返回
+    string departure_name = 2;
+
+    ///<目的地名称:[/],(/,/,/),[/],(/,/),导航路线终点，仅查询返回
+    string destination_name = 3;
+
+    ///<导航路线几何:[/],(/,/,/),[/],(/,/),记录导航路线的几何轨迹，置顶、简略查询不赋值
+    repeated CRGnss path_geometry = 4;
+
+    ///<变更时间:[/],(0,0,/),[/],(1,0),新增或修改路线时间,UNIX时间戳
+    uint32 change_time = 5;
+
+    ///<路线里程:[m],(0,0,/),[/],(1,0),简略查询提供导航路线里程
+    int32 path_length = 6;
+
+    ///<路线里程:[m],(0,0,/),[/],(1,0),详细查询给可领航里程，简略查询不赋值
+    ///<备注：可领航里程，实际是众包加高精的覆盖里程
+    int32 nid_length = 7;
+
+    ///<用户置顶时间:[/],(0,0,/),[/],(1,0),无置顶为空置,20231013拟增加
+    uint32 user_top_time = 8;
+}

@@ -1,0 +1,99 @@
+/**
+* @file     psm.proto
+* @author   王忠才
+* @details  平台状态管理
+* @date     2023-07-27
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.7.27       <th>1.0                   <th>王忠才 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	Psm;
+
+/**
+* @brief PsmStatus
+* @detail PsmStatus Psm状态
+*/
+message PsmStatus{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+  
+///< C2电源模式切换标志：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+///<0x0: 电源正常
+///<0x1: 电源即将进入休眠模式
+///<0x2: 电源休眠模式
+///<0x3: 电源即将关闭
+uint32 c2_power_status = 2;
+
+///< OTA模式启动标志：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF
+///<0x0: 无OTA
+///<0x1: SOTA
+///<0x2: FOTA
+uint32 c2_ota_model = 3;
+
+///< C2诊断模式：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+///<0x0: 无诊断
+///<0x1: 远程诊断
+///<0x2: 诊断仪接入(ODB)本地诊断
+///<0x3: 诊断仪接入_下线电检
+///<0x4: 诊断仪接入_诊断仪读取自驾记录核心数据(新国标)
+///<0x5: 诊断编程模式
+///<0x6: 诊断扩展模式
+uint32 c2_dm_status = 4;
+} 
+
+
+/**
+* @brief VersionInfo
+* @detail 各个控制器或者传感器版本信息
+*/
+message VersionInfo{
+///< 版本匹配标志：[/],(3,/,/),[/],(1,0),	 
+///<0x0: 版本匹配
+///<0x1: 版本不匹配
+///<0x1: 版本未获取
+uint32 status = 1;
+
+///<软件名：[/],(/,/,/),[/],(/,0),/ 
+string software_name = 2;
+	
+///<当前版本号：[/],(/,/,/),[/],(/,0),/ 
+string current_version = 3;
+
+///<目标版本号最小值：[/],(/,/,/),[/],(/,0),/ 
+string min_version = 4;
+
+///<目标版本号最大值：[/],(/,/,/),[/],(/,0),/ 
+string max_version = 5;
+	
+
+}
+
+
+/**
+* @brief VersionStatus
+* @detail 版本匹配状态
+*/
+message VersionStatus{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+  
+///< 整体版本匹配标志：[/],(3,/,/),[/],(1,0),/
+///<0x0: 版本匹配
+///<0x1: 版本不匹配
+///<0x1: 版本未获取
+uint32 version_status = 2;
+
+///<版本信息列表：[/],(/,/,/),[32],(/,/),/ 
+repeated VersionInfo version_list = 3;
+
+} 

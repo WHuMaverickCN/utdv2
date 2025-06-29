@@ -1,0 +1,764 @@
+//versiong =3.14
+syntax = "proto3";
+package Data;
+option cc_enable_arenas = true;
+
+message TileData{
+    repeated HADLane HADLaneList = 1;
+    repeated HADLaneAdas HADLaneAdasList = 2;
+    repeated HADLaneDivider HADLaneDividerList = 3;
+    repeated HADLaneLimit HADLaneLimitList = 4;
+    repeated HADLaneNode HADLaneNodeList = 5;
+    repeated HADLaneNodeConnect HADLaneNodeConnectList = 6;
+    repeated HADRoadDivider HADRoadDividerList = 7;
+    repeated LandMark LandMarkList = 8;
+    repeated LocSign LocSignList = 9;
+    repeated LocTrafficLight LocTrafficLightList = 10;
+    repeated LocObj LocObjList = 11;
+    repeated Park ParkList = 12;
+    repeated HADLaneZlevel HADLaneZlevelList = 13;
+    repeated HADLaneZlevelNode HADLaneZlevelNodeList = 14;  
+    TileTime TileTime = 15;
+    repeated HADNotOdd HADNotOddList = 16;
+    repeated VehicelPedestrainMixedTraffic VehicelPedestrainMixedTrafficList =17;
+    repeated Lights LightsList=18; 
+}
+
+message GeoPoint
+{
+    int32 x =1;//经度   单位：度
+	int32 y =2;//纬度   
+	int32 z =3;
+
+}
+
+//车道中心线
+message HADLane{
+    uint64 id = 1; //用户编号
+    uint64 shadlanenode_id = 2;//起点id
+    uint64 ehadlanenode_id = 3;//终点id
+    HADLaneDriveType drivetype =4; //车道类型
+    int32 other_drivetype =5;//图商特有的的车道类型
+    int32 length =6;//长度
+    TravelDirection lane_direction =7;//车道通行方向
+    repeated uint64 hadlanedivider_id_list_l =8;//关联左侧分界线idlist
+    repeated uint64 hadlanedivider_id_list_r =9;//关联右侧分界线idlist
+	repeated uint64 hadroaddivider_id_list_l =10;//关联左侧道路分界线idlist
+    repeated uint64 hadroaddivider_id_list_r =11;//关联右侧道路分界线idlist
+	repeated uint64 hadlane_id_list_l =12;//关联左侧中心线list
+	repeated uint64 hadlane_id_list_r =13;//关联右侧中心线list
+    Floor floor =14;//层级
+    uint64 parking_id =15;//关联停车场id
+    int32 average_speed_max =16;//车道通行推荐最高速度
+    int32 average_speed_min =17;//车道通行推荐最低速度
+	int32 data_sources =18;//数据来源
+    //采用32bit表示,从右到左依次为0~31bit,每bit表示一个类型(如下)，赋值为0/1分别表示否/是, 如:0000 0000 0000 0000 0000 0000 0000 0001表示分界线推导
+    //第0bit 左右分界线/道路边界推导
+    //第1bit 用户轨迹挖掘
+    //第2bit 图商
+    //第3bit 前后分界线/道路边界推导
+    repeated GeoPoint geometry = 19;//geometry
+    BaseInfo baseInfo =20;//
+    int32 collect_num=21;//采集次数
+    repeated uint64 hadnotodd_id_list=22;//关联notoddid
+    repeated uint32 bump_s_offset_list=23;//颠簸开始偏移距离
+    repeated uint32 bump_length_list=24;// 颠簸长度
+    repeated bump_level bump_level_list=25;// 颠簸等级
+    repeated bump_type bump_type_list=26;// 颠簸类型
+}
+
+//车道的ADAS图层
+message HADLaneAdas{
+    uint64 id = 1; //用户编号
+    int32 seqnum =2; //形状点序号
+    uint64 hadlane_id =3; //车道用户编号
+    int32 slope =4;//纵坡坡度
+    int32 curvature =5;//曲率
+    GeoPoint geometry= 6;//geometry
+    BaseInfo baseInfo =7;//
+}
+
+//车道分界线
+message HADLaneDivider{
+    uint64 id = 1; //用户编号
+    HADLaneDividerType type =2;//分界线类型
+    HADLaneDividerColor color =3;//分界线颜色
+    int32 longitudinal_type =4;//附加线形
+    //采用32bit表示,从右到左依次为0~31bit,每bit表示一个类型(如下)，赋值为0/1分别表示否/是, 如:0000 0000 0000 0000 0000 0000 0000 0001表示常规线形
+    //第0bit 常规线形
+    //第3bit 车行道纵向减速标线
+    //第4bit 导流区边线
+    //第5bit 禁停区边线
+    repeated GeoPoint geometry= 5;//geometry
+    BaseInfo baseInfo =6;//
+    bool vectorization_direction_change =7;//是否南西原则改变过矢量化方向。0：否；1：是
+}
+
+//限制时间
+message LimitTime
+{
+    ///<限制时间起点:[s],(0,0,/),[/],(1,0),记录从当天0点开始经过的秒数
+    uint64 time_start = 1;
+    ///<限制时间结束点:[s],(0,0,/),[/],(1,0),记录从当天0点开始经过的秒数
+    uint64 time_end = 2;
+    ///<限制时间生效对应的周内日，按位填充，周日对应bit-0:[/],(0,0,/),[/],(1,0),从右至左，依次为0~6bit，即从星期日到星期一
+    uint32 time_day = 3;
+}
+
+//车道中心线限制信息
+message HADLaneLimit{
+    uint64 id = 1; //用户编号
+    uint64 hadlane_id =2;//关联车道中心线
+    uint64 hadlanenodeconnect_id =3;//关联点点连通关系
+    repeated LimitTime LaneLimit = 4;
+    TravelDirection limit_direction =5;//限制的车道方向
+    BaseInfo baseInfo =6;//
+}
+
+//车道中心线节点
+message HADLaneNode{
+    uint64 id = 1; //用户编号
+    int32 match_id =2;//接边匹配id
+    int32  type =3; 
+    //采用32bit表示,从右到左依次为0~31bit,每bit表示一个类型(如下)，赋值为0/1分别表示否/是, 如: 0000 0000 0000 0000 0000 0000 0000 0001表示普通节点
+    //第0bit 普通节点
+    //第1bit 线形变化点
+    //第2bit  分歧起点
+    //第3bit  隧道起点
+    //第4bit 隧道终点
+    //第5bit  停车场入口
+    //第6bit  停车场出口
+    //第7bit  Tile切割点
+    //第8bit  坡度变化点
+    //第9bit 合流终点
+    //第10bit 截止点 
+    GeoPoint geometry = 4;//geometry
+    BaseInfo baseInfo =5;//
+}
+
+//车道中心线节点连通关系
+message HADLaneNodeConnect{
+    uint64 id = 1; //用户编号
+    uint64 shadlanenode_id = 2;//起点id
+    uint64 ehadlanenode_id = 3;//终点id
+    BaseInfo baseInfo =4;//
+}
+
+
+//道路边界
+message HADRoadDivider{
+    uint64 id = 1; //用户编号
+    HADRoadDividerType type =3;//道路边界类型
+    repeated GeoPoint geometry = 4;//geometry
+    BaseInfo baseInfo =5;//
+    bool vectorization_direction_change =6;//是否南西原则改变过矢量化方向。0：否；1：是
+}
+
+//路面标识面
+message LandMark{
+    uint64 id = 1; //用户编号
+    LandmarkType type =2;//面类型
+    LandmarkColor color =3;//颜色
+    LandmarkDSubtype type_num =4;//面式样编码
+    string measure =5;//文字描述
+    repeated uint64 hadlane_id_list =6; //关联车道中心线idlist 
+    repeated GeoPoint geometry = 7;//geometry
+    BaseInfo baseInfo =8;//
+}
+
+//标牌
+message LocSign{
+    uint64 id = 1; //用户编号
+    uint64 hadlane_id =2;//关联车道中心线
+    uint64 s_offset=3;//标牌投影到关联车道偏移车道起点的距离
+    int32 heading =4;//朝向角
+    SignType type =5;//标牌类型
+    oneof sub_type{
+        SignWarningType warning_subtype =6;//
+        SignForbiddenType forbidden_subtype =7;//
+        SignInformationType information_subtype =8;//
+    }
+    int32 high =9;//相对地面高
+	string measure =10;//文字描述
+    GeoPoint geometry =11;//geometry
+    BaseInfo baseInfo =12;//
+}
+
+//交通灯
+message LocTrafficLight{
+    uint64 id = 1; //用户编号
+    repeated uint64 hadlane_id_list =2;//关联车道中心线
+    repeated uint64 s_offset_list =3;//交通灯投影到关联车道偏移车道起点的距离；单位：cm
+    int32 heading =4;//朝向角
+    int32 high =5;//相对地面高
+    GeoPoint geometry =6;//geometry
+    BaseInfo baseInfo =7;//
+}
+
+//其他要素
+message LocObj{
+    uint64 id = 1; //用户编号
+    repeated uint64 hadlane_id_list =2;//关联HADLane的用户编号 
+    ObjType type =3;//
+    int32 high =4;//相对地面高
+    repeated GeoPoint geometry =5;//geometry
+    BaseInfo baseInfo =6;//
+}
+
+//停车场基本属性
+message Park{
+    uint64 id = 1; //用户编号
+    BaseInfo baseInfo =2;//
+}
+
+message TileTime{
+    int64 id =1;//tileid
+    uint32 time  =2;//tile发布时间 从母库拉取数据发布的时间，记录为UNIX时间戳（timestamp）
+}
+
+//立交组
+message HADLaneZlevel{
+    uint64 id = 1; //用户编号
+    GeoPoint XY =2;//立交位置经纬度坐标
+    repeated int64 zlevel_num =3;//立交点层数排序
+    BaseInfo baseInfo =4;//
+}
+
+//立交点
+message HADLaneZlevelNode{
+    uint64 id = 1; //用户编号
+    uint64 hadlane_id =2; //车道用户编号
+    GeoPoint geometry  = 3;//geometry
+    BaseInfo baseInfo =4;//
+}
+
+message BaseInfo{
+    uint32 tile_id =1;//图幅号
+    int32 confidence_level =2;//置信度
+    uint32 update_time =3;//更新时间
+}
+
+message HADNotOdd{
+    uint64 id = 1; //用户编号
+    int32 type=2; //odd类型
+    //采用32bit表示,从右到左依次为0~31bit,每bit表示一个类型(如下)，赋值为0/1分别表示否/是, 如: 0000 0000 0000 0000 0000 0000 0000 0001表示收费站 
+    //第0bit 收费站 
+    //第1bit 交通灯 
+    //第2bit  断头路 
+    //第3bit  隧道 
+    //第4bit  无护栏 
+    //第5bit  曲率超限 
+    //第6bit  坡度超限 
+    //第7bit  匝道或JCT 
+    //第8bit  车道宽度异常 
+    //第9bit  施工区域
+    //第16bit 道路采集不全-分歧合流
+    //第17bit 道路采集不全-路口
+    //第18bit 质检case报错
+    //第19bit 未验证or验证不通过
+    //第20bit 道路等级低
+    repeated GeoPoint geometry  = 3;//geometry
+    BaseInfo baseInfo =4;//    
+
+}
+
+message VehicelPedestrainMixedTraffic{
+    uint64 id =1;//
+    repeated uint64 num_list =2;//每个时间段数量
+    BaseInfo baseInfo =3;// 
+    GeoPoint geometry  = 4;//geometry 
+}
+
+message Lights{
+    uint64 id = 1;//红绿灯灯箱集id
+    uint64 hadlane_id= 2;//关联车道id
+    uint32 lights_num = 3;//红绿灯灯箱的数量
+    uint32 lights_order = 4;//红绿灯灯箱的排序
+    LightsColor lights_color = 5;//红绿灯灯箱的颜色
+    LightsType lights_type = 6;//红绿灯灯箱的类型
+    BaseInfo baseInfo =7;//
+}
+// 表编码类型
+enum TableDefination
+{
+    TableDefination_NOUSE = 0;  //不使用 占位
+    TableDefination_HADLane = 1;
+    TableDefination_HADLaneAdas = 2; 
+    TableDefination_HADLaneDivider = 3;    
+    TableDefination_HADLaneLimit = 4; 
+    TableDefination_HADLaneNode = 5;
+    TableDefination_HADLaneNodeConnect = 6; 
+    TableDefination_HADRoadDivider = 7;
+    TableDefination_LandMark = 8;
+    TableDefination_LocSign = 9;
+	TableDefination_LocTrafficLight = 10;
+	TableDefination_LocObj = 11;
+	TableDefination_Park = 12;
+    TableDefination_HADLaneZlevel = 13;
+    TableDefination_HADLaneZlevelNode = 14;
+    TableDefination_TileTime = 15;
+    TableDefination_HADNotOdd =16;
+    TableDefination_VehicelPedestrainMixedTraffic =17;
+    TableDefination_Lights =18;  
+}
+// 车道类型枚举
+
+enum HADLaneDriveType
+{
+    HADLaneDriveType_COMMON_LANE = 0;  // 普通车道
+    HADLaneDriveType_VIRTUAL_LANE = 1; // 虚拟连接车道
+    HADLaneDriveType_CONNECT_LANE=2;//过渡连接车道
+}
+
+// 车道通行方向
+enum TravelDirection
+{
+    TravelDirection_NOUSE = 0;// 不使用，占位
+    TravelDirection_POSITIVE = 1;       // 顺方向
+    TravelDirection_NEGTIVE = 2;        // 逆方向
+    TravelDirection_BOTH_DIRECTION = 3; // 双向通行
+    TravelDirection_UNKNOWN = 4; // 未调查
+}
+
+// 层级
+enum Floor
+{
+    Floor_UNKNOWN = 0;
+    Floor_B6 = 1; // 地下6层
+    Floor_B5 = 2;
+    Floor_B4 = 3;
+    Floor_B3 = 4;
+    Floor_B2 = 5;
+    Floor_B1 = 6;
+    Floor_ZERO = 7;
+    Floor_F1 = 8;
+    Floor_F2 = 9;
+    Floor_F3 = 10;
+    Floor_F4 = 11;
+    Floor_F5 = 12;
+    Floor_F6 = 13;
+}
+
+// 车道节点类型
+enum HADLaneNodeType
+{
+    HADLaneNodeType_NOUSE = 0;  //不使用 占位
+    HADLaneNodeType_COMMON = 1;       //普通节点
+    HADLaneNodeType_CHANGE = 2;       //线性变化点
+    HADLaneNodeType_SPLIT = 4;        //分歧起点
+    HADLaneNodeType_TUNNEL_START = 8; //隧道起点
+    HADLaneNodeType_TUNNEL_END = 16;   //隧道终点
+    HADLaneNodeType_PARKING_ENTRY = 32;
+    HADLaneNodeType_PARKING_EXIT = 64;
+    HADLaneNodeType_TILE_BORDER = 128;  //Tile切割点
+    HADLaneNodeType_SLOPE_CHANGE = 256; //坡度变化点
+    HADLaneNodeType_MERGE = 512;       //合流终点
+    HADLaneNodeType_STOP_POINT = 1024; // 截止点
+}
+
+// 道路物理分界类型
+enum HADRoadDividerType
+{
+    HADRoadDividerType_NOUSE =0; //不使用 占位
+    HADRoadDividerType_GUARDRAIL = 1;     // 护栏
+    HADRoadDividerType_CURB = 2;          // 路缘石
+    HADRoadDividerType_BOUNDARY_END = 3;  // 地理边界
+    HADRoadDividerType_OTHER_DIVIDER = 4; // 其他硬隔离
+    HADRoadDividerType_WALL = 5;          // 墙体
+    HADRoadDividerType_BELT = 6;          // 绿化带
+    HADRoadDividerType_PILLARS = 8;       // 停车场柱子
+}
+
+// 车道分界线类型
+enum HADLaneDividerType
+{
+    HADLaneDividerType_NOUSE =0;    //不使用 占位
+    HADLaneDividerType_DASHED_LINE = 1;        //
+    HADLaneDividerType_DOUBLE_SOLID_LINE = 2; //
+    HADLaneDividerType_SOLID_LINE = 3;         //
+    HADLaneDividerType_SOLID_DASHED_LINE = 4;  //
+    HADLaneDividerType_DASHED_SOLID_LINE = 5;  //
+    HADLaneDividerType_DASHED_BLOCKS = 6;      //
+    HADLaneDividerType_DOUBLE_DASHED_LINE = 9; //
+    HADLaneDividerType_FOUR_SOLID_LINE = 10;   //
+}
+
+// 车道分界线颜色
+enum HADLaneDividerColor
+{
+    HADLaneDividerColor_WHITE = 0;
+    HADLaneDividerColor_YELLOW = 1;
+    HADLaneDividerColor_GREEN = 2;
+    HADLaneDividerColor_BLUE = 3;
+    HADLaneDividerColor_WHITE_YELLOW = 4;
+    HADLaneDividerColor_YELLOW_WHITE = 5;
+    HADLaneDividerColor_RED = 6;
+    HADLaneDividerColor_OTHER = 7;
+}
+
+//附加线形
+enum HADLaneDividerLongitudinalType
+{
+    HADLaneDividerLongitudinalType_NOUSE =0;//不使用，占位
+    HADLaneDividerLongitudinalType_COMMON = 1;   //常规线形
+    HADLaneDividerLongitudinalType_DISTANCE = 4; //白色半圆状车距确认线
+    HADLaneDividerLongitudinalType_SLOW = 8;     //车行道纵向减速标线
+    HADLaneDividerLongitudinalType_GORE = 16;     //导流区边线
+    HADLaneDividerLongitudinalType_STOP = 32;     //禁停区边线
+    HADLaneDividerLongitudinalType_PARKING=64;//停车位标线
+}
+
+enum LandmarkType
+{
+    LandmarkType_UNKNOWN = 0;      //
+    LandmarkType_STOP_LINE = 1;    // 停止线
+    LandmarkType_STOP = 2;         // 停车让行线
+    LandmarkType_SLOW_LINE = 3;    // 减速让行线
+    LandmarkType_SLOW = 4;         // 减速带
+    LandmarkType_CROSSWALK = 5;    // 人行横道
+    LandmarkType_ARROW = 7;        // 地面箭头
+    LandmarkType_WORDS = 8;        // 地面文字
+    LandmarkType_SPEED_LIMIT = 10; // 地面限速
+    LandmarkType_NON_MORTOR = 12;  // 非机动车道标识
+    LandmarkType_PARKING = 14;     // 停车位
+    LandmarkType_ANTI_SLIP = 19;   // 防滑车道标线
+    LandmarkType_LOCK = 20;        // 地锁
+    LandmarkType_LIMIT = 21;       // 限位器
+    LandmarkType_PEDESTRAINS = 22; // 行人区域
+}
+
+enum LandmarkColor
+{
+    LandmarkColor_NOUSE =0; //不使用，占位
+    LandmarkColor_WHITE = 1;
+    LandmarkColor_YELLOW = 2;
+    LandmarkColor_ORANGE = 3;
+    LandmarkColor_BLUE = 4;
+    LandmarkColor_GREEN = 5;
+    LandmarkColor_RED = 6;
+    LandmarkColor_OTHER = 7;
+}
+
+enum LandmarkDSubtype
+{
+    LandmarkDSubtype_NOUSE = 0; //不使用，占位
+    LandmarkDSubtype_STAIGHT = 1;        //直行
+    LandmarkDSubtype_STRAIGHT_LEFT = 2;  //直行+左转
+    LandmarkDSubtype_LEFT = 3;           //左转
+    LandmarkDSubtype_RIGHT = 4;          //右转
+    LandmarkDSubtype_STRAIGHT_RIGHT = 5; //直行+右转
+    LandmarkDSubtype_UTURN = 6;          //前方调头
+    LandmarkDSubtype_STRIGHT_UTURN = 7;  //直行+调头
+    LandmarkDSubtype_LEFT_UTURN = 8;     //前方左转+调头
+    LandmarkDSubtype_LEFT_RIGHT = 9;     //左右转弯
+    LandmarkDSubtype_MERGE_LEFT = 10;    //提示前方道路有左弯或者需要向左合流
+    LandmarkDSubtype_MERGE_RIGHT = 11;   //提示前方道路有右弯或者需要向右合流
+    LandmarkDSubtype_MAX_SPEED1 = 12;    //最高限速1
+    LandmarkDSubtype_MAX_SPEED2 = 13;    //最高限速2
+    LandmarkDSubtype_MAX_SPEED3 = 14;    //最高限速3
+    LandmarkDSubtype_MIN_SPEED1 = 15;    //最低限速1
+    LandmarkDSubtype_MIN_SPEED2 = 16;    //最低限速2
+	LandmarkDSubtype_LEFT_FRONT =17;      //左前方
+	LandmarkDSubtype_RIGHT_FRONT =18;      //右前方
+	LandmarkDSubtype_LEFT_STRAIGHT_RIGHT =19;      //左转+直行+右转
+	LandmarkDSubtype_LEFT_RIGHT_UTURN =20;      //左转+右转+调头
+	LandmarkDSubtype_RIGHT_UTURN =21;      //右转+调头  
+}
+
+enum ObjType
+{
+    ObjType_NOUSE =0;//不使用，占位
+    ObjType_POLE = 1;  //杆
+    ObjType_GANTRY = 2; //龙门架
+    ObjType_PARKING = 3;//停车场道闸
+}
+
+enum SignType
+{
+    SignType_Other = 0;            //未区分，或不是禁止、警告等有导航含义的看板类型
+    SignType_Warning_Sign = 1;     //警告标志
+    SignType_Forbidden_Sign = 2;   //禁止标志
+    SignType_Information_Sign = 3; //指示标志
+    SignType_Guide_Sign = 4;       //指路标志（蓝色方面看板）
+    SignType_Tourist_Sign = 5;     //旅游区标志（棕色方面看板）
+    SignType_Normal_Sign = 6;      //一般路牌
+    SignType_Advertising_Sign = 7; //广告牌
+}
+
+enum SignWarningType
+{
+    SignWarningType_OTHER =0 ;//其它
+    SignWarningType_STEEP_DROP_ON_RIGHT = 1;              //傍山险路（右侧）
+    SignWarningType_STEEP_DROP_ON_LEFT = 2;               //傍山险路（左侧）
+    SignWarningType_VILLAGE_AHEAD = 3;                    //村庄
+    SignWarningType_EMBANKMENT_ON_THE_RIGHT = 4;          //堤坝路（右侧）
+    SignWarningType_EMBANKMENT_ON_THE_LEFT = 5;           //堤坝路（左侧）
+    SignWarningType_CROSS_T = 6;                          //丁字平面交叉
+    SignWarningType_FERRY_TERMINAL = 7;                   //渡口
+    SignWarningType_CARRIAGEWAY_NARROWS = 8;              //二侧变窄
+    SignWarningType_FALLING_ROCKS_ON_THE_RIGHT = 9;       //注意落石（左侧）
+    SignWarningType_DOUBLE_HAIRPIN_CURVE = 10;            //向左反向弯路
+    SignWarningType_REVERSE_BENDS = 11;                   //向右反向弯路
+    SignWarningType_ROAD_FLOODS = 12;                     //过水路面
+    SignWarningType_DANGEROUS_INTERSECTION = 13;          //十字交叉路口
+    SignWarningType_INTESECTION_K = 14;                   //卡字交叉路口
+    SignWarningType_INTERSECTION_Y_LEFT_DOWN = 15;        //Y 形交叉（左下侧）
+    SignWarningType_INTERSECTION_Y_RIGHT_DOWN = 16;       //Y 形交叉（右下侧）
+    SignWarningType_INTERSECTION_Y_LEFT_UP = 17;          //Y 形交叉（左上侧）
+    SignWarningType_CARRIAGEWAY_NARROWS_LEFT = 18;        //左侧变窄
+    SignWarningType_INTERSECTION_Y = 19;                  //Y 形交叉（右上侧）
+    SignWarningType_INTERSECTION_T_LEFT_RIGHT = 20;       //T 形交叉路口
+    SignWarningType_INTERSECTION_T_LEFT = 21;             //T 形交叉（左侧）
+    SignWarningType_INTERSECTION_T__RIGHT = 22;           //T 形交叉（右侧）
+    SignWarningType_ROUNDABOUT_AHEAD = 23;                //环形交叉路口
+    SignWarningType_CURVY_ROAD = 24;                      //连续弯路
+    SignWarningType_DOWN_CONTUNUE = 25;                   //连续下坡
+    SignWarningType_UNEVEN_ROAD = 26;                     //路面不平
+    SignWarningType_RAIN = 27;                            //注意雨（雪）天
+    SignWarningType_LOW_LYING = 28;                       //路面低洼
+    SignWarningType_RISK_OF_GROUNDING = 29;               //路面高突（减速丘）
+    SignWarningType_SLOW_DOWN = 30;                       //慢行
+    SignWarningType_STEEP_INCLINE = 31;                   //上陡坡
+    SignWarningType_ROAD_WORKS = 32;                      //施工
+    SignWarningType_INTERSECTION = 33;                    //十字平面交叉
+    SignWarningType_HIGH_ACCIDENT_AREA = 34;              //事故易发地段
+    SignWarningType_TWO_WAY_TRAFFIC = 35;                 //双向交通
+    SignWarningType_ANIMALS = 36;                         //注意野生动物
+    SignWarningType_TUNNEL = 37;                          //隧道
+    SignWarningType_TUNNEL_LIGHT = 38;                    //隧道开车灯
+    SignWarningType_HUMPBACK_BRIDGE = 39;                 //驼峰桥
+    SignWarningType_RAILROAD_CROSSING_WITHOUT_GATES = 40; //无人看守的铁道路口
+    SignWarningType_STEEP_DECLINE = 41;                   //下陡坡
+    SignWarningType_CURVE_RIGHT = 42;                     //向右急转弯
+    SignWarningType_CURVE_LEFT = 43;                      //向左急转弯
+    SignWarningType_SLIPPERY_ROAD = 44;                   //易滑
+    SignWarningType_LIGHT_SIGNALS = 45;                   //注意信号灯
+    SignWarningType_RAILROAD_CROSSING_WITH_GATES = 46;    //有人看守的铁道路口
+    SignWarningType_CARRIAGEWAY_NARROWS_RIGHT = 47;       //右侧变窄
+    SignWarningType_PASS_RIGHT_OF_OBSTACLE = 48;          //右侧绕行
+    SignWarningType_NARROW_BRIDGE = 49;                   //窄桥
+    SignWarningType_KEEP_DISTANCE = 50;                   //注意保持车距
+    SignWarningType_WEATHER_WARNING = 51;                 //注意不利气象条件
+    SignWarningType_DISABILITY_WARNING = 52;              //注意残疾人
+    SignWarningType_LANE_USED_IN_BOTH_DIRECTIONS = 53;    //注意潮汐车道
+    SignWarningType_FOG_AREA = 54;                        //注意雾天
+    SignWarningType_CHILDREN = 55;                        //注意儿童
+    SignWarningType_CYCLISTS = 56;                        //注意非机动车
+    SignWarningType_PEDESTRIAN_CROSSING = 57;             //注意行人
+    SignWarningType_LANE_MERGE_FROM_LEFT = 58;            //注意合流（左侧）
+    SignWarningType_LANE_MERGE_FROM_RIGHT = 59;           //注意合流（右侧）
+    SignWarningType_WIND = 60;                            //注意横风
+    SignWarningType_ICY_ROAD = 61;                        //注意路面结冰
+    SignWarningType_FALLING_ROCKS_ON_THE_LEFT = 62;       //注意落石（右侧）
+    SignWarningType_GENERAL_HAZARD = 63;                  //注意危险
+    SignWarningType_CATTLE = 64;                          //注意牲畜
+    SignWarningType_PASS_LEFT_OF_OBSTACLE = 65;           //左侧绕行
+    SignWarningType_PASS_LEFT_OR_RIGHT_OF_OBSTACLE = 66;  //左右绕行
+    SignWarningType_TRAFFIC_JAM = 67;                     //注意前方车辆排队
+	SignWarningType_Y = 68;                     //Y 形交叉（左右侧）
+	SignWarningType_INTERSECTION_CROSS = 69;              //线条粗细示意相交道路宽度的交叉路口标志 
+    SignWarningType_SLOPE = 70;                      //陡坡标志加坡度值 
+	SignWarningType_X = 71;                      //叉形符号  
+	SignWarningType_SLASH = 72;                      //斜杠符号  
+	SignWarningType_BIKE_ELEC = 73;                      //注意电动自行车  
+	SignWarningType_ACCIDENT = 74;                      //交通事故管理  
+	SignWarningType_ADVICE_SPEED = 75;                      //建议速度  
+	SignWarningType_ESCAPE_LANE = 76;                      //避险车道  
+	SignWarningType_LANENUM_REDUCE = 77;                      //注意车道数变少  
+	SignWarningType_LINER_INDUCER = 78;                      //线形诱导标 
+	SignWarningType_WATER = 79;                           //注意积水
+}
+
+enum SignForbiddenType
+{
+    signForbiddenType_OTHER =0; //其它
+    SignForbiddenType_NO_OVERTAKING = 1;                //禁止超车
+    SignForbiddenType_ANIMAL_CAR_PROHIBITED = 2;        //禁止畜力车进入
+    SignForbiddenType_BUS_PROHIBITED = 3;               //禁止大型载客汽车驶入
+    SignForbiddenType_ELETRIC_TRICYCLE_PROHIBITED = 4;  //禁止电动三轮车驶入
+    SignForbiddenType_TURN_RESTRICTION = 5;             //禁止掉头
+    SignForbiddenType_NON_MORTOR_PROHIBITED = 6;        //禁止各类非机动车进入
+    SignForbiddenType_UNLOADING_CAR_PROHIBITED = 7;     //禁止载货汽车左转
+    SignForbiddenType_TRAILER_PROHIBITED = 8;           //禁止挂车、半挂车驶入
+    SignForbiddenType_PEDESTRIANS_PROHIBITED = 9;       //禁止行人进入
+    SignForbiddenType_VEHICLES_PROHIBITED = 10;         //禁止机动车驶入
+    SignForbiddenType_HONKING_PROHIBITED = 11;          //禁止鸣喇叭
+    SignForbiddenType_MORTOR_PROHIBITED = 12;           //禁止摩托车驶入
+    SignForbiddenType_SPECIFIC_VEHICLE_PROHIBITED = 13; //禁止标志上所示的两种车辆驶入
+    SignForbiddenType_STRAIGHT_RESTRICTION = 14;        //禁止直行
+    SignForbiddenType_CART_PROHIBITED = 15;             //禁止人力车进入
+    SignForbiddenType_TRICICLE_PROHIBITED = 16;         //禁止人力货运三轮车进入
+    SignForbiddenType_RIKSCHA_PROHIBITED = 17;          //禁止人力客运三轮车进入
+    SignForbiddenType_TRACTORS_PROHIBITED = 18;         //禁止拖拉机驶入
+    SignForbiddenType_RIGHT_RESTRICTION = 19;           //禁止向右转弯
+    SignForbiddenType_LEFT_RIGHT_RESTRICTION = 20;      //禁止向左向右转弯
+    SignForbiddenType_STRIGHT_RIGHT_RESTRICTION = 21;   //禁止直行和向右转弯
+    SignForbiddenType_LOW_SPEED_RESTRICTION = 22;       //禁止三轮汽车、低速货车驶入
+    SignForbiddenType_LEFT_RESTRICTION = 23;            //禁止向左转弯
+    SignForbiddenType_CARS_RIGHT_RESTRICTION = 24;      //禁止小客车向右转弯
+    SignForbiddenType_CARS_PROHIBITED = 25;             //禁止小型载客汽车驶入
+    SignForbiddenType_TRUCTS_PROHIBITED = 26;           //禁止载货汽车驶入
+    SignForbiddenType_DANGEROUS_PROHIBITED = 27;        //禁止运输危险物品车辆驶入
+    SignForbiddenType_SRAIGHT_LEFT_RESTRICTION = 28;    //禁止直行和向左转弯
+    SignForbiddenType_WEIGHT_RESTRICTION = 29;          //限制质量
+    SignForbiddenType_AXLE_RESTRICTION = 30;            //限制轴重
+    SignForbiddenType_CUNSTOMS = 31;                    //海关
+    SignForbiddenType_STOP_CHECK = 32;                  //停车检查
+    SignForbiddenType_DONT_STOP_ZONE = 33;              //禁止车辆停放 
+    SignForbiddenType_STOP_LONG_RESTRICTION = 34;       //禁止车辆长时停放 
+    SignForbiddenType_SPEED_LIMIT = 35;                 //限制速度
+    SignForbiddenType_SPEED_LIMIT_END = 36;             //解除限制速度
+    SignForbiddenType_HEIGHT_RESTRICTION = 37;          //限制高度
+    SignForbiddenType_WIDTH_RESTRICTION = 38;           //限制宽度
+    SignForbiddenType_STOP = 39;                        //停车让行
+    SignForbiddenType_YIELD = 40;                       //减速让行
+    SignForbiddenType_NO_ENTRY = 41;                    //禁止通行
+    SignForbiddenType_YIELD_TO_ONCOMING = 42;           //会车让行
+    SignForbiddenType_DO_NOT_ENTER = 43;                //禁止驶入
+    SignForbiddenType_NO_OVERTAKING_END = 44;           //解除禁止超车
+	SignForbiddenType_ELECCAR_ENTRY = 45; //禁止电动自行车进入  
+    SignForbiddenType_CAR_NO_LEFT = 46; //禁止小客车向左转弯  
+    SignForbiddenType_TRUCK_NO_RIGHT = 47;  //禁止载货汽车右转  
+    SignForbiddenType_STOP_INSPECTION = 48; //口岸停车检查 
+    SignForbiddenType_NO_PARKING_LONG= 49; //区域禁止车辆长时停放 
+    SignForbiddenType_PARKING_LONG = 50; //区域禁止车辆长时停放解除 
+    SignForbiddenType_NO_PARKING = 51; //区域禁止车辆停放 
+    SignForbiddenType_PARKING = 52; //区域禁止车辆停放解除 
+    SignForbiddenType_SPEED_LIMIT_AREA = 53;  //区域限制速度 
+    SignForbiddenType_RELIEVE_SPEED_LIMIT_AREA = 54; //区域限制速度解除 
+}
+
+enum SignInformationType
+{
+    SignInformationType_OTHER =0 ;//其它
+    SignInformationType_PEDESTRIAN_ZONE = 1;         //行人 
+    SignInformationType_BICYCLE_PATH = 2;            //非机动车行驶
+    SignInformationType_ROUNDABOUT_AHEAD = 3;        //环岛行驶
+    SignInformationType_MOTOR_VEHICLE_ROAD = 4;      //机动车行驶
+    SignInformationType_PASS_RIGHT_OF_OBSTACLE = 5;  //分隔带右侧行驶 
+    SignInformationType_PASS_LEFT_OF_OBSTACLE = 6;   //分隔带左侧行驶 
+    SignInformationType_STRAIGHT_RIGHT_CROSS = 7;    //立体交叉直行和右转弯行驶
+    SignInformationType_STRAIGHT_LEFT_CROSS = 8;     //立体交叉直行和左转弯行驶
+    SignInformationType_AUDIBLE_WARNING = 9;         //鸣喇叭
+    SignInformationType_TURN_RIGHT = 10;             //向右转弯
+    SignInformationType_TURN_LEFT_RIGHT = 11;        //向左和向右转弯
+    SignInformationType_TURN_LEFT = 12;              //向左转弯
+    SignInformationType_STRAIGHT = 13;               //直行
+    SignInformationType_STRAIGHT_RIGHT = 14;         //直行和向右转弯
+    SignInformationType_STRAIGHT_LEFT = 15;          //直行和向左转弯
+    SignInformationType_BRANCH_TO_THE_RIGHT = 16;    //单行路向左
+    SignInformationType_BRANCH_TO_THE_LEFT = 17;     //单行路向右
+    SignInformationType_INTERSECTION_FIRST = 18;     //路口优先通行
+    SignInformationType_PRIORITY_OVER_ONCOMING = 19; //会车先行
+    SignInformationType_RIGHT_LANE = 20;             //右转车道
+    SignInformationType_LEFT_LANE = 21;              //左转车道
+    SignInformationType_STRAIGHT_LANE = 22;          //直行车道
+    SignInformationType_STRAIGHT_RIGHT_LANE = 23;    //直行和右转合用车道
+    SignInformationType_STRAIGHT_LEFT_LANE = 24;     //直行和左转合用车道
+    SignInformationType_U_TURN_LANE = 25;            //掉头车道
+    SignInformationType_U_TURN_LEFT_LANE = 26;       //掉头和左转合用车道
+    SignInformationType_BUS_LANE = 27;               //公交线路专用车道
+    SignInformationType_MOTOR_LANE = 28;             //机动车车道
+    SignInformationType_NON_MOTOR_LANE = 29;         //非机动车车道
+    SignInformationType_FAST_BUS_LANE = 30;          //快速公交系统专用车道
+    SignInformationType_CARPOOL_LANE = 31;           //多乘员车辆专用车道
+    SignInformationType_PARKING = 32;                //停车位
+    SignInformationType_U_TURN = 33;                 //允许掉头
+    SignInformationType_MINIMUM_SPEED = 34;          //最低限速
+    SignInformationType_PEDESTRIAN_CROSSING = 35;    //人行横道
+	SignInformationType_OPENLIGHT =36; //开车灯 
+    SignInformationType_COMBINATION_SET =37; //组合设置 
+    SignInformationType_COMBINATION_SET1 =38; //组合设置 
+    SignInformationType_CAR_LANE =39; //小型客车车道 
+    SignInformationType_ELEC_BIKE =40; //电动自行车行驶标志 
+    SignInformationType_ELEC_BIKE_LANE =41; //电动自行车车道  
+    SignInformationType_BIKE_PEOPLE_SEPRATE =42; //非机动车与行人分开空间通行 
+    SignInformationType_BIKE_PEOPLE_SHARE =43; //非机动车与行人共享空间通行 
+    SignInformationType_SPECIFIC_LANE =44; //不同的专用车道标志并设 
+    SignInformationType_BIKE_WALK =45; //非机动车推行  
+    SignInformationType_RIGHT_DRIVE =46; //靠右侧车道行驶  
+    SignInformationType_BRT_LANE =47; //有轨电车专用车道  
+    SignInformationType_DISABLE_PARKING =48; //残疾人专用停车位  
+    SignInformationType_SCHOOLBUS_PARKING =49; //校车专用停车位标志、校车停靠站点标志 
+    SignInformationType_TAXI_PARKING =50; //出租车专用停车位标志 
+    SignInformationType_BIKE_PARKING =51; //非机动车专用停车位标志  
+    SignInformationType_BUS_PARKING =52; //公交车专用停车位标志  
+    SignInformationType_ELC_PARKING =53; //充电停车位标志  
+    SignInformationType_SPECIAL_PARKING =54; //专属停车位标志  
+    SignInformationType_SHOULDER_LANE =55; //硬路肩允许行驶标志 
+    SignInformationType_TRUCK_LANE =56; //货车通行标志  
+    SignInformationType_TIME_LIMIT_PARKING =57; //限时长停车位标志  
+    SignInformationType_ONE_DIRECTION =58; //单行路（直行）
+}
+
+enum DataSourceType
+{
+    DataSourceType_NOUSE =0;//不使用，占位
+    DataSourceType_DEDUCE =1;// 左右分界线/道路边界推导
+    DataSourceType_TRAJECTORY = 2;//用户轨迹挖掘
+    DataSourceType_MapQuotient= 4; //图商
+    DataSourceType_FRONTREARDEDUCE =8; //前后分界线/道路边界推导
+}
+
+// odd类型
+enum OddType
+{
+    ODDType_OTHER = 0;  //其它
+    ODDType_TOLL = 1;       //收费站
+    ODDType_TRAFFIC_LITGHT = 2;       //交通灯
+    ODDType_DEAD_END_ROAD = 4;        //断头路
+    ODDType_TUNNEL = 8; //隧道
+    ODDType_NO_GUARD = 16;   //无护栏
+    ODDType_CURVATURE_OUT_OF_LIMIT = 32;//曲率超限
+    ODDType_SLOPE_OUT_OF_LIMIT = 64;//坡度超限
+    ODDType_RAMP_OR_JCT = 128;  //匝道或JCT
+    ODDType_ABNORMAL_WIDTH = 256; //车道宽度异常
+    ODDType_CONSTRUCTION_AREA= 512;       //施工区域
+    ODDType_INCOMPLETE_COLLECTION = 65536; // 道路采集不全-分歧合流
+    ODDType_INCOMPLETE_INTERSECTION = 131072;//道路采集不全-路口
+    ODDType_CASE_LOG = 262144 ;//质检case报错
+    ODDType_NO_CHECK = 524288;//未验证or验证不通过
+    ODDType_LOW_GRADE_ROAD =1048576;//道路等级低
+}
+
+//颠簸等级
+enum bump_level
+{
+    bump_level_NOUSE = 0;  //不使用，占位
+    bump_level_small  = 1; //小
+    bump_level_medium = 2; //中
+    bump_level_big  = 3;//大
+
+}
+//颠簸类型
+enum bump_type
+{
+    bump_type_NOUSE = 0;  //不使用，占位
+    bump_type_pothole  = 1; //凹坑
+    bump_type_speed_bump = 2; //减速带
+    bump_type_bad_road  = 3;//烂路
+
+}
+
+//红绿灯灯箱颜色
+enum LightsColor
+{
+    LightsColor_NOUSE  = 0;//不使用，占位
+    LightsColor_RED = 1;  //红
+    LightsColor_GREEN  = 2; //绿
+    LightsColor_YELLOW = 3; //黄
+    
+
+}
+
+//红绿灯灯箱类型
+enum LightsType
+{
+    LightsType_NOUSE = 0;  //不使用，占位
+    LightsType_ROUND_LIGHT  = 1; //圆形
+    LightsType_LEFT_LIGHT= 2; //箭头-左
+    LightsType_RIGHT_LIGHT  = 3;//箭头-右
+    LightsType_STRAIGHT_LIGHT  = 4;//箭头-直
+    LightsType_UTURN_LIGHT  = 5;//箭头-掉头
+
+}

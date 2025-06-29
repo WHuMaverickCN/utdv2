@@ -1,0 +1,115 @@
+/**
+
+* @file     vp_parsing.proto
+* @author   zhanghongjie
+* @details  BEV逻辑层相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+syntax = "proto3";
+package VpParsingProto;
+import "vp_image.proto";
+import "vp.camera.proto";
+import "vp_parsing_setting.proto";
+
+
+/**
+* @brief bev 信息
+* @detail TODO
+*/
+message Elevation {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),高程数据地面方程换算，已经弃用
+  repeated float ground_normal_vector = 1;     
+  ///< proto信号:[/],(0,0,1),[/],(1,0),高程量化分类输出，每个类别对应一段范围，所有类别对应范围的vec，[0, 10, 20, 30...] 
+  repeated float height_ranges = 2;               
+}
+
+/**
+* @brief bev 信息
+* @detail TODO
+*/
+message BevSetting {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  repeated float spatial_resolution = 1;         
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  repeated float visible_range = 2;               
+}
+
+/**
+* @brief bev 信息
+* @detail TODO
+*/
+message DepthSetting {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  float scale_number = 1;                                  
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  float shift_scale = 2;                                   
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  uint32 mapping_type = 3;                
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号                 
+  uint32 mapping_shift = 4;    
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号                            
+  float confidence_scale = 5;                     
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号         
+  float max_depth = 6;                            
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号         
+  float min_depth = 7;                            
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号         
+  float max_confidence = 8;                       
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号         
+  float min_confidence = 9;                                
+  //VpCameraProto.CameraParam camera_param = 10;           
+}
+
+/**
+* @brief bev 信息
+* @detail TODO
+*/
+message Parsing {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  VpImageProto.Image image = 1;    
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号                        
+  VpParsingSettingProto.ParsingSetting parsing_setting = 2;
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号
+  Elevation elevation = 3;    
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号                             
+  BevSetting bev_setting = 4; 
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信号                             
+  DepthSetting depth_setting = 5;                          
+}
+

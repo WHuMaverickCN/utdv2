@@ -1,0 +1,590 @@
+/**
+* @file     vp_can.proto
+* @author   wuchuanping
+* @details  can输出数据信息
+* @date     
+* @version  V1.0
+* @copyright(C),CA,2023
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.2.27          <th>1.0                 <th>
+* <table>
+**********************************************************************************
+*/
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+syntax = "proto2";
+package VpCANProto;
+
+
+import "vp_ad_base.proto";
+
+
+
+/**
+*@brief   车辆速度
+*@detail  车辆速度数据
+*/
+message VehSpeed {
+  ///< speed：[float],(/,/,/),[/],(1,0),车辆速度
+  optional float speed = 1;
+  ///< time_stamp：[int64],(/,/,/),[/],(1,0),车辆速度时间戳
+  optional int64 time_stamp = 2;
+  ///< veh_speed_valid：[bool],(/,/,/),[/],(1,0),车辆速度有效性
+  optional bool veh_speed_valid = 3;
+  ///< wheel_pulse：[int64],(/,/,/),[/],(1,0),车辆车轮转速
+  repeated int64 wheel_pulse = 4;
+  ///< wheel_pulse_valid：[bool],(/,/,/),[/],(1,0),车辆车轮转速有效性
+  repeated bool wheel_pulse_valid = 5;
+  ///< wheel_speed：[float],(/,/,/),[/],(1,0),车辆车轮速度
+  repeated float wheel_speed = 6;
+  ///< wheel_speed_valid：[bool],(/,/,/),[/],(1,0),车辆车轮速度有效性
+  repeated bool wheel_speed_valid = 7;
+  ///< wheel_pulse_direction：[int64],(/,/,/),[/],(1,0),车辆车轮旋转方向
+  repeated int64 wheel_pulse_direction = 8;
+  ///< wheel_pulse_direction_valid：[bool],(/,/,/),[/],(1,0),车辆车辆车轮旋转方向有效性
+  repeated bool wheel_pulse_direction_valid = 9;
+}
+
+/**
+*@brief   轮偏转角
+*@detail  车辆轮偏转角数据
+*/
+message WheelAngle {
+  ///<angle：[float],(/,/,/),[/],(1,0),车辆轮偏转角
+  optional float angle = 1;
+  ///< time_stamp：[int64],(/,/,/),[/],(1,0),车辆轮偏转角时间戳
+  optional int64 time_stamp = 2;
+}
+
+/**
+*@brief   方向盘
+*@detail  车辆方向盘数据
+*/
+message SteeringWheel {
+  ///<steering_wheel_valid：[bool],(/,/,/),[/],(1,0),方向盘有效性
+  optional bool steering_wheel_valid = 1;
+  ///<steering_wheel_in_deg：[float],(/,/,/),[/],(1,0),方向盘转角角度
+  optional float steering_wheel_in_deg = 2;
+  ///<steering_wheel_in_rad：[float],(/,/,/),[/],(1,0),方向盘转角弧度
+  optional float steering_wheel_in_rad = 3;
+  ///<steering_tire_in_rad：[float],(/,/,/),[/],(1,0),轮胎转角弧度
+  optional float steering_tire_in_rad = 4;
+}
+
+/**
+*@brief   转向扭矩
+*@detail  车辆转向扭矩数据
+*/
+message SteeringTorque {
+  ///<steering_torque_valid：[bool],(/,/,/),[/],(1,0),转向扭矩有效性
+  optional bool steering_torque_valid = 1;
+  ///<steering_torque：[float],(/,/,/),[/],(1,0),转向扭矩
+  optional float steering_torque = 2;
+}
+
+/**
+*@brief   车辆设备位置
+*@detail  车辆设备位置
+*/
+enum GearPosition {
+  ///< GEAR_POSITION_UNKNOWN [/], (/,/,/), [/], (1,0),未知
+  GEAR_POSITION_UNKNOWN = 0;
+  ///<  GEAR_POSITION_PARKING [/], (/,/,/), [/], (1,0),停止
+  GEAR_POSITION_PARKING = 1;
+  ///< GEAR_POSITION_REVERSE [/], (/,/,/), [/], (1,0),反向
+  GEAR_POSITION_REVERSE = 2;
+  ///< GEAR_POSITION_NEUTRAL [/], (/,/,/), [/], (1,0),正常
+  GEAR_POSITION_NEUTRAL = 3;
+  ///< GEAR_POSITION_DRIVE [/], (/,/,/), [/], (1,0),行驶
+  GEAR_POSITION_DRIVE = 4;
+}
+
+/**
+*@brief   车辆设备信息
+*@detail  车辆设备信息
+*/
+message GearInfo {
+  ///<gear_valid：[bool],(/,/,/),[/],(1,0),有效性
+  optional bool gear_valid = 1;
+  ///<gear_position：[GearPosition],(/,/,/),[/],(1,0),车辆设备位置
+  optional GearPosition gear_position = 2;
+}
+
+/**
+*@brief   车辆惯性信息
+*@detail  车辆惯性信息
+*/
+message InertialInfo {
+  ///<yaw_rate_valid：[bool],(/,/,/),[/],(1,0),侧偏角有效性
+  optional bool yaw_rate_valid = 1;
+  ///<yaw_rate：[float],(/,/,/),[/],(1,0),侧偏角度
+  optional float yaw_rate = 2;
+  ///<longitudinal_acc_valid：[bool],(/,/,/),[/],(1,0),纵向加速度有效性
+  optional bool longitudinal_acc_valid = 3;
+  ///<longitudinal_acc：[float],(/,/,/),[/],(1,0),纵向加速度
+  optional float longitudinal_acc = 4;
+  ///<lateral_acc_valid：[bool],(/,/,/),[/],(1,0),横向加速度有效性
+  optional bool lateral_acc_valid = 5;
+  ///<lateral_acc：[float],(/,/,/),[/],(1,0),横向加速度
+  optional float lateral_acc = 6;
+}
+
+/**
+*@brief   车灯信息
+*@detail  车灯信息
+*/
+message LampInfo {
+  ///<left_light_status：[bool],(/,/,/),[/],(1,0),左转灯状态
+  optional bool left_light_status = 1;
+  ///<right_light_status：[bool],(/,/,/),[/],(1,0),右转灯状态
+  optional bool right_light_status = 2;
+  ///<brake_light_status：[bool],(/,/,/),[/],(1,0),刹车灯状态
+  optional bool brake_light_status = 3;
+  ///<high_beam_status：[bool],(/,/,/),[/],(1,0),远光灯状态
+  optional bool high_beam_status = 4;
+  ///<low_beam_status：[bool],(/,/,/),[/],(1,0),近光灯状态
+  optional bool low_beam_status = 5;
+}
+
+/**
+*@brief   引擎信息
+*@detail  引擎信息
+*/
+message EngineInfo {
+  ///<engine_torque：[float],(/,/,/),[/],(1,0),发动机转矩
+  optional float engine_torque = 62;
+  ///<engine_speed：[float],(/,/,/),[/],(1,0),发动机转速
+  optional float engine_speed = 63;
+  ///<engine_status：[int32],(/,/,/),[/],(1,0),发动机状态
+  optional int32 engine_status = 64;
+  ///<engine_toruqe_act_max：[float],(/,/,/),[/],(1,0),engine_toruqe_act_max
+  optional float engine_toruqe_act_max = 65;
+  ///<engine_toruqe_act_min：[float],(/,/,/),[/],(1,0),engine_toruqe_act_min
+  optional float engine_toruqe_act_min = 66;
+}
+
+/**
+*@brief   侧向自动驾驶
+*@detail  侧向自动驾驶
+*/
+enum LateralAutodriveMode {
+  ///<LATERAL_AUTODRIVE_MODE_UNKNOWN：[/],(/,/,/),[/],(1,0),未知
+  LATERAL_AUTODRIVE_MODE_UNKNOWN = 0;
+  ///<LATERAL_AUTODRIVE_MODE_MANUAL：[/],(/,/,/),[/],(1,0),手动
+  LATERAL_AUTODRIVE_MODE_MANUAL = 1;
+  ///<LATERAL_AUTODRIVE_MODE_AUTODRIVE：[/],(/,/,/),[/],(1,0),自动
+  LATERAL_AUTODRIVE_MODE_AUTODRIVE = 2;
+  ///<LATERAL_AUTODRIVE_MODE_OVERRIDE：[/],(/,/,/),[/],(1,0),超驰
+  LATERAL_AUTODRIVE_MODE_OVERRIDE = 3;
+  ///<LATERAL_AUTODRIVE_MODE_ERROR：[/],(/,/,/),[/],(1,0),错误
+  LATERAL_AUTODRIVE_MODE_ERROR = 4;
+}
+
+/**
+*@brief   侧向控制接口
+*@detail  侧向控制接口
+*/
+enum LateralControlInterface {
+  ///<LATERAL_CONTROL_INTERFACE_UNKNOWN：[/],(/,/,/),[/],(1,0),未知
+  LATERAL_CONTROL_INTERFACE_UNKNOWN = 0;
+  ///<LATERAL_CONTROL_INTERFACE_STEERANGLE：[/],(/,/,/),[/],(1,0),转角
+  LATERAL_CONTROL_INTERFACE_STEERANGLE = 1;
+  ///<LATERAL_CONTROL_INTERFACE_STEERTORQUE：[/],(/,/,/),[/],(1,0),转矩
+  LATERAL_CONTROL_INTERFACE_STEERTORQUE = 2;
+}
+
+/**
+*@brief   纵向自动驾驶
+*@detail  纵向自动驾驶
+*/
+enum LongitudinalAutodriveMode {
+  ///<LONGITUDINAL_AUTODRIVE_MODE_UNKNOWN：[/],(/,/,/),[/],(1,0),未知
+  LONGITUDINAL_AUTODRIVE_MODE_UNKNOWN = 0;
+  ///<LONGITUDINAL_AUTODRIVE_MODE_MANUAL：[/],(/,/,/),[/],(1,0),手动
+  LONGITUDINAL_AUTODRIVE_MODE_MANUAL = 1;
+  ///<LONGITUDINAL_AUTODRIVE_MODE_AUTODRIVE：[/],(/,/,/),[/],(1,0),自动
+  LONGITUDINAL_AUTODRIVE_MODE_AUTODRIVE = 2;
+  ///<LONGITUDINAL_AUTODRIVE_MODE_OVERRIDE：[/],(/,/,/),[/],(1,0),超驰
+  LONGITUDINAL_AUTODRIVE_MODE_OVERRIDE = 3;
+  ///<LONGITUDINAL_AUTODRIVE_MODE_ERROR：[/],(/,/,/),[/],(1,0),错误
+  LONGITUDINAL_AUTODRIVE_MODE_ERROR = 4;
+}
+
+/**
+*@brief   纵向控制接口
+*@detail  纵向控制接口
+*/
+enum LongitudinalControlInterface {
+  ///<LONGITUDINAL_CONTROL_INTERFACE_UNKNOWN：[/],(/,/,/),[/],(1,0),未知
+  LONGITUDINAL_CONTROL_INTERFACE_UNKNOWN = 0;
+  ///<LONGITUDINAL_CONTROL_INTERFACE_ACC：[/],(/,/,/),[/],(1,0),加速度
+  LONGITUDINAL_CONTROL_INTERFACE_ACC = 1;
+  ///<LONGITUDINAL_CONTROL_INTERFACE_ENGINETORQUE：[/],(/,/,/),[/],(1,0),引擎转矩
+  LONGITUDINAL_CONTROL_INTERFACE_ENGINETORQUE = 2;
+}
+
+/**
+*@brief   自动驾驶信息
+*@detail  自动驾驶信息
+*/
+message AutodriveStatusInfo {
+  ///<lateral_autodrive_mode：[LateralAutodriveMode],(/,/,/),[/],(1,0),侧向自动驾驶模式
+  optional LateralAutodriveMode lateral_autodrive_mode = 1;
+  ///<lateral_control_interface：[LateralControlInterface],(/,/,/),[/],(1,0),侧向自动驾驶接口
+  optional LateralControlInterface lateral_control_interface = 2;
+  ///<longitudinal_autodrive_mode：[LongitudinalAutodriveMode],(/,/,/),[/],(1,0),纵向自动驾驶模式
+  optional LongitudinalAutodriveMode longitudinal_autodrive_mode = 3;
+  ///<longitudinal_control_interface：[LongitudinalControlInterface],(/,/,/),[/],(1,0),纵向自动驾驶接口
+  optional LongitudinalControlInterface longitudinal_control_interface = 4;
+}
+
+/**
+*@brief   人控信息
+*@detail  人控信息
+*/
+message HumanControlInfo {
+  ///<left_turn_switch_status：[bool],(/,/,/),[/],(1,0),左转开关信息
+  optional bool left_turn_switch_status = 1;
+  ///<right_turn_switch_status：[bool],(/,/,/),[/],(1,0),右转开关信息
+  optional bool right_turn_switch_status = 2;
+  ///<low_beam_switch_status：[bool],(/,/,/),[/],(1,0),近光灯开关信息
+  optional bool low_beam_switch_status = 3;
+  ///<high_beam_switch_status：[bool],(/,/,/),[/],(1,0),远光灯开关信息
+  optional bool high_beam_switch_status = 4;
+  ///<auto_lamp_switch_status：[bool],(/,/,/),[/],(1,0),自动大灯开关信息
+  optional bool auto_lamp_switch_status = 5;
+  ///<wiper_switch_status：[int32],(/,/,/),[/],(1,0),雨刮状态信息
+  optional int32 wiper_switch_status = 6;
+  ///<acc_on_off_switch_status：[bool],(/,/,/),[/],(1,0),加速启用信息
+  optional bool acc_on_off_switch_status = 7;
+  ///<acc_cancel_switch_status：[bool],(/,/,/),[/],(1,0),加速取消信息
+  optional bool acc_cancel_switch_status = 8;
+  ///<acc_increase_switch_status：[bool],(/,/,/),[/],(1,0),加速开关信息
+  optional bool acc_increase_switch_status = 9;
+  ///<acc_decrease_switch_status：[bool],(/,/,/),[/],(1,0),减速开关信息
+  optional bool acc_decrease_switch_status = 10;
+  ///<acc_timegap_switch_status：[bool],(/,/,/),[/],(1,0),acc_timegap_switch_status
+  optional bool acc_timegap_switch_status = 11;
+  ///<brake_pedal_status：[bool],(/,/,/),[/],(1,0),脚刹板信息
+  optional bool brake_pedal_status = 12;
+  ///<acc_pedal_override：[bool],(/,/,/),[/],(1,0),加速板信息
+  optional bool acc_pedal_override = 13;
+  ///<gear_valid：[int32],(/,/,/),[/],(1,0),按钮id
+  optional int32 button_id = 14;
+  ///<driver_input_torque_valid：[bool],(/,/,/),[/],(1,0),driver_input_torque_valid
+  optional bool driver_input_torque_valid = 15;
+  ///<driver_input_torque：[float],(/,/,/),[/],(1,0),driver_input_torque
+  optional float driver_input_torque = 16;
+}
+
+/**
+*@brief   底盘驾驶员信息
+*@detail  底盘驾驶员信息
+*/
+message ChassisDriverStatus {
+  ///<hands_off_status：[bool],(/,/,/),[/],(1,0),hands_off_status
+  optional bool hands_off_status = 1;
+  ///<seatbelt_status：[bool],(/,/,/),[/],(1,0),安全带信息
+  optional bool seatbelt_status = 2;
+  ///<autodrive_on_off_status：[int32],(/,/,/),[/],(1,0),自动驾驶开关信息
+  optional int32 autodrive_on_off_status = 3;
+}
+
+/**
+*@brief   底盘错误信息
+*@detail  底盘错误信息
+*/
+message ChassisFaultStatus {
+  ///<esp_valid：[bool],(/,/,/),[/],(1,0),esp有效性
+  optional bool esp_valid = 1;
+  ///<eps_valid：[bool],(/,/,/),[/],(1,0),eps有效性
+  optional bool eps_valid = 2;
+  ///<brake_pedal_valid：[bool],(/,/,/),[/],(1,0),刹车板有效性
+  optional bool brake_pedal_valid = 3;
+}
+
+/**
+*@brief   底盘功能信息
+*@detail  底盘功能信息
+*/
+message ChassisFunctionStatus {
+  ///<epb_active：[bool],(/,/,/),[/],(1,0),epb启动
+  optional bool epb_active = 1;
+  ///<abs_active：[bool],(/,/,/),[/],(1,0),abs启动
+  optional bool abs_active = 2;
+  ///<tcs_active：[bool],(/,/,/),[/],(1,0),tcs启动
+  optional bool tcs_active = 3;
+  ///<vdc_active：[bool],(/,/,/),[/],(1,0),vds启动
+  optional bool vdc_active = 4;
+  ///<elk_active：[bool],(/,/,/),[/],(1,0),elk启动
+  optional bool elk_active = 5;
+  ///<aeb_active：[bool],(/,/,/),[/],(1,0),aeb启动
+  optional bool aeb_active = 6;
+}
+
+/**
+*@brief   底盘传感器信息
+*@detail  底盘传感器信息
+*/
+message ChassisSensorStatus {
+  ///<middle_range_radar_valid：[bool],(/,/,/),[/],(1,0),中距雷达有效性
+  optional bool middle_range_radar_valid = 1;
+  ///<corner_radar_valid：[bool],(/,/,/),[/],(1,0),角雷达有效性
+  optional bool corner_radar_valid = 2;
+  ///<trunk_status：[bool],(/,/,/),[/],(1,0),后备箱状态
+  optional bool trunk_status = 3;
+  ///<hood_status：[bool],(/,/,/),[/],(1,0),车棚状态
+  optional bool hood_status = 4;
+  ///<doors_status：[bool],(/,/,/),[/],(1,0),车门状态
+  repeated bool doors_status = 5;
+  ///<tires_pressure_status：[bool],(/,/,/),[/],(1,0),轮胎胎压状态
+  repeated bool tires_pressure_status = 6;
+}
+
+/**
+*@brief   车辆设备
+*@detail  车辆设备
+*/
+message Gear {
+  ///<type：[int32],(/,/,/),[/],(1,0),类型
+  optional int32 type = 1;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 2;
+}
+
+/**
+*@brief   转向灯
+*@detail  转向灯
+*/
+message TurnSignal {
+  ///<type：[int32],(/,/,/),[/],(1,0),类型
+  optional int32 type = 1;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 2;
+}
+
+/**
+*@brief   UDLC状态类型
+*@detail  UDLC状态类型
+*/
+message UDLCStatusType {
+  ///<left_type：[int32],(/,/,/),[/],(1,0),左侧类型
+  optional int32 left_type = 1;
+  ///<right_type：[int32],(/,/,/),[/],(1,0),右侧类型
+  optional int32 right_type = 2;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 3;
+}
+
+/**
+*@brief   CAN IMU信息
+*@detail  CAN IMU信息
+*/
+message CANIMU {
+  ///<acc：[float],(/,/,/),[/],(1,0),加速度
+  optional float acc = 1;
+  ///<yaw：[float],(/,/,/),[/],(1,0),侧偏角
+  optional float yaw = 4;
+  ///<yaw_rate：[float],(/,/,/),[/],(1,0),yaw_rate
+  optional float yaw_rate = 7;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 50;
+}
+
+/**
+*@brief   CAN HLBeam信息
+*@detail  CAN HLBeam信息
+*/
+message CANHLBeam {
+  ///<high_beam：[int32],(/,/,/),[/],(1,0),远光灯
+  optional int32 high_beam = 1;
+  ///<low_beam：[int32],(/,/,/),[/],(1,0),近光灯
+  optional int32 low_beam = 2;
+  ///<auto_light：[int32],(/,/,/),[/],(1,0),自动灯
+  optional int32 auto_light = 3;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 4;
+}
+
+/**
+*@brief   CAN Frame信息
+*@detail  CAN Frame信息
+*/
+message CANFrame {
+  ///<ts：[TurnSignal],(/,/,/),[/],(1,0),TurnSignal
+  repeated TurnSignal ts = 1;
+  ///<gt：[Gear],(/,/,/),[/],(1,0),Gear
+  repeated Gear gt = 2;
+  ///<sp：[VehSpeed],(/,/,/),[/],(1,0),VehSpeed
+  repeated VehSpeed sp = 3;
+  ///<wa：[WheelAngle],(/,/,/),[/],(1,0),WheelAngle
+  repeated WheelAngle wa = 4;
+  ///<CANIMU：[CANIMU],(/,/,/),[/],(1,0),CANIMU
+  repeated CANIMU imu = 5;
+  ///<hlbeam：[CANHLBeam],(/,/,/),[/],(1,0),CANHLBeam
+  repeated CANHLBeam hlbeam = 6;
+  ///<udlc：[UDLCStatusType],(/,/,/),[/],(1,0),UDLCStatusType
+  repeated UDLCStatusType udlc = 7;
+}
+
+/**
+*@brief   CAN Frame Raw信息
+*@detail  CAN Frame Raw信息
+*/
+message CANFrameRaw {
+
+/**
+*@brief   CAN类型
+*@detail  CAN类型
+*/
+  enum CANTYPE {
+    ///<CAN_TYPE_STANDARD：[/],(/,/,/),[/],(1,0),CAN_TYPE_STANDARD
+    CAN_TYPE_STANDARD = 0;
+    ///<CAN_TYPE_FD：[/],(/,/,/),[/],(1,0),CAN_TYPE_FD
+    CAN_TYPE_FD = 1;
+  }
+
+  ///<can_id：[int32],(/,/,/),[/],(1,0),CAN id
+  optional int32 can_id = 1;
+  ///<can_dlc：[int32],(/,/,/),[/],(1,0),CAN dlc
+  optional int32 can_dlc = 2;
+  ///<data：[int32],(/,/,/),[/],(1,0),数据
+  repeated int32 data = 3;
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 4;
+  ///<can_type：[int32],(/,/,/),[/],(1,0),CAN类型
+  optional int32 can_type = 5;
+  ///<can_channel：[int32],(/,/,/),[/],(1,0),CAN通道
+  optional int32 can_channel = 6;
+}
+
+/**
+*@brief   车辆消息
+*@detail  车辆消息
+*/
+message VehicleMsg {
+
+/**
+*@brief   MASK有效性
+*@detail  MASK有效性
+*/
+  enum VALIDMASK {
+    ///<MASK_SPEED_VALID：[/],(/,/,/),[/],(1,0),速度
+    MASK_SPEED_VALID = 1;
+    ///<：[/],(/,/,/),[/],(1,0),侧偏角度
+    MASK_YAW_RATE_VALID = 2; 
+    ///<：[/],(/,/,/),[/],(1,0),偏转角
+    MASK_WHEEL_ANGLE_VALID = 4; 
+    ///<：[/],(/,/,/),[/],(1,0),纵向加速度
+    MASK_LONG_ACC_VALID = 8;  
+    ///<：[/],(/,/,/),[/],(1,0),侧向加速度
+    MASK_LAT_ACC_VALID = 16;  
+    ///<：[/],(/,/,/),[/],(1,0),设备
+    MASK_GEAR_VALID = 32;  
+    ///<：[/],(/,/,/),[/],(1,0),远光灯
+    MASK_HIGH_BEAM_VALID = 64;  
+    ///<：[/],(/,/,/),[/],(1,0),近光灯
+    MASK_LOW_BEAM_VALID = 128;  
+    ///<：[/],(/,/,/),[/],(1,0),转向灯
+    MASK_TURN_SIGNAL_VALID = 256;  
+    ///<：[/],(/,/,/),[/],(1,0),雨刮器
+    MASK_WIPER_VALID = 512; 
+    ///<：[/],(/,/,/),[/],(1,0),UDLC左向
+    MASK_UDLC_LEFT_VALID = 1024;  
+    ///<：[/],(/,/,/),[/],(1,0),UDLC右向
+    MASK_UDLC_RIGHT_VALID = 2048; 
+  }
+
+  ///<time_stamp：[int64],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 1;  
+  ///<valid_mask：[bool],(/,/,/),[/],(1,0),mask有效性
+  optional int64 valid_mask = 2; 
+  ///<speed：[float],(/,/,/),[/],(1,0),速度
+  repeated float speed = 3; 
+  ///<wheel_angle：[float],(/,/,/),[/],(1,0),偏转角
+  repeated float wheel_angle = 4; 
+  ///<yaw_rate：[float],(/,/,/),[/],(1,0),侧偏角度
+  repeated float yaw_rate = 5; 
+  ///<long_acc：[float],(/,/,/),[/],(1,0),纵向加速度
+  repeated float long_acc = 6; 
+  ///<lat_acc：[float],(/,/,/),[/],(1,0),侧向加速度
+  repeated float lat_acc = 7; 
+  ///<gear：[int32],(/,/,/),[/],(1,0),设备
+  repeated int32 gear = 8; 
+  ///<high_beam：[int32],(/,/,/),[/],(1,0),远光灯
+  repeated int32 high_beam = 9; 
+  ///<low_beam：[int32],(/,/,/),[/],(1,0),近光灯
+  repeated int32 low_beam = 10; 
+  ///<turn_signal：[int32],(/,/,/),[/],(1,0),转向灯
+  repeated int32 turn_signal = 11; 
+  ///<wiper：[int32],(/,/,/),[/],(1,0),雨刮器
+  repeated int32 wiper = 12; // wiper status
+  ///<udlc_left：[int32],(/,/,/),[/],(1,0),UDLC左向
+  repeated int32 udlc_left = 13; 
+  ///<udlc_right：[int32],(/,/,/),[/],(1,0),UDLC右向
+  repeated int32 udlc_right = 14; 
+}
+
+/**
+*@brief   车辆状态
+*@detail  车辆状态
+*/
+message VehicleStatus {
+  ///<header：[VpAdBaseProto.Header],(/,/,/),[/],(1,0),数据头
+  optional VpAdBaseProto.Header header = 1;
+  ///<veh_speed：[VehSpeed],(/,/,/),[/],(1,0),VehSpeed
+  optional VehSpeed veh_speed = 2;
+  ///<steering_wheel：[SteeringWheel],(/,/,/),[/],(1,0),SteeringWheel
+  optional SteeringWheel steering_wheel = 3;
+  ///<steering_torque：[SteeringTorque],(/,/,/),[/],(1,0),SteeringTorque
+  optional SteeringTorque steering_torque = 4;
+  ///<gear_info：[GearInfo],(/,/,/),[/],(1,0),GearInfo
+  optional GearInfo gear_info = 5;
+  ///<inertial_info：[InertialInfo],(/,/,/),[/],(1,0),InertialInfo
+  optional InertialInfo inertial_info = 6;
+  ///<lamp_info：[LampInfo],(/,/,/),[/],(1,0),LampInfo
+  optional LampInfo lamp_info = 7;
+  ///<engine_info：[EngineInfo],(/,/,/),[/],(1,0),EngineInfo
+  optional EngineInfo engine_info = 8;
+  ///<autodrive_status_info：[AutodriveStatusInfo],(/,/,/),[/],(1,0),AutodriveStatusInfo
+  optional AutodriveStatusInfo autodrive_status_info = 9;
+  ///<human_control_info：[HumanControlInfo],(/,/,/),[/],(1,0),HumanControlInfo
+  optional HumanControlInfo human_control_info = 10;
+  ///<driver_status：[ChassisDriverStatus],(/,/,/),[/],(1,0),ChassisDriverStatus
+  optional ChassisDriverStatus driver_status = 11;
+  ///<chassis_fault_status：[ChassisFaultStatus],(/,/,/),[/],(1,0),ChassisFaultStatus
+  optional ChassisFaultStatus chassis_fault_status = 12;
+  ///<chassis_function_status：[ChassisFunctionStatus],(/,/,/),[/],(1,0),ChassisFunctionStatus
+  optional ChassisFunctionStatus chassis_function_status = 13;
+  ///<chassis_sensor_status：[ChassisSensorStatus],(/,/,/),[/],(1,0),ChassisSensorStatus
+  optional ChassisSensorStatus chassis_sensor_status = 14;
+}
+
+/**
+*@brief   CAN Frames信息
+*@detail  CAN Frames信息
+*/
+message CANFrames {
+  ///<can_frame_raws：[CANFrameRaw],(/,/,/),[/],(1,0),CANFrameRaw
+  repeated CANFrameRaw can_frame_raws = 1;
+  ///<can_frame：[CANFrame],(/,/,/),[/],(1,0),CANFrame
+  optional CANFrame can_frame = 2;
+}
+
+

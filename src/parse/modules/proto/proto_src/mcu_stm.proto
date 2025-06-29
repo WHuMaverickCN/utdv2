@@ -1,0 +1,71 @@
+/**
+* @file     mcu_stm.proto
+* @author   wangqing
+* @details  MCU状态机相关信号的输出接口定义
+* @date     2023-5-19
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.5.22        <th>1.0                 <th>wangqing 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	StmMcu;
+
+/**
+* @brief 监控状态机
+* @detail MCU输出
+*/
+message McuStmInfo
+{
+  ///< 监控状态机状态：[/],(/,/,/),[/],(/，/),监控状态机状态
+  uint32 mstm_status = 1;
+  ///< 监控状态机心跳信号：[/],(/,/,/),[/],(/，/),监控状态机心跳信号
+  uint32 seq_sts_mstm = 2;
+  ///< 监控状态机版本号：[/],(/,/,/),[/],(/，/),监控状态机版本号
+  uint32 version_number = 3;
+  ///< MCU状态机纵向状态：[/],(/,/,/),[/],(/，/),MCU状态机纵向状态
+  uint32 m_sys_lngstate = 4;
+  ///< MCU状态机横向状态：[/],(/,/,/),[/],(/，/),MCU状态机横向状态
+  uint32 m_sys_latstate = 5;
+  ///< MCU状态机acc模式：[/],(/,/,/),[/],(/，/),MCU状态机acc模式
+  uint32 m_hmi_acc_accmode = 6;
+  ///< MCU状态机产品形态：[/],(/,/,/),[/],(/，/),MCU状态机产品形态
+  uint32 m_pd_status = 7;
+  ///< MCU状态机系统泊车控制激活状态：[/],(/,/,/),[/],(/，/),MCU状态机系统泊车控制激活状态
+  uint32 m_park_enable = 8;
+  ///< MCU状态机iacc模式：[/],(/,/,/),[/],(/，/),MCU状态机iacc模式
+  uint32 m_hmi_acc_iacchwamode = 9;
+  ///< MCU状态机nda模式：[/],(/,/,/),[/],(/，/),MCU状态机nda模式
+  uint32 m_hmi_ads_nda_status = 10;
+  ///< MCU状态机横向接管报警等级：[/],(/,/,/),[/],(/，/),MCU状态机横向接管报警等级
+  uint32 m_takeover_alarm_lat_level = 11;
+  ///< MCU状态机纵向接管报警等级：[/],(/,/,/),[/],(/，/),MCU状态机纵向接管报警等级
+  uint32 m_takeover_alarm_lng_level = 12;
+  ///< MCU状态机纵向控制直接减速标志位：[/],(/,/,/),[/],(/，/),MCU状态机纵向控制直接减速标志位
+  uint32 m_lng_ctrl_dec_request = 13;
+  ///< MCU状态机请求控制方式：[/],(/,/,/),[/],(/，/),MCU状态机请求控制方式
+  uint32 ad_reqmode = 14;
+  ///< MCU状态机AD横向请求控制方式：[/],(/,/,/),[/],(/，/),MCU状态机AD横向请求控制方式
+  uint32 ad_latreqmode = 15;
+  ///< 智驾功能开启状态：[/],(/,/,/),[/],(/，/),智驾功能开启状态
+  uint32 ad_fctopensts = 16;
+  ///< 状态机触发策略原因：[/],(/,/,/),[/],(/，/),状态机触发策略原因
+  uint32 err_reason = 17;
+  ///< 当前场景模式：[/],(/,/,/),[/],(/，/),当前场景模式
+  uint32 adc_sence_mode = 18;
+  ///< apa功能开启状态：[/],(/,/,/),[/],(/，/),apa功能开启状态
+  uint32 hmi_ad_apaonoff = 19;
+  ///< 泊车系统功能开启状态：[/],(/,/,/),[/],(/，/),泊车系统功能开启状态
+  uint32 ad_apasysenasta = 20;
+}

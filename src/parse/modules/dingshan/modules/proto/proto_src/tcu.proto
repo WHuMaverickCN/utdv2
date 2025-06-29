@@ -1,0 +1,145 @@
+/**
+* @file     tcu.proto
+* @author   dengpeng
+* @details  挡位数据相关输出
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>dengpeng 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	TcuProto;
+
+/**
+* @brief Tcu
+* @detail Tcu
+*/
+message Tcu{ 
+	///<BusAcmInfo：[/],(/,/,/),[32],(1,0),
+    BusAcmInfo acm_info = 1;
+	
+	///< BusTcuSts：[/],(/,/,/),[32],(1,0),
+    BusTcuSts tcu_sts = 2;
+} 
+
+/**
+* @brief BusAcmInfo
+* @detail BusAcmInfo 20ms
+*/
+message BusAcmInfo{ 
+	///< ACM与执行机构状态：[/],(/,/,/),[/],(1,0),
+    uint32 acm_acm_actuator_status = 1;
+	
+	///< ACM与DCT执行机构状态：[/],(/,/,/),[/],(1,0),
+    uint32 acm_acm_actuator_status_dct = 2;
+	
+	///< 执行机构PRND状态：[/],(/,/,/),[/],(1,0),
+    uint32 acm_actuator_prnd_status = 3;
+	
+	///< 驾驶员干预换挡：[/],(/,/,/),[/],(1,0),
+    uint32 acm_ap_adriver_interruption = 4;
+	
+	///< APA控制使能：[/],(/,/,/),[/],(1,0),
+    uint32 acm_apa_request_enable = 5;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 6;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+	
+}
+
+/**
+* @brief BusTcuSts
+* @detail BusTcuSts 10ms
+*/
+message BusTcuSts{ 
+	///< 实际档位：[/],(/,/,/),[/],(1,0),0x0:Invalid 0x1:P 0x2:R 0x3:N 0x4:D 0x5:reserved 0xff:invalid
+    uint32 tcu_actual_gear = 1;
+	
+	///< 实际档位有效：[/],(/,/,/),[/],(1,0),0x0:Valid; 0xff:invalid
+    uint32 tcu_actual_gear_valid = 2;
+	
+	///< 换挡器位置：[/],(/,/,/),[/],(1,0),0x0：Parking；0x1：Reverse；0x2：Nutral；0x3：D；0x4:Reserved; 0xE:Unreliable; 0xF:Invalid;
+    uint32 tcu_gear_shift_position = 3;
+	
+	///< 换挡器位置有效：[/],(/,/,/),[/],(1,0),0x0:Valid; 0xff:invalid
+    uint32 tcu_shift_postion_valid = 4;
+	
+	///< 换挡过程状态：[/],(/,/,/),[/],(1,0),
+    uint32 tcu_shiftin_progress = 5;
+	
+	///< 换挡过程状态有效：[/],(/,/,/),[/],(1,0),
+    uint32 tcu_shiftin_progress_valid = 6;
+	
+	///< 变速箱故障状态：[/],(/,/,/),[/],(1,0),
+    uint32 tcu_trans_failure_status = 7;
+	
+	///< 目标档位有效：[/],(/,/,/),[/],(1,0),
+    uint32 tcu_target_gear_valid = 8;
+	
+	///< 目标档位：[/],(/,/,/),[/],(1,0),
+    uint32 tcu_target_gear = 9;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 10;
+	
+    	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 11;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 12;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 13;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 14;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 15;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 16;	
+	
+} 

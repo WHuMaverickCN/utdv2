@@ -1,0 +1,298 @@
+/**
+
+* @file     topological_layer.proto
+* @author   zhanghongjie
+* @details  BEV拓扑层相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+syntax = "proto3";
+
+import "vp_ndm_base_v2.proto";
+import "vp_line_v2.proto";
+
+package VpNdmProtoV2;
+
+/**
+* @brief Area 类型
+* @detail TODO
+*/
+enum AreaType {
+  ///< 未知：[/],(0,0,1),[/],(1,0),未知
+  UNKNOWN = 0;
+  ///< 社区：[/],(0,0,1),[/],(1,0),社区
+  COMMUNITY = 1;
+}
+
+/**
+* @brief 道路转换类型
+* @detail TODO
+*/
+enum PathTransitionType{
+  ///< 无效：[/],(0,0,1),[/],(1,0),无效
+  PATH_TRANSITION_INVALID = 0;
+  ///< 分道：[/],(0,0,1),[/],(1,0),分道
+  PATH_TRANSITION_SPLIT = 1;
+  ///< 汇流：[/],(0,0,1),[/],(1,0),汇流
+  PATH_TRANSITION_MERGE = 2;
+  ///< 继续：[/],(0,0,1),[/],(1,0),继续
+  PATH_TRANSITION_CONTINUE = 3;
+}
+
+/**
+* @brief 路径信息
+* @detail TODO
+*/
+message Path{
+  ///< link信息：[/],(0,0,1),[/],(1,0),link信息
+  
+  optional Link road = 1;
+  ///< path转移信息：[/],(0,0,1),[/],(1,0),path转移信息：
+
+  optional PathTransitionType type = 2;
+}
+
+/**
+* @brief 区域信息
+* @detail TODO
+*/
+message Area {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< 多边形id：[/],(0,0,1),[/],(1,0),多边形id
+  repeated string areapolygon_ids = 2;
+  ///< 边界多边形:[/],(0,0,1),[/],(1,0),边界多边形
+  optional Polygon bounding_polygon = 3;
+  ///< 区域类型:[/],(0,0,1),[/],(1,0),区域类型
+  optional AreaType type = 4;
+  ///< 区域名称:[/],(0,0,1),[/],(1,0),区域名称
+  optional string name = 5;
+  ///< 区域:[/],(0,0,1),[/],(1,0),区域名称
+  repeated string link_ids = 6;  
+}
+
+
+/**
+* @brief 停车区信息
+* @detail TODO
+*/
+message Parking {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string parkingspace_ids = 2;
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  repeated string section_ids = 3;
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  repeated string junction_ids = 4;
+  ///< 边界多边形:[/],(0,0,1),[/],(1,0),边界多边形
+  optional Polygon bounding_polygon = 5;
+  ///< 区域名称:[/],(0,0,1),[/],(1,0),区域名称
+  optional string name = 6;
+  ///< linkid:[/],(0,0,1),[/],(1,0),Area
+  repeated string link_ids = 7;  
+}
+
+/**
+* @brief 道路节点信息
+* @detail TODO
+*/
+message RoadNode {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  repeated string include_ids = 2;    
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  repeated string in_link_ids = 3;    
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  repeated string out_link_ids = 4;   
+  ///< 车辆到达此Path的可能性：[/],(0,0,1),[/],(1,0),车辆到达此Path的可能性
+  optional float probability = 5;    
+  ///< 转向角度：[/],(0,0,1),[/],(1,0),转向角度
+  optional float turn_angle = 6;      
+}
+
+
+/**
+* @brief 道路边信息
+* @detail TODO
+*/
+message RoadEdge {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< link信息：[/],(0,0,1),[/],(1,0),无
+  repeated Link sections = 2;
+}
+
+/**
+* @brief 信息
+* @detail TODO
+*/
+enum FormOfWay {
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_Unknown = 0;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_MultipleCarriageWay = 2;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_SingleCarriageWay = 3;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_RoundaboutCircle = 4;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_Service = 13;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_RampEntry = 16;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_RampExit = 17;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_CrossLink = 18;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_JCT = 19;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_SlipRoad = 20;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_SideRoad = 21;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_SlipAndJCT = 22;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_TurnRightLineA = 23;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_TurnRightLineB = 24;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_TurnLeftLineA = 25;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_TurnLeftLineB = 26;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_TurnLeftRightLine = 27;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_ServiceAndSlipRoad = 28;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_ServiceAndJCT = 29;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_ServiceAndSlipRoadAndJCT = 30;
+  ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+  FormOfWay_Other = 99;
+}
+
+/**
+* @brief 信息
+* @detail TODO
+*/
+message Road {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< 名称：[/],(0,0,1),[/],(1,0),名称
+  optional string name = 2;
+  ///< 前向link：[/],(0,0,1),[/],(1,0),前向link
+  repeated Link forward_links = 3;
+  ///< 后向link：[/],(0,0,1),[/],(1,0),后向link
+  repeated Link backward_links = 4;
+  ///< 道路构成：[/],(0,0,1),[/],(1,0),道路构成
+  optional FormOfWay form = 10;
+  ///< 道路等级:[/],(0,0,1),[/],(1,0),道路等级
+  optional uint32 function = 11;
+  ///< 其他Link要素:[/],(0,0,1),[/],(1,0),其他Link要素
+  repeated Link links = 20;  
+}
+
+
+/**
+* @brief 信息
+* @detail TODO
+*/
+message Tile {
+  ///< id：[/],(0,0,1),[/],(1,0),id
+  optional string id = 1;
+  ///< index：[/],(0,0,1),[/],(1,0),index
+  optional Index index = 2;       
+  ///<最近距离点：[/],(0,0,1),[/],(1,0),最近距离点
+  optional Point min_point = 3;  
+
+  /**
+  * @brief 信息
+  * @detail TODO
+  */ 
+  enum TileRange {
+    ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+    UNSPECIFIED = 0;
+    ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+    T0 = 40;                      // m
+    ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+    T1 = 80;
+    ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+    T2 = 160;
+    ///< 枚举类型：[/],(0,0,1),[/],(1,0),枚举类型
+    T3 = 320;
+  }
+  ///<范围：[/],(0,0,1),[/],(1,0),范围
+  optional TileRange range = 4;  
+  ///<子：[/],(0,0,1),[/],(1,0),子
+  repeated string childs = 5;    
+  ///<utm时区：[/],(0,0,1),[/],(1,0),utm时区
+  optional string utm_zone = 6;   
+  ///< linkid：[/],(0,0,1),[/],(1,0),link id 
+  repeated string link_ids = 7;  
+}
+
+
+/**
+* @brief  用来描述MPP的概念，一条mpp含有一条root_road(path)和多条sub_path(road)
+* @detail TODO
+*/
+
+message Tree {      
+  ///< id：[/],(0,0,1),[/],(1,0),id              
+  optional string id = 1;
+  ///< 主路：[/],(0,0,1),[/],(1,0),的主路
+  optional Path root_path = 2;   
+  ///< 分岔路：[/],(0,0,1),[/],(1,0),分岔路
+  repeated Path sub_paths = 3;  
+}
+
+/**
+* @brief BEV 拓扑层信息
+* @detail TODO
+*/
+message TopologicalLayer {
+  ///< 虚拟车道线：[/],(0,0,1),[/],(1,0),虚拟车道线
+  repeated VpLineV2.Line reflines = 1;
+  ///< 区域：[/],(0,0,1),[/],(1,0),区域    
+  repeated Area areas = 3;
+  ///< 停车区：[/],(0,0,1),[/],(1,0),停车区 
+  repeated Parking parkings = 4;
+  ///< 道路：[/],(0,0,1),[/],(1,0),道路 
+  repeated Road roads = 5;
+  ///< tiles：[/],(0,0,1),[/],(1,0),tiles 
+  repeated Tile tiles = 6;
+  ///< 道路节点：[/],(0,0,1),[/],(1,0),道路节点   
+  repeated RoadNode road_nodes = 7;
+  ///< 道路边：[/],(0,0,1),[/],(1,0),道路边 
+  repeated RoadEdge road_edges = 8;
+  ///< 道路树：[/],(0,0,1),[/],(1,0),道路树
+  repeated Tree trees = 9;
+}

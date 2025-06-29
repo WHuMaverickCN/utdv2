@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+//检测的物体输出
+package slamcommon;
+option java_package = "com.mx.changan.datacollect.proto";//生成文件存放的路径
+
+message Version {
+     string protocol_version = 1;//协议版本
+     string model_id = 2;//识别模型id,来自perception模块
+}
+
+message Header {
+     int32 time_stamp = 1;
+     int32 frame_id = 2;
+}
+
+message Point {
+     double x = 1;
+     double y = 2;
+     double z = 3;
+     double std = 4;//1个标准差,三个维度都一样
+}
+
+message Box3D {
+     Point lower_lt = 1;
+     Point lower_lb = 2;
+     Point lower_rb = 3;
+     Point lower_rt = 4;
+     Point upper_lt = 5;
+     Point upper_lb = 6;
+     Point upper_rb = 7;
+     Point upper_rt = 8;
+     float conf = 9;
+}
+
+message Polygon {
+    repeated Point points = 1;
+     Point normal = 2;
+     Point direction = 3;//红绿灯光，排列顺序，横向，纵向的?
+}
+
+message ORBFeature {
+     int32 octave = 1;//level
+     float x = 2;//图像坐标x位置
+     float y = 3;//图像坐标y位置
+     float size = 4;//
+     float respones = 5;
+
+    repeated int32 descriptors = 6;//32个字节的的描述符
+}

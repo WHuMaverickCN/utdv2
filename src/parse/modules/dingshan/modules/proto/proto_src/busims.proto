@@ -1,0 +1,106 @@
+/**
+* @file     busims.proto
+* @author   ljp
+* @details  busims.proto
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>ljp
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	BusimsProto;
+/**
+* @brief BusIMS
+* @detail BusIMS 100ms
+*/
+message BusIMS{ 
+	///< 覆盖上超差：[cm],(0x0,0,15),[/],(1,0),0x0:0cm 0x1~0xF:1cm~15cm
+    uint32 ims_brow_offset_value = 1;
+	///< IMS注意力分散状态：[/],(0x0,0,3),[/],(1,0),0x0:Not Distracted 0x1:Distracted 0x2:Unknown 0x3:Invalid
+    uint32 ims_distraction_status = 2;
+	///< 闭眼状态：[/],(0x7,0,7),[/],(1,0),0x0:both eyes close 0x1:left eye close 0x2:right  eye close 0x3:both eyes open 0x4~0x6:Reserved 0x7:Invalid
+    uint32 ims_driver_eye_closestatus = 3;
+	///< 驾驶员视线所在区域：[/],(0x0,0,15),[/],(1,0),0x0:driver forward 0x1:left outside mirror 0x2:right outside mirror 0x3:inside mirror 0x4:front passenger forward 0x5:HU area  0x6:IP area 0x7:gear area 0x8:below IP 0x9:driver door 0xA:front passenger 0xB:driver door window 0xC:up forward 0xD:front passenger door window 0xE:other 0xF:invalid
+    uint32 ims_driver_eyes_fov_area = 4;
+	///< 驾驶员头部检测状态：[/],(0x0,0,3),[/],(1,0),0x0:Invalid 0x1:Not detected 0x2:detected 0x3:Reserved
+    uint32 ims_driver_head_detect = 5;
+	///< IMS疲劳状态：[/],(0x0,0,7),[/],(1,0),0x0:Awake 0x1:Slightly Drowsy 0x2:Drowsy 0x3:Microsleep 0x4:Reserved 0x5:Unavailable 0x6:Unknown 0x7:Invalid
+    uint32 ims_drowsiness_status = 6;
+	///< 视线追踪状态（YAW）：[度],(0xFF,-75,75),[/],(1,0),0x0~0x97:-75~75 0x98~0xFE:Reserved 0xFF:invalid
+    int32 ims_eye_gaze_status = 7;
+	///< 头部纵摇状态：[度],(0xFF,-25,45),[/],(1,0),0x0~0x47:-25~45 0x48~0xFE:Reserved 0xFF:invalid
+    int32 ims_head_detect_sts_pitch = 8;
+	///< 头部横摇状态：[度],(0xFF,-45,45),[/],(1,0),0x0~0x5B:-45~45 0x5C~0xFE:Reserved 0xFF:invalid
+    int32 ims_head_detect_sts_roll = 9;
+	///< 头部首摇状态：[度],(0xFF,-75,75),[/],(1,0),0x0~0x97:-75~75 0x98~0xFE:Reserved 0xFF:invalid
+    int32 ims_head_detect_sts_yaw = 10;
+	///< IMS系统状态：[/],(0x1,0,7),[/],(1,0),0x0:Off 0x1:Standby 0x2:Active 0x3:Camera Blocked 0x4:Failure 0x5~0x6:Reserved 0x7:Invalid
+    uint32 ims_ims_status = 11;
+	///< 覆盖下超差：[cm],(0x0,0,15),[/],(1,0),0x0:0cm 0x1~0xF:1cm~15cm
+    uint32 ims_jaw_offset_value = 12;
+	///< 驾驶员打电话状态：[/],(0x0,0,1),[/],(1,0),0x0:Not In Phone Call 0x1:In Phone Call
+    uint32 ims_phone_call_sts = 13;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 15;
+	///< 驾驶员行为状态：[/],(0x0,0,/),[/],(/,/),0x1:Not detected 0x2:Smoke 0x3:Drink
+    uint32 ims_driverbehaviors = 16;
+    	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 17;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 18;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 19;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 20;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 21;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 22;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 23;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 24;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 25;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 26;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 27;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 28;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 29;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 30;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 31;	
+	
+	///< 预留信号15：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved14 = 32;	
+} 

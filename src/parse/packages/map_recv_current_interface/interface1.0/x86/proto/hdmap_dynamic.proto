@@ -1,0 +1,245 @@
+/**
+
+* @file     hdmap_dynamic.proto
+* @author   jianghongyue
+* @details  高精地图动态模块相关信号的输出接口定义，动态模块主要提供高精地图要素与输入坐标点相对位置关系
+* @date     2022-06-14
+* @version  V2.5
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  GCJ02
+
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2022.03.05         <th>2.4                 <th>jianghongyue
+
+* <tr><th>2022.06.14         <th>2.5                 <th>jianghongyue
+
+* <table>
+
+**********************************************************************************
+
+*/
+
+
+syntax="proto3";
+
+import "hdmap_enum.proto";
+import "hdmap_static.proto";
+package hdmap;
+
+/**
+* @brief 请求地图的坐标点相关信息
+* @details  计算输入坐标点的相对位置信息，包括所在电子围栏、车道组link、车道，等
+*/
+message AnchorPosRelatedInfo
+{
+    ///<车道数:[/],(-1,0,7),[/],(1,0),当前位置车道数量
+    ///<注:无效值-1
+	uint32 num_of_lanes = 1;
+
+    ///<车道编号:[/],(-1,0,7),[/],(1,0),当前所在车道编号
+    ///<注:无效值-1
+    uint32 current_lane_num = 2;
+
+    ///<是否在电子围栏内:[/],(3,0,3),[/],(1,0),该围栏指系统用于限定启动功能下发的动态范围
+    ///<0x0:outside
+    ///<0x2:within
+    ///<0x3:unknown
+	uint32 within_geofence = 3;
+
+    ///<当前位置所在的link ID:[/],(0,0,4294967295),[/],(1,0),/
+    uint64 current_link_id = 4;
+
+    ///<距离当前link结束位置的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double to_link_end = 5;
+
+    ///<当前位置到电子围栏终点的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double to_geo_fence_end = 6;
+
+    ///<当前设置的目标点经纬度坐标:[/],(/,/,/),[/],(/,/),/
+    Gnss current_distination = 7;
+}
+
+/**
+* @brief 特殊区域
+* @details  计算包括隧道、收费站、施工区的相对位置信息
+*/
+message SpecialArea
+{
+    ///<特殊地区类型:[/],(0,0,3),[/],(1,0),/
+    SpecialAreaType type = 1;
+
+    ///<最近特殊地区长度:[m],(-1,0,65535),[/],(0.01,0),/
+    ///<注:无效值-1
+    double special_area_length = 2;
+
+    ///<当前位置与特殊地区关系类型:[/],(0,0,5),[/],(1,0),/
+    CurrentRelatedSpecialArea related_type = 3;
+
+    ///<当前位置与特殊地区入口/出口距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double to_spacial_area = 4;
+}
+
+/**
+* @brief 匝道相关信息
+* @details  提供当前请求点相对于匝道的位置关系
+*/
+message RampInfoOut
+{
+    ///<是否存在匝道:[/],(0,0,2),[/],(1,0),/
+    ///<注:2km内是否存在匝道
+    ///<0:无
+    ///<1:有
+    ///<2:unkown
+	uint32 ramp_info_status = 1;
+
+    ///<当前位置与匝道纵向关系:[/],(0,0,3),[/],(1,0),/
+    ///<0:出口
+    ///<1:入口
+    ///<2:匝道中
+    ///<3:无效
+	uint32 enter_ramp_info = 2;
+
+    ///<当前位置到匝道:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+	double to_dis = 3;
+
+    ///<距分流起点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+	double split_start_dis = 4;
+
+    ///<距分流终点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double split_end_dis = 5;
+
+    ///<距汇流起点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+	double merge_start_dis = 6;
+
+    ///<距汇流终点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double merge_end_dis = 7;
+
+    ///<分流匝道与主路的横向关系:[/],(0,0,65535),[/],(1,0),/
+    ///<备注：0bit开始,包括应急车道，匝道为分流匝道，掩码表示(0bit - 车道1)
+    uint32 split_ramp_lane_id = 8;
+
+    ///<汇流匝道与主路的横向关系:[/],(0,0,65535),[/],(1,0),/
+    ///<备注：0bit开始,包括应急车道，匝道为分流匝道，掩码表示(0bit - 车道1)
+    uint32 merge_lane_id = 9;
+}
+
+/**
+* @brief 导航路径车道组、车道
+* @details  提供导航路径上各个link内的可用车道号
+*/
+message RoutingPath
+{
+    ///<Link编号:[/],(0,0,4294967295),[/],(1,0),/
+    uint64 link_id = 1;
+
+    ///<可用车道的车道号:[/],(0,0,65535),[16],(1,0),/
+	repeated uint32 avaliable_lanes = 2;
+}
+
+/**
+* @brief 车道引导信息
+* @details  提供导航路径上推荐车道信息
+*/
+message PathPlanningOut
+{
+    ///<导航规划与匝道的关系:[/],(0,0,2),[/],(1,0),/
+    PathPlanningType path_planning_type = 1;
+
+    ///<导航规划匝道分流/汇流起点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0×FFFF
+    double path_planning_to_ramp_start_dis = 2;
+
+    ///<导航规划匝道分流/汇流终点距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0×FFFF
+    double path_planning_to_ramp_end_dis = 3;
+
+    ///<导航路径上的link-id和可行车道:[/],(/,/,/),[50],(1,0),当前车辆位置到目标点顺向排列
+	repeated RoutingPath routing_path = 4;
+
+    ///<匝道相对于主路的位置:[/],(0,0,2),[/],(1,0),/
+    ///<0:未知
+    ///<1:左
+    ///<2:右
+	uint32 ramp_direction_to_mainroad = 5;
+}
+
+
+/**
+* @brief 动态信息集
+* @details  作为整体动态信息的综合
+*/
+message DynamicHDMapInfo
+{
+    ///<utc时间:[ms],(/,/,/),[/],(/,/),Timestamp时间戳判断请求定位时间
+    double utc = 1;
+
+    ///<锚点坐标:[/],(/,/,/),[5],(/,/),请求地图的定位点
+	Gnss anchor_pos = 2;
+
+    ///<是否在地图内:[/],(0,0,1),[/],(1,0),/
+    bool is_in_map = 3;
+
+    ///<隧道、收费站、施工区信息:[/],(/,/,/),[4],(1,0),/
+	repeated SpecialArea special_area = 4;
+
+    ///<请求地图坐标点的相关信息:[/],(/,/,/),[/],(/,/),/
+    AnchorPosRelatedInfo related_info = 5;
+
+    ///<匝道相关信息:[/],(/,/,/),[/],(/,/),/
+    RampInfoOut ramp_info = 6;
+
+    ///<车道级引导信息:[/],(/,/,/),[/],(/,/),/
+    PathPlanningOut path_planning = 7;
+
+    ///<车道数量变化的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0×FFFF
+    double to_num_change_of_lanes_dis = 8;
+
+    ///<车道数量变化的类型:[/],(0,0,4),[/],(1,0),/
+    ///< 0:无
+    ///< 1:增加
+    ///< 2:减少
+    ///< 3: 匝道引起的增加
+    ///< 4:匝道引起的减少
+    uint32 to_num_change_of_lanes_type = 9;
+
+    ///<车道数量变化的ID:[/],(0,1,65535),[/],(1,0),/
+    ///<备注:0bit开始,包括应急车道，匝道为分流匝道，掩码表示(0bit - 车道1)
+    uint32 num_change_of_lanes_id = 10;
+
+    ///<前方100m车道曲率:[1/m],(0,-1,1),[/],(0.01,0),/
+    double lane_curvature_100m = 11;
+
+    ///<前方200m车道曲率:[1/m],(0,-1,1),[/],(0.01,0),/
+    double lane_curvature_200m = 12;
+
+    ///<前方300m车道曲率:[1/m],(0,-1,1),[/],(0.01,0),/
+    double lane_curvature_300m = 13;
+}
+

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+//检测的运动中或干扰制图的物体
+
+package cameraparam;
+option java_package = "com.mx.changan.datacollect.proto";//生成文件存放的路径
+
+message DistortParam {
+    repeated float param = 1;//畸变参数5个float的数组
+}
+
+message InstrinsicParam {
+     float focal_u = 1;
+     float focal_v = 2;
+     float center_u = 3;
+     float center_v = 4;
+}
+
+//参考地平线摄像头标定坐标系（CCS）的定义
+message ExtrinsicParam {
+     float x = 1; //在CCS下表示
+     float y = 2; //在CCS下表示
+     float z = 3; //在CCS下表示
+     float yaw = 4;
+     float pitch = 5;
+     float roll = 6;
+     float fov = 7;//左右视场角
+}
+
+//从CCS到VCS的转换参数
+message VCSParam {
+     float rotation = 1;//三个float,分别是yaw,pitch,roll；在VCS坐标系下表示
+     float translation = 2;//三个float,分别是x,y,z；在VCS坐标系下表示
+}

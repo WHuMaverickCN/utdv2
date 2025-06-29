@@ -1,0 +1,3732 @@
+/**
+
+* @file     vp_object.proto
+* @author   huangconglin
+* @details  BEV相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+
+
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+syntax = "proto3";
+package VpNdmProtoV2;
+
+
+import "vp_perception_base.proto";
+import "vp_ndm_base_v2.proto";
+import "vp_obstacle.proto";
+import "vp_parsing.proto";
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ObjectType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_Unknown = 0;  
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_TrafficSign = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_TrafficLight = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_TrafficLightBulb = 3;  // Bulbs inside a traffic light box
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_LaneMarking = 4;  // Traffic signs on the ground, such as turn signs, U-turn signs, etc.
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_StopLine = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_SpeedBump = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_Pole = 7;   // Line objects, such as light poles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_CrossWalk = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_Zone = 9;  // An area, such as an area under construction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingSlot = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_TrafficCone = 11;  // Safety cone
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingLockClose = 12;  // Closed ground lock
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingLockOpen = 13;  // Opened ground lock
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingColumn = 14;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingAFrameSign = 15;  // A-shaped warning sign
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_Junction = 16;  // junction of different roads
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingLock = 17;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_CementColumn_Yes = 18;  // Connected to the wall
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_CementColumn_No = 19;  // Not connected to the wall
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectType_ParkingRod = 20;  // Wheel bar for assisted parking
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ObjectShape {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectShape_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectShape_Rectangle = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectShape_Triangle = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectShape_Round = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectShape_Cylinder = 4;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ObjectStatus {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_Off = 1;  // The traffic light is off
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_Invalid = 2;  // object is not available
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_Valid = 3;  // Object is available
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_TrafficLight_Green = 10;   // TrafficLight color
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_TrafficLight_Yellow = 11;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_TrafficLight_Red = 12;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_TrafficLight_More_Color = 13;  // Colors other than red, yellow and green
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStatus_Occupied = 20; // Parking slot, Zone, etc.
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ObjectStage {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_Uninit = 0;  // The reconstructed object is not initialized
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_Unconverged = 1;  // The results of reconstructed objects do not converge
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_Converged = 2;  // The results of the reconstructed objects converged
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_UpdateError = 3;  // The reconstructed object update incorrectly
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_Lost = 4;  // The reconstruct object is lose tracking
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectStage_Fixed = 5;  // The results of the reconstructed is fixed
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum Orientation {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectOrientation_Unknown = 0;  
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectOrientation_Back = 1;  // Object is facing away from the vehicle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectOrientation_Side = 2;  // Object is facing the side of the vehicle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ObjectOrientation_Front = 3;  // Object is facing the vehicle
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficLightStructType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_HorVer1 = 1;  // Light box with single lamp
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Hor2 = 2;  // Horizontal light box with 2 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Ver2 = 3;  // Vertical light box with 2 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Hor3 = 4;  // Horizontal light box with 3 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Ver3 = 5;  // Vertical light box with 3 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Hor4 = 6;  // Horizontal light box with 4 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Ver4 = 7;  // Vertical light box with 4 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Hor5 = 8;  // Horizontal light box with 5 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_Ver5 = 9;  // Vertical light box with 5 bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_HorNonmotor = 10; // Horizontal light box with Non motor
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  StructType_VerNonmotor = 11; // Vertical light box with Non motor
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficLightBulbSpotMode {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbSpotMode_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbSpotMode_On = 1;  // The light bulb is on
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbSpotMode_Flash = 2;  // The light bulb is blinking
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbSpotMode_OFF = 3;  // The light bulb is off
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ParkingType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TYPE_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TYPE_VERTICAL = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TYPE_PARALLEL = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TYPE_OBLIQUE = 3;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingPoseInfo {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float width = 1; // width, correspond to entrance
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float length = 2; // length, correspond to side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float angle = 3; // polygon interior angle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float yaw_vcs = 4; // yaw, correspond to poly 03
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpPerceptionBaseProto.Point center_vcs = 5;  // center point under VCS coordinates
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated VpPerceptionBaseProto.Point poly_vcs = 6;  // 4 corner point under VCS coordinates
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated float poly_vcs_cov_x = 7; // 4 corner
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated float poly_vcs_cov_y = 8; // 4 corner
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ParkingOccupyStatus {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_OCCUPY_STATUS_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_OCCUPY_STATUS_OCCUPIED = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_OCCUPY_STATUS_NOT_OCCUPIED = 2;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ParkingLockStatus {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ParkingLockStatus_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ParkingLockStatus_Open = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ParkingLockStatus_Close = 2;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingLockInfo {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool valid = 1; // exist
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpPerceptionBaseProto.Point position_vcs = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingLockStatus lock_status = 3;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingOccupyInfo {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingOccupyStatus occupy_status = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingLockInfo lock_info = 2;  // parking lock info
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingRodInfo {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool valid = 1;  // exist
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated VpPerceptionBaseProto.Point end_vcs = 2; // 2 end point
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingBoundaryInfo {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated VpPerceptionBaseProto.Point point_vcs = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ParkingTrackStatus {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TRACK_STATUS_UNKNOW = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TRACK_STATUS_PREDICTED = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PARKING_TRACK_STATUS_CORRECTED = 2;
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ParkingSlotAttr {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 verify = 1;  // parking verify
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 source = 2;  // sensor source, bev,uss,lidar...
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingType type = 3;  // parking type
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingPoseInfo pose = 4;  // pose para
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingOccupyInfo occupy_info = 5;  // occupancy info
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingRodInfo rod_info = 6;   // rod info
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingBoundaryInfo boundary = 7;  // boundary,three points correspond to poly 12,23,30
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingTrackStatus track_status = 8; // predicted or corrected
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ObjectSource {
+  // tracking state
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  OBJECT_SOURCE_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  OBJECT_SOURCE_MEASURED = 1;  // The result of reconstructed object in the current frame is obtained by observation
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  OBJECT_SOURCE_PREDICTED = 2;   // The result of reconstructed object int the current frame is obtained by prediction
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message Object {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 id = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string str_id = 2;     // global id, UUID
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpNdmProtoV2.Polygon border = 3;  // The bounding box of the reconstructed object in VCS coordinate
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 type = 4;        // ObjectType
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 sub_type = 5;    // LaneMarkingType, TrafficSignType, etc.
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 conf = 6;        // confidence, 0~100
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 life_time = 7;   // The time since the object was detected (unit: ms)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 age = 8;         // The frame number since the object was detected
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ObjectAttr attr = 9;  // object attributes
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated string child_ids = 10;   // child object ids
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpNdmProtoV2.Point position = 11;  // object center position and covariance in VCS coordinate
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated int32 child_types = 12;  // only light, TrafficLightBulbType_CIRCLE | TrafficLightBulbType_LEFT_ARROW
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool in_cur_lane = 13;   // object in current lane flag
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool drive_start_up = 14;   // start_up flag (traffic light from red to green)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int64 generation_time = 15;  // time stamp when the object generates
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 submap_id = 16; // used for park mapping, mark which submap object belongs to
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ObjectAttr {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 shape = 1;       // ObjectShape
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional string value = 2;      // e.g. speed_limit value = "60"
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float cycle_time = 3;  // traffic light countdown (unit: s)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional bool dynamic = 4;      // Whether the static elements are variable, for example: variable speed limit signs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 traversable = 5;   // Is it possible to cross
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float height = 6;      // The height of the object element in the vcs coordinate system (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float radius = 7;      // cylinder, uint: m
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional int32 status = 8;      // object's status, see ObjectStatus
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpObstacleProto.ImageSpaceInfo img_info = 9;  // Information of the object on image
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Condition conditions = 10;  // restricted conditions, such as speed limits, etc.
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Orientation orientation = 11;  // Orientation of traffic lights/signs and etc.
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional TrafficLightStructType struct_type = 12;  // struct type of traffic light
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional TrafficLightBulbSpotMode spot_mode = 13; // spot mode for light bulb
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficLightBulbSpotMode spot_modes = 14;  // spot mode for light bulbs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ObjectStage stage = 15;     // object's stage, see ObjectStage
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float pole_lift_angle = 16;  // Angle between target and ground
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ParkingSlotAttr parking_slot_attr = 17;  // parking attribute
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional PoleLiftState pole_lift_state = 18;  // toll pole lift state
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float length = 19;      // object's length (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float width = 20;      // object's width (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float sigma_height = 21;      // The uncertainty of the height of object (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float sigma_length = 22;      // The uncertainty of the length of object (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float sigma_width = 23;      // The uncertainty of the width of object (unit: m)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ObjectSource obj_source = 24;  // ObjectSource
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float ttc = 25;  // Collision time (unit: s)
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated TrafficLightBulbSpotMode bulb_modes = 26; // bulb flash
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated float bulb_cycle_times = 27; // bulb time
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated float bulb_confs = 28; // bulb conf
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated VpObstacleProto.ImageSpaceInfo bulb_img_infos = 29; // bulb 2d rect
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message Objects {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpPerceptionBaseProto.Header header = 1;  // Perceived information about the perception message
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  repeated Object objects = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional float conf_scale = 3;  // confidence value scale factor
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional VpParsingProto.BevSetting bev_setting = 4;  // bev setting
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficLightType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_CIRCLE = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_CROSS = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_PEDESTRIAN = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_BICYCLE = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_ARROW = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_TIME = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_TEXT = 7;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightType_MULTI_LEN = 8;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficLightBulbColor {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbColor_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbColor_OFF = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbColor_GREEN = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbColor_YELLOW = 11;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbColor_RED = 12;
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficLightBulbType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_UNKNOWN = 0;        // 0
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_CIRCLE = 1;        // 1 << 0
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_LEFT_ARROW = 2;        // 1 << 1
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_RIGHT_ARROW = 4;        // 1 << 2
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_UP_ARROW = 8;        // 1 << 3
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_DOWN_ARROW = 16;       // 1 << 4
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_UTURN = 32;       // 1 << 5
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_FORWARD_AND_LEFT = 64;       // 1 << 6
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_FORWARD_AND_RIGHT = 128;      // 1 << 7
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_PEDESTRAIN = 256;      // 1 << 8
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_NON_MOTOR = 512;      // 1 << 9
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_TIME = 1024;     // 1 << 10  // Non-motor vehicle lights
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_LEFT_AND_RETURN = 2048;     // 1 << 11
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_NO_DRIVE_INTO = 4096;     // 1 << 12  // No entry
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_TEXT_OF_ALLOW_PED = 8192;     // 1 << 13  // Pedestrians can pass, in text form
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_SIGN_OF_ALLOW_PED = 16384;    // 1 << 14  // Pedestrians can pass, in sign form
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_TEXT_OF_FORBID_PED = 32768;   // 1 << 15  // Pedestrians are prohibited, in text form
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficLightBulbType_SIGN_OF_FOPBID_PED = 65536;   // 1 << 16  // Pedestrians are prohibited, in sign form
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum LaneMarkingType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_UNKNOWN = 0;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_LEFT = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_FORWARD = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_RIGHT = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_LEFT_AND_FORWARD = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_RIGHT_AND_FORWARD = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_LEFT_AND_RIGHT = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_U_TURN = 7;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_U_TURN_AND_FORWARD = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_U_TURN_AND_LEFT = 9;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_MERGE_LEFT = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_MERGE_RIGHT = 11;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_CROSSWALK_NOTICE = 12;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_SPEED_LIMIT_LOW = 13;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_SPEED_LIMIT_HIGH = 14;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_LEFT_TURN = 15;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_RIGHT_TURN = 16;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_U_TURN = 17;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_FORWARD_AND_LEFT_AND_RIGHT = 18;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_FORWARD_AND_U_TURN_AND_LEFT = 19;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_RIGHT_AND_U_TURN = 20;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_TEXT = 21;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_TIME = 22;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_CHECK_FOLLOWING_DISTANCE = 23;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_STOP_TO_GIVE_WAY = 24;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_SLOWDOWN_TO_GIVE_WAY = 25;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_STOP_MARK = 26;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_NETS = 27;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_FORWARD = 28;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_MERGE_LEFT = 29;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_ARROW_NO_MERGE_RIGHT = 30;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_NO_PARKING_LINE = 31;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_DIAMOND_MARKING = 32;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_INVERTED_TRIANGLE_MARKING = 33;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_BIKELANE = 34;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_BUSLANE = 35;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneMarkingType_EXCLUSIVELANE = 36;  // bus lane and non-motorized lane
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficSignTypeUS {
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TRAFFIC_SIGN_TYPE_US_UNSPECIFIED = 0;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_UNKNOWN = 2000;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_DoNotEnter = 2009;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_KeepLeft = 2010;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_KeepRight = 2012;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_LeftTurnOnly = 2014;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoLeftOrUTurn = 2016;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoLeftTurn = 2017;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoParkingSymbol = 2018;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoRightTurn = 2019;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoUTurn = 2021;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoVehiclesOnTracks = 2022;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OneWayArrow = 2023;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_RightTurnOnly = 2026;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_Stop = 2043;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_StraightOnly = 2044;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_TwoWayLeftturnOnlyOverhead = 2047;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_WrongWay = 2048;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_Yield = 2049;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AddedLaneLeft = 2050;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AddedLaneRight = 2051;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Bicycle = 2052;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_CirularIntersection = 2053;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LaneEndsSymbolLeft = 2054;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LaneEndsSymbolRight = 2055;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MergeLeft = 2056;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MergeRight = 2057;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Pedestrian = 2059;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SignalAheadSymbol = 2061;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_TurnLeft = 2062;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_TurnRight = 2063;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Two_WayTraffic = 2064;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_WindingRoad = 2065;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_SpeedLimitmph = 2066;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_SpeedLimitMinimummph = 2082;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_SpeedLimitNightmph = 2098;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_TruckSpeedmph = 2114;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_SpeedLimitWithMinimumSpeedMph = 2130;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_CombinedSpeedLimitMph = 2131;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MetricCombinedSpeedLimitKmh = 2229;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_SpeedLim = 2231;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AdvisorySpeedCurvemph = 2233;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AdvisorySpeedExitmph = 2249;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AdvisorySpeedPlaquemph = 2265;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_AdvisorySpeedRampmph = 2281;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_AdvisorySpeed = 2394;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OptionalMovementStraightAndLeft = 2408;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OptionalMovementStraightAndRight = 2409;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OptionalMovementLeftAndReturn = 2410;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MultiLeftAndReturn = 2411;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl3LaneLeft = 2412;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl3LaneRight = 2413;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl3LaneLSR = 2414;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_ReversibleLaneControlOverhead = 2415;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl2LaneLeft = 2416;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl2LaneRight = 2417;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_IntersectionLaneControl2LaneRoundabout = 2418;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OtherIntersectionLaneControl = 2419;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_EndReverseLaneTurnOnly = 2420;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_CenterLaneControlTime = 2421;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_BikeLane = 2423;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_DividedHighwayCrossingTIntersection = 2428;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_RailroadCrossingCrossbuck = 2429;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NumberofTracks = 2430;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_LightRailTransitDividedHighwayCrossingTIntersection = 2431;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_Look = 2432;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_SeatBeltRequired = 2433;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_YieldHereToPedestrians = 2434;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_In_StreetPedestrianCrossingStop = 2436;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_In_StreetPedestrianCrossingYield = 2437;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_TurningTrafficMustYieldToPedestrians = 2438;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_PhotoEnforced = 2439;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OneWayInArrowLeft = 2442;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_OneWayInArrowRight = 2443;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_WeightLimitSymbolic = 2444;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_DoNotPassLightRailTransit = 2445;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_HOVOnlyLaneAhead = 2449;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_HOVLaneEnds = 2450;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_ILEVAllowedInHOVLane = 2451;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_LeftNotStopBusOnlyHOVLane = 2452;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_WhiteBlack = 2454;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_WhiteBlack_Text = 2557;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoStraight = 2566;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoTrucksSymbol = 2567;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoBicycles = 2568;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoHitchHikingWordLegend = 2569;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoPedestriansSymbol = 2570;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_HazardousMaterialsProhibited = 2571;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NationalNetworkTrucksProhibited = 2572;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoLeftTurnAcrossTracks = 2573;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_RedCircle = 2575;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoParkingSymbolTimes = 2579;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoParkingSymbolBikeLane = 2584;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NoParkingTransitLogo = 2586;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_WhiteRed = 2598;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_BicycleWrongWay = 2601;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MultiWayStop = 2603;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_M_DetourArrow = 2611;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Two_WayTrafficDivider = 2612;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_CenterLaneClosedAheadSymbol = 2613;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_FlaggerSymbol = 2614;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_WorkersSymbol = 2615;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DoubleReverseCurve1Lane = 2616;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DoubleReverseCurve2Lane = 2617;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DoubleReverseCurve3Lane = 2618;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_OrangeBlack = 2620;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_OrangeBlack_Text = 2652;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_TurnLeftWithAdvisorySpeed = 2656;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_TurnRightWithAdvisorySpeed = 2657;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LeftReverseTurn = 2664;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_RightReverseTurn = 2665;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LargeArrowOneDirection = 2668;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LargeArrowTwoDirections = 2669;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_ChevronLeft = 2670;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_ChevronRight = 2671;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LeftSideRoadIntersection = 2673;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_RightSideRoadIntersection = 2674;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LeftCurveSideRoadIntersection = 2681;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_RightCurveSideRoadIntersection = 2682;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_HairpinCurveLeft = 2685;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_HairpinCurveRight = 2686;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_TruckRollover = 2687;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Left270DegreeCurve = 2690;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Right270DegreeCurve = 2691;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SideRoad = 2692;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Tintersection = 2693;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Yintersection = 2694;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_CrossRoads = 2695;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_YieldAheadSymbol = 2696;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SideRoadDiagonal = 2697;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_StopAheadSymbol = 2698;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SpeedReductionAhead = 2699;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_NarrowBridgeSymbol = 2700;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_EnteringRoadwayMergeLeft = 2701;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_EnteringRoadwayMergeRight = 2702;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_EnteringAddedLaneLeft = 2703;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_EnteringAddedLaneRight = 2704;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DividedHighwaySymbol = 2705;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DividedHighwayEndsSymbol = 2706;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_HillSymbol = 2708;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_HillBicycle = 2709;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SlipperyWhenWet = 2710;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_BicycleSurfaceCondition = 2711;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_RailroadCrossingAdvance = 2712;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_RailroadCrossingStorageSpace = 2713;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Deer = 2717;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Cattle = 2718;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_FramMachineryAlt = 2719;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_FramMachinery = 2720;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Snowmobile = 2721;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Equestrian = 2722;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_EmergencyVehicle = 2723;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Wheelchair = 2724;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Truck = 2725;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_GolfCart = 2726;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Horse_DrawnVehicle = 2727;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DoubleArrow = 2728;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LowClearance = 2729;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_Playground = 2730;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_SchoolAreaSign = 2731;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LowGroundClearanceRailroadCrossing = 2732;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_LightRailTransitApproaching = 2733;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_DiagonalDownwardArrowPlaque = 2734;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_FreewayPedestrian = 2736;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_YellowBlack = 2738;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_YellowBlack_Text = 2815;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_BlueWhite = 2844;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_BlueWhite_Text = 2885;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_RouteID_Blue = 2892;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_D_ParkRide = 2895;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_D_BikeRoute = 2896;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_M_LightRailStation = 2911;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_GreenWhite = 2915;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_GreenWhite_Text = 2942;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_B_BuisnessRouteID_Green = 2952;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_HazardousMaterialsPermitted = 2955;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_NationalNetworkTrucksPermitted = 2956;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_Other_GreenCircle = 2958;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_M_Milepost = 2968;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_G_GuideSign_BrownWhite = 2989;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_RouteID_White = 3010;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_O_Other = 3013;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MetricSpeedLimitKmh = 3033;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MetricSpeedLimitMinimumKmh = 3034;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MetricSpeedLimitNightKmh = 3035;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_MetricTruckSpeedKmh = 3036;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MetricAdvisorySpeedCurveKmh = 3037;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MetricAdvisorySpeedExitKmh = 3038;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MetricAdvisorySpeedPlaqueKmh = 3039;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_W_MetricAdvisorySpeedRampKmh = 3040;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_M_DirectionalArrow = 3041;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_KeepRightArrow = 3042;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_KeepLeftArrow = 3043;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_TowAwayZoneSymbol = 3044;
+
+ ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeUS_R_LightRailOnlyLane = 3045;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficSignTypeEU {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_Placeholder = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_OpeningOrSwingBridge_g1 = 4000;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraightOrTurnLeft_g2 = 4001;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndPedestriansOnly_g2 = 4002;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_RoundaboutGoRight_g1 = 4003;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PedestriansCrossing_g4 = 4004;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Snow_g5 = 4005;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_FrogCrossing_g1 = 4006;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TourismInformation_g1 = 4007;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronLeft_g1 = 4008;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEnd_g2 = 4009;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TextsThreeLines_g1 = 4010;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TowAwayZone_g1 = 4011;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndPedesAndBicycles_g1 = 4012;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronLeft_g2 = 4013;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_InterstateRoute_g1 = 4016;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SchoolZone_g2 = 4017;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndLivingStreet_g1 = 4018;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoBuses_g1 = 4019;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Roundabout_g3 = 4020;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_CurveLeft_g3 = 4021;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Tunnel_g5 = 4022;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrailCrossing_g4 = 4023;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_BusesOnly_g1 = 4024;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Vehicles_g1 = 4026;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_EquestriansOnly_g1 = 4027;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Parking_g2 = 4028;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Caravans_g2 = 4029;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_JunctionLeft_g2 = 4030;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TurnRight_g2 = 4031;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoStraightThrough_g2 = 4032;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PassLeft_g1 = 4033;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PedestriansRight_g1 = 4034;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndMopedsAndBiOnly_g1 = 4035;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_DisabledPersons_g1 = 4037;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DoubleTurnFirstLeft_g1 = 4038;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoBiTractorsOrCarts_g1 = 4039;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BicyclesTurnRight_g1 = 4040;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_FallingRocksOrDebrisRight_g1 = 4041;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_BicyclesAndBusesOnly_g1 = 4043;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoHeavyGoodsVehicles_g2 = 4044;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BicyclesBothWays_g1 = 4046;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_PedestriansCrossing_g1 = 4047;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_LengthLimit_g1 = 4048;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_GoStraightOrLeft_g1 = 4049;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TextsTwoLines_g1 = 4050;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_BicyAndPedes_g1 = 4051;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WhenRainy_g1 = 4052;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_CurveRight_g1 = 4053;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g7 = 4054;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+
+  TrafficSignTypeEU_W_TrafficSignals_g1 = 4055;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+
+  TrafficSignTypeEU_W_TrucksRollover_g4 = 4056;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+
+  TrafficSignTypeEU_R_TramsOnly_g1 = 4057;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TRoads_g1 = 4058;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimitPerAxle_g1 = 4059;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnRight_g2 = 4060;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndProhibition_g1 = 4062;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_UnevenRoad_g2 = 4063;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PavementAhead_g1 = 4064;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimit_g7 = 4065;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_LimitedAccessRoad_g1 = 4066;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_StayInLane_g1 = 4067;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptTractors_g1 = 4068;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DualBicyAndPedes_g1 = 4069;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TurnLeft_g1 = 4070;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DualPedesAndBicy_g1 = 4071;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SoftShoulder_g2 = 4072;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Electricity_g1 = 4073;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_SidewalkClosed_g1 = 4074;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Motorcycles_g2 = 4075;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TwoWayTraffic_g1 = 4076;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RoadNarrowsLeft_g2 = 4077;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Roadworks_g1 = 4078;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoPedestrians_g2 = 4079;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Dip_g2 = 4080;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_VehiclesAndMotor_g1 = 4083;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicles_g7 = 4084;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_OtherDanger_g1 = 4085;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_QuayOrRiverBank_g1 = 4086;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_CyclingRestriction_g1 = 4087;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndDualBicyAndPedes_g1 = 4088;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksGoRightAhead_g1 = 4089;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoVehiclesExceptMotor_g2 = 4090;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEnd_g3 = 4091;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Camera_g2 = 4092;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_SpeedZone_g1 = 4093;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptVehicles_g1 = 4094;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoRightTurn_g2 = 4095;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParkingOrNoStopping_g2 = 4096;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficMergesLeft_g2 = 4097;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBicyclesOnly_g1 = 4098;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorcycles_g2 = 4099;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoEntry_g1 = 4100;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicles_g5 = 4101;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoParkingOrStopping_g1 = 4102;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_OneWayRight_g2 = 4103;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoRightTurn_g1 = 4105;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_MaxSpeed_g2 = 4106;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SoftShoulder_g1 = 4108;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DomesticAnimals_g6 = 4109;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TripleLanes_g1 = 4110;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Texts_g1 = 4111;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Parking_g4 = 4112;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnLeftOrRight_g2 = 4113;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SteepDescent_g1 = 4114;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_KeepRight_g4 = 4115;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DisabledPersons_g1 = 4116;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_JunctionRight_g1 = 4118;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBicyclesOnly_g2 = 4119;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g9 = 4120;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TripleLanes_g1 = 4121;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_ExitAhead_g3 = 4122;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimit_g1 = 4123;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ObstacleDelineator_g3 = 4124;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Tunnel_g1 = 4126;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Texts_g2 = 4127;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptBicycles_g1 = 4128;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoCarryingDangerous_g1 = 4129;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndSpeedZone_g3 = 4130;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PassOnEitherSide_g1 = 4131;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_LowBeamHeadlights_g1 = 4132;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndRoadWorks_g2 = 4133;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_OneWayStraight_g1 = 4134;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_LowBeamHeadlights_g2 = 4135;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronRight_g5 = 4136;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoStopping_g1 = 4138;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Text_g2 = 4140;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronLeft_g4 = 4142;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_SoftShoulder_g1 = 4143;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksGoLeft_g1 = 4144;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimitWithTrucks_g1 = 4145;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Parking_g5 = 4146;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Trucks_g3 = 4147;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GiveWayToOncomingTraffic_g2 = 4148;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_OneWayLeft_g3 = 4149;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_AccidentArea_g5 = 4151;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g6 = 4152;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_MaxSpeedLed_g1 = 4153;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_GoStraightOrRight_g1 = 4154;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronRight_g1 = 4156;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronRight_g2 = 4157;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_HurricaneEvacuationRoute_g1 = 4159;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimit_g4 = 4160;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoOvertaking_g4 = 4162;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Motorway_g1 = 4163;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksTurnLeft_g1 = 4164;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParkingOrNoStopping_g3 = 4165;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicles_g3 = 4166;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Roundabout_g3 = 4167;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Tractors_g1 = 4168;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParkingBiOrMotor_g1 = 4169;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TurnLeft_g2 = 4170;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Subway_g1 = 4171;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PriorityOverVehicles_g1 = 4172;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_LaneControl_g3 = 4173;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WhenSnowy_g1 = 4174;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PedestriansOnly_g1 = 4176;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Wind_g1 = 4177;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoBicycles_g1 = 4178;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BusStop_g1 = 4179;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DangerousCrosswindsRight_g1 = 4180;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoOvertaking_g5 = 4181;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBicyclesAndPedes_g1 = 4182;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnLeft_g1 = 4183;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParking_g1 = 4184;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoOvertaking_g1 = 4185;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoLeftTurn_g1 = 4186;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Camera_g4 = 4187;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoGoodsVehicleTrailers_g1 = 4188;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PedestriansPushButton_g1 = 4189;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoTractorsOrCarts_g1 = 4190;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RailroadCrossingB_g3 = 4191;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Hospital_g1 = 4193;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_MotorwayExitAhead_g1 = 4197;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PedesCrossing_g1 = 4198;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WidthLimit_g1 = 4200;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TrafficMergesLeft_g1 = 4201;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DangerousCrosswindsLeft_g2 = 4203;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksBusesTrailers_g1 = 4204;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_FlightPort_g1 = 4205;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TramsAndBusesOnly_g1 = 4208;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RailroadCrossingB_g1 = 4209;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PriorityRouteIs_g5 = 4210;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Buses_g1 = 4211;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_LaneControl_g2 = 4213;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RoadNarrowsRight_g1 = 4214;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_GeneralDirections_g1 = 4215;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DomesticAnimals_g1 = 4217;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnLeftOrRight_g1 = 4218;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_KeepRight_g1 = 4219;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Distance_g3 = 4220;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_RoadClosedToVehicles_g1 = 4221;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraightOrTurnLeft_g1 = 4222;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksTurnRight_g1 = 4223;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BothDirections_g2 = 4224;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DividedHighwayOnLeft_g2 = 4226;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoTurns_g1 = 4227;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_HighwayInterchange_g1 = 4228;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_LooseRoadSurface_g1 = 4230;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TwoWayTraffic_g1 = 4231;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_LowFlyingAircraft_g1 = 4232;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndMaxSpeed_g2 = 4233;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_EquestriansCrossing_g1 = 4234;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Ferry_g1 = 4235;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_AccidentArea_g3 = 4236;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_VehiclesOnRails_g1 = 4238;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_GasStation_g1 = 4239;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PriorityRouteIs_g4 = 4242;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_YRoads_g2 = 4243;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_BicyclesCrossing_g4 = 4245;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEndLeft_g1 = 4246;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Children_g1 = 4247;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TanksOnly_g1 = 4248;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndSpeedZone_g2 = 4249;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoEquestrians_g1 = 4250;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SlipperyRoadSurface_g1 = 4251;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TimeRestrictions_g3 = 4252;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_RoundaboutGoLeft_g1 = 4253;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicleTrailers_g1 = 4254;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Tunnel_g1 = 4255;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_AllDirectionsPermitted_g1 = 4256;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Snow_g4 = 4258;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBuiltUpArea_g4 = 4259;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BikeRoute_g3 = 4260;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoVehiclesExceptMotor_g1 = 4261;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_GoLeft_g1 = 4262;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DoNotStopOnTracks_g1 = 4263;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoPedestrians_g1 = 4264;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_OneWayRight_g1 = 4265;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParking_g9 = 4266;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_BicyclesCrossing_g1 = 4267;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Trucks_g1 = 4268;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_RoadClosed_g1 = 4269;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Camera_g3 = 4270;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_OffsetRoads_g1 = 4271;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DoubleCurveFirstLeft_g1 = 4272;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Children_g4 = 4273;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptPollutingLevelGreen_g1 = 4274;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksGoStraight_g1 = 4275;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RailroadBarriers_g1 = 4276;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraight_g1 = 4278;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEndExBicyAndPedes_g1 = 4279;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_MaxSpeed_g4 = 4281;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TollStation_g1 = 4282;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WhenWet_g1 = 4284;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_UTurn_g1 = 4285;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_KoalaCrossing_g4 = 4286;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnRight_g1 = 4287;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_ParkingRestrictions_g1 = 4288;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RoadNarrowsLeft_g1 = 4289;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_MotorcyclesOnly_g1 = 4290;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TramsCrossing_g1 = 4291;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficQueuesLikely_g1 = 4292;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBuiltUpArea_g3 = 4293;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WearSeatBelt_g1 = 4294;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_ParkingWithRestrictions_g1 = 4295;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronRight_g4 = 4296;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TimeRestrictions_g1 = 4299;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TwoWayTraffic_g3 = 4300;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PassRight_g1 = 4301;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndParkingZone_g1 = 4302;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TrafficMergesRight_g1 = 4303;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnLeftAhead_g1 = 4305;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Text_g1 = 4309;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_OneDirectionLeft_g1 = 4311;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoLeftTurn_g2 = 4313;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrucksCrossing_g2 = 4314;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoRickshaws_g3 = 4315;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficQueuesLikely_g2 = 4316;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEndRight_g1 = 4318;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicles_g1 = 4319;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficSlow_g1 = 4320;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TurnLeft_g2 = 4321;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TrucksAndBusesOnly_g1 = 4322;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Ruts_g1 = 4323;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PriorityRouteIs_g3 = 4324;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g8 = 4325;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnRightAhead_g2 = 4326;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrailCrossing_g1 = 4327;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_FallingRocksOrDebrisLeft_g1 = 4328;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_LivingStreet_g3 = 4329;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronLeft_g5 = 4330;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GiveWayToOncomingTraffic_g1 = 4331;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndOneWayStraight_g1 = 4333;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_BicyclesOnly_g1 = 4334;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TurnRightAhead_g1 = 4335;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_UTurn_g1 = 4336;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_AdvisoryMaxSpeed_g1 = 4337;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TrucksOnly_g1 = 4339;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Trees_g1 = 4341;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DualSpeeds_g1 = 4342;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoVehiclesMotorBicycles_g1 = 4344;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TripleLanesGo_g1 = 4345;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_StopSignals_g1 = 4346;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBuiltUpArea_g1 = 4347;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TextsFourLines_g1 = 4348;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_WildAnimals_g6 = 4349;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndSnowChains_g1 = 4350;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParkingOrNoStopping_g4 = 4351;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TwoWayTraffic_g2 = 4352;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TrailCrossing_g3 = 4353;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoHorn_g1 = 4354;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoParking_g1 = 4355;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TrailCrossing_g2 = 4356;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Motorcycles_g3 = 4358;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Lodging_g1 = 4359;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptTrams_g1 = 4360;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g1 = 4361;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_WildAnimals_g1 = 4362;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_JunctionRight_g2 = 4363;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BicyclesCrossing_g3 = 4364;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Crossroads_g1 = 4365;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_OffsetRoads_g4 = 4367;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParking_g6 = 4368;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndSpeedZone_g1 = 4369;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoOverByVehicles_g1 = 4370;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_CurveLeft_g1 = 4371;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SlipperyBicycles_g1 = 4372;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_RestArea_g1 = 4373;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BicycleLane_g1 = 4374;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PedesAndBicy_g1 = 4375;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraightOrTurnRight_g2 = 4376;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParkingOrNoStopping_g1 = 4377;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_MotorwayExitAhead_g3 = 4378;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PriorityRoad_g1 = 4379;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_IcyRoad_g1 = 4380;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PedestriansCrossing_g12 = 4381;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Dip_g1 = 4384;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PriorityRouteIs_g2 = 4385;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Yield_g1 = 4386;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_HeightLimit_g1 = 4387;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptBuses_g1 = 4388;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_JunctionFromRight_g1 = 4389;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_WeightLimitPerTandemAxle_g1 = 4390;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_PerpendicularParking_g1 = 4391;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_RoadClosedToVehicles_g3 = 4392;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorVehicles_g4 = 4393;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksGoRight_g1 = 4394;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TextsTwoLines_g1 = 4395;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndMaxSpeed_g1 = 4396;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PedestriansCrossing_g1 = 4397;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoStopping_g4 = 4399;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndLimitedAccessRoad_g1 = 4400;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Parking_g1 = 4401;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BikeRoute_g1 = 4402;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficSignals_g5 = 4403;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_MotorcyclesOnly_g2 = 4404;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficMergesRight_g2 = 4405;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_SnowChains_g1 = 4406;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_ParkingRestrictions_g2 = 4407;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_WildAnimals_g7 = 4408;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BuiltUpArea_g1 = 4409;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_RoadBump_g1 = 4410;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoOverByVehicles_g1 = 4412;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Tunnel_g2 = 4413;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_LimitedLightingUnderTrees_g1 = 4415;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_RadarEnforced_g1 = 4416;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PandaCrossing_g1 = 4417;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_TrafficMergesRight_g1 = 4418;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Roadworks_g3 = 4419;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WeightLimit_g1 = 4420;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptTrucks_g1 = 4423;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Roundabout_g1 = 4424;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ResBothDirec_g1 = 4425;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_JunctionLeft_g1 = 4426;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_LaneControl_g1 = 4427;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PriorityRouteIs_g1 = 4428;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_SnowmobilesOnly_g1 = 4429;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DoubleCurveFirstRight_g3 = 4430;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_LooseRoadSurface_g3 = 4432;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TurnRight_g1 = 4433;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PedestriansOnly_g2 = 4434;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoOverByVehicles_g2 = 4435;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Roadworks_g5 = 4436;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_AccidentArea_g2 = 4437;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndBusesOnly_g1 = 4439;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TextsOneLine_g1 = 4440;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DoubleCurveFirstRight_g1 = 4441;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParking_g2 = 4442;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraightOrTurnRight_g1 = 4444;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_PassingLaneAhead_g1 = 4445;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraightBicycles_g1 = 4446;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TrucksAndTrailers_g1 = 4448;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_LivingStreet_g1 = 4449;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Snowmobiles_g1 = 4450;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoUTurn_g1 = 4451;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WidthLimit_g1 = 4453;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEnd_g1 = 4454;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_TrucksBothWays_g1 = 4458;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_CycTwoAbreastPerm_g1 = 4459;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_DividedHighwayEnds_g3 = 4460;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PriorityToTheRight_g1 = 4462;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Stairs_g1 = 4463;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_TextsThreeLines_g1 = 4464;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoMotorcycles_g1 = 4465;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BothDirections_g1 = 4466;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RoadNarrows_g1 = 4467;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SteepAscent_g1 = 4468;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoParking_g4 = 4469;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ExceptBicycles_g2 = 4471;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_MaxSpeed_g1 = 4472;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Vehicles_g2 = 4473;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndNoOvertaking_g1 = 4474;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_SpeedingFinesIncreased_g1 = 4475;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_AdvisoryExitOrRampSpeed_g1 = 4476;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BikeRoute_g2 = 4477;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DisabledPersons_g2 = 4478;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_DeadEnd_g1 = 4479;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DualLanesGoStraightOnLeft_g1 = 4480;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoVehiclesOrBuses_g1 = 4481;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndSchoolZone_g1 = 4482;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoHeavyGoodsVehicles_g1 = 4483;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Motorcycles_g1 = 4484;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ChevronRight_g3 = 4485;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_WeekendsOrHolidays_g1 = 4486;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_FoggyRoad_g2 = 4488;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_KeepLeft_g1 = 4489;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RoadBump_g1 = 4490;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoPedestriansOrBicycles_g1 = 4491;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_ExitAhead_g2 = 4492;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoStopping_g3 = 4493;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_SL_MaxSpeed_g3 = 4494;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Roundabout_g1 = 4495;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PedestriansLeft_g1 = 4496;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_UnevenRoad_g1 = 4497;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndPriorityRoad_g1 = 4498;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_Stop_g10 = 4499;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_ObstacleDelineator_g2 = 4501;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_KeepRight_g9 = 4502;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Detour_g1 = 4503;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_Children_g3 = 4504;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndMotorway_g1 = 4505;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_RailroadCrossing_g4 = 4506;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndTunnel_g2 = 4507;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_PedestriansAndBicycles_g1 = 4509;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_SharpTurn_g1 = 4510;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BikeRoute_g1 = 4511;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_NoCarryingDange_g1 = 4512;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_StateRoute_g1 = 4513;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_BicyclesCrossing_g1 = 4514;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_BiPedesDetour_g1 = 4515;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_DoNotPass_g1 = 4516;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_GoStraight_g3 = 4518;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_MS_MinSpeed_g1 = 4519;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_DeadEndExceptBicycles_g1 = 4520;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_LowFlyingAircraft_g3 = 4521;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_MinSafeDistance_g1 = 4522;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Distance_g1 = 4523;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_Distance_g2 = 4525;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_PR_EndPedestriansOnly_g1 = 4526;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Stairs_g4 = 4527;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_R_OneWayLeft_g1 = 4528;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_C_TwoWayTraffic_g4 = 4529;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_Tunnel_g2 = 4531;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_HighwayExit_g1 = 4532;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_W_PedestriansCrossing_g5 = 4533;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_I_MotorwayExitAhead_g2 = 4534;
+
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignTypeEU_Unknown_g1 = 4999;
+
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficSignType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Stop_For = 1;    // stop to give way
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Slow_For = 2;    // slow down and give way
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Give_Way = 3;    // give way
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Noway = 4;    // no way
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Entry = 5;    // no entry
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Parking = 6;    // no parking
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Long_Parking = 7;    // no long-term parking
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Parking_Check = 8;    // stop for check
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Motor = 9;    // no entry of motor vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Motorcycle = 10;   // no entry of motorcycles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Truck = 11;   // no entry of truck
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Moto_Tricycle = 12;   // no entry of tricycles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Bus = 13;   // no entry of Bus
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Car = 14;   // no entry of car
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Trailer = 15;   // no entry of trailer
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Tractor = 16;   // no entry of tractor
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Cargo_Tricycle = 17;   // no entry of cargo tricycles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Non_Motor = 18;   // no entry of non-motor vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Animal_Vehicle = 19;   // no entry of animal vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Human_Vehicle = 20;   // no entry of rickshaws
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Human_Cargo_Triangle = 21;   // no entry of manpower cargo tricycles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Human_Passenger_Triangle = 22;   // no entry of manpower passenger tricycles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Human = 23;   // no entry of pedestrians
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Left_Turn = 24;   // no left turn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Right_Turn = 25;   // no right turn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Left_Right_Turn = 26;   // no turning left or right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Forward = 27;   // no forward
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Forward_Left = 28;   // no forward and turn left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Forward_Right = 29;   // no forward and turn right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Return = 30;   // no u-turn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Horning = 31;   // no horning
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Height_Lim = 32;   // height limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Width_Lim = 33;   // width limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Weight_Lim = 34;   // weight limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Weight_Lim_wheel = 35;   // limit of axle load
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Speed_Lim = 36;   // speed limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Speed_Lim_Rev = 37;   // remove the speed limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Passing = 38;   // no passing
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Dangerous = 39;   // no entry of dangerous goods vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Custom = 40;   // the customs
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Other = 41;   // other prohibitions
+
+  // Warning
+  TrafficSignType_W_T_Shap = 42;   // warning T-junction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_T_Shap_Left = 43;   // warning left T-junction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_T_Shap_Right = 44;   // warning right T-junction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_T_Shaps = 45;   // warning continuous T-junctions
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Cross = 46;   // warning intersection
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Circle = 47;   // warning roundabouts
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Y_Left = 48;   // warning the fork in the front left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Y_Right = 49;   // warning the fork in the front right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_YB_Left = 50;   // warning the fork at the rear left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_YB_Right = 51;   // warning the fork at the rear right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Left_Turn = 52;   // warning the sharp left turns
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Right_Turn = 53;   // warning the sharp right turns
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_RL_Turn = 54;   // warning the reverse bend on the right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_LR_Turn = 55;   // warning the reverse bend on the left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Continuous_Turn = 56;   // warning continuous bends
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Up = 57;   // warning uphill
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Down = 58;   // warning downhill
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Continuous_Down = 59;   // warning continuous downhill
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Accident_Prone = 60;   // warning accident-prone road sections
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Danger = 61;   // warning dangerous
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Left_Narrow = 62;   // warning the narrow on the left side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Right_Narrow = 63;   // warning the narrow on the right side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_LR_Narrow = 64;   // warning the narrow on both sides
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Narrow_Bridge = 65;   // warning the narrow bridge
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Slip = 66;   // warning the slippery sections
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Pedestrain = 67;   // warning the pedestrian
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Children = 68;   // warning children
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Cycle = 69;   // warning non-motor vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Disabled = 70;   // warning disabled
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Side_Wind = 71;   // warning crosswinds
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Domestic = 72;   // warning livestock
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Animal = 73;   // warning wild animal
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Tunnel = 74;   // warning tunnel
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Tunnel_Headlight = 75;   // warning head lights in the tunnel
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Traffic_Light = 76;   // warning traffic light
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Left_Falling = 77;   // warning the failing rocks on the left side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Right_Falling = 78;   // warning the failing rocks on the right side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Mount_Left = 79;   // warning the mountain road on the left side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Mount_Right = 80;   // warning the mountain road on the right side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Village = 81;   // warning village
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Dam_Right = 82;   // warning dam on the right side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Dam_Left = 83;   // warning dam on the left side
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Ferry = 84;   // warning ferry
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Ford = 85;   // warning ford
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Slow = 86;   // warning slow down
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Hump_Bridge = 87;   // warning the hump bridge
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Bumpy = 88;   // warning the bumpy roads
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Bump = 89;   // warning bumps
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Low_Lying = 90;   // warning low-lying roads
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Working = 91;   // warning construction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Guarded_Railway = 92;   // warning the guarded railway
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Railway = 93;   // warning the unguarded railway
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Detour_Around = 94;   // warning detouring around
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Detour_Left = 95;   // warning detouring on the left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Detour_Right = 96;   // warning detouring on the right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Merge_Left = 97;   // warning merge on the left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Merge_Right = 98;   // warning merge on the right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Two_Way = 99;   // warning two-way traffic
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Tidal = 100;  // warning tidal
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Keep_Distance = 101;  // warning keeping the distance
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Cross_Intersection = 102;  // warning cross intersection
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_T_Intersection = 103;  // warning T-intersection
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Vehicle_Queue = 104;  // warning the queue of vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Ice = 105;  // warning the icy roads
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Rain = 106;  // waring rain and snow weather
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Fog = 107;  // warning the fog
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Bad_Weather = 108;  // warning the bad weather
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Other = 109;  // other warnings
+  
+  // instruction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward = 110;  // straight
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left_Turn = 111;  // turn left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Right_Turn = 112;  // turn right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Left = 113;  // go straight and turn left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Right = 114;  // go straight and turn right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left_Right = 115;  // turn left and right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Right = 116;  // drive on the right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left = 117;  // drive on the left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Left_Stereo = 118;  // go straight and turn left at an interchange
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Right_Stereo = 119;  // go straight and turn right at an interchange
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Circle = 120;  // driving around the island
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Walk = 121;  // walk
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Honk = 122;  // honk
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Min_Speed_Lim = 123;  // minium speed limit
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Motors = 124;  // motor vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Non_Motors = 125;  // non-motor vehicles
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Pedestrian_Cross = 126;  // crosswalk
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Other = 127;  // other instructions
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Passing_Rev = 128;  // remove the prohibition of no passing
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_All_Speed_Limit_Cancel = 129;  // remove all speed limits
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Tripod = 130;  // warning the tripod
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_MultiVehicle = 131;  // multivehicle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Bike_Down_Slope = 132;  // no bike down slop
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Bike_Up_Slope = 133;  // no bike up slop
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Mini_bus = 134;  // no mini bus
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Specific_Left_Turn = 135;  // no specific left turn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_No_Specific_Right_Turn = 136;  // no specific right turn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Speed_Lim_ele = 137;  // speed lim ele
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Vehicle_Other = 138;  // other vehicle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_P_Other_Speed_Lim_ele = 139;  // other speed lim ele
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Slow_Down = 140;  // warning slow down
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Split_Left = 141;  // warning split left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_W_Split_Right = 142;  // warning split right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Allow_Uturn = 143;  // allow uturn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Fast_Bus_Lane = 144;  // fast bus lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Lane = 145;  // forward lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Left_Lane = 146;  // forward left lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Forward_Right_Lane = 147;  // forward right lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left_Bus_Lane = 148;  // left bus lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left_Line = 149;  // left line
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Left_Turn_Lane = 150;  // left turn lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Motors_Lane = 151;  // motors lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Multi_Occupant_Motors_Lane = 152;  // multi occupant motors lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Non_Motors_Lane = 153;  // non motors lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Other_circle = 154;  // other circle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Other_rectangle = 155;  // other rectangle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Parking_Space = 156;  // parking space
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Priority_Intereesction = 157;  // Priority intereesction
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Right_Line = 158;  // right line
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Right_Turn_Lane = 159;  // right turn lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Split_Drive_Line = 160;  // split drive line
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Straight_Line = 161;  // straight line
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_UTurn_And_Left_Lane = 162;  // Uturn and left lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_UTurn_Lane = 163;  // Uturn lane
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_I_Uturn = 164;  // Uturn
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_Route_Sign_Misc = 166;  // Route Sign Misc
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_Multi_Misc = 167;  // multi Misc
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_GSWB_Misc = 168;  // GSWB Misc
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_G_Guide_Sign_Green_White = 169;  // Guide Sign Green White
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_G_Guide_Sign_White_Black = 170;  // Guide Sign White Black
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_IR_Ramp = 171;  // Ramp
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_IR_Ramp_Arrow = 172;  // Ramp Arrow
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_IR_Zones = 173;  // IR_Zones
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_IR_Zones_II = 174;  // Zones II
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_R_Road_Sign_Blue_White = 175;  // Road Sign Blue White
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_Route_ID_Other = 176;  // Other Route ID
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_Route_ID_Red_White = 177;  // Route ID Red White
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_Route_ID_Yellow_Black = 178;  // Yellow Black
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficSignType_T_Travel_Sign_Brown_White = 179;  // Travel Sign Brown White
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficSignTypeCN {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ETCLanes = 48;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ElectricalETC = 49;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_HighwayETCTollStationsNotice = 62;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLot = 99;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_Ramp = 109;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_RampArrow = 110;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_Zones = 134;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ZonesII = 135;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_AllowUturn = 136;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Circle = 137;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_FastBusLane = 138;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Forward = 139;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ForwardLane = 140;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ForwardLeft = 141;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ForwardLeftLane = 142;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ForwardRight = 144;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ForwardRightLane = 145;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Honk = 147;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Left = 148;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LeftBusLane = 149;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LeftLine = 150;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LeftRight = 151;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LeftTurn = 152;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LeftTurnLane = 153;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_MinSpeedLim = 154;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Motors = 162;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_MotorsLane = 163;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_MultiOccupantMotorsLane = 164;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_NonMotors = 165;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_NonMotorsLane = 166;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ParkingSpace = 169;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_PedestrianCross = 171;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_PriorityIntereesction = 172;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Right = 173;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_RightLine = 174;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_RightTurn = 175;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_RightTurnLane = 176;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_SplitDriveLine = 177;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_StraightLine = 178;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_UTurnAndLeftLane = 179;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_UTurnLane = 180;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Uturn = 183;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Walk = 184;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_MSL_Other = 185;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_PR_Other = 214;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_PSL_Other = 216;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_PSL_Unknown = 217;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_Custom = 218;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_GiveWay = 219;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_HeightLim = 220;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_MultiVehicle = 221;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoAnimalVehicle = 222;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoBikeDownSlope = 223;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoBikeUpSlope = 224;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoBus = 225;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoCar = 226;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoCargoTricycle = 227;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoDangerous = 228;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoEntry = 229;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoForward = 230;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoForwardLeft = 231;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoForwardRight = 232;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoHorning = 233;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoHuman = 234;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoHumanCargoTriangle = 235;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoHumanPassengerTriangle = 236;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoHumanVehicle = 237;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoLeftRightTurn = 238;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoLeftTurn = 239;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoLongParking = 240;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoLongParkingRev = 241;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoMinibus = 242;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoMotor = 244;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoMotorcycle = 245;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoNonMotor = 246;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoParking = 247;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoParkingRev = 248;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoPassing = 249;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoPassingRev = 250;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoReturn = 251;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoRightTurn = 252;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoSpecificLeftTurn = 253;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoSpecificRightTurn = 254;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoTractor = 255;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoTrailer = 256;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoTricycle = 257;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoTruck = 258;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_Noway = 259;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_Other_SpeedLimele = 261;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_ParkingCheck = 262;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_SlowFor = 263;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_SpeedLim = 264;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_SpeedLimele = 265;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_SpeedLimRev = 300;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_StopFor = 324;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_VehicleOther = 327;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_WeightLim = 328;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_WeightLimWheel = 329;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_WidthLim = 330;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_AccidentProne = 376;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_BadWeather = 378;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Bump = 379;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Bumpy = 380;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Children = 381;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Circle = 382;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_ContinuousDown = 383;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_ContinuousTurn = 384;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Cross = 385;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_CrossIntersection = 386;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Cycle = 388;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_DamLeft = 389;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_DamRight = 390;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Danger = 391;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_DetourAround = 392;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_DetourLeft = 393;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_DetourRight = 394;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Disabled = 395;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Down = 397;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Ferry = 399;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Fog = 400;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Ford = 401;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_GuardedRailway = 402;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_HumpBridge = 403;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Ice = 404;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_KeepDistance = 405;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LRNarrow = 406;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LRTurn = 407;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LeftFalling = 408;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LeftNarrow = 409;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LeftTurn = 410;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LowLying = 411;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_MergeLeft = 412;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_MergeRight = 413;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_MountLeft = 414;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_MountRight = 415;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_NarrowBridge = 416;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Pedestrian = 418;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_RLTurn = 419;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Railway = 420;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Rain = 421;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_RightFalling = 422;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_RightNarrow = 423;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_RightTurn = 424;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_SideWind = 425;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Slip = 428;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Slow = 429;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_SlowDown = 430;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_SplitLeft = 431;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_SplitRight = 432;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TIntersection = 433;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TShapLeft = 435;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TShapRight = 436;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Tidal = 437;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TrafficLight = 438;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Tripod = 439;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Tshape = 440;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Tshaps = 441;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Tunnel = 442;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TunnelHeadlight = 443;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_TwoWay = 444;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Up = 446;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_VehicleQueue = 447;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Village = 448;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_Working = 449;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_YBLeft = 450;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_YBRight = 451;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_YLeft = 454;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_YRight = 455;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_AuxiliaryRoad = 471;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_RampGreen = 472;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_RampExit = 475;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_RampHighwayExit = 476;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_RightLane = 479;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_SpecificRamp = 480;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ETCLanesKeepDistance = 483;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ETCTollStation = 496;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ETCLaneIndication = 497;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_AccidentManageArea = 498;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_W_LanesDecrease = 499;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_On_Smoking = 500;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_P_NoElectricBicycle = 501;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotEntrance = 502;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotExit = 503;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotExitAndEntrance = 504;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronLeft_g1 = 505;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronLeft_g2 = 506;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronLeft_g3 = 507;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronRight_g1 = 508;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronRight_g2 = 509;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronRight_g3 = 510;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronLeftOther = 511;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ChevronRightOther = 512;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotCrossLayer = 513;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotStair = 514;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_IR_ParkingLotElevator = 515;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_TramCarLane = 516;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ElectricBicycleLane = 517;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_PassengerCarLane = 518;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_HardShoulderThrough = 519;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_EndOfHardShoulderThroughTheFollow = 520;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_EndOfHardShoulderThrough = 521;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_LightUp = 522;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_ElectricBicycle = 523;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_NonVehicleAndPedestrian = 524;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_NonVehiclePush = 525;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_TruckKeepRight = 526;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_TruckThrough = 527;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_RouteIDSign = 1501;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_MiscSign = 1502;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_GuideSign = 1503;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+ TrafficSignTypeCN_I_Other = 1504;
+}
+
+/**
+* @brief  BEV信息
+* @detail BEV信息
+*/
+enum YesNoUnknown {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  YesNoUnknown_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  YesNoUnknown_Yes = 1;  // Related to the vehicle
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  YesNoUnknown_No = 2;  // Not related to the vehicle
+}
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ConditionType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_Numeric = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_Vehicle = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_Load = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_TimeOfDay = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_Weather = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_FuzzyTime = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ConditionType_TurnDirection = 6;
+}
+
+
+/**
+* @brief  BEV信息
+* @detail speed/height limit value
+*/
+message ConditionNumeric {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 value = 1;
+}
+
+/**
+* @brief  BEV信息
+* @detail The type of vehicle, such as car, motorcycle, etc.
+*/
+message ConditionVehicleType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 vehicle_type_mask = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail Refers to the type of thing the vehicle pulls
+*/
+
+enum Load {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_WaterPolluting = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Explosive = 2;  // Explosive products
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_OtherDangerous = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Empty = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Special = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Gasses = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_FlammableLiquids = 7;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_FlammableSolids = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Oxidizing = 9;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_ToxicInfectious = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Radioactive = 11;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Load_Corrosive = 12;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ConditionLoad {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional Load value = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ConditionTimeOfDay {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 start_minutes = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 end_minutes = 2;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum Weather {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_NoSpecial = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Sunshine = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Rain = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Fog = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Snow = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_Ice = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  Weather_StrongWind = 7;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ConditionWeather {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 weather = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum FuzzyTime {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  FUZZY_TIME_UNSPECIFIED = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  FuzzyTime_Unknown = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  FuzzyTime_Day = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  FuzzyTime_Night = 3;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ConditionFuzzyTime {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional FuzzyTime fuzzytime = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum LaneArrowMarking {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_None = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_Straight = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_SlightRight = 2;  // Merge to right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_Right = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_HardRight = 8;  // Sharp turn to right
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_UTurn = 16;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_HardLeft = 32;  // Sharp turn to left
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_Left = 64;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  LaneArrowMarking_SlightLeft = 128;  // Merge to left
+  //LaneArrowMarking_NA = -1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message ConditionTurnDirection {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional LaneArrowMarking direction = 1;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message Condition {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional ConditionType type = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  optional YesNoUnknown applies_to_egovehicle = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  oneof condition {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionNumeric condition_numeric = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionVehicleType condition_vehicletype = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionLoad condition_load = 5;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionTimeOfDay condition_time_of_day = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionWeather condition_weather = 7;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionFuzzyTime condition_fuzzy_time = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+      ConditionTurnDirection condition_turndirection = 9;
+  }
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum ZoneType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_UNKNOWN = 0;
+  // a circular shape
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_CIRCLE = 1;
+  // cul de sac
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_CIRCLE_CUL_DE_SAC = 2;
+  // a polygon shape
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_POLYGON = 3;
+  // keep clear zone
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_KEEP_CLEAR = 4;
+  // drive way
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_DRIVEWAY = 5;
+  // parking lot
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  ZoneType_PARKING_LOT = 6;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // railway crossing
+  ZoneType_RAILWAY_CROSSING = 7;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // intersection
+  ZoneType_INTERSECTION = 8;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // a parking area
+  ZoneType_PARKING_AREA = 9;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // a pick up zone
+  ZoneType_PICK_UP_ZONE = 10;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // a drop off zone
+  ZoneType_DROP_OFF_ZONE = 11;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // a roadwork stop
+  ZoneType_ROADWORK_ZONE = 12;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  // cross walk
+  ZoneType_CROSS_WALK = 13;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum PoleType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_UNKNOWN = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_GANTRY = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_SIGNPOST = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_SIGNAL = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_ROADGATE = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleType_HEIGHTLIMIT = 5;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum TrafficConeType {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_Unknown = 0;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_TrafficCone = 1;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_TrafficBollard = 2;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_IsolationBollard = 3;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_OtherBollard = 4;
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_CrashBarrel = 5;  // Anti-collision cone
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  TrafficConeType_Tripod = 6;
+}
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+enum PoleLiftState {
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleLiftState_closed = 0;  // Toll bar is closed
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleLiftState_changing = 1;  // Toll bars is being raised or closed
+  ///< proto信息：[/],(0,0,1),[/],(1,0),proto信息
+  PoleLiftState_opened = 2;  // Toll bar is opened
+}
+
+// [END messages]

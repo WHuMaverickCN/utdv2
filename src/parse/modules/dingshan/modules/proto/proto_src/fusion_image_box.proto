@@ -1,0 +1,61 @@
+/**
+* @file     fusion_image_box.proto
+* @author   tanwei
+* @details  fusion image_box相关信号的输出接口定义
+* @date     2022-12-09
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.12.9          <th>1.0                 <th>tanwei 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package FusionProto;
+import "fusion_common.proto";
+
+/**
+* @brief fusion image box信息
+* @detail xxxxxxxx
+*/
+
+message FusionImageBox
+{
+    ///< 视觉ID: [/],(0，0,25500),[/],(1,0),视觉ID
+    int32 cam_track_id = 1;
+    ///< 视觉目标框: [/],(/，/,/),[/],(1,0),视觉目标框
+    FusionCommonProto.Rect rect = 2;
+    ///< lidar ID: [/],(0，0,25500),[/],(1,0),lidarID
+    int32 lidar_track_id = 3;
+    ///< 投影像素点: [/],(/，/,/),[/],(1,0),投影像素点
+    repeated FusionCommonProto.PixelPoint points = 4;
+    ///< cam_source: [/],(0，0,2),[/],(1,0),cam_source
+    int32 cam_source = 5;
+}
+
+/**
+* @brief fusion image boxs信息
+* @detail xxxxxxxx
+*/
+message FusionImageBoxs
+{
+    ///< 视觉ID: [/],(/，/,/),[/],(1,0),视觉ID
+    int32 cam_id = 1;
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 2;
+    ///< box集: [/],(/，/,/),[/],(1,0),box集
+    repeated FusionImageBox fusion_image_boxes = 3;
+    ///< 帧: [/],(/，/,/),[/],(1,0),帧
+    int32 frame_index = 4;
+}
+

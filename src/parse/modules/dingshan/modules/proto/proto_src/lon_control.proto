@@ -1,0 +1,172 @@
+/**
+
+* @file     lon_control.proto
+* @author   张熏
+* @details  行车纵向控制接口定义
+* @date     2023-05-26
+* @version  V1.2
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.20          <th>1.0                 <th>孙秋
+* <table>
+* @par      修改日志:行车纵向控制接口
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.26          <th>1.1                 <th>孙秋
+* <table>
+* @par      修改日志:注释修改
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.4.25          <th>1.2                 <th>金书峰
+* <table>
+* @par      修改日志:新增模式信号
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.5.26          <th>1.3                 <th>张熏
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax="proto3";
+package	LONProto;
+import "seq_header.proto";
+
+/**
+ * @brief LongCtrlCmdOutProto
+ * @detail  控制指令输出
+ */
+message LongCtrlCmdOutProto
+{
+  ///< acc_acctrqreq: [%]，(0，0，99.99)，[/]，(1，0)，ACC扭矩请求值
+  double  acc_acctrqreq = 1;            
+  ///< acc_acctrqreqena: [/]，(0，0，1)，[/]，(1，0)，ACC扭矩请求激活
+  bool  acc_acctrqreqena = 2;   
+  ///< acc_cddaxena: [/]，(0，0，1)，[/]，(1，0)，减速请求激活
+  bool  acc_cddaxena = 3; 
+  ///< acc_targetacceleration: [m/s2]，(0,-5,7.75)，[/]，(1，0)，ACC目标加速度值
+  double  acc_targetacceleration = 4;   
+  ///< acc_dectostop: [/]，(0，0，1)，[/]，(1，0)，停止请求
+  bool  acc_dectostop = 5;
+  ///< acc_driveoff_request: [/]，(0，0，1)，[/]，(1，0)，起步请求
+  bool  acc_driveoff_request = 6; 
+  ///< acc_aebtargetdecelrt: [m/s2]，(0,-16,16)，[/]，(1，0)，AEB目标减速度
+  double  acc_aebtargetdecelrt = 7;    
+  ///< acc_aebdecctrlavail: [/]，(0，0，1)，[/]，(1，0)，AEB减速激活标志位
+  bool  acc_aebdecctrlavail = 8; 
+  ///< vlc_funcstatus: [/]，(0，0，1)，[/]，(1，0)，纵向控制功能状态
+  bool  vlc_funcstatus = 9;    
+  ///< laeb_ctrltype: [/]，(0，0，15)，[/]，(1，0)，LAEB请求类型              
+  uint32  laeb_ctrltype = 10;           
+  ///< laebvehilceholdreq: [/]，(0，0，1)，[/]，(1，0)，LAEB停车保压请求                           
+  bool  laebvehilceholdreq = 11;   
+  ///< seq_header: [/]，(0，0，1)，[/]，(1，0)，seq_header                                   
+  SeqHeaderProto.DelayHeader seq_header = 12;
+  ///< epb_request: [/]，(0，0，1)，[/]，(1，0)，拉手刹请求
+  uint32 epb_request = 13;  
+  ///< ad_reqmode: [/]，(0，0，3)，[/]，(1，0)，请求控制方式
+  uint32 ad_reqmode = 14; 
+  ///< brake_insufficient: [/]，(0，0，1)，[/]，(1，0)，制动不足
+  uint32 brake_insufficient = 15;
+  ///< fault1: [/]，(0，0，1)，[/]，(1，0)，故障1
+  double fault1 = 16;
+  ///< fault2: [/]，(0，0，1)，[/]，(1，0)，故障2
+  double fault2 = 17;
+  ///< fault3: [/]，(0，0，1)，[/]，(1，0)，故障3
+  double fault3 = 18;
+  ///< fault4: [/]，(0，0，1)，[/]，(1，0)，故障4
+  double fault4 = 19;
+  ///< pf_longitudinal_active: [/]，(0，0，1)，[/]，(1，0)，平台化纵向控制激活信号
+  bool pf_longitudinal_active = 20;
+  ///< pf_veh_des_acc: [/]，(0，0，1)，[/]，(1，0)，平台化目标加速度
+  double pf_veh_des_acc = 21;
+  ///< ad_fctopensts: [/]，(0，0，1)，[/]，(1，0)，制动控制状态
+  uint32 ad_fctopensts = 22;
+}
+
+/**
+ * @brief DebugVlcOutProto
+ * @detail  VLC内部监控信息
+ */
+message DebugVlcOutProto
+{
+  ///< decellimitstate: [/]，(0，0，1)，[/]，(1，0)，制动使能切换条件
+  bool  decellimitstate = 1;
+  ///< accellimitstate: [/]，(0，0，1)，[/]，(1，0)，油门使能切换条件
+  bool  accellimitstate = 2; 
+  ///< enable_0b_1t: [/]，(0，0，1)，[/]，(1，0)，油门制动响应判定
+  bool  enable_0b_1t = 3;        
+  ///< strategy_lng_ctrl: [NM]，(0，-200，400)，[/]，(1，0)，透传纵向控制策略                               
+  double  strategy_lng_ctrl = 4;         
+  ///< safestop_request: [NM]，(0，-200，400)，[/]，(1，0)，透传安全停车信号
+  double  safestop_request = 5;            
+  ///< vcu_real_torque: [NM]，(0，-200，400)，[/]，(1，0)，透传vcu真实扭矩
+  double  vcu_real_torque = 6;     
+  ///< esp_epb_req_avl: [NM]，(0，-200，400)，[/]，(1，0)，透传epb可用信号
+  double  esp_epb_req_avl = 7;            
+  ///< dpqp_trigerflag: [NM]，(0，-200，400)，[/]，(1，0)，透传纵向规划心跳信号
+  double  dpqp_trigerflag = 8;        
+  ///< roadgrade_mpss: [m/s2]，(0，-10，10)，[/]，(1，0)，坡道减速度
+  double  roadgrade_mpss = 9;        
+  ///< esp_longaccel: [m/s2]，(0，-10，10)，[/]，(1，0)，透传esp加速度
+  double  esp_longaccel = 10;       
+  ///< accelvh_mpss: [m/s2]，(0，-10，10)，[/]，(1，0)，本车实际减速度
+  double  accelvh_mpss = 11;         
+  ///< vcu_maxindicatedtorq: [m/s2]，(0，-10，10)，[/]，(1，0)，透传vcu最大扭矩
+  double  vcu_maxindicatedtorq = 12;       
+  ///< version: [/]，(0，0，9999)，[/]，(1，0)，VLC版本信号
+  uint32  version = 13;              
+  ///< acceleration_ref: [m/s2]，(0，0，1)，[/]，(1，0)，参考加速度
+  double acceleration_ref = 14; 
+  ///< velocity_ref: [m/s]，(0，0，1)，[/]，(1，0)，参考速度
+  double velocity_ref = 15; 
+  ///< accel_ref_filter: [m/s2]，(0，0，1)，[/]，(1，0)，滤波后的参考加速度
+  double accel_ref_filter = 16; 
+  ///< esp_vehcle_speed: [m/s]，(0，0，1)，[/]，(1，0)，车速
+  double esp_vehcle_speed = 17; 
+  ///< qp_sequence_num: [/]，(0，0，1)，[/]，(1，0)，qp_sequence_num
+  uint32 qp_sequence_num = 18; 
+  ///< lon_control_debug1: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug1
+  double lon_control_debug1 = 19; 
+  ///< lon_control_debug2: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug2
+  double lon_control_debug2 = 20; 
+  ///< lon_control_debug3: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug3
+  double lon_control_debug3 = 21; 
+  ///< lon_control_debug4: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug4
+  double lon_control_debug4 = 22; 
+  ///< lon_control_debug5: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug5
+  double lon_control_debug5 = 23; 
+  ///< lon_control_debug6: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug6
+  double lon_control_debug6 = 24; 
+  ///< lon_control_debug7: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug7
+  double lon_control_debug7 = 25; 
+  ///< lon_control_debug8: [m/s]，(0，0，1)，[/]，(1，0)，lon_control_debug8
+  double lon_control_debug8 = 26; 
+  ///< heartbeat: [m/s]，(0，0，1)，[/]，(1，0)，heartbeat
+  double heartbeat = 27; 
+  ///< drive_mode: [m/s]，(0，0，1)，[/]，(1，0)，驱动形式
+  double drive_mode = 28; 
+  ///< suspension_type: [m/s]，(0，0，1)，[/]，(1，0)，悬架类型
+  double suspension_type = 29; 
+  ///< tyre_type: [m/s]，(0，0，1)，[/]，(1，0)，轮胎规格
+  double tyre_type = 30; 
+  ///< battery_capacity: [m/s]，(0，0，1)，[/]，(1，0)，电池容量
+  double battery_capacity = 31; 
+  ///< vehicle_type: [m/s]，(0，0，1)，[/]，(1，0)，车型
+  double vehicle_type = 32; 
+  ///< ibcu_cddavailable: [m/s]，(0，0，1)，[/]，(1，0)，主制动可用状态
+  double ibcu_cddavailable = 33; 
+}
+

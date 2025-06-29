@@ -1,0 +1,388 @@
+/**
+
+* @file     hmi_basc_hzpparkinteract.proto
+* @author   HMITEAM
+* @details  SDA-S泊车-hzp交互数据
+* @date     2024-01-22
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2024-01-22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+package HmiInterface;
+import "hmi_basic_apainteract.proto";
+/**
+* @brief AD_HZPMapPnt3D
+* @details HZP记忆地图3D坐标点
+*/
+message ADHZPMapPnt3D {
+  ///<x:[m],(/,/,/),[/],(/,/),纬度
+  ///<0x0: 默认
+  double x = 1;
+
+  ///<y:[m],(/,/,/),[/],(/,/),经度
+  ///<0x0: 默认
+  double y = 2; 
+
+  ///<z:[m],(/,/,/),[/],(/,/),高度
+  ///<0x0: 默认
+  double z = 3;
+
+  ///<ad_hzpmapfloor:[/],(/,/,/),[/],(/,/),楼层
+  ///<0x0: 默认
+  int32 ad_hzpmapfloor = 4;
+
+  ///<ad_hzpmpgnewpnt:[/],(/,/,/),[/],(/,/),新建状态
+  ///<0x0: 非新建
+  ///<0x1: 新建
+  uint32 ad_hzpmpgnewpnt = 5;
+}
+
+/**
+* @brief AD_HZPParkRouteStruct
+* @details 规划轨迹
+*/
+message ADHZPParkRouteStruct {
+  ///<AD_HZPParkRouteStrtPnt:[/],(/,/,/),[/],(/,/),规划起点
+  ADHZPMapPnt3D ad_zhpparkroutestrtpnt = 1;
+
+  ///<AD_HZPParkRouteEndPnt:[/],(/,/,/),[/],(/,/),规划终点
+  ADHZPMapPnt3D ad_hzpparkrouteendpnt = 2;
+
+  ///<AD_HZPParkRoutePnt:[/],(/,/,/),[/],(/,/),规划轨迹
+  repeated ADHZPMapPnt3D ad_hzpparkroutepnt = 3;
+}
+
+/**
+* @brief AD_HZPMapEgoPose
+* @details HZP自车位姿
+*/
+message ADHZPMapEgoPose {
+  ///<x:[m],(/,/,/),[/],(/,/),纬度
+  ///<0x0: 默认
+  double x = 1;
+
+  ///<y:[m],(/,/,/),[/],(/,/),经度
+  ///<0x0: 默认
+  double y = 2; 
+
+  ///<z:[m],(/,/,/),[/],(/,/),高度
+  ///<0x0: 默认
+  double z = 3;
+
+  ///<ad_hzpmapfloor:[/],(/,/,/),[/],(/,/),楼层
+  ///<0x0: 默认
+  int32 ad_hzpmapfloor = 4;
+
+  ///<AD_HZPMapEgoTheta:[/],(/,/,/),[/],(/,/),角度
+  ///<0x0: 默认
+  float ad_hzpmapegotheta = 5;  
+}
+
+/**
+* @brief AD_HZPParkInteractData
+* @details HZPs泊车交互数据
+*/
+message ADHZPParkInteractData { 
+  ///<ad_hzpparkrecommd:[/],(/,/,/),[/],(/,/),记忆泊入推荐
+  ///<0x0: 无推荐
+  ///<0x1: 推荐开启
+  ///<0x2: 自动开启提示
+  ///<0x3: 推荐解除条件开启
+  uint32  ad_hzpparkrecommd	=	1;
+
+  ///<ad_hzpparksta:[/],(/,/,/),[/],(/,/),记忆泊车状态机
+  ///<0x0: 关闭
+  ///<0x1: 区域ODD外
+  ///<0x2: 抑制
+  ///<0x3: 待机
+  ///<0x4: 设置目的地
+  ///<0x5: 巡航
+  ///<0x6: 暂停
+  ///<0x7: 中断
+  ///<0x8: 泊车
+  ///<0x9: 完成
+  uint32  ad_hzpparksta	=	2;
+
+  ///<ad_hzpparkproinfo:[/],(/,/,/),[/],(/,/),记忆泊车过程提示
+  ///<0x0: 具体键值见soa服务网站，Basc_HZPParkInteract->Ntf_AD_HZPParkInteract
+  uint32  ad_hzpparkproinfo	=	3;
+
+  ///<ad_hzpparkremaindst:[m],(/,/,/),[/],(/,/),剩余距离
+  ///<0x0: 默认
+  float ad_hzpparkremaindst	=	4;
+
+  ///<ad_hzpparkavdvehnr:[/],(/,/,/),[/],(/,/),避让车辆数
+  ///<0x0: 默认
+  uint32  ad_hzpparkavdvehnr	=	5;
+
+  ///<ad_hzpparkavdpednr:[/],(/,/,/),[/],(/,/),避让行人数
+  ///<0x0: 默认
+  uint32  ad_hzpparkavdpednr	=	6;
+
+  ///<ad_hzpparkunavlreas:[/],(/,/,/),[/],(/,/),记忆泊车不可用条件
+  ///<0x0: 具体键值见soa服务网站，Basc_HZPParkInteract->Ntf_AD_HZPParkInteract
+  uint32  ad_hzpparkunavlreas	=	7;
+
+  ///<AD_HZPParkAbnormExit:[/],(/,/,/),[/],(/,/),记忆泊车异常退出
+  ///<0x0: 具体键值见soa服务网站，Basc_HZPParkInteract->Ntf_AD_HZPParkInteract
+  uint32  ad_hzpparkabnormexit = 8;
+  
+  ///<AD_HZPParkSetSts:[/],(/,/,/),[/],(/,/),记忆泊车设置状态
+  ///<0x0: 默认
+  ///<0x1: 已选择车位，点击开始_【去这里】
+  ///<0x2: 该路线无收藏车位_【去这里】
+  ///<0x3: 请选择目标车位_【去这里】
+  uint32  ad_hzpparksetsts	=	9;
+
+  ///<AD_HZPParkTarSlotID:[/],(/,/,/),[/],(/,/),目标车位ID	
+  ///<0x0: 默认
+  uint32  ad_hzpparktarslotid	=	10;
+
+  ///<AD_HZPParkAvlSlotID	:[/],(/,/,/),[/],(/,/),可用车位ID
+  ///<0x0: 默认
+  uint32  ad_hzpparkavlslotid = 11;
+
+  ///<AD_HZPParkReqSlotID:[/],(/,/,/),[/],(/,/),请求车位ID	
+  ///<0x0: 默认
+  uint32  ad_hzpparkreqslotid	=	12;
+
+  ///<AD_HZPParkTarSlotMtchSts:[/],(/,/,/),[/],(/,/),	目标车位匹配状态
+  ///<0x0: 默认
+  ///<0x1: 可用
+  ///<0x2: 被占用
+  uint32  ad_hzpparktarslotmtchsts = 13;
+
+  ///<AD_HZPParkDriveDst:[m],(/,/,/),[/],(/,/),	行驶距离
+  ///<0x0: 默认
+  float  ad_hzpparkdrivedst = 14;
+
+  ///<AD_HZPParkRoute:[/],(/,/,/),[/],(/,/),	规划路径
+  ADHZPParkRouteStruct  ad_hzpparkroute = 15;
+  
+  ///<AD_HZPMapEgoPose:[/],(/,/,/),[/],(/,/),	自车位姿
+  ADHZPMapEgoPose ad_hzpmapegopose = 16;
+}
+
+/**
+* @brief AD_HZPMpgInteractData
+* @details 建图交互数据
+*/
+message ADHZPMpgInteractData { 
+  ///<AD_HZPMpgRecommd:[/],(/,/,/),[/],(/,/),推荐建图
+  ///<0x0: 无推荐
+  ///<0x1: 推荐
+  uint32	ad_hzpmpgrecommd	=	1;
+
+  ///<AD_HZPMpgSta:[/],(/,/,/),[/],(/,/),建图状态机
+  ///<0x0: Off
+  ///<0x1: Passive
+  ///<0x2: Standby
+  ///<0x3: Learning
+  ///<0x4: Saving
+  ///<0x5: Mapedit
+  ///<0x6: Terminate
+  ///<0x7: Finish
+  uint32	ad_hzpmpgsta	=	2;
+
+  ///<AD_HZPMpgUnavlReas:[/],(/,/,/),[/],(/,/),建图不可用抑制条件
+  ///<0x1: Dooropen
+  ///<0x2: Speedtoohigh
+  ///<0x3: OutoffODD
+  ///<0x4: Systemfailure
+  ///<0x5: Environmentalconditioninhibition
+  ///<0x6: Unloggedaccount
+  ///<0x7: Insufficientlearningpath
+  ///<0x8: Permissionnotenabled
+  uint32	ad_hzpmpgunavlreas	=	3;
+
+  ///<ad_hzpmpgprocinfo:[/],(/,/,/),[/],(/,/),建图过程提示
+  ///<0x0: Defult
+  ///<0x1: Standstillwhenlearningpath
+  ///<0x2: SwitchthePgeartosave
+  ///<0x3: Speedover20km
+  ///<0x4: Lowpower
+  ///<0x5: Backoff
+  ///<0x6: Standstilltimeout
+  ///<0x7: Outofrange
+  ///<0x8: Mileageusedup
+  ///<0x9: Opendoor
+  ///<0xA: Mileagelessthan30m
+  ///<0xB: Savefordrivoutofrange
+  ///<0xC: Savefinish
+  ///<0xD: Learningparkin
+  ///<0xE: Nocollectedslot
+  ///<0xF: Saving
+  ///<0x10: Savefinishedwaitingcollectslot
+  ///<0x11: Unfastensafebelt
+  uint32	ad_hzpmpgprocinfo	=	4;
+
+  ///<AD_HZPMpgProcGuide:[/],(/,/,/),[/],(/,/),建图引导
+  ///<0x0: 无消息
+  ///<0x1: 里程不足无法开启引导清理
+  ///<0x2: 建图确认
+  ///<0x3: 等待超时，继续确认
+  ///<0x4: 单次里程超限，保存确认
+  uint32	ad_hzpmpgprocguide	=	5;
+
+  ///<ad_hzpmpgabnormexit:[/],(/,/,/),[/],(/,/),建图异常退出
+  ///<0x0: 无消息
+  ///<0x1: 车速过快，新建路线已退出
+  ///<0x2: 逆向行驶已取消新建路线，请重试并正向行驶
+  ///<0x3: 等待超时，新建路线已退出
+  ///<0x4: 您已驶出建图区域，新建路线已退出
+  ///<0x5: 建图失败
+  ///<0x6: 车内干扰，新建路线已退出
+  ///<0x7: 记忆路线不足30米,新建路线已取消
+  ///<0x8: 记忆路线保存失败
+  uint32	ad_hzpmpgabnormexit	=	6;
+
+  ///<ad_hzpmpgdst:[m],(/,/,/),[/],(/,/),建图里程
+  ///<0x0: 默认
+  float	ad_hzpmpgdst	=	7;
+
+  ///<AD_HZPMpgNrofSpdBmp:[/],(/,/,/),[/],(/,/),建图减速带个数
+  ///<0x0: 默认
+  uint32	ad_hzpmpgnrofspdbmp	=	8;
+
+  ///<ad_hzpmpgramp:[/],(/,/,/),[/],(/,/),建图坡道个数
+  ///<0x0: 默认
+  uint32	ad_hzpmpgramp	=	9;
+
+  ///<AD_HZPMpgCurFloor:[/],(/,/,/),[/],(/,/),建图当前位置
+  ///<0x0: 默认
+  int32	ad_hzpmpgcurfloor	=	10;
+
+  ///<AD_HZPMpgSaveProgs:[/],(/,/,/),[/],(/,/),建图保存进度
+  ///<0x0: 默认
+  uint32	ad_hzpmpgsaveprogs	=	11;
+
+  ///<AD_MpgStrtPnt:[/],(/,/,/),[/],(/,/),建图起点
+  Point2DStruct	ad_mpgstrtpnt	=	12;
+
+  ///<AD_MpgEndPnt:[/],(/,/,/),[/],(/,/),建图终点
+  Point2DStruct	ad_mpgendpnt	=	13;
+}
+
+/**
+* @brief AD_HZPMapMngInfoData
+* @details 地图管理交互数据
+*/
+message ADHZPMapMngInfoData { 
+  ///<AD_HZPMapMngSts:[/],(/,/,/),[/],(/,/),地图状态
+  ///<0x0: Dft
+  ///<0x1: Available
+  ///<0x2: Unavailable
+  ///<0x3: Open
+  ///<0x4: Full
+  uint32	ad_hzpmapmngsts	=	1;
+
+  ///<AD_HZPMapUnavlReas:[/],(/,/,/),[/],(/,/),地图不可用原因
+  ///<0x0: 无消息
+  ///<0x1: 地图不可用
+  ///<0x2: 收藏车位已满，您可以删除不常用车位后重试
+  uint32	ad_hzpmapunavlreas	=	2;
+}
+
+
+/**
+* @brief ADHZPMapMnglistData
+* @details 地图管理列表通知
+*/
+message ADHZPMapMnglistData { 
+  ///<ad_hzpmaptotdst:[m],(/,/,/),[/],(/,/),地图总里程
+  float	ad_hzpmaptotdst	=	1;
+
+  ///<ad_hzpmaproutenr:[/],(0,0,256),[/],(/,/),地图总路线
+  uint32	ad_hzpmaproutenr	=	2;
+
+  ///<ad_hzpmapslotcollectnr:[/],(0,0,256),[/],(/,/),地图标记车位个数
+  uint32	ad_hzpmapslotcollectnr	=	3;
+
+  ///<ad_hzpmapmemprkglotnr:[/],(0,0,256),[/],(/,/),地图记忆停车场个数
+  uint32	ad_hzpmapmemprkglotnr	=	4;
+
+  ///<ad_hzpmapmemmilgmax:[m],(/,/,/),[/],(/,/),建图最大里程
+  float	ad_hzpmapmemmilgmax	=	5;
+
+  ///<ad_hzpmapmemnrofmapmax:[/],(0,0,256),[/],(/,/),建图最大个数
+  uint32	ad_hzpmapmemnrofmapmax	=	6;
+
+  ///<ad_hzpmaplist:[/],(/,/,/),[/],(/,/),地图清单
+  ADHZPMaplist	ad_hzpmaplist	=	7;
+}
+
+/**
+* @brief ADHZPMaplist
+* @details 地图清单
+*/
+message ADHZPMaplist { 
+  ///<ad_hzpmapid:[/],(0,0,256),[/],(/,/),地图ID
+  uint32	ad_hzpmapid	=	1;
+
+  ///<ad_hzpmapname:[/],(/,/,/),[/],(/,/),地图名称
+  string ad_hzpmapname	=	2;
+
+  ///<ad_hzpmapdate:[/],(/,/,/),[/],(/,/),地图日期
+  string ad_hzpmapdate	=	3;
+
+  ///<ad_hzpmapmilg:[m],(/,/,/),[/],(/,/),地图里程
+  ///<0x0: 无消息
+  ///<0x1: 地图不可用
+  ///<0x2: 收藏车位已满，您可以删除不常用车位后重试
+  float ad_hzpmapmilg	=	4;
+
+  ///<ad_hzpmapnrofcollctslot:[/],(0,0,256),[/],(/,/),地图收藏车位个数
+  uint32 ad_hzpmapnrofcollctslot	=	5;
+
+  ///<ad_hzpmapin_out:[/],(/,/,/),[/],(/,/),地图类型
+  ///<0x0: 默认无效
+  ///<0x1: 入库
+  ///<0x2: 出库
+  ///<0x3: 入库&出库
+  uint32 ad_hzpmapin_out	=	6;
+}
+
+
+
+/**
+* @brief ADHZPMap
+* @details 通知地图数据
+*/
+message ADHZPMap { 
+  ///<ad_hzpmapid:[/],(0,0,256),[/],(/,/),地图ID
+  uint32	ad_hzpmapid	=	1;
+
+  ///<ad_hzpmapglbvisioncentr:[/],(/,/,/),[/],(/,/),地图全局视觉中心
+  ADHZPMapPnt3D ad_hzpmapglbvisioncentr	=	2;
+
+  ///<ad_hzpmapnroffloordisp:[/],(/,/,/),[/],(/,/),楼层展示
+  repeated int32 ad_hzpmapnroffloordisp	=	3;
+
+  ///<ad_hzpmapstrtpnt:[],(/,/,/),[/],(/,/),起点
+  repeated  ADHZPMapPnt3D ad_hzpmapstrtpnt	=	4;
+
+  ///<ad_hzpmapendpnt:[/],(0,0,256),[/],(/,/),终点
+  repeated  ADHZPMapPnt3D ad_hzpmapendpnt	=	5;
+
+  ///<ad_hzpmaproadnetpnt:[/],(/,/,/),[/],(/,/),路网轨迹点
+  repeated ADHZPMapPnt3D ad_hzpmaproadnetpnt	=	6;
+}

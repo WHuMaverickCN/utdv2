@@ -1,0 +1,86 @@
+/**
+* @file     vp_real3d_fc.proto
+* @author   fengguiyu
+* @details  real3D输出数据结构信息
+* @date     2022-07-25
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.25          <th>1.0                 <th>fengguiyu
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package VpReal3DFcProto;
+
+
+import "vp_obstacle.proto";
+import "vp_perception_base.proto";
+
+/**
+*@brief   3D目标类型
+*@detail  3DBox的目标类型，行人、骑车人、车辆3类
+*/
+enum Real3DType {
+///< VEHICLE: [/], (/,/,/), [/], (1,0), 车辆
+    VEHICLE = 0;  // 车辆
+///< PEDESTRIAN: [/], (/,/,/), [/], (1,0), 行人
+    PEDESTRIAN = 1;  // 行人
+///< CYCLIST: [/], (/,/,/), [/], (1,0), 骑车人
+    CYCLIST = 2;  // 骑车人
+  };
+
+/**
+*@brief   单个目标的real3d感知结果
+*@detail  包括单个目标3D框8个点在VCS下的位置、图像域的坐标以及一个2D全车框的图像域坐标，置信度等
+*/
+message Real3DResult {
+  ///< bev_obstacle: [/], (/,/,/), [/], (1,0), 3DBox目标结构体，包括8个点的VCS坐标，3dbox目标的各个属性等
+   VpObstacleProto.Obstacle bev_obstacle = 1;
+  ///< img_3dbox: [/], (/,/,/), [/], (1,0), 3DBox检测输入图像域结构体，包括8个点的图像域坐标等
+   VpPerceptionBaseProto.Box3D img_3dbox = 2;
+  ///< img_rect: [/], (/,/,/), [/], (1,0), 全车2D框，包括4个点的图像域坐标等
+   VpPerceptionBaseProto.Rect img_rect = 3;
+}
+
+/**
+*@brief   多个目标的real3d感知结果
+*@detail  包括目标的Real3DResult，头部信息
+*/
+message Real3DResults {
+  ///< header: [/], (/,/,/), [/], (1,0), 头部信息，包括相机id，frame id，当前时间戳
+   VpPerceptionBaseProto.Header header = 1;
+  ///< type: [/], (/,/,/), [/], (1,0), 3D目标类型
+   int32 type = 2;
+  ///< coordinate_type: [/], (/,/,/), [/], (1,0), 坐标系类型camera、vcs或者camera_new
+   string coordinate_type = 3;
+  ///< real3d_result: [/], (/,/,/), [/], (1,0), 单个目标的real3d感知结果集合
+  repeated Real3DResult real3d_result = 4;
+}
+
+/**
+*@brief   Real3D的输出proto
+*@detail  包括各类目标的Real3DResults，头部信息
+*/
+message Real3DProto {
+  ///< header: [/], (/,/,/), [/], (1,0), 头部信息，包括相机id，frame id，当前时间戳
+   VpPerceptionBaseProto.Header header = 1;
+
+  ///< real3d_results: [/], (/,/,/), [/], (1,0), 单类别的Real3DResults结果集合
+  repeated Real3DResults real3d_results = 2;
+
+  ///< real3d_results[0]: Real3DType::PEDESTRIAN
+  ///< real3d_results[1]: Real3DType::VEHICLE
+  ///< real3d_results[2]: Real3DType::CYCLIST
+}
+

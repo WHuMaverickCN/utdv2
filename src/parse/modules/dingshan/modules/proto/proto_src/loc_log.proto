@@ -1,0 +1,89 @@
+/**
+* @file     loc_log.proto
+* @author   yangzhao
+* @details  定位ADR接口定义
+* @date     2022-03-2
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+import "loc_trigger.proto";
+
+/**
+* @brief 定位ADR_LOG信息
+* @detail xxxxxxxx
+*/
+message Log
+{
+  ///<ADR触发信号:[/],(/,/,/),[/],(/,/),标识ADR触发信号
+  LocTrigger adrtrigger = 1;
+
+  ///<定位模块log（字符串）:[/],(/,/,/),[/],(/,/),标识定位模块log输出字符串
+  string logs = 2;
+}
+
+/**
+ * @brief 诊断类型
+ * @detail LocDiagnosisInfo.input_signal_invalid状态位定义
+ */
+ enum DiagnosisType {
+  ///< 时间同步故障
+  kTimeSynFault = 0;
+
+  ///< INS超时
+  kInsTimeout = 1;
+
+  ///< 前视超时
+  kFcTimeout = 2;
+
+  ///< 高精地图超时
+  kHdmapTimeout = 3;
+
+  ///< 前视数据异常
+  kFcDataFault = 4;
+
+  ///< 高精地图数据异常
+  kHdmapDataFault = 5;
+
+  ///< 轮速数据异常
+  kWheelDataDault = 6;
+}
+
+/**
+* @brief 模块故障信息
+* @detail 每一位表示不同的故障源
+*/
+message LocDiagnosisInfo{
+  ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+
+  ///< 前级或依赖模块工作异常状态位:[/],(/,/,/),[/],(1,0),前级或依赖模块工作异常状态位
+  uint32 front_module_fail = 2;
+
+  ///< 输入信号超时或校验异常状态位:[/],(/,/,/),[/],(1,0),输入信号超时或校验异常状态位
+  uint32 input_signal_invalid = 3;
+
+  ///< 模块运行错误:[/],(/,/,/),[/],(1,0),模块运行错误
+  uint32 module_running_error = 4;
+
+  ///< DTC状态位:[/],(/,/,/),[/],(1,0),DTC状态位
+  uint32 is_dtc = 5;
+
+  ///< Reserved位:[/],(/,/,/),[/],(1,0),Reserved位
+  double reserved = 6;
+}

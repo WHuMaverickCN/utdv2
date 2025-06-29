@@ -1,0 +1,686 @@
+/**
+* @file     sabcommon.proto
+* @author   liuhang
+* @details  SAB毫米波雷达模块COMMON相关信号的输出接口定义
+* @date     2022-12-05
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.12.5          <th>1.0                 <th>liuhang 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package SabCommonProto;
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+
+enum PointType 
+{
+    ///< 忽略
+    POINT_TYPE_IGNORE = 0;  
+    ///< 汽车
+    POINT_TYPE_CAR = 1; 
+    ///< 路沿
+    POINT_TYPE_ROADDELIMITER = 2;
+    ///< 行人
+    POINT_TYPE_PEDESTRAIN = 3;
+    ///< 锥形桶
+    POINT_TYPE_CONE = 4;
+    ///< 静态目标
+    POINT_TYPE_STATICOBJECT = 5;
+    ///< 未知
+    POINT_TYPE_UNKNOWN = 6;
+    ///< 无效
+    POINT_TYPE_INVALID = 7;
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum PointMotionState
+{
+    ///< 未知
+    POINT_MOTION_UNKNOWN = 0;
+    ///< 运动
+    POINT_MOTION_MOVING = 1;
+    ///< 静止	
+    POINT_MOTION_STATIONARY = 2; 
+}
+
+/**
+ * @brief Freespace 扇区置信度
+ * @detail Freespace 扇区置信度
+ */
+enum PointConRidence
+{
+    ///< 低 (≤ %50)
+    LOW = 0;
+    ///< 中(>%50, ≤70%)
+    MID = 1;
+    ///< 高(>70%)
+    HIGHT = 2;
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum PointDetectedSensor
+{
+    POINT_FROM_DEFAULT = 0;
+    POINT_FROM_CR = 1;
+    POINT_FROM_FR = 2;
+    POINT_FROM_SC = 3;
+    POINT_FROM_FC = 4;
+    POINT_FROM_FUSION = 5;
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum ObjectClass
+{
+    ///< 未知目标
+    OBJECT_CLASS_UNKNOWN = 0; 
+    ///< 汽车
+    OBJECT_CLASS_CAR = 1;
+    ///< 卡车  
+    OBJECT_CLASS_TRUCK = 2; 
+    ///< 摩托车
+    OBJECT_CLASS_MOTORCYCLE = 3;
+    ///< 行人
+    OBJECT_CLASS_PEDESTRIAN = 4; 
+    ///< 自行车
+    OBJECT_CLASS_CYCLIST = 5; 
+    ///< 动物
+    OBJECT_CLASS_ANIMAL = 6;
+    ///< 巴士 
+    OBJECT_CLASS_BUS = 7; 
+    ///< 其他
+    OBJECT_CLASS_OTHER = 8; 
+    ///< 购物车、婴儿推车
+    OBJECT_CLASS_HANDCART = 9;
+    ///< 柱子
+    OBJECT_CLASS_COLUMN = 10; 
+    ///< 锥桶
+    OBJECT_CLASS_CONE = 11;
+    ///< 已被锁上的车位锁 
+    OBJECT_CLASS_PARKING_LOCKED = 12;
+    ///< 未被锁上的车位锁 
+    OBJECT_CLASS_PARKING_UNLOCKED = 13; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum TurnSignal
+{
+    ///< 无转向信号
+    NONE_TRUN_SIGNAL = 0;
+    ///< 左转向
+    TRUN_LEFT_SIGNAL = 1;
+    ///< 右转向
+    TRUN_RIGHT_SIGNAL = 2;
+    ///< 双闪
+    TRUN_DOUBLE_SIGNAL = 3;
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum ReferencePointType
+{
+    ///< 参考点未知
+    REFERENCE_POINT_UNKNOWN = 0;
+    ///< 后方左角点  
+    REFERENCE_POINT_REAR_LEFT = 1;
+    ///< 后方中心 
+    REFERENCE_POINT_REAR_CENTER = 2; 
+    ///< 后方右角点
+    REFERENCE_POINT_REAR_RIGHT = 3;
+    ///< 左边中心 
+    REFERENCE_POINT_CENTER_LEFT = 4; 
+    ///< 中心
+    REFERENCE_POINT_CENTER_CENTER = 5; 
+    ///< 右边中心
+    REFERENCE_POINT_CENTER_RIGHT = 6;
+    ///< 前方左角点 
+    REFERENCE_POINT_FRONT_LEFT = 7; 
+    ///< 前方中心
+    REFERENCE_POINT_FRONT_CENTER = 8; 
+    ///< 前方右角点
+    REFERENCE_POINT_FRONT_RIGHT = 9; 
+    ///< 前轮
+    REFERENCE_POINT_FRONT_WHEEL = 10; 
+    ///< 后轮
+    REFERENCE_POINT_REAR_WHEEL = 11;
+    ///< 内部轮 
+    REFERENCE_POINT_INNER_WHEEL = 12;  
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum ObjectMotionState
+{
+    ///< 运动状态未知
+    OBJECT_MOTION_UNKNOWN = 0;
+    ///< 运动 
+    OBJECT_MOTION_MOVING = 1; 
+    ///< 静止
+    OBJECT_MOTION_STATIONARY = 2; 
+    ///< 运动到静止
+    OBJECT_MOTION_STOPPED = 3; 
+    ///< 缓慢移动
+    OBJECT_MOTION_MOVING_SLOWLY = 4; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum ObjectLaneAssignment
+{
+    ///< 目标位置未知
+    OBJECT_IN_UNKNOWN = 0;
+    ///< 目标在左左车道
+    OBJECT_IN_LEFT_LEFT = 1; 
+    ///< 目标在左车道
+    OBJECT_IN_LEFT = 2;
+    ///< 目标在本车道  
+    OBJECT_IN_HOST = 3; 
+    ///< 目标右本车道 
+    OBJECT_IN_RIGHT = 4; 
+    ///< 目标右右本车道 
+    OBJECT_IN_RIGHT_RIGHT = 5; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum CutStatus
+{
+    ///< 未知
+    CUT_STATUS_UNKNOWN = 0; 
+    ///< 正常
+    CUT_STATUS_NORMAL = 1; 
+    ///< 正在切入
+    CUT_STATUS_CUTIN = 2; 
+    ///< 正在切出
+    CUT_STATUS_CUTOUT = 3; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum CutInFlag
+{
+    ///< 未知
+    CUT_IN_FLAG_INVALID = 0; 
+    ///< 切入本车道
+    CUT_IN_FLAG_HOSTLANE = 1; 
+    ///< FOV边缘
+    CUT_IN_FLAG_FOV = 2; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum MeasureState
+{
+    ///< 未知
+    MEASURE_STATE_INVALID = 0; 
+    ///< 测量的
+    MEASURE_STATE_MEASURED = 1; 
+    ///< 预测的
+    MEASURE_STATE_PREDICTED = 2; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum DetectSensor
+{
+    ///< 无传感器
+    DETECT_SENSOR_NONE = 0;
+    ///< 前视摄像头   
+    DETECT_SENSOR_ONLY_FRONT_CAMERA = 1; 
+    ///< 周视摄像头
+    DETECT_SENSOR_ONLY_AROUND_CAMERA = 2; 
+    ///< 环视摄像头
+    DETECT_SENSOR_ONLY_SURROUND_CAMERA = 3; 
+    ///< 前雷达
+    DETECT_SENSOR_ONLY_FRONT_RADAR = 4; 
+    ///< 角雷达
+    DETECT_SENSOR_ONLY_CORNER_RADAR = 5; 
+    ///< 激光雷达
+    DETECT_SENSOR_ONLY_LIDAR = 6;
+    ///< 雷达和和摄像头
+    DETECT_SENSOR_RADAR_VISION = 7; 
+    ///< 雷达和激光雷达
+    DETECT_SENSOR_RADAR_LIDAR = 8; 
+    ///< 激光雷达和摄像头
+    DETECT_SENSOR_LIDAR_VISION = 9; 
+    ///< 雷达、摄像头和激光雷达
+    DETECT_SENSOR_RADAR_VISION_LIDAR = 10;
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum LineColor
+{
+    ///< 颜色未知
+    LINE_COLOR_UNKNOWN = 0; 
+    ///< 白色
+    LINE_COLOR_WHITE = 1;
+    ///< 黄色
+    LINE_COLOR_YELLOW = 2;  
+    ///< 混合色
+    LINE_COLOR_MIXED = 3; 
+    ///< 车道线颜色最大种类数
+    LINE_COLOR_NUM = 4;   
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum LineType
+{
+    ///< 实线、重要
+    LINE_TYPE_SOLID = 0;
+    ///< 虚线、重要
+    LINE_TYPE_DASHED = 1; 
+    ///< 双虚线、重要
+    LINE_TYPE_DASHED_DASHED = 2; 
+    ///< 虚实线、重要
+    LINE_TYPE_DASHED_SOLID = 3;
+    ///< 实虚线 、重要
+    LINE_TYPE_SOLID_DASHED = 4;  
+    ///< 双实线、 重要
+    LINE_TYPE_SOLID_SOLID = 5;
+    ///< 0x6 = multiple（Eu&USA）；
+    LINE_TYPE_MULTIPLE = 6;
+    ///< 0x7=multiple_warning（Eu&USA）；
+    LINE_TYPE_MULTIPLE_WARNING = 7; 
+    ///< 0x8 =car_pool；
+    LINE_TYPE_CAR_POOL = 8; 
+    ///< 0x9 =asphalt_joint（USA）；
+    LINE_TYPE_ASPHALT_JOINT = 9;
+    ///< 0xA=Bot-Dott（USA）；
+    LINE_TYPE_BOT_DOTT = 10;
+    ///< 路沿； 
+    LINE_TYPE_ROAD_EDGE = 11; 
+    ///< 护栏；
+    LINE_TYPE_GUARDRAIL = 12; 
+    ///< 0xD =curbstone；
+    LINE_TYPE_CURBSTONE = 13;
+    ///< 墙面线；
+    LINE_TYPE_WALL = 14;
+    ///< 锥形筒线；
+    LINE_TYPE_TRAFFIC_CONE = 15; 
+    ///< 0x10=delineator_post；
+    LINE_TYPE_DELINEATOR_POST = 16; 
+    ///< 0x11 =parking_car；
+    LINE_TYPE_PARKING_CAR = 17; 
+    ///< 0x12=unknown_raised；
+    LINE_TYPE_UNKNOWN_RAISED = 18; 
+    ///< 鱼骨线；
+    LINE_TYPE_FISHBONE = 19; 
+    ///< 未知；
+    LINE_TYPE_UNKNOWN = 20; 
+    ///< 内分岔
+    LINE_TYPE_DIVERSION_INSIDE = 21; 
+    ///< 外分岔
+    LINE_TYPE_DIVERSION_OUTSIDE = 22; 
+    ///< 宽虚线（匝道的）、 重要
+    LINE_TYPE_WIDE_DASHED = 23; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum TrafficSignType 
+{
+    ///< 未定义标识
+    TRAFFIC_SIGN_NONE = 0;
+    ///< 限速标识
+    TRAFFIC_SIGN_SPEED_LIMIT = 1;
+    ///< 取消限速标识 
+    TRAFFIC_SIGN_SPEED_LIMIT_CANCEL = 2; 
+    ///< 禁止标识
+    TRAFFIC_SIGN_PROHIBITION = 3; 
+    ///< 左转标识
+    TRAFFIC_SIGN_TRUN_LEFT = 4;
+    ///< 右转标识
+    TRAFFIC_SIGN_TURN_RIGHT = 5; 
+    ///< 直行标识
+    TRAFFIC_SIGN_STRAIGHT = 6; 
+    ///< 合流标识
+    TRAFFIC_SIGN_CONFLUENCE = 7;
+    ///< 匝道标识 
+    TRAFFIC_SIGN_RAMP = 8;
+    ///< 施工标识 
+    TRAFFIC_SIGN_CONSTURCTION = 9; 
+    ///< 学校标识
+    TRAFFIC_SIGN_SCHOOL = 10; 
+    ///< 医院标识
+    TRAFFIC_SIGN_HOSPITAL = 11; 
+    ///< 拥堵标识
+    TRAFFIC_SIGN_TRAFFIC_JAM = 12; 
+}	
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum GroundTrafficSignType 
+{
+    ///< 未定义标识
+    GROUND_SIGN_NONE = 0;
+    ///< 直行
+    GROUND_SIGN_STRAIGHT = 1; 
+    ///< 左转标识
+    GROUND_SIGN_TURN_LEFT = 2;
+    ///< 右转标识 
+    GROUND_SIGN_TURN_RIGHT = 3; 
+    ///< 掉头
+    GROUND_SIGN_TURN_AROUND = 4; 
+    ///< 左传直行
+    GROUND_SIGN_TURN_LEFT_STRAIGHT = 5;
+    ///< 右传直行 
+    GROUND_SIGN_TURN_RIGHT_STRAIGHT = 6; 
+    ///< 人行道预警
+    GROUND_SIGN_SIDEWALK_WARNING = 7; 
+    ///< 人行道
+    GROUND_SIGN_SIDEWALK = 8; 
+    ///< 停止线
+    GROUND_SIGN_STOP_LINE = 9; 
+    ///< 代行线
+    GROUND_SIGN_WATING_LINE = 10; 
+    ///< 地下车库导向箭头
+    GROUND_SIGN_UNDERGROUND_GUIDE_SHEAR = 11; 
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum TrafficLightColor 
+{
+    ///< 无颜色
+    LIGHT_COLOR_NONE = 0;
+    ///< 红色
+    LIGHT_COLOR_RED = 1;
+    ///< 黄色
+    LIGHT_COLOR_YELLOW = 2;
+    ///< 绿色
+    LIGHT_COLOR_GREEN = 3;
+    ///< 未知颜色
+    LIGHT_COLOR_UNKNOW = 4;
+} 
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum TrafficLightDirection 
+{
+    ///< 未定义
+    LIGHT_DIRECTION_NONE = 0;
+    ///< 直行
+    LIGHT_DIRECTION_STRAIGHT = 1; 
+    ///< 左转标识
+    LIGHT_DIRECTION_TURN_LEFT = 2; 
+    ///< 右转标识
+    LIGHT_DIRECTION_TURN_RIGHT = 3; 
+    ///< 掉头
+    LIGHT_DIRECTION_TURN_AROUND = 4; 
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum SensorFlag
+{
+    ///< 无传感
+    SENSOR_FLAG_UNKNOWN = 0; 
+    ///< 长距摄像头 
+    SENSOR_LONG_RANGE_CAMERA = 1; 
+    ///< 中距摄像头
+    SENSOR_MIDDLE_RANGE_CAMERA = 2; 
+    ///< 短距摄像头
+    SENSOR_SHORT_RANGE_CAMERA = 3; 
+    ///< 周视
+    SENSOR_AROUND_CAMERA = 4; 
+    ///< 环视
+    SENSOR_SURROUND_CAMERA = 5; 
+    ///< 双目
+    SENSOR_STEREO_CAMERA = 6; 
+    ///< 前雷达
+    SENSOR_FRONT_RADAR = 7; 
+    ///< 前角雷达
+    SENSOR_FRONT_CORNER_RADAR = 8;
+    ///< 后角雷达
+    SENSOR_REAR_CORNER_RADAR = 9;
+    ///< 角雷达 
+    SENSOR_CORNER_RADAR = 10; 
+    ///< 前激光雷达
+    SENSOR_FRONT_LIDAR = 11; 
+    ///< 角激光雷达
+    SENSOR_CORNER_LIDAR = 12; 
+    ///< 超声波
+    SENSOR_ULTRASONIC = 13; 
+    ///< 车辆
+    SENSOR_VEHICLE = 14; 
+    ///< 传感器类别总数
+    SENSOR_FLAG_NUM = 15; 
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum CoordinateSystem
+{
+    ///< 未定义
+    COORDINATE_SYSTEM_UNDEFINED = 0; 
+    ///< 车辆坐标系 原点：车辆后轴 定义：右手法则
+    COORDINATE_SYSTEM_VEHICLE_BASE = 1; 
+    ///< 传感坐标系
+    COORDINATE_SYSTEM_SENSOR = 2;  
+    ///< 世界坐标系
+    COORDINATE_SYSTEM_WORLD = 3;  
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum CommunicationFailure
+{
+    ///< 通信无故障
+    COMMUNICATION_FAIL_NO = 0; 
+    ///< CRC校验故障
+    COMMUNICATION_FAIL_CRC = 1;  
+    ///< rollcounter校验故障
+    COMMUNICATION_FAIL_ROLLCOUNTER = 2; 
+    ///< 超时故障
+    COMMUNICATION_FAIL_TIMEOUT = 3; 
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum SensorStateFailure
+{
+    ///< 传感器无故障
+    SENSOR_FAIL_NO = 0; 
+    ///< 致盲故障
+    SENSOR_FAIL_BLIND = 1; 
+    ///< 校准故障
+    SENSOR_FAIL_ALIGN = 2; 
+    ///< 可逆故障
+    SENSOR_FAIL_REVERSIBLE = 3; 
+    ///< 不可逆故障
+    SENSOR_FAIL_IRREVERSIBLE = 4; 
+}
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+enum FusionStateFailure
+{
+    ///< 融合无故障
+    FUSION_FAIL_NO = 0; 
+    ///< 融合有故障
+    FUSION_FAIL_YES = 1; 
+}
+
+/**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message PixelPoint
+{
+    ///< 像素点横坐标: [/],(0,0,10000),[/],(1,0),像素点横坐标
+    int32 u = 1; 
+    ///< 像素点纵坐标: [/],(0,0,5000),[/],(1,0),像素点纵坐标
+    int32 v = 2; 
+}   
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message EulerAngle
+{
+    ///< 侧滚旋转角度： [rad],(0，-4,4),[/],(1,0),侧滚旋转角度：
+    double  yoll = 1;    
+    ///< 俯仰旋转角度： [rad],(0，-4,4),[/],(1,0),俯仰旋转角度
+    double  pitch = 2;   
+    ///< 横摆旋转角度： [rad],(0，-4,4),[/],(1,0),横摆旋转角度
+    double  yaw = 3;      
+} 
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message TranslationVector
+{
+    ///< x方向距离： [m],(0，-20,20),[/],(1,0),x方向距离
+    double deta_x = 1; 
+    ///< y方向距离： [m],(0，-20,20),[/],(1,0),y方向距离
+    double deta_y = 2; 
+    ///< z方向距离： [m],(0，-20,20),[/],(1,0),z方向距离
+    double deta_z = 3; 	
+} 
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message SensorParameters
+{
+    ///< 传感器类型： [/],(0，0,15),[/],(1,0),传感器类型
+    SensorFlag sensor_flag = 1; 
+    ///< 传感外参： [/],(/，/,/),[16],(/,/),传感外参
+    repeated float external_parameter = 2;
+    ///< 传感内参： [/],(/，/,/),[16],(/,/),传感内参
+    repeated float internal_parameter = 3; 
+    ///< 传感欧拉角外参： [/],(/，/,/),[/],(1,0),传感欧拉角外参
+    EulerAngle sensor_rotation_angle = 4; 
+    ///< 传感平移外参： [/],(/，/,/),[/],(/,/),传感平移外参
+    TranslationVector sensor_translation_vector = 5; 
+}
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message Point2DPosition
+{
+    ///< 纵向距离： [m],(0，0,300),[/],(1,0),纵向距离
+    double longitudinal_distance = 1; 
+    ///< 横向距离： [m],(0，-30,30),[/],(1,0),横向距离
+    double lateral_distance = 2;
+}
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message Point3DPosition
+{
+    ///< 纵向距离：[m],(0，0,300),[/],(1,0),纵向距离
+    double longitudinal_distance = 1; 
+    ///< 横向距离: [m],(0，-30,30),[/],(1,0),横向距离
+    double lateral_distance = 2;
+    ///< 垂直距离: [m],(0，-30,30),[/],(1,0),垂直距离
+    double vertical_distance = 3;  
+}
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message Rect
+{
+    ///< 矩形左上点像素坐标: [/],(/，/,/),[/],(/,/),矩形左上点像素坐标
+    PixelPoint left_top = 1; 
+    ///< 矩形右下点像素坐标: [/],(/，/,/),[/],(/,/),矩形右下点像素坐标
+    PixelPoint right_bottom = 2; 
+}
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message Cube
+{
+    ///< 立方体上层四个点像素坐标: [/],(/，/,/),[4],(1,0),立方体上层四个点像素坐标
+    repeated PixelPoint top = 1;
+    ///< 立方体下层四个点像素坐标: [/],(/，/,/),[4],(1,0),立方体下层四个点像素坐标
+    repeated PixelPoint bottom = 2; 
+}
+ /**
+* @brief common信息
+* @detail xxxxxxxx
+*/
+message FrameClue
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1; 
+    ///< 通道名字: [/],(/，/,/),[/],(1,0),通道名字
+    string channel_name = 2;  
+    ///< 数据帧索引: [/],(0，0,100000),[/],(1,0),数据帧索引
+    int32 frame_index = 3; 
+}
+
+/**
+* @brief 护栏类型
+* @detail xxxxxxxx
+*/
+enum GuardrailType
+{
+    ///< 前左：[/],(/,/,/),[/],(1,0),标识前左
+	FRONT_LEFT = 0;
+    ///< 前右：[/],(/,/,/),[/],(1,0),标识前右
+	FRONT_RIGHT = 1;
+}

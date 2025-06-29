@@ -1,0 +1,117 @@
+/**
+* @file     fusion_failure.proto
+* @author   chenjianbing
+* @details  fusion Failure相关信号的输出接口定义
+* @date     2022-03-05
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.5          <th>1.0                 <th>chenjianbing 
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package FusionProto;
+import "fusion_common.proto";
+
+/**
+* @brief fusionFailure信息
+* @detail xxxxxxxx
+*/
+
+message SensorFailure
+{
+    ///< 传感器类型: [/],(0，0,14),[/],(1,0),传感器类型
+    FusionCommonProto.SensorFlag flag = 1; 
+    ///< 通信故障: [/],(0，0,3),[/],(1,0),通信故障
+    FusionCommonProto.CommunicationFailure communication_fail = 2;
+    ///< 传感器状态故障: [/],(0，0,4),[/],(1,0),传感器状态故障
+    FusionCommonProto.SensorStateFailure state_fail = 3; //传感器状态故障,[/],(0,0,4)
+}
+
+/**
+* @brief fusionFailure信息
+* @detail xxxxxxxx
+*/
+message FusFailureInfo
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1;//时间戳
+    ///< 融合故障状态: [/],(0，0,1),[/],(1,0),融合故障状态
+    FusionCommonProto.FusionStateFailure fusion_fail = 2; 
+    ///< 传感器故障状态: [/],(0，0,16),[16],(1,0),传感器故障状态
+    repeated SensorFailure sensor_fail = 3; //传感器故障状态,[16]
+    ///< 该输出对应的输入数据索引: [/],(0，0,255),[16],(1,0),该输出对应的输入数据索引
+    repeated FusionCommonProto.FrameClue input_info = 4; 
+    ///< 数据帧索引: [/],(0，0,100000),[/],(1,0),数据帧索引
+    int32 frame_index = 5; 
+}
+
+/**
+* @brief fusionDiagnose信息
+* @detail xxxxxxxx
+*/
+message FusDiagnosis
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1;
+
+    ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+    ///< 0x0: 默认值，无故障
+    ///< bit0: 整车信号时间戳异常
+    ///< bit1: 整车信号输入超时故障
+    ///< bit2: 前视目标超时故障
+    ///< bit3: 前视freespace超时故障
+    ///< bit4: 周视目标超时故障
+    ///< bit5: 周视freespace超时故障
+    ///< bit6: 环视目标超时故障
+    ///< bit7: 环视freespace超时故障
+    ///< bit8: 前雷达目标超时故障
+    ///< bit9: 前雷达freespace超时故障
+    ///< bit10: 前角雷达目标超时故障
+    ///< bit11: 前角雷达freespace超时故障
+    ///< bit12: 后角雷达目标超时故障
+    ///< bit13: 后角雷达freespace超时故障
+    ///< bit14: 激光雷达目标超时故障
+    ///< bit15: 激光雷达freespace超时故障
+    ///< bit16: 后视目标超时故障
+    ///< bit17: 后视freespace超时故障
+    ///< bit18: 目标融合进程故障 
+    ///< bit19: fs融合进程故障
+    ///< bit20: 输入无效故障,FF not pass
+    ///< bit21: 合理性故障
+    ///< bit22: 环视车位超时故障
+    ///< bit23: 车位融合故障
+    uint32 diagnosis_code = 2;
+
+    ///< 额外诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+    string diagnosis_info = 3;
+    ///< 心跳信号：[/],(0,0,255),[/],(/,/),心跳信号
+    uint32 heartbeat = 4;
+}
+
+/**
+* @brief  融合ERROR类别
+* @detail 融合ERROR类别
+*/
+enum FusErrorType
+{
+    ///< 没有错误
+    NO_REEOR = 0;
+    ///< 目标融合进程失败
+    ERROR_OBJ_FUS = 1;
+    ///< fs融合进程失败
+    ERROR_FREESPACE_FUS = 2;
+    ///< 目标and fs融合进程失败
+    ERROR_OBJ_AND_FREESPACE_FUS = 3;
+}

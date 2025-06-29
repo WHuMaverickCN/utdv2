@@ -1,0 +1,59 @@
+/**
+* @file     calibration_diagnosis.proto
+* @author   wangzipeng
+* @details  在线标定diagnosis消息输出接口
+* @date     2024-1-4
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴对地的投影中心（虚拟投影中心） 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2024.1.4          <th>1.0                 <th>wangziepng
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3";
+package calibration;
+
+/**
+ * @brief 标定诊断
+ * @detail 描述在线标定诊断信息
+ */
+message CalibDiagnosis {
+  ///< UNIX时间: [s],(/,/,/),[/],(1,0),UNIX时间
+  double time_stamp = 1;
+  ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+  ///< 0x0: 默认值，无故障
+  ///< bit 0: 预留
+  ///< bit 1: 传感内参错误 error
+  ///< bit 2: 传感未被标定 error
+  ///< bit 2: 未正确加载传感配置信息 error
+  ///< bit 3: 传感roll角、pitch角、yaw角标定场景错误 error
+  ///< bit 4: 传感roll角需要重新标定 error
+  ///< bit 5: 传感pitch角需要重新标定 error
+  ///< bit 6: 传感yaw角需要重新标定 error
+  ///< bit 7: 传感roll角、pitch角需要重新标定 error
+  ///< bit 8: 传感pitch角、yaw角需要重新标定 error
+  ///< bit 9: 传感yaw角，roll角需要重新标定 error
+  ///< bit 10: 传感roll角、pitch角、yaw角需要重新标定 error
+  ///< bit 11: 保存标定结果失败 error
+  ///< bit 12: 标定结果roll角超差 error
+  ///< bit 13: 标定结果pitch角超差 error
+  ///< bit 14: 标定结果yaw角超差 error
+  ///< bit 15: 标定输入数据不可用 warn
+  ///< bit 16: 标定结果与标定方式不匹配 error
+  ///< bit 17: 标定进程丢失 error
+  ///< bit 18: 售后标定失败 error
+  uint32 diagnosis_code = 2;
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),对诊断码进一步解释
+  string diagnosis_info = 3;
+  ///< 心跳信号: [/],(/,/,/),[/],(1,0),心跳信号
+  uint32 heart_beats = 4;
+}

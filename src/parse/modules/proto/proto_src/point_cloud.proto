@@ -1,0 +1,52 @@
+/**
+* @file     point_cloud.proto
+* @author   yangzhao
+* @details  点云接口定义
+* @date     2022-06-06
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date             <th>version             <th>author
+* <tr><th>2022.6.6         <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3";
+package localization;
+import "header.proto";
+import "odometry.proto";
+
+/**
+* @brief Channel信息
+* @detail xxxxxxxx
+*/
+message Channel {
+  ///< channel名:[/],(/,/,/),[/],(/,/),标识channel名
+  string name = 1;
+
+  ///< 数值:[/],(/,/,/),[9999],(/,/),标识该信道下点的数值
+  repeated double values = 2;
+}
+
+/**
+* @brief 点云信息
+* @detail xxxxxxxx
+*/
+message PointCloud {
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 位置信息:[/],(/,/,/),[9999],(/,/),标识经纬度高程坐标、局部坐标系下基于原点的XYZ坐标
+  repeated Point points = 2;
+
+  ///< channel信息:[/],(/,/,/),[9999],(/,/),标识channel信息
+  repeated Channel channels = 3;
+}

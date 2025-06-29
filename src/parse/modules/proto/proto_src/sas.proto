@@ -1,0 +1,2273 @@
+/**
+* @file     sas.proto
+* @author   sas
+* @details  sas相关信号的输出接口定义
+* @date     2023-09-25
+* @version  V2.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.10.27         <th>2.0                <th>sas
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	SasProto;
+import "seq_header.proto";
+
+/**
+* @brief FromSAS
+* @detail xxxxxxxx
+*/
+message FromSAS{ 
+///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      SasVersion sas_version = 1;
+///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AebResult aeb_result = 2;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AebDebug aeb_debug = 3;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AebTriggerAndDiagnostic aeb_triggeranddiagnostic = 4;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AebDiagnosisInfo aeb_diagnosis_info = 5;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AesResult aes_result = 6;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AesAiDbgT aes_ai_dbg_t = 7;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      AesCoreDbgT aes_core_dbg_t = 8;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      EssTriggerAndDiagnostic ess_trigger_and_diagnostic = 9;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasSystemState las_system_state = 10;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasLatCtrlInfo las_lat_ctrl_info = 11;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasDebug las_debug = 12;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasTriggerAndDiagnostic las_trigger_and_diagnostic = 13;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasToAds31A las_to_ads_31a = 14;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasToAds244 las_to_ads_244 = 15;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasDiagnosisInfo las_diagnosis_info = 16;
+ } 
+
+ 
+
+/**
+* @brief AEB中间变量
+* @detail xxxxxxxx
+*/
+message AebDebug{ 
+
+    ///<选中目标的ID:[/],(0,0,255),[/],(1,0),选中目标的ID
+    uint32 cip_id = 1;
+
+    ///<选中目标的纵向距离:[m],(0,0,200),[/],(1,0),选中目标的纵向距离
+    float cip_lng_dis = 2;
+
+    ///<选中目标横向距离:[m],(0,0,200),[/],(1,0),选中目标的横向距离
+    float cip_lat_dis = 3;
+
+    ///<选中目标的纵向速度:[m/s],(0,-50,50),[/],(1,0),选中目标的纵向速度
+    float cip_lng_spd = 4;
+
+    ///<选中目标的横向速度:[m/s],(0,-50,50),[/],(1,0),选中目标的横向速度
+    float cip_lat_spd = 5;
+
+    ///<选中目标的纵向加速度:[m/s2],(0,-50,50),[/],(1,0),选中目标的纵向加速度
+    float cip_lng_accl = 6;
+
+    ///<选中目标的横向加速度:[m/s2],(0,-50,50),[/],(1,0),选中目标的横向加速度
+    float cip_lat_accl = 7;
+
+    ///<选中目标的长度: [m],(0,0,30),[/],(1,0),选中目标的长度
+    float cip_length = 8;
+
+    ///<选中目标的宽度: [m],(0,0,5),[/],(1,0),选中目标的宽度
+    float cip_width = 9;
+
+    ///<选中目标的高度: [/],(0,0,5),[/],(1,0),选中目标的高度
+    float cip_heigh = 10;
+
+    ///<选中目标的航向角: [rad],(0，-4,4),[/],(1,0),选中目标的航向角
+    float cip_heading_angle = 11;
+
+    ///<选中目标的类别: [/],(0，0,8),[/],(1,0),选中目标的类别
+    uint32 cip_class = 12;
+
+    ///<选中目标的置信度: [/],(0，0,100),[/],(1,0),置信度
+    uint32 cip_confidence = 13;
+
+    ///</选中目标预估的横向投影距离:[m],(0,0,200),[/],(1,0),选中目标预估的横向投影距离
+    float cip_project_estlatdist = 14;
+
+    ///<选中目标的横向投影距离:[m],(0,0,200),[/],(1,0),选中目标的横向投影距离
+    float cip_project_latdist = 15;
+
+    ///<选中目标的纵向投影距离:[m],(0,0,200),[/],(1,0),选中目标的纵向投影距离
+    float cip_project_lngdist = 16;
+
+    ///<选中目标的横向投影速度:[m/s],(0,-50,50),[/],(1,0),选中目标的横向投影速度
+    float cip_project_latspd = 17;
+
+    ///<选中目标的纵向投影速度:[m/s],(0,-50,50),[/],(1,0),选中目标的纵向投影速度
+    float cip_project_lngspd = 18;
+
+    ///<选中目标的ttc: [s],(0，0,25.5),[/],(1,0), 选中目标的ttc
+    float cip_ttc = 19;
+
+    ///<选中目标的制动避撞时间: [s],(0，0,25.5),[/],(1,0), 选中目标的制动避撞时间
+    float cip_ttb = 20;
+
+    ///<选中目标所需请求减速度:[m/s2],(0,-20,20),[/],(1,0),选中目标所需请求减速度
+    float cip_anec = 21;
+
+    ///<选中目标的转向避险的时间: [s],(0，0,25.5),[/],(1,0), 选中目标的转向避险的时间
+    float cip_ttt = 22;
+
+    ///<选中目标的修正长度: [m],(0，0,30),[/],(1,0),选中目标的修正长度
+    float cip_modifylength = 23;
+
+    ///<选中目标的修正宽度: [m],(0，0,5),[/],(1,0),选中目标的修正宽度
+    float cip_modifywidth = 24;
+
+    ///<选中目标的滤波纵向距离:[m],(0,0,200),[/],(1,0),选中目标的滤波纵向距离
+    float cip_fitposx = 25;
+
+    ///<选中目标的滤波横向距离:[m],(0,0,200),[/],(1,0),选中目标的滤波横向距离
+    float cip_fitposy = 26;
+
+    ///<选中目标的距离:[m],(0,0,200),[/],(1,0),选中目标的距离
+    float cip_range = 27;
+
+    ///<选中目标的可靠度: [/],(0,0,1),[/],(1,0),选中目标的可靠度
+    float cip_prob = 28;
+
+    ///<选中目标的覆盖度:[/],(0,0,1),[/],(1,0),选中目标的覆盖度
+    float cip_overlap = 29;
+
+    ///<选中目标的场景类型:[/],(0,0,4),[/],(1,0),选中目标的场景类型
+    uint32 cip_scencetype = 30;
+
+    ///<选中目标的通行域判断:[/],(0,0,1),[/],(1,0),选中目标的通行域判断
+    bool cip_inpath = 31;
+
+    ///<循环计数:[/],(0,0,10),[/],(1,0),循环计数
+    uint32 aeb_count = 32;
+
+    ///<制动请求类型:[/],(0,0,6),[/],(1,0),制动请求类型
+    uint32 autobrkreqtyp = 33;
+
+    ///<滤波后自车速度:[km/h],(0,0,460.744),[/],(1,0),滤波后自车速度
+    float fitvehspd = 34;
+
+    ///<滤波后纵向加速度:[m/s2],(0,-16,15.90625),[/],(1,0),滤波后纵向加速度
+    float fitlngacc = 35;
+
+    ///<转弯标志位:[/],(0,0,1),[/],(1,0),转弯标志位
+    bool incurveroad = 36;
+
+    ///<Aebactive标志:[/],(0,0,1),[/],(1,0),Aebactive标志
+    bool esp_aebactive = 37;
+
+    ///<驾驶员介入标志位:[/],(0,0,1),[/],(1,0),驾驶员介入标志位
+    uint32 drvengage = 38;
+
+    ///<制动踏板激活标志:[/],(0,0,1),[/],(1,0),制动踏板激活标志
+    bool brakepedal_active = 39;
+
+    ///<接管标志:[/],(0,0,1),[/],(1,0),接管标志
+    bool override = 40;
+
+    ///<加速抑制标志:[/],(0,0,1),[/],(1,0),加速抑制标志
+    bool gas_passive = 41;
+
+    ///<变道抑制标志:[/],(0,0,1),[/],(1,0),变道抑制标志
+    bool lane_passive = 42;
+
+    ///<制动抑制标志:[/],(0,0,1),[/],(1,0),制动抑制标志
+    bool brake_passive = 43;
+
+    ///<highbrake持续时间:[/],(0,0,500),[/],(1,0),highbrake持续时间
+    uint32 highbraketimer = 44;
+
+    ///<fullbrake持续时间:[/],(0,0,500),[/],(1,0),fullbrake持续时间
+    uint32 fullbraketimer = 45;
+
+    ///<选中目标纵向相对速度:[m/s],(0,-50,50),[/],(1,0),选中目标纵向相对速度
+    float objlongrelvel = 46;
+
+    ///<aeb激活持续时间:[s],(0,0,100),[/],(1,0),aeb激活持续时间
+    float aebactive_durationtimer = 47;
+
+    ///<Vru目标Lowbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Vru目标Lowbrake判断条件标志位
+    uint32 vrulbflag = 48;
+
+    ///<VruLb的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VruLb的TTC的阈值
+    float vrulbthr = 49;
+
+    ///<Vru目标Highbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Vru目标Highbrake判断条件标志位
+    uint32 vruhbflag = 50;
+
+    ///<VruHb的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VruHb的TTC的阈值
+    float vruhbthr = 51;
+
+    ///<Vru目标Fullbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Vru目标fullbrake判断条件标志位
+    uint32 vrufbflag = 52;
+
+    ///<Vru目标释放AEB请求:[/],(0,0,1),[/],(1,0),Vru目标释放AEB请求
+    bool vrureleasebrk = 53;
+
+    ///<VruFcw的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VruFcw的TTC的阈值
+    float vrufcwthr = 54;
+
+    ///<Vru目标Fcw判断条件标志位:[/],(0,0,255),[/],(1,0),Vru目标Fcw判断条件标志位
+    uint32 vrufcwflag = 55;
+
+    ///<Vru目标LAEB判断条件标志位:[/],(0,0,255),[/],(1,0),Vru目标LAEB判断条件标志位
+    uint32 vrulaebflag = 56;
+
+    ///<Veh目标Lowbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Veh目标Lowbrake判断条件标志位
+    uint32 vehlbflag = 57;
+
+    ///<VehLb的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VehLb的TTC的阈值
+    float vehlbthr = 58;
+
+    ///<Veh目标Highbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Veh目标Highbrake判断条件标志位
+    uint32 vehhbflag = 59;
+
+    ///<VehHb的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VehHb的TTC的阈值
+    float vehhbthr = 60;
+
+    ///<Veh目标Fullbrake判断条件标志位:[/],(0,0,255),[/],(1,0),Veh目标Fullbrake判断条件标志位
+    uint32 vehfbflag = 61;
+
+    ///<Veh目标释放AEB请求:[/],(0,0,1),[/],(1,0),Veh目标释放AEB请求
+    bool vehreleasebrk = 62;
+
+    ///<VehFcw的TTC的阈值: [s],(0，0,25.5),[/],(1,0), VehFcw的TTC的阈值
+    float vehfcwthr = 63;
+
+    ///<Veh目标Fcw判断条件标志位:[/],(0,0,255),[/],(1,0),Veh目标Fcw判断条件标志位
+    uint32 vehfcwflag = 64;
+
+    ///<Veh目标Laeb判断条件标志位:[/],(0,0,255),[/],(1,0),Veh目标Laeb判断条件标志位
+    uint32 vehlaebflag = 65;
+
+    ///<选中目标的制动需求时刻距离:[m],(0,0,200),[/],(1,0),选中目标的制动需求时刻距离
+    float cip_ldnec = 66;
+
+    ///<场景模式:[/],(0,0,/),[/],(1,0),场景模式
+    ///< 0:UnknownScene
+    uint32 scene_mode = 67;
+   
+    ///<静止场景主车条件标志位:[/],(0,0,/),[/],(1,0),静止场景主车条件标志位
+    uint32 stationary_scene_ego_flag = 68;
+   
+    ///<静止场景目标条件标志位:[/],(0,0,/),[/],(1,0),静止场景目标条件标志位
+    uint32 stationary_scene_obj_flag = 69;
+   
+    ///<运动场景主车条件标志位:[/],(0,0,/),[/],(1,0),运动场景主车条件标志位
+    uint32  movable_scene_ego_flag = 70;
+   
+    ///<运动场景目标条件标志位:[/],(0,0,/),[/],(1,0),运动场景目标条件标志位
+    uint32  movable_scene_obj_flag  = 71;
+   
+    ///<横穿场景主车条件标志位:[/],(0,0,/),[/],(1,0),横穿场景主车条件标志位
+    uint32  cross_scene_ego_flag  = 72;
+   
+    ///<横穿场景目标条件标志位:[/],(0,0,/),[/],(1,0),横穿场景目标条件标志位
+    uint32  cross_scene_obj_flag  = 73;
+   
+    ///<主车单转弯场景主车条件标志位:[/],(0,0,/),[/],(1,0),主车单转弯场景主车条件标志位
+    uint32  ego_turn_scene_ego_flag  = 74;
+   
+    ///<主车单转弯场景目标条件标志位:[/],(0,0,/),[/],(1,0),主车单转弯场景目标条件标志位
+    uint32  ego_turn_scene_obj_flag  = 75;
+   
+    ///<双转弯场景主车条件标志位:[/],(0,0,/),[/],(1,0),双转弯场景主车条件标志位
+    uint32  ego_obj_turn_scene_ego_flag  = 76;
+   
+    ///<双转弯场景目标条件标志位:[/],(0,0,/),[/],(1,0),双转弯场景目标条件标志位
+    uint32  ego_obj_turn_scene_obj_flag  = 77;
+   
+    ///<横穿转直行场景主车条件标志位:[/],(0,0,/),[/],(1,0),横穿转直行场景主车条件标志位
+    uint32  cros_to_strgt_scene_ego_flag  = 78;
+   
+    ///<横穿转直行场景目标条件标志位:[/],(0,0,/),[/],(1,0),横穿转直行场景目标条件标志位
+    uint32  cros_to_strgt_scene_obj_flag  = 79;
+   
+    ///<其他场景主车条件满足状态位:[/],(0,0,/),[/],(1,0),其他场景主车条件满足状态位
+    uint32  other_scene_ego_sts  = 80;
+   
+    ///<其他场景目标条件满足状态位:[/],(0,0,/),[/],(1,0),其他场景目标条件满足状态位
+    uint32  other_scene_obj_sts  = 81;
+   
+    ///<其他场景主车条件标志位:[/],(0,0,/),[/],(1,0),其他场景主车条件标志位
+    uint32  other_scene_ego_flag  = 82;
+   
+    ///<其他场景目标条件标志位:[/],(0,0,/),[/],(1,0),其他场景目标条件标志位
+    uint32  other_scene_obj_flag  = 83;
+
+    ///<制动目标标志位:[/],(0,0,1),[/],(1,0),制动目标标志位
+    bool obj_brk_flag = 84;
+   
+    ///<AEB避撞标志位:[/],(0,0,1),[/],(1,0),AEB避撞标志位
+    bool  aeb_avoid_brk_flag = 85;
+    
+    ///<静止场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),静止场景主车条件满足状态位
+    bool stationary_scene_ego_valid = 86;
+   
+    ///<静止场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),静止场景目标条件满足状态位
+    bool stationary_scene_obj_valid = 87;
+
+    ///<运动场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),运动场景主车条件满足状态位
+    bool  movable_scene_ego_valid = 88;
+   
+    ///<运动场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),运动场景目标条件满足状态位
+    bool  movable_scene_obj_valid = 89;
+
+    ///<横穿场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),横穿场景主车条件满足状态位
+    bool  cross_scene_ego_valid  = 90;
+   
+    ///<横穿场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),横穿场景目标条件满足状态位
+    bool  cross_scene_obj_valid  = 91;
+
+    ///<主车单转弯场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),主车单转弯场景主车条件满足状态位
+    bool  ego_turn_scene_ego_valid  = 92;
+   
+    ///<主车单转弯场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),主车单转弯场景目标条件满足状态位
+    bool  ego_turn_scene_obj_valid  = 93;
+
+    ///<双转弯场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),双转弯场景主车条件满足状态位
+    bool  ego_obj_turn_scene_ego_valid  = 94;
+   
+    ///<双转弯场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),双转弯场景目标条件满足状态位
+    bool  ego_obj_turn_scene_obj_valid  = 95;
+
+    ///<横穿转直行场景主车条件满足状态位:[/],(0,0,1),[/],(1,0),横穿转直行场景主车条件满足状态位
+    bool  cros_to_strgt_scene_ego_valid  = 96;
+   
+    ///<横穿转直行场景目标条件满足状态位:[/],(0,0,1),[/],(1,0),横穿转直行场景目标条件满足状态位
+    bool  cros_to_strgt_scene_obj_valid  = 97;
+
+} 
+
+/**
+* @brief AEB诊断信号
+* @detail xxxxxxxx
+*/
+message AebDiagnosisInfo{ 
+
+    ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+    float time_stamp = 1;
+
+    ///<前级或依赖模块工作异常状态位:[/],(/,/,/),[/],(1,0),前级或依赖模块工作异常状态位
+    uint32 front_module_fail = 2;
+
+    ///<输入信号超时或校验异常状态位:[/],(/,/,/),[/],(1,0),输入信号超时或校验异常状态位
+    bool input_signal_invalid = 3;
+
+    ///<模块运行错误:[/],(/,/,/),[/],(1,0),模块运行错误
+    uint32 module_running_error = 4;
+
+    ///<DTC状态位:[/],(/,/,/),[/],(1,0),DTC状态位
+    uint32 is_dtc = 5;
+
+    ///<心跳信号:[/],(/,/,/),[/],(1,0),心跳信号
+    uint32 heart_beats = 6;
+
+    ///<Reserved位:[/],(/,/,/),[/],(1,0),Reserved位
+    uint32 aeb_eol = 7;
+} 
+
+/**
+* @brief AEB功能状态bus
+* @detail xxxxxxxx
+*/
+message AebResult{ 
+
+    ///<影子模式触发标志位:[/],(0,0,1),[/],(1,0),影子模式触发标志位
+    ///< 0:不触发
+    ///< 1:触发
+    bool shadowmode_trg = 1;
+
+    ///<影子模块判断标志位:[/],(0,0,65535),[/],(1,0),影子模块判断标志位
+    uint32 shadowmode_flag = 2;
+
+    ///<CMP版本信号:[/],(1,1,9999),[/],(1,0),CMP版本信号
+    uint32 version = 3;
+
+    ///<Prefill激活状态:[/],(0,0,1),[/],(1,0),Prefill激活状态
+    ///< 0:不激活
+    ///< 1:激活
+    bool prefill_active = 4;
+
+    ///<紧急制动灯激活状态:[/],(0,0,6),[/],(1,0),紧急制动灯点亮请求
+	///< 0:不激活
+	///< 1:激活
+    uint32 cib_el_request = 5;
+
+    ///<warningJerk激活状态:[/],(0,0,1),[/],(1,0),warningJerk激活状态
+    ///< 0:不激活
+    ///< 1:激活
+    bool awb_active = 6;
+
+    ///<warningJerk危险等级:[/],(0,0,15),[/],(1,0),warningJerk危险等级
+	///< 0:无请求
+    ///< 1:Level1
+	///< 2:Level2
+	///< 3:Level3
+    uint32 awb_level = 7;
+
+    ///<AEB激活状态:[/],(0,0,1),[/],(1,0),AEB激活状态
+    ///< 0:不激活
+    ///< 1:激活
+    bool aeb_decctrlactive = 8;
+
+    ///<AEB请求减速度:[m/s2],(0,-20,20),[/],(1,0),AEB请求减速度
+    float aeb_targetdc = 9;
+
+    ///<AEB保压请求:[/],(0,0,1),[/],(1,0),AEB保压请求
+    ///< 0:不请求
+    ///< 1:请求
+    bool aeb_hold = 10;
+
+    ///<FCW激活状态:[/],(0,0,1),[/],(1,0),FCW激活状态
+    ///< 0:不激活
+    ///< 1:激活
+    bool fcw_active = 11;
+
+    ///<距离报警激活状态:[/],(0,0,1),[/],(1,0),距离报警激活状态
+    ///< 0:不激活
+    ///< 1:激活
+    bool latwarning_active = 12;
+
+    ///<HBA请求状态:[/],(0,0,1),[/],(1,0),HBA请求状态
+    ///< 0:不请求
+    ///< 1:请求
+    bool hba_active = 13;
+
+    ///<HBA请求等级:[/],(0,0,15),[/],(1,0),HBA请求等级
+	///< 0:无请求
+    ///< 1:Level1
+	///< 2:Level2
+	///< 3:Level3
+    uint32 hba_level = 14;
+
+    ///<EBA请求状态:[/],(0,0,1),[/],(1,0),EBA请求状态
+    ///< 0:不请求
+    ///< 1:请求
+    bool eba_active = 15;
+
+    ///<EBA请求减速度:[m/s2],(0,-12,12),[/],(1,0),EBA请求减速度
+    float eba_targetdc = 16;
+
+    ///<AEB的请求类型:[/],(0,0,16),[/],(1,0),AEB的请求类型
+	///< 0:no request
+	///< 1:AEB车辆
+	///< 2:AEB行人
+	///< 3:AEB骑行者
+	///< 4:EBA
+	///< 5:FCTB
+	///< 6:RCTB
+    uint32 aeb_controltype = 17;
+
+    ///<AEB控车模式:[/],(0,0,1),[/],(1,0),AEB控车模式
+    ///< 0:影子模式
+    ///< 1:控车模式
+    bool aeb_controlmode = 18;
+
+    ///<aeb_status状态：[/],(0,0,4),[/],(1,0),aeb_status状态
+    ///<0x0:off
+    ///<0x1:passive
+    ///<0x2:standby
+    ///<0x3:active
+    ///<0x4:failure
+    uint32 aeb_status = 19;
+
+    ///<reb_status状态：[/],(0,0,4),[/],(1,0),aeb_status状态
+    ///<0x0:off；
+    ///<0x1:passive；
+    ///<0x2:standby；
+    ///<0x3:active；
+    ///<0x4:failure
+    uint32 reb_status = 20;
+
+    ///<aeb_active状态标志：[/],(0,0,1),[/],(1,0),aeb_active状态标志
+    ///< 0:不激活
+    ///< 1:激活
+    bool aeb_active = 21;
+
+    ///<reb_active状态标志：[/],(0,0,1),[/],(1,0),reb_active状态标志
+	///< 0:不激活
+    ///< 1:激活
+    bool reb_active = 22;
+
+    ///<aeb激活后目标横穿位置：[/],(0,0,2),[/],(1,0),aeb激活后目标横穿位置
+    ///<0x0:not active；
+    ///<0x1:left active；
+    ///<0x2:right active；
+    uint32 fctb_active = 23;
+
+    ///<reb激活后目标横穿位置：[/],(0,0,2),[/],(1,0),reb激活后目标横穿位置
+    ///<0x0:not active；
+    ///<0x1:left active；
+    ///<0x2:right active；
+	uint32 rctb_active = 24;
+
+    ///<后向碰撞预警：[/],(0,0,4),[/],(1,0),后向碰撞预警
+    ///<0x0:off；
+    ///<0x1:passive；
+    ///<0x2:standby；
+    ///<0x3:active；
+    ///<0x4:failure
+    uint32 rcw_status = 25;
+
+    ///<前向碰撞预警状态：[/],(0,0,4),[/],(1,0),前向碰撞预警状态
+    ///<0x0:off；
+    ///<0x1:passive；
+    ///<0x2:standby；
+    ///<0x3:active；
+    ///<0x4:failure
+    uint32 fcw_status = 26;
+
+    ///<fcw激活后目标横穿位置：[/],(0,0,2),[/],(1,0),fcw激活后目标横穿位置
+    ///<0x0:not active；
+    ///<0x1:left active；
+    ///<0x2:right active；
+    uint32 fcta_warning = 27;
+
+    ///<rcw激活后目标横穿位置：[/],(0,0,2),[/],(1,0),rcw激活后目标横穿位置
+    ///<0x0:not active；
+    ///<0x1:left active；
+    ///<0x2:right active；
+    uint32 rcta_warning = 28;
+
+    ///<前向碰撞预警标志：[/],(0,0,1),[/],(1,0)，前向碰撞预警标志
+	///< 0:不激活
+    ///< 1:激活
+    bool fcw_warning = 29;
+
+    ///<后向碰撞预警标志：[/],(0,0,1),[/],(1,0)，后向碰撞预警标志
+	///< 0:不激活
+    ///< 1:激活
+    bool rcw_warning = 30;
+
+    ///<fcw开关状态反馈：[/],(0,0,4),[/],(1,0),fcw开关状态反馈
+    uint32 fcw_hustatus = 31;
+
+    ///<fcw灵敏度开关设置反馈：[/],(0,0,2),[/],(1,0),fcw灵敏度开关设置反馈
+    uint32 fcw_husensitiveset = 32;
+
+    ///<aeb开关状态反馈：[/],(0,0,2),[/],(1,0),aeb开关状态反馈
+    uint32 aeb_hustatus = 33;
+
+    ///<reb开关状态反馈：[/],(0,0,2),[/],(1,0),reb开关状态反馈
+    uint32 reb_hustatus = 34;
+
+    ///<rcw开关状态反馈：[/],(0,0,2),[/],(1,0),rcw开关状态反馈
+    uint32 rcw_hustatus = 35;
+
+    ///<前碰撞辅助类型：[/],(4,0,5),[/],(1,0),前碰撞辅助类型
+    uint32 ad_forwardcolliasttype = 36;
+
+    ///<后碰撞辅助类型：[/],(4,0,5),[/],(1,0),后碰撞辅助类型
+    uint32 ad_rearcolliasttype = 37;
+
+    ///<fcw灵敏度：[/],(1,0,2),[/],(1,0),fcw灵敏度
+    uint32 ad_forwardcolliastsenstyle = 38;
+
+    ///< seq_header: [/]，(0，0，1)，[/]，(1，0)，seq_header                                   
+    SeqHeaderProto.DelayHeader seq_header = 39;
+
+    ///<AEB高速刹车激活信号:[/],(0,0,1),[/],(1,0),AEB高速刹车激活信号
+    bool aeb_highspdbrake_active = 40;
+
+    ///<AEB高速刹车请求减速度值:[m/s2],(0,-20,20),[/],(1,0),AEB高速刹车请求减速度值
+    float aeb_highspdbrake_reqdec = 41;
+} 
+
+/**
+* @brief AEB事件bus
+* @detail xxxxxxxx
+*/
+message AebTriggerAndDiagnostic{ 
+
+    ///<AEB事件触发标志位:[/],(0,0,1),[/],(1,0),AEB事件触发标志位
+    ///< 0:不触发
+    ///< 1:触发
+    bool is_trigger_adr = 1;
+
+    ///<AEB事件诊断位:[/],(0,0,1),[/],(1,0),AEB事件诊断位
+    uint32 diagnostic_code = 2;
+
+   ///<AEB SOP2功能影子模式:[/],(0,0,1),[/],(1,0),SOP2功能影子模式标志位
+    bool aeb_shadow_mode_trigger = 3;
+
+   ///<AEB SOP2功能事件诊断位:[/],(0,0,65535),[/],(1,0),AEBSOP2功能事件诊断位
+    uint32 aeb_shadow_mode_flag = 4;
+
+   ///<AEB SOP1功能使能:[/],(0,0,1),[/],(1,0),AEBSOP1功能使能事件标志位
+    bool aeb_enable_adr_trigge = 5;
+
+   ///<AEB SOP1功能使能事件诊断位:[/],(0,0,65535),[/],(1,0),AEBSOP1功能使能事件诊断位
+    uint32 aeb_enable_adr_flag = 6;
+} 
+
+/**
+* @brief AESdebug
+* @detail xxxxxxxx
+*/
+message AesAiDbgT{ 
+
+    ///<左侧车道线id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_llm_id = 1; 
+
+    ///<左侧车道线起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_llm_start = 2; 
+
+    ///<左侧车道线终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_llm_end = 3; 
+
+    ///<左侧车道线系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_llm_a0 = 4; 
+
+    ///<左侧车道线系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_llm_a1 = 5; 
+
+    ///<左侧车道线系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_llm_a2 = 6; 
+
+    ///<左侧车道线系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_llm_a3 = 7; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_llm_info = 8; 
+
+    ///<右侧车道线id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_rlm_id = 9; 
+
+    ///<右侧车道线起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_rlm_start = 10; 
+
+    ///<右侧车道线终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_rlm_end = 11; 
+
+    ///<右侧车道线系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_rlm_a0 = 12; 
+
+    ///<右侧车道线系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_rlm_a1 = 13; 
+
+    ///<右侧车道线系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_rlm_a2 = 14; 
+
+    ///<右侧车道线系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_rlm_a3 = 15; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_rlm_info = 16; 
+
+    ///<左左侧车道线id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_nllm_id = 17; 
+
+    ///<左左侧车道线起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_nllm_start = 18; 
+
+    ///<左左侧车道线终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_nllm_end = 19; 
+    
+    ///<左左侧车道线系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_nllm_a0 = 20; 
+
+    ///<左左侧车道线系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_nllm_a1 = 21; 
+
+    ///<左左侧车道线系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_nllm_a2 = 22; 
+
+    ///<左左侧车道线系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_nllm_a3 = 23; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_nllm_info = 24; 
+
+    ///<右右侧车道线id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_nrlm_id = 25; 
+
+    ///<右右侧车道线起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_nrlm_start = 26; 
+
+    ///<右右侧车道线终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_nrlm_end = 27; 
+
+    ///<右右侧车道线系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_nrlm_a0 = 28; 
+
+    ///<右右侧车道线系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_nrlm_a1 = 29; 
+
+    ///<右右侧车道线系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_nrlm_a2 = 30; 
+
+    ///<右右侧车道线系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_nrlm_a3 = 31; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_nrlm_info = 32; 
+
+    ///<左侧路沿id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_lre_id = 33; 
+
+    ///<左侧路沿起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_lre_start = 34; 
+
+    ///<左侧路沿终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_lre_end = 35; 
+
+    ///<左侧路沿系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_lre_a0 = 36; 
+
+    ///<左侧路沿系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_lre_a1 = 37; 
+
+    ///<左侧路沿系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_lre_a2 = 38; 
+
+    ///<左侧路沿系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_lre_a3 = 39; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_lre_info = 40; 
+
+    ///<右侧路沿id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_rre_id = 41; 
+
+    ///<右侧路沿起点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_rre_start = 42; 
+
+    ///<右侧路沿终点距离: [m],(0,0,100),[/],(1,0), 
+    float vf32_aes_ai_rre_end = 43; 
+
+    ///<右侧路沿系数a0: [m],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_rre_a0 = 44; 
+
+    ///<右侧路沿系数a1: [rad],(0,-4,4),[/],(0.0001,0), 
+    float vf32_aes_ai_rre_a1 = 45; 
+
+    ///<右侧路沿系数a2: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_ai_rre_a2 = 46; 
+
+    ///<右侧路沿系数a3: [1/m*s],(0,-0.00024414,0.00024414),[/],(3.7253e-09,0), 
+    float vf32_aes_ai_rre_a3 = 47; 
+
+    ///</: [/],(0,0,4294967295),[/],(1,0),bit 1-6 color  bit 7-12 conf  bit 13-18 type  bit 19-24 status  bit 25-30 source  bit 31-32 valid
+    uint32 vu32_aes_ai_rre_info = 48; 
+
+    ///<道路半径: [m],(0,0,10000),[/],(0.1,0), 
+    float vf32_aes_ai_estimated_radius = 49; 
+
+    ///<自车车速: [km/h],(0,0,360),[/],(0.1,0), 
+    float vf32_aes_ai_host_spd_kph = 50; 
+
+    ///<自车纵向加速度: [m/s2],(0,-10,10),[/],(0.01,0), 
+    float vf32_aes_ai_host_longaccel_mps2 = 51; 
+
+    ///<自车横向加速度: [m/s2],(0,-20.5,20.5),[/],(0.1,0), 
+    float vf32_aes_ai_host_lataccel_mps2 = 52; 
+
+    ///<自车横摆角速度: [rad/s],(0,-1,1),[/],(0.001,0), 
+    float vf32_aes_ai_host_yawrate_rps = 53; 
+
+    ///<自车加速踏板位置: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ai_host_accelpedposn = 54; 
+
+    ///<方向盘转角: [deg],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_ai_host_strwhlang_deg = 55; 
+
+    ///<方向盘转速: [deg/s],(0,-1000,1000),[/],(0.001,0), 
+    float vf32_aes_ai_host_strwhlangrate_dps = 56; 
+
+    ///<驾驶员手力矩: [nm],(0,-10,10),[/],(0.001,0), 
+    float vf32_aes_ai_host_handtorque_nm = 57; 
+
+    ///<车辆挡位: [/],(0,0,10),[/],(1,0), 
+    uint32 vu32_aes_ai_host_gearshiftposn = 58; 
+
+    ///<主缸压力: [/],(0,0,250),[/],(0.01,0), 
+    float vf32_aes_ai_host_mastercyclinderpressure_bar = 59; 
+
+    ///<相机故障: [/],(0,0,4294967295),[/],(1,0), 
+    uint32 vu32_aes_ai_host_camerafault = 60; 
+
+    ///<车辆信息: [/],(0,0,4294967295),[/],(1,0),bit 1:tcs_atv  bit 2:abs_atv  bit 3:vdc_atv  bit 4:ebd_atv  bit 5:esc_atv  bit 6:msr_atv  bit 7:hdc_atv  bit 8:hazardwarninglightsts  bit 9:otherdoor_open  bit 10:epb_sts_on  bit 11:roadtype_enable  bit 12:airbag_active  bit 13:tirepressure_nomal  bit 14:drvseatbelt_fasten
+    uint32 vu32_aes_ai_host_info = 61; 
+
+    ///<车辆信息标志位: [/],(0,0,4294967295),[/],(1,0),bit 1:host_spd_vld  bit 2:host_longaccel_vld  bit 3:lataccel_vld  bit 4:yawrate_vld  bit 5:accelpedposn_vld  bit 6:strwhlang_vld  bit 7:handtorque_vld  bit 8:gearshiftposn_vld  bit 9:mastercyclinderpressure_vld  bit 10:epb_sts_vld
+    uint32 vu32_aes_ai_host_info_vld = 62; 
+} 
+
+/**
+* @brief AESdebug
+* @detail xxxxxxxx
+*/
+message AesCoreDbgT{ 
+
+    ///<主目标id: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_tp_target_id = 1; 
+
+    ///<主目标置信度: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_tp_target_conf = 2; 
+
+    ///<主目标类型: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_tp_target_type = 3; 
+
+    ///<主目标场景: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_tp_target_scenetype = 4; 
+
+    ///<主目标运动状态: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_tp_target_motionstate = 5; 
+
+    ///<主目标TTC: [s],(0,0,25.5),[/],(0.001,0), 
+    float vf32_aes_tp_target_ttc = 6; 
+
+    ///<主目标宽度: [m],(0,0,20),[/],(0.001,0), 
+    float vf32_aes_tp_target_width = 7; 
+
+    ///<主目标长度: [m],(0,0,20),[/],(0.001,0), 
+    float vf32_aes_tp_target_length = 8; 
+
+    ///<主目标航向角: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_tp_target_angle = 9; 
+
+    ///<主目标纵向距离: [m],(0,-200,200),[/],(0.001,0), 
+    float vf32_aes_tp_target_posx = 10; 
+
+    ///<主目标横向距离: [m],(0,-20,20),[/],(0.001,0), 
+    float vf32_aes_tp_target_posy = 11; 
+
+    ///<主目标纵向对地速度: [m/s],(0,-60,60),[/],(0.001,0), 
+    float vf32_aes_tp_target_velx_abs_mps = 12; 
+
+    ///<主目标横向对地速度: [m/s],(0,-60,60),[/],(0.001,0), 
+    float vf32_aes_tp_target_vely_abs_mps = 13; 
+
+    ///<主目标纵向对地加速度: [m/s2],(0,-12.7,12.7),[/],(0.001,0), 
+    float vf32_aes_tp_target_accx_abs_mps2 = 14; 
+
+    ///<主目标xolc: [/],(0,-20,20),[/],(0.001,0), 
+    float vf32_aes_tp_target_xolc = 15; 
+
+    ///<failsafe掩码: [/],(0,0,4294967295),[/],(1,0), 
+    uint32 vu32_aes_ic_failsafetype = 16; 
+
+    ///<抑制条件掩码: [/],(0,0,4294967295),[/],(1,0), 
+    uint32 vu32_aes_ic_inhibittype = 17; 
+
+    ///<故障掩码: [/],(0,0,4294967295),[/],(1,0), 
+    uint32 vu32_aes_ic_faulttype = 18; 
+
+    ///<failsafe标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_failsafe = 19; 
+
+    ///<aes抑制标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_aes_inhibit = 20; 
+
+    ///<ces抑制标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_ces_inhibit = 21; 
+
+    ///<des抑制标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_des_inhibit = 22; 
+
+    ///<aes故障标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_aes_fault = 23; 
+
+    ///<ces故障标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_ces_fault = 24; 
+
+    ///<des故障标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ic_des_fault = 25; 
+
+    ///<横穿目标偏置率: [/],(0,-100,100),[/],(0.001,0), 
+    uint32 vf32_aes_ae_crossvru_overlap = 26; 
+
+    ///<主目标cutout状态: [/],(0,0,100),[/],(1,0), 
+    uint32 vu32_aes_ae_cutoutdirection = 27; 
+
+    ///<主目标偏置左转判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_tgtlatbias_leftdenied = 28; 
+
+    ///<主目标偏置右转判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_tgtlatbias_rightdenied = 29; 
+
+    ///<驾驶员主动左转判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_drvleftstr = 30; 
+
+    ///<驾驶员主动右转判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_drvrightstr = 31; 
+
+    ///<des使能碰撞检测: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_nocollsn = 32; 
+
+    ///< name:[[m,rad]],([0,0],[-10,-1],[10,1]),[2],([0.1,0.0001],0),description
+    repeated float vf32_aes_pp_currentstate = 33; 
+
+    ///< name:[[m,rad,rad/s]],([0,0,0],-,-),[3],(-,0),description
+    repeated float vf32_aes_pp_endstate = 34; 
+
+    ///< name:[-],([0,0,0,0,0,0],-,-),[6],(-,0),description
+    repeated float vf32_aes_pp_linkpoly = 35; 
+
+    ///<转向时间: [s],(0,0,10),[/],(0.001,0), 
+    float vf32_aes_pp_steertime = 36; 
+
+    ///<转向基础时间: [s],(0,0,10),[/],(0.001,0), 
+    float vf32_aes_pp_basettc = 37; 
+
+    ///</: [/],(0,0,10),[/],(1,0),value:0 collision  value:1 ces_left_nocollisn  value:2 ces_right_nocollsin  value:3 des_left_nocollisn  value:4 des_right_nocollsin  value:5 aes_left_nocollisn  value:6 aes_right_nocollsin
+    uint32 vu32_aes_pp_nocollision = 38; 
+
+    ///<AES模式: [/],(0,0,16),[/],(1,0), 
+    uint32 vu32_aes_mm_aes_mode = 39; 
+
+    ///<目标TTC阈值系数: [/],(0,0,10),[/],(0.001,0), 
+    float vf32_aes_mm_ttc_thredfac = 40; 
+
+    ///<目标TTC阈值: [s],(0,0,10),[/],(0.001,0), 
+    float vf32_aes_mm_ttc_thred = 41; 
+
+    ///<目标TTC Offset: [s],(0,-10,10),[/],(0.001,0), 
+    float vf32_aes_mm_ttc_offset = 42; 
+
+    ///<满足cesTTC阈值判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mm_ces_ttc_satisfied = 43; 
+
+    ///<满足desTTC阈值判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mm_des_ttc_satisfied = 44; 
+
+    ///<满足aesTTC阈值判断: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mm_aes_ttc_satisfied = 45; 
+
+    ///<期望横向位置: [m],(0,-10,10),[/],(0.001,0), 
+    float vf32_aes_mc_mp_desired_latdist = 46; 
+
+    ///<实际横向位置: [m],(0,-10,10),[/],(0.001,0), 
+    float vf32_aes_mc_mp_actual_latdist = 47; 
+
+    ///<期望航向角: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_mc_mp_desired_hdgang = 48; 
+
+    ///<实际航向角: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_mc_mp_actual_hdgang = 49; 
+
+    ///<期望曲率: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_mc_mp_desired_curvature = 50; 
+
+    ///</: [1/m],(0,-0.032,0.032),[/],(1e-07,0), 
+    float vf32_aes_mc_mp_totalcurvature = 51; 
+
+    ///<转向完成标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mc_mp_steercomplete = 52; 
+
+    ///<横向误差在范围内标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mc_mp_stable_laterr = 53; 
+
+    ///<航向误差在范围内标志位: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_mc_mp_stable_hdgerr = 54; 
+
+    ///<横向位置误差: [m],(0,-10,10),[/],(0.001,0), 
+    float vf32_aes_mc_latdist_error = 55; 
+
+    ///<航向角误差: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_mc_hdgang_error = 56; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_latdist_spdfac = 57; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_latdist_laterrfac = 58; 
+
+    ///</: [/],(0,0,100),[/],(0.001,0), 
+    float vf32_aes_mc_latdist_gain = 59; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_latrate_spdfac = 60; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_latrate_latrateerrfac = 61; 
+
+    ///</: [/],(0,0,100),[/],(0.001,0), 
+    float vf32_aes_mc_latrate_gain = 62; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_hdgang_spdfac = 63; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_hdgang_hdgangerrfac = 64; 
+
+    ///</: [/],(0,0,100),[/],(0.001,0), 
+    float vf32_aes_mc_hdgang_gain = 65; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_hdgrate_spdfac = 66; 
+
+    ///</: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_hdgrate_hdgrateerrfac = 67; 
+
+    ///</: [/],(0,0,100),[/],(0.001,0), 
+    float vf32_aes_mc_hdgrate_gain = 68; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_latdist_contribution = 69; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_latrate_contribution = 70; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_hdgang_contribution = 71; 
+
+    ///<前馈角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_ff = 72; 
+
+    ///<前馈系数: [/],(0,0,100),[/],(0.001,0), 
+    float vf32_aes_mc_ff_gain = 73; 
+
+    ///<前馈转向时间系数: [/],(0,0,4),[/],(0.001,0), 
+    float vf32_aes_mc_ff_strtm_spd_fac = 74; 
+
+    ///<反馈系数: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_fb = 75; 
+
+    ///<PID模块输出转角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_pid_tarstrwhlang = 76; 
+
+    ///<转角仲裁模块输出转角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_ta_tarstrwhlang = 77; 
+
+    ///<最大值限制输出转角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_strlim_tarstrwhlang_maxlim = 78; 
+
+    ///<斜率限制输出转角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_mc_strlim_tarstrwhlang_ratelim = 79; 
+
+    ///<仲裁输出转角: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_bsa_tarstrwhlang_deg = 80; 
+
+    ///<仲裁输出减速度: [/],(0,-12.7,12.7),[/],(0.001,0), 
+    float vf32_aes_bsa_aeb_decelvalue = 81; 
+
+    ///<仲裁输出转向方向: [/],(0,0,4),[/],(1,0), 
+    uint32 vu32_aes_bsa_path_direction = 82; 
+
+    ///<仲裁输出AES模式: [/],(0,0,16),[/],(1,0), 
+    uint32 vu32_aes_bsa_aes_mode = 83; 
+
+    ///<仲裁输出AES状态: [/],(0,0,16),[/],(1,0), 
+    uint32 vu32_aes_bsa_aes_state = 84; 
+
+    ///<仲裁输出AEB模式: [/],(0,0,16),[/],(1,0), 
+    uint32 vu32_aes_bsa_aeb_mode = 85; 
+
+    ///<仲裁输出转向激活标志: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_bsa_steering_active = 86; 
+
+    ///<仲裁输出制动激活标志: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_bsa_decel_active = 87; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vf32_aes_frespa_reverse1 = 88; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vu32_aes_frespa_reverse2 = 89; 
+
+    ///</: [/],(0,-720,720),[/],(0.001,0), 
+    float vu32_aes_frespa_reverse3 = 90;
+
+    ///<主目标左下角纵向距离: [m],(0,-10,100),[/],(0.01,0), 
+    float vf32_aes_tp_target_lb_lgtdist = 91; 
+
+    ///<主目标左下角横向距离: [m],(0,-20,20),[/],(0.01,0), 
+    float vf32_aes_tp_target_lb_latdist = 92; 
+
+    ///<主目标右上角纵向距离: [m],(0,-10,100),[/],(0.01,0), 
+    float vf32_aes_tp_target_rt_lgtdist = 93; 
+
+    ///<主目标右上角横向距离: [m],(0,-20,20),[/],(0.01,0), 
+    float vf32_aes_tp_target_rt_latdist = 94; 
+
+    ///<左侧车道线类型抑制左转: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_leftlanetype_aesdenied = 95; 
+
+    ///<右侧车道线类型抑制右转: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_rightlanetype_aesdenied = 96; 
+
+    ///<感兴趣目标判断有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_toi_evaluation = 97; 
+
+    ///<ces满足基础使能条件: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_enablepre = 98; 
+
+    ///<ces纵向运动目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_tgtlgtmovetypevld = 99; 
+
+    ///<ces左侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_tgtleftmovetypevld = 100; 
+
+    ///<ces右侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_tgtrightmovetypevld = 101; 
+
+    ///<aes满足基础使能条件: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_enablepre = 102; 
+
+    ///<aes纵向运动目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_tgtlgtmovetypevld = 103; 
+
+    ///<aes左侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_tgtleftmovetypevld = 104; 
+
+    ///<aes右侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_tgtrightmovetypevld = 105; 
+
+    ///<des满足基础使能条件: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_enablepre = 106; 
+
+    ///<des纵向运动目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_tgtlgtmovetypevld = 107; 
+
+    ///<des左侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_tgtleftmovetypevld = 108; 
+
+    ///<des右侧横穿目标是否有效: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_tgtrightmovetypevld = 109; 
+
+    ///<ces左转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_left_enable = 110; 
+
+    ///<ces右转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_ces_right_enable = 111; 
+
+    ///<aes左转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_left_enable = 112; 
+
+    ///<aes右转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_aes_right_enable = 113; 
+
+    ///<des左转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_left_enable = 114; 
+
+    ///<des右转使能: [/],(0,0,1),[/],(1,0), 
+    bool vbl_aes_ae_des_right_enable = 115; 
+
+    ///<自车距离左侧车道线的横向位置: [m],(0,-20,20),[/],(0.01,0), 
+    float vf32_aes_pp_leftlane_latdist_preview = 116; 
+
+    ///<自车和左侧车道线的航向角: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_pp_leftlane_hdgang_preview = 117; 
+
+    ///<自车距离右侧车道线的横向位置: [m],(0,-20,20),[/],(0.01,0), 
+    float vf32_aes_pp_rightlane_latdist_preview = 118; 
+
+    ///<自车和右侧车道线的航向角: [rad],(0,-4,4),[/],(0.001,0), 
+    float vf32_aes_pp_rightlane_hdgang_preview = 119; 
+    
+    ///<AES轨迹规划失败原因模式: [/],(0,0,16),[/],(1,0), 
+    uint32 vu32_aes_pp_failcause = 120; 
+} 
+
+/**
+* @brief AES功能状态bus
+* @detail xxxxxxxx
+*/
+message AesResult{ 
+
+    ///<aes转向角度请求:[degree],(0,-720,720),[/],(0.1,-720),标识方向盘的转向角度请求值
+    float aes_lat_ang_req = 1;
+
+    ///<AES系统状态:[/],(/,/,/),[/],(/,/),/
+    ///<0:off
+    ///<1:passive
+    ///<2:failure
+    ///<3:standby
+    ///<4:active
+    ///<5:reserved
+    uint32 aes_aeb_status = 2;
+
+    ///<AES触发:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:not Active；
+    ///<0x1:DES_Left_Active;
+    ///<0x2:DES_Right_Active;
+    ///<0x3:CES_Left_Active;
+    ///<0x4:CES_Right_Active;
+    ///<0x5:AES_Left_Active;
+    ///<0x6:AES_Right_Active;
+    uint32 aes_active = 3;
+
+    ///<AES报警:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:not Active；
+    ///<0x1:DES_Left_Warning;
+    ///<0x2:DES_Right_Warning;
+    ///<0x3:CES_Left_Warning;
+    ///<0x4:CES_Right_Warning;
+    ///<0x5:AES_Left_Warning;
+    ///<0x6:AES_Right_Warning;
+    uint32 aes_warning = 4;
+
+    ///<vu32_aes_ao_aeb_status:[/],(/,/,/),[/],(/,/),/
+    uint32 vu32_aes_ao_aeb_status = 5;
+
+    ///<vuf32_aes_ao_aeb_decel_value:[/],(/,/,/),[/],(/,/),/
+    float vuf32_aes_ao_aeb_decel_value = 6;
+
+    ///<vuf32_aes_ao_aeb_decel_active:[/],(/,/,/),[/],(/,/),/
+    bool vuf32_aes_ao_aeb_decel_active = 7;
+
+    ///<aes开关:[/],(0,0,1),[/],(1,0),aes开关状态
+    ///<0:关
+    ///<1:开
+    bool aes_enable = 8;
+    
+    ///<aes版本:[/],(0,0,1),[/],(1,0),aes版本号
+    float aes_version = 9;
+
+    ///< seq_header: [/]，(0，0，1)，[/]，(1，0)，seq_header                                   
+    SeqHeaderProto.DelayHeader seq_header = 10;
+} 
+
+
+/**
+* @brief ESS事件信息
+* @detail xxxxxxxx
+*/
+message EssTriggerAndDiagnostic{ 
+
+    ///<ESS 全场景影子模式包括CES，AES及横穿场景标志位:[/],(0,0,1),[/],(1,0),ESS 全场景影子模式包括CES，AES及横穿场景
+    ///<0:不触发
+    ///<1:触发
+    bool ess_shadow_trigger = 1;
+
+    ///<影子模式目标判断标志位:[/],(0,0,65535),[/],(1,0),影子模式目标判断标志位
+    ///<0:off
+    uint32 ess_shadow_trigger_flag = 2;
+
+    ///<ess事件诊断位:[/],(0,0,1),[/],(1,0),aes事件诊断位
+    uint32 ess_diagnostic_code = 3;
+
+    ///<ESS SOP1功能使能数据上云:[/],(0,0,1),[/],(1,0),ESS SOP1功能使能数据上云 
+    ///<0:不触发
+    ///<1:触发
+    bool ess_enable_adr_trigger = 4;
+
+    ///<ESS SOP1功能使能数据上云标志位:[/],(0,0,65535),[/],(1,0),ESS SOP1功能使能数据上云标志位
+    ///<0:off
+    uint32 ess_enable_adr_trigger_flag = 5;
+
+    ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+    float time_stamp = 6;
+
+    ///<前级或依赖模块工作异常状态位:[/],(/,/,/),[/],(1,0),前级或依赖模块工作异常状态位
+    uint32 front_module_fail = 7;
+
+    ///<输入信号超时或校验异常状态位:[/],(/,/,/),[/],(1,0),输入信号超时或校验异常状态位
+    bool input_signal_invalid = 8;
+
+    ///<模块运行错误:[/],(/,/,/),[/],(1,0),模块运行错误
+    uint32 module_running_error = 9;
+
+    ///<DTC状态位:[/],(/,/,/),[/],(1,0),DTC状态位
+    uint32 is_dtc = 10;
+
+    ///<心跳信号:[/],(/,/,/),[/],(1,0),心跳信号
+    uint32 heart_beats = 11;
+
+    ///<故障位:[/],(/,/,/),[/],(1,0),故障位
+    uint32 ess_fault_info_realtedeol = 12;
+} 
+
+/**
+* @brief las诊断信息
+* @detail xxxxxxxx
+*/
+message LasDiagnosisInfo{ 
+    ///<心跳信号: [s],(/,/,/),[/],(1,0),心跳信号
+    uint32 heart_beats = 1;
+
+    ///<时间戳: [s],(/,/,/),[/],(1,0),时间戳
+    float time_stamp = 2;
+
+    ///<SA_LAS传感器遮挡故障信息:[/],(/,/,/),[/],(/,/),SA_LAS传感器遮挡故障信息
+    ///<bit0: 前视摄像头遮挡
+    ///<bit1: 后视摄像头遮挡
+    ///<bit2: 周视摄像头遮挡
+    ///<bit3: 环视摄像头遮挡
+    ///<bit4: 前雷达遮挡
+    ///<bit5: 前角雷达遮挡
+    ///<bit6: 后角雷达遮挡
+    ///<bit7: 激光雷达遮挡
+    ///<bit8: 多传感器遮挡
+    ///<bit9: DMS传感器遮挡
+    ///<bit10: Reserved
+    uint32 front_module_fail = 3;
+
+    ///<SA_LAS关联系统故障信息:[/],(/,/,/),[/],(1,0),SA_LAS关联系统故障信息
+    ///<bit0: orin硬件故障
+    ///<bit1: 通讯故障
+    ///<bit2: 转向系统故障
+    ///<bit3: 制动系统故障
+    ///<bit4: 域控VIU_FL故障
+    ///<bit5: EDC故障
+    ///<bit6: MCU故障
+    ///<bit7:  时间同步故障
+    ///<bit8: 前视摄像头故障
+    ///<bit9: 周视摄像头故障
+    ///<bit10: 后视摄像头故障
+    ///<bit11: 环视摄像头故障
+    ///<bit12: 前雷达故障
+    ///<bit13: 前角雷达故障
+    ///<bit14: 后角雷达故障
+    ///<bit15: 激光雷达故障
+    ///<bit16: 胎压异常
+    ///<bit17: DMS故障
+    ///<bit18: Reserved
+    uint32 input_signal_invalid = 4;
+
+    ///<SA_LAS关联EOL故障信息:[/],(/,/,/),[/],(1,0),SA_LAS关联EOL故障信息
+    ///<bit0: LDW配置字未正确写入
+    ///<bit1: LKA配置字未正确写入
+    ///<bit2: ELK配置子未正确写入
+    ///<bit3: 前视摄像头未标定
+    ///<bit4: 周视摄像头未标定
+    ///<bit5: 后视摄像头未标定
+    ///<bit6: 环视摄像头未标定
+    ///<bit7: 前雷达未标定
+    ///<bit8: 前角雷达未标定
+    ///<bit9: 后角雷达未标定
+    ///<bit10: 激光雷达未标定
+    ///<bit11: 胎压异常
+    ///<bit12: Reserved
+    uint32 module_running_error = 5;
+
+    ///<DTC状态位:[/],(/,/,/),[/],(1,0),DTC状态位
+    uint32 is_dtc = 6;
+
+    ///<Reserved位:[/],(/,/,/),[/],(1,0),Reserved位
+    float las_eol = 7;
+} 
+
+/**
+* @brief SAS_LAS_ELK_Lcs调试信息
+* @detail xxxxxxxx
+*/
+message LasElkLcsDebug{ 
+
+    ///<elk_lcs状态从passive_to_standby标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从passive_to_standby
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_passive_to_standby = 1;
+
+    ///<elk_lcs状态从standby到passive标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从standby到passive
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_standby_to_passive = 2;
+
+    ///<elk_lcs状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_left_standby_to_active = 3;
+
+    ///<elk_lcs状态从standby到right_active标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从standby到right_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_right_standby_to_active = 4;
+
+    ///<elk_lcs状态从Active到Passive标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从Active到Passive
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_active_to_passive = 5;
+
+    ///<elk_lcs状态从Left_Active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态left_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_left_active_to_standby_go_fail = 6;
+
+    ///<elk_lcs状态从right_active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态right_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_right_active_to_standby_go_fail = 7;
+
+    ///<elk_lcs状态从Left_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态left_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_left_active_to_standby_come_succeed = 8;
+
+    ///<elk_lcs状态从right_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态right_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_lcs_right_active_to_standby_come_succeed = 9;
+
+    ///<elk_lcs左前方目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs左前方目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_fl_active = 10;
+
+    ///<elk_lcs右前方目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs右前方目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_rl_active = 11;
+
+    ///<elk_lcs左侧目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs左侧目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_obj_left_active = 12;
+
+    ///<elk_lcs右前方目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs右前方目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_fr_active = 13;
+
+    ///<elk_lcs右后方目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs右后方目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_rr_active = 14;
+
+    ///<elk_lcs左侧目标激活标志位:[/],(0,0,1),[/],(1,0),elk_lcs左侧目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_lcs_obj_right_active = 15;
+} 
+
+/**
+* @brief LAS_Elk_o调试信息
+* @detail xxxxxxxx
+*/
+message LasElkODebug{ 
+
+    ///<elk_o状态从passive_to_standby标志位:[/],(0,0,1),[/],(1,0),elk_o状态从passive_to_standby
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_passive_to_standby = 1;
+
+    ///<elk_o状态从standby到right_active标志位:[/],(0,0,1),[/],(1,0),elk_o状态从standby到right_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_standby_to_passive = 2;
+
+    ///<elk_o状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),elk_o状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_left_standby_to_active = 3;
+
+    ///<elk_o状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),elk_o状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_right_standby_to_active = 4;
+
+    ///<elk_o状态从Active到Passive标志位:[/],(0,0,1),[/],(1,0),elk_o状态从Active到Passive
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_active_to_passive = 5;
+
+    ///<elk_o状态从Left_Active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_o状态left_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_left_active_to_standby_go_fail = 6;
+
+    ///<elk_o状态从right_active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_o状态right_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_right_active_to_standby_go_fail = 7;
+
+    ///<elk_o状态从Left_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_o状态left_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_left_active_to_standby_come_succeed = 8;
+
+    ///<elk_o状态从right_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_o状态right_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_o_right_active_to_standby_come_succeed = 9;
+
+    ///<elk_o左边目标激活标志位:[/],(0,0,1),[/],(1,0),elk_o左边目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_o_object_left_active = 10;
+
+    ///<elk_o右边目标激活标志位:[/],(0,0,1),[/],(1,0),elk_o右边目标激活标志位
+    ///<0:未激活
+    ///<1:激活
+    bool elk_o_object_right_active = 11;
+} 
+
+/**
+* @brief LAS_ELK_re调试信息
+* @detail xxxxxxxx
+*/
+message LasElkReDebug{ 
+
+    ///<elk_re状态从passive_to_standby标志位:[/],(0,0,1),[/],(1,0),elk_re状态从passive_to_standby
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_passive_to_standby = 1;
+
+    ///<elk_lcs状态从standby到passive标志位:[/],(0,0,1),[/],(1,0),elk_lcs状态从standby到passive
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_standby_to_passive = 2;
+
+    ///<elk_re状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),elk_re状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_left_standby_to_active = 3;
+
+    ///<elk_re状态从standby到right_active标志位:[/],(0,0,1),[/],(1,0),elk_re状态从standby到right_active
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_right_standby_to_active = 4;
+
+    ///<elk_re状态从Active到Passive标志位:[/],(0,0,1),[/],(1,0),elk_re状态从Active到Passive
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_active_to_passive = 5;
+
+    ///<elk_re状态从Left_Active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_re状态left_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_left_active_to_standby_go_fail = 6;
+
+    ///<elk_re状态从Left_Active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),elk_re状态left_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_right_active_to_standby_go_fail = 7;
+
+    ///<elk_re状态从Left_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_re状态left_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_left_active_to_standby_come_succeed = 8;
+
+    ///<elk_re状态从Left_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),elk_re状态left_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_right_active_to_standby_come_succeed = 9;
+
+    ///<左侧路沿和车道线之间的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_left_curb_lane_distance = 10;
+
+    ///<左侧到车道线的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_left_lane_distance = 11;
+
+    ///<左侧到路沿的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_left_curb_distance = 12;
+
+    ///<左侧时间延时距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_left_delay_distance = 13;
+
+    ///<右侧时间延时距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_k_elk_re_left_distance = 14;
+
+    ///<右侧路沿和车道线的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_right_curb_lane_distance = 15;
+
+    ///<右侧到车道线的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_right_lane_distance = 16;
+
+    ///<右侧到路沿的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_right_curb_distance = 17;
+
+    ///<右侧时间延时的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_right_delay_distance = 18;
+
+    ///<右侧到路沿的距离:[/],(/,/,/),[/],(/,/),/
+    float elk_re_k_elk_re_right_distance = 19;
+
+    ///<左侧路沿状态:[/],(/,/,/),[/],(/,/),/
+    ///<0:正常
+    ///<1:收缩
+    ///<2:扩张
+    uint32 elk_re_left_curb_sts = 20;
+
+    ///<右侧路沿状态:[/],(/,/,/),[/],(/,/),/
+    ///<0:正常
+    ///<1:收缩
+    ///<2:扩张
+    uint32 elk_re_right_curb_sts = 21;
+
+    ///<左侧到路沿的距离标志位:[/],(0,0,1),[/],(1,0),左侧到路沿的距离标志位
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_left_curb_distance_judge = 22;
+
+    ///<右侧到路沿的距离标志位:[/],(0,0,1),[/],(1,0),右侧到路沿的距离标志位
+    ///<0:不跳
+    ///<1:跳
+    bool elk_re_right_curb_distance_judge = 23;
+} 
+
+/**
+* @brief  LAS_Lane调试信息
+* @detail xxxxxxxx
+*/
+message LasLaneStateInfor{ 
+
+    ///<车道线曲率:[/],(/,/,/),[/],(/,/),/
+    float curve = 1;
+
+    ///<左侧车道线曲率:[/],(/,/,/),[/],(/,/),/
+    float left_curve = 2;
+
+    ///<右侧车道线曲率:[/],(/,/,/),[/],(/,/),/
+    float right_curve = 3;
+
+    ///<左侧车道线距离:[/],(/,/,/),[/],(/,/),/
+    float left_distance = 4;
+
+    ///<左侧横向速度:[/],(/,/,/),[/],(/,/),/
+    float left_speed = 5;
+
+    ///<右侧车道线距离:[/],(/,/,/),[/],(/,/),/
+    float right_distance = 6;
+
+    ///<右侧车速:[/],(/,/,/),[/],(/,/),/
+    float right_speed = 7;
+
+    ///<左侧路沿存在:[/],(/,/,/),[/],(/,/),/
+    bool near_left_curb_exist = 8;
+
+    ///<右侧路沿存在:[/],(/,/,/),[/],(/,/),/
+    bool near_right_curb_exist = 9;
+
+    ///<车道线属性矩阵: [/], (0,-100,100),[54],(1,0),/
+    repeated float line_maker_mat = 10;
+} 
+
+/**
+* @brief LAS_LAT控制信息
+* @detail 横向控制给其它功能模块的控制信号
+*/
+message LasLatCtrlInfo{ 
+    ///<las使能信号:[/],(0,0,1),[/],(0,1),las使能信号
+    bool las_enable = 1;
+
+    ///<转向角度请求:[degree],(0,-720,720),[/],(0.1,-720),标识方向盘的转向角度请求值
+    float lato_acc_latang_req = 2;
+
+    ///<横向控制请求状态:[/],(0,0,1),[/],(1,0),标识横向控制的请求状态
+    ///<0:不激活
+    ///<1:激活
+    bool lato_acc_latang_req_active = 3;
+
+    ///<横向控制模块状态:[/],(0,0,1),[/],(1,0),标识横向控制模块的控制状态
+    ///<0:出错
+    ///<1:正常
+    bool lato_funstatus = 4;
+
+    ///<横向控制有效状态:[/],(0,0,1),[/],(1,0),标识横向控制有效状态
+    ///<0:无效
+    ///<1:有效
+    bool lato_latcontrol_valid = 5;
+
+    ///<横向控制可激活状态:[/],(0,0,1),[/],(1,0),标识横向控制可激活状态
+    ///<0:不可激活
+    ///<1:可激活
+    bool lato_latstartup_valid = 6;
+
+    ///<EPS电机最大扭矩限制值:[Nm],(0,-20.48,20.44),[/],(0.02,-20.48),标识EPS电机最大扭矩限制值
+    float lato_motortorq_maxlim = 7;
+
+    ///<EPS电机最小扭矩限制值:[Nm],(0,-20.48,20.44),[/],(0.02,-20.48),标识EPS电机最小扭矩限制值
+    float lato_motortorq_minlim = 8;
+} 
+
+/**
+* @brief  LAS_LAT调试信息
+* @detail 横向控制调试信号
+*/
+message LasLatDebug{ 
+
+    ///<横向控制版本号:[/],(0,0,10000),[/],(1,0),标识横向控制版本号
+    float lat_version_num = 1;
+
+    ///<方向盘转角限制功能安全上限值（绝对值）:[degree],(0,0,720),[/],(0.1,0),标识方向盘转角限制功能安全上限值（绝对值）
+    float lat_strang_uplimthod = 2;
+
+    ///<方向盘转速限制功能安全上限值（绝对值）:[degree],(0,0,1000),[/],(0.1,0),标识方向盘转速限制功能安全上限值（绝对值）
+    float lat_strave_uplimthod = 3;
+
+    ///<原始的期望方向盘转角请求:[degree],(0,-720,720),[/],(0.1,0),标识原始的期望方向盘转角请求
+    float lat_expstrang = 4;
+
+    ///<滤波后的期望方向盘转角请求:[degree],(0,-720,720),[/],(0.1,0),标识滤波后的期望方向盘转角请求
+    float lat_expstrang_filt = 5;
+
+    ///<条件插值后的期望方向盘转角请求:[degree],(0,-720,720),[/],(0.1,0),标识条件插值后的期望方向盘转角请求
+    float lat_expstrang_interp = 6;
+
+    ///<功能安全限制后的期望方向盘转角请求:[degree],(0,-720,720),[/],(0.1,0),标识功能安全限制后的期望方向盘转角请求
+    float lat_expstrang_lim = 7;
+
+    ///<方向盘转角请求幅值的功能安全触发状态:[/],(0,0,1),[/],(1,0),标识方向盘转角请求幅值的功能安全触发状态
+    ///<0:未触发
+    ///<1:触发
+    float lat_stranglim_err_info = 8;
+
+    ///<方向盘转角速率请求的功能安全触发状态:[/],(0,0,1),[/],(1,0),标识方向盘转角速率请求的功能安全触发状态
+    ///<0:未触发
+    ///<1:触发
+    float lat_stravelim_err_info = 9;
+
+    ///<横向控制数据记录触发类型:[/],(0,0,2),[/],(1,0),标识横向控制数据记录触发类型
+    ///<0:初始化
+    ///<1:直线
+    ///<1:弯道
+    uint32 lat_data_trigger_type = 10;
+
+    ///<横向控制数据记录触发是否有效，:[/],(0,0,1),[/],(1,0),标识横向控制数据记录触发是否有效，
+    ///<0:无效
+    ///<1:有效
+    bool lat_data_trigger_valid = 11;
+
+    ///<预瞄距离:[m],(0,0,100),[/],(0.01,0),标识预瞄距离
+    float lat_prv_dis = 12;
+
+    ///<预瞄曲率:[1/m],(0,-1,1),[/],(1e-08,0),标识预瞄曲率
+    float lat_prv_curvature = 13;
+
+    ///<预瞄偏差:[m],(0,-10,10),[/],(0.01,0),标识预瞄偏差
+    float lat_prv_detay = 14;
+
+    ///<方向盘转角请求原始FF前馈加PID反馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始FF前馈加PID反馈值
+    float lat_prv_strangall = 15;
+
+    ///<方向盘转角请求原始FF前馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始FF前馈值
+    float lat_prv_strangff = 16;
+
+    ///<方向盘转角请求原始PID反馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始PID反馈值
+    float lat_prv_strangpid = 17;
+
+    ///<方向盘转角请求原始P反馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始P反馈值
+    float lat_prv_strangp = 18;
+
+    ///<方向盘转角请求原始I反馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始I反馈值
+    float lat_prv_strangi = 19;
+
+    ///<方向盘转角请求原始D反馈值:[degree],(0,-720,720),[/],(0.1,0),标识方向盘转角请求原始D反馈值
+    float lat_prv_strangd = 20;
+
+    ///<前视摄像头安装角度偏差自学习值:[rad],(0,-0.1,0.1),[/],(1e-08,0),标识前视摄像头安装角度偏差自学习值
+    float lat_camoffset_write = 21;
+
+    ///<偏差转角pid:[/],(/,/,/),[/],(/,/),/
+    float lat_a0_strangpid = 22;
+
+    ///<偏差转角p项:[/],(/,/,/),[/],(/,/),/
+    float lat_a0_strangp = 23;
+
+    ///<偏差转角i项:[/],(/,/,/),[/],(/,/),/
+    float lat_a0_strangi = 24;
+
+    ///<偏差转角d项:[/],(/,/,/),[/],(/,/),/
+    float lat_a0_strangd = 25;
+} 
+
+/**
+* @brief LAS_LDW调试信息
+* @detail xxxxxxxx
+*/
+message LasLdwDubug{ 
+
+    ///<ldw信号校验:[/],(0,0,1),[/],(1,0),ldw信号校验
+    ///<0:不跳
+    ///<1:跳
+    bool ldw_fail_sts = 1;
+
+    ///<ldw状态从passive_to_standby标志位:[/],(0,0,1),[/],(1,0),ldw状态从passive_to_standby
+    ///<0:不跳
+    ///<1:跳
+    bool ldw_passive_to_standby = 2;
+
+    ///<ldw状态从standby到passive标志位:[/],(0,0,1),[/],(1,0),ldw状态从standby到passive
+    ///<0:不跳
+    ///<1:跳
+    bool ldw_standby_to_passive = 3;
+
+    ///<ldw状态从Active到Passive标志位:[/],(0,0,1),[/],(1,0),ldw状态从Active到Passive
+    ///<0:不跳
+    ///<1:跳
+    bool ldw_active_to_passive = 4;
+
+    ///<ldw状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),ldw状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool left_standby_to_active = 5;
+
+    ///<ldw状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),ldw状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool right_standby_to_active = 6;
+} 
+
+/**
+* @brief LAS_lka调试信息
+* @detail xxxxxxxx
+*/
+message LasLkaDebug{ 
+
+    ///<lka状态从passive_to_standby标志位:[/],(0,0,1),[/],(1,0),lka状态从passive_to_standby
+    ///<0:不跳
+    ///<1:跳
+    bool lka_passive_to_standby = 1;
+
+    ///<lka状态从standby到passive标志位:[/],(0,0,1),[/],(1,0),lka状态从standby到passive
+    ///<0:不跳
+    ///<1:跳
+    bool lka_standby_to_passive = 2;
+
+    ///<lka状态从standby到left_active标志位:[/],(0,0,1),[/],(1,0),lka状态从standby到left_active
+    ///<0:不跳
+    ///<1:跳
+    bool lka_left_standby_to_active = 3;
+
+    ///<lka状态从standby到right_active标志位:[/],(0,0,1),[/],(1,0),lka状态从standby到right_active
+    ///<0:不跳
+    ///<1:跳
+    bool lka_right_standby_to_active = 4;
+
+    ///<lka状态从Active到Passive标志位:[/],(0,0,1),[/],(1,0),lka状态从Active到Passive
+    ///<0:不跳
+    ///<1:跳
+    bool lka_active_to_passive = 5;
+
+    ///<lka状态从Left_Active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),lka状态left_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool lka_left_active_to_standby_go_fail = 6;
+
+    ///<lka状态从right_active到standby_go_fail标志位:[/],(0,0,1),[/],(1,0),lka状态right_active到standby_go_fail
+    ///<0:不跳
+    ///<1:跳
+    bool lka_right_active_to_standby_go_fail = 7;
+
+    ///<lka状态从Left_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),lka状态left_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool lka_left_active_to_standby_come_succeed = 8;
+
+    ///<lka状态从right_Active到standby_go_come_succeed标志位:[/],(0,0,1),[/],(1,0),lka状态right_active到standby_go_come_succeed
+    ///<0:不跳
+    ///<1:跳
+    bool lka_right_active_to_standby_come_succeed = 9;
+
+    ///<lka左激活距离:[/],(/,/,/),[/],(/,/),/
+    float k_lka_left_dtle = 10;
+
+    ///<lka左激活距离:[/],(/,/,/),[/],(/,/),/
+    float k_lka_right_dtle = 11;
+} 
+
+/**
+* @brief  LAS_PCS调试信息
+* @detail 横向控制调试信号
+*/
+message LasPcsDebug{ 
+
+    ///<回正规划系数a0:[/],(/,/,/),[/],(/,/),/
+    float finalpath_a0 = 1;
+
+    ///<回正规划系数a1:[/],(/,/,/),[/],(/,/),/
+    float finalpath_a1 = 2;
+
+    ///<回正规划系数a2:[/],(/,/,/),[/],(/,/),/
+    float finalpath_a2 = 3;
+
+    ///<回正规划系数a3:[/],(/,/,/),[/],(/,/),/
+    float finalpath_a3 = 4;
+
+    ///<做插值标志位:[/],(/,/,/),[/],(/,/),/
+    float return_in_progress = 5;
+} 
+
+/**
+* @brief LAS各功能共用信号bus
+* @detail xxxxxxxx
+*/
+message LasShare{ 
+
+    ///<las运行模式:[/],(/,/,/),[/],(/,/),/
+    uint32 mode_select = 1;
+
+    ///<用户选择las模式:[/],(/,/,/),[/],(/,/),/
+    uint32 hu_las_mode_selection = 2;
+
+    ///<用户选择elk开关:[/],(/,/,/),[/],(/,/),/
+    uint32 hu_elk_enable = 3;
+
+    ///<las运行模式:[/],(/,/,/),[/],(/,/),/
+    bool sys_fail_sts = 4;
+
+    ///<las运行模式:[/],(/,/,/),[/],(/,/),/
+    uint32 steer_over_ride = 5;
+
+    ///<握手状态:[/],(/,/,/),[/],(/,/),/
+    bool handsoff_sts = 6;
+
+    ///<左侧规划系数:[/],(/,/,/),[8],(/,/),/
+    repeated float left_coef = 7;
+
+    ///<右侧规划系数:[/],(/,/,/),[8],(/,/),/
+    repeated float right_coef = 8;
+
+    ///<原始车道线宽度:[/],(/,/,/),[/],(/,/),/
+    float ln_width_raw = 9;
+
+    ///<车道宽度:[/],(/,/,/),[/],(/,/),/
+    float ln_width = 10;
+
+    ///<左侧连续压线标志位:[/],(/,/,/),[/],(/,/),/
+    bool left_inside_flag = 11;
+
+    ///<左侧连续压线标志位:[/],(/,/,/),[/],(/,/),/
+    bool right_inside_flag = 12;
+
+    ///<接管请求:[/],(/,/,/),[/],(/,/),/
+    bool take_over = 13;
+
+    ///<换道状态:[/],(/,/,/),[/],(/,/),/
+    float lane_change = 14;
+
+    ///<当前车道状态:[/],(/,/,/),[/],(/,/),/
+    uint32 crt_lane_sts = 15;
+
+    ///<las插值时间:[/],(/,/,/),[/],(/,/),/
+    float las_intertime = 16;
+
+    ///<las_lat接管请求:[/],(/,/,/),[/],(/,/),/
+    bool lat_take_ove_req = 17;
+
+    ///<las版本号:[/],(/,/,/),[/],(/,/),/
+    float las_version_number = 18;
+
+    ///<部分目标属性矩阵: [/], (/,/,/),[36],(/,/),/
+    repeated float left_right_obj = 19;
+} 
+
+/**
+* @brief LAS功能状态bus
+* @detail xxxxxxxx
+*/
+message LasSystemState{ 
+
+    ///<ldw系统状态:[/],(0,0,4),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Passive
+    ///<0x2:Standby
+    ///<0x3:Active
+    ///<0x4:Failure
+    uint32 ldw_state = 1;
+
+    ///<ldw工作模式:[/],(0,0,2),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Left active
+    ///<0x2:Right active
+    uint32 ldw_intervention_type = 2;
+
+    ///<lka系统状态:[/],(0,0,4),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Passive
+    ///<0x2:Standby
+    ///<0x3:Active
+    ///<0x4:Failure
+    uint32 lka_state = 3;
+
+    ///<lka工作模式:[/],(0,0,2),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Left active
+    ///<0x2:Right active
+    uint32 lka_intervention_type = 4;
+
+    ///<elk系统状态:[/],(0,0,4),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Passive
+    ///<0x2:Standby
+    ///<0x3:Active
+    ///<0x4:Failure
+    uint32 elk_state = 5;
+
+    ///<elk左侧干预模式:[/],(0,0,3),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Road edge
+    ///<0x2:Backward target
+    ///<0x3:Opposite target
+    uint32 elk_left_intervention_type = 6;
+
+    ///<elk右侧干预模式:[/],(0,0,3),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Road edge
+    ///<0x2:Backward target
+    ///<0x3:Opposite target
+    uint32 elk_right_intervention_type = 7;
+
+    ///<las运行模式:[/],(0,0,5),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:LKA
+    ///<0x2:ELK_re
+    ///<0x3:ELK_lcs
+    ///<0x4:ELK_o
+    ///<0x5:Auto
+    uint32 mode_select = 8;
+
+    ///<las工作状态:[/],(0,0,5),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Passive
+    ///<0x2:Standby
+    ///<0x3:Left active
+    ///<0x4:Right active
+    ///<0x5:Failure
+    uint32 lka_elk_state = 9;
+
+    ///<ldw原始系统状态:[/],(0,0,5),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Passive
+    ///<0x2:Standby
+    ///<0x3:Left active
+    ///<0x4:Right active
+    ///<0x5:Failure
+    uint32 ldw_state_yaw = 10;
+
+    ///<ldw连续激活抑制:[/],(0,0,1),[/],(/,/),/
+    ///<0x0:Uninhibit
+    ///<0x1:Inhibit
+    uint32 ldw_waring_inhibit = 11;
+
+    ///<lka连续激活抑制:[/],(0,0,1),[/],(/,/),/
+    ///<0x0:Uninhibit
+    ///<0x1:Inhibit
+    uint32 lka_waring_inhibit = 12;
+
+    ///<elk激活目标ID:[/],(/,/,/),[10],(/,/),/
+    repeated uint32 elk_active_object_id = 13;
+
+    ///<las模式选择反馈信号:[/],(/,/,/),[/],(/,/),/
+    uint32 ad_las_mode_selection_status = 14;
+
+    ///<elk开关反馈信号:[/],(/,/,/),[/],(/,/),/
+    uint32 ad_elk_enable = 15;
+
+    ///<las智能模式反馈信号:[/],(/,/,/),[/],(/,/),/
+    uint32 ad_las_intellgent_mode_selection_status = 16;
+    
+    ///<las警告模式反馈信号:[/],(/,/,/),[/],(/,/),/
+    uint32 ad_las_warning_mode_selection_sts = 17;
+
+    ///<las功能激活时驾驶员手力矩打断状态标志信号:[/],(/,/,/),[/],(/,/),/
+    ///<0x0: Inactive
+    ///<0x1:Active
+    bool las_override_torque = 18;
+} 
+
+/**
+* @brief LAS发送到ads244的信息
+* @detail xxxxxxxx
+*/
+message LasToAds244{ 
+
+    ///<acc_ldw状态:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:Off
+    ///<0x1:Standby
+    ///<0x2:Active
+    ///<0x3:Failure
+    float acc_ldw_states = 1;
+
+    ///<振动报警请求:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:No Warning不报警
+    ///<0x1:Left Warning左报警
+    ///<0x2:Right Warning右报警
+    ///<0x3:reserved
+    float acc_ldw_vibration_warning_req = 2;
+
+    ///<acc_lka状态:[/],(/,/,/),[/],(/,/),/
+    float acc_lka_status = 3;
+} 
+
+/**
+* @brief LAS发到ads31a的信息
+* @detail xxxxxxxx
+*/
+message LasToAds31A{ 
+
+    ///<横向目标轨迹与实际轨迹航向角偏差:[/],(/,/,/),[/],(/,/),/
+    float acc_lat_path_heading_angle = 1;
+
+    ///<横向目标轨迹与实际轨迹间距:[/],(/,/,/),[/],(/,/),/
+    float acc_lat_path_dy = 2;
+
+    ///<紧急车道保持开关状态:[/],(/,/,/),[/],(/,/),/
+    float acc_elk_enable_status = 3;
+
+    ///<紧急车道保持模式:[/],(/,/,/),[/],(/,/),/
+    float acc_elk_intervention_mode = 4;
+
+    ///<紧急车道保持系统状态:[/],(/,/,/),[/],(/,/),/
+    float acc_elk_mode = 5;
+
+    ///<中间变量:[/],(/,/,/),[/],(/,/),/
+    float acc_host_ped_lat_range_1 = 6;
+
+    ///<中间变量:[/],(/,/,/),[/],(/,/),/
+    float acc_host_ped_log_range_1 = 7;
+
+    ///<中间变量:[/],(/,/,/),[/],(/,/),/
+    float acc_host_ped_detection_1 = 8;
+
+    ///<IACC驾驶员信息提示:[/],(/,/,/),[/],(/,/),/
+    float acc_iacc_hwa_text_info_for_driver = 9;
+
+    ///<左侧车道线类型:[/],(/,/,/),[/],(/,/),/
+    float acc_left_lane_marker_type = 10;
+
+    ///<本车道左侧车道线状态:[/],(/,/,/),[/],(/,/),/
+    float acc_host_lane_left_status = 11;
+
+    ///<本车道右侧车道线状态:[/],(/,/,/),[/],(/,/),/
+    float acc_host_lane_right_status = 12;
+
+    ///<LAS警告方式状态:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:Reserved
+    ///<0x1:sound
+    ///<0x2:vibration
+    ///<0x3:sound and vibration
+    ///<0x4~0x7:Reserved
+    float acc_las_warning_mode_selection_sts = 13;
+
+    ///<LDW震动强度状态:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:reserved
+    ///<0x1:low
+    ///<0x2:normal
+    ///<0x3:high
+    float acc_ldw_shake_lev_status = 14;
+
+    ///<IACC/HWA使能开关状态:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:OFF
+    ///<0x1:ON
+    float acc_iacc_hwa_enable = 15;
+
+    ///<LAS模式选择信号状态:[/],(/,/,/),[/],(/,/),/
+    float acc_las_mode_selection_status = 16;
+
+    ///<TJP开关状态:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:OFF
+    ///<0x1:ON
+    float ads_tjp_enable_status = 17;
+
+    ///<右侧车道线类型:[/],(/,/,/),[/],(/,/),/
+    float acc_right_lane_marker_type = 18;
+
+    ///<驾驶辅助声音信息:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:no voice
+    ///<0x1:latentWarning voive
+    ///<0x2:FCW/AEB voice
+    ///<0x3:ACC object detect voice
+    ///<0x4:ACC object disappeared voice
+    ///<0x5:ACC/IACC takeover request voice
+    ///<0x6:Lane Left dangerous warning  voice
+    ///<0x7:Lane Right dangerous warning  voice
+    ///<0x8:reserved
+    ///<0x9:IACC Active voice
+    ///<0xA:IACC exit voice
+    ///<0xB:reserved
+    ///<0xC:reserved
+    ///<0xD:cruise unintended exit
+    ///<0x0E:TrafficWarning
+    ///<0xF~0x1F:reserved
+    float acc_voice_info = 19;
+
+    ///<横向接管请求:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:no request
+    ///<0x1:level 1 request
+    ///<0x2:level 2 request
+    ///<0x3:reserved
+    float acc_lat_take_over_req = 20;
+
+    ///<IACC/HWA工作模式:[/],(/,/,/),[/],(/,/),/
+    ///<0x0:off
+    ///<0x1:standby
+    ///<0x2:passive
+    ///<0x3:active
+    ///<0x4:suspend
+    ///<0x5:prohibition
+    ///<0x6:reserved
+    ///<0x7:failure
+    float acc_iacc_hwa_mode = 21;
+} 
+
+/**
+* @brief LAS事件信息
+* @detail xxxxxxxx
+*/
+message LasTriggerAndDiagnostic{ 
+
+    ///<elk_re事件触发标志位:[/],(0,0,1),[/],(1,0),elk_re事件触发标志位
+    ///<0:不触发
+    ///<1:触发
+    bool elk_re_shadow_trigger = 1;
+
+    ///<目标事件触发标志位:[/],(0,0,1),[/],(1,0),目标事件触发标志位
+    ///<0:不触发
+    ///<1:触发
+    bool object_shadow_trigger = 2;
+
+    ///<影子模式目标判断标志位:[/],(0,0,4),[/],(1,0),影子模式目标判断标志位
+    ///<0:off
+    ///<1:elk_lcs_left
+    ///<2:elk_lcs_right
+    ///<3:elk_o_left
+    ///<4:elk_o_right
+    uint32 object_shadow_trigger_flag = 3;
+
+    ///<las事件诊断位:[/],(0,0,1),[/],(1,0),las事件诊断位
+    uint32 las_diagnostic_code = 4;
+} 
+
+/**
+* @brief sas版本号bus
+* @detail xxxxxxxx
+*/
+message SasVersion{ 
+
+    ///<sas版本号:[/],(/,/,/),[/],(/,/),/
+    float sas_version = 1;
+} 
+
+/**
+* @brief LAS Debug
+* @detail xxxxxxxx
+*/
+message LasDebug{ 
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasShare las_share = 1;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasLaneStateInfor las_lane_state_info = 2;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasLatDebug las_lat_debug = 3;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasPcsDebug las_pcs_debug = 4;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasLdwDubug las_ldw_debug = 5;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasLkaDebug las_lka_debug = 6;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasElkReDebug las_elk_re_debug = 7;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasElkLcsDebug las_elk_lcs_debug = 8;
+ ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+      LasElkODebug las_elk_o_debug = 9;
+} 

@@ -1,0 +1,235 @@
+/**
+* @file     idmap_sd_path.proto
+* @details  启动时的定位点,导航地图的路线信息
+* @date     2023-3-30
+* @version  2.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+**********************************************************************************
+*/
+
+syntax = "proto3";
+
+package sdmap;
+
+
+/**
+* @brief 形状点
+* @details  经纬度坐标点
+*/
+message Gnss
+{
+  ///<经度:[°],(0,-180,180),[/],(0.000001,0),东经为正
+  double x = 1;
+
+  ///<纬度:[°],(0,-90,90),[/],(0.000001,0),北纬为正
+  double y = 2;
+}
+
+
+/**
+ * @brief link唯一标识
+ * @details  link唯一标识
+ */
+message LinkIdentity
+{
+  ///<UrId:[/],(/,/,/),[/],(/,0),取值范围>0
+  uint64 ur_id = 1;
+
+  ///<tile id:[/],(/,/,/),[/],(/,0),取值范围>0
+  uint64 tile_id = 2;
+
+  ///<TP id:[/],(/,/,/),[/],(/,0),取值范围>0
+  uint64 tp_id = 3;
+
+  ///<link方向:[/],(0,0,0),[/],(/,0),Link存储方向，该方向是以DB中存储的物理正方向为基准
+  ///<0:正向
+  ///<1:逆向
+  bool direction = 4;
+}
+
+
+/**
+ * @brief link信息
+ * @details  link信息
+ */
+message LinkInfo
+{
+  ///<当前link标识:[/],(/,/,/),[/],(/,/),辅助信息
+  LinkIdentity link_key = 1;
+
+  ///<当前link形状点:[/],(/,/,/),[/],(/,/),必要信息
+  repeated Gnss points = 2;
+
+  ///<当前link长度:[m]，(/,/,/),[/],(/,/),必要信息
+  uint32 link_length = 3;
+
+  ///<道路通行方向:[/],(0,0,1),[/],(1,0),与link存储方向不同,辅助信息
+  ///<0:双方向通行
+  ///<1:单向通行
+  uint32 road_direction = 4;
+
+  ///<道路等级:[/],(0,0,11),[/],(1,0),/
+  ///<0:NULL，无效值；
+  ///<1:Freeway，高速公路；
+  ///<2:NationalRoad，国道；
+  ///<3:ProvinceRoad，省道；
+  ///<4:CountyRoad，县道；
+  ///<5:RuralRoad，乡公路；
+  ///<6:InCountyRoad，县乡村内部道路；
+  ///<7:CitySpeedway，主要大街、城市快速道；
+  ///<8:MainRoad，主要道路；
+  ///<9:SecondaryRoad，次要道路；
+  ///<10:CommonRoad，普通道路；
+  ///<11:NonNaviRoad，非导航道路
+  int32 road_class = 5;
+
+  ///<当前道路类型:[/],(0,0,11),[/],(1,0),/
+  ///<0:normal link,普通link
+  ///<1:RAMP,匝道
+  ///<2:Roundabout,环岛
+  ///<3:PARALLEL,平行路
+  ///<4:Service_Road,辅路
+  ///<5:Main_Road,主路
+  ///<6:SQUARE
+  ///<7:PEDESTRIAN_ZONE
+  ///<8:PEDESTRIAN
+  ///<9:ROUNDABOUT_INTERIOR
+  ///<10:SLIP_ROAD
+  ///<11:SPECIAL_TRAFFIC_FIGURE
+  ///<12:BOUNDARY
+  int32 link_type = 6;
+
+  ///<道路属性:[/],(0,0,12),[/],(1,0),/
+  ///<0:NULL,无道路属性
+  ///<1:Ferry,航道
+  ///<2:Tunnel，隧道
+  ///<3:Bridge,桥
+  ///<4:ControlledAccess,控制通行
+  ///<5:ServiceArea,服务区
+  ///<6:urban,城区
+  ///<7:ComplexIntersection,复杂路口
+  ///<8:PluralJunction,交叉路口
+  ///<9:Motorway,快车道
+  ///<10:Elevated高架
+  ///<11:ExitLink出口
+  ///<12:EntranceLink,入口
+  int32 road_attributes = 7;
+
+  ///<导航主动作:[/],(0,0,99),[/],(1,0),必要信息
+  ///<0x0:NULL,无基本导航动作
+  ///<0x1:TurnLeft,左转
+  ///<0x2:TurnRight,右转
+  ///<0x3:SlightLeft,向左前方行驶
+  ///<0x4:SlightRight,向右前方行驶
+  ///<0x5:TurnHardLeft,向左后方行驶
+  ///<0x6:TurnHardRight,向右后方行驶
+  ///<0x7:UTurn,左转调头
+  ///<0x8:Continue,直行
+  ///<0x9:MergeLeft,靠左
+  ///<0x0A:MergeRight,靠右
+  ///<0x0B:EntryRing,进入环岛
+  ///<0x0C:LeaveRing,离开环岛
+  int32 main_action = 8;
+
+  ///<导航辅助动作:[/],(0,0,99),[/],(1,0),必要信息
+  ///<0x00:NULL,无辅助导航动作
+  ///<0x01:EntryMain,进入主路
+  ///<0x02:EntrySideRoad,进入辅路
+  ///<0x03:EntryFreeway,进入高速
+  ///<0x04:EntrySlip,进入匝道
+  ///<0x05:EntryTunnel,进入隧道
+  ///<0x06:EntryCenterBranch,进入中间岔道
+  ///<0x07:EntryRightBranch,进入右岔路
+  ///<0x08:EntryLeftBranch,进入左岔路
+  ///<0x09:EntryRightRoad,进入右转专用道
+  ///<0x0A:EntryLeftRoad,进入左转专用道
+  ///<0x0B:EntryMergeCenter,进入中间道路
+  ///<0x0C:EntryMergeRight,进入右侧道路
+  ///<0x0D:EntryMergeLeft,进入左侧道路
+  ///<0x0E:EntryMergeRightSild,靠右行驶进入辅路
+  ///<0x0F:EntryMergeLeftSild,靠左行驶进入辅路
+  ///<0x10:EntryMergeRightMAIN,靠右行驶进入主路
+  ///<0x11:EntryMergeLeftMAIN,靠左行驶进入主路
+  ///<0x12:EntryMergeRightRight,靠右行驶进入右转专用道
+  ///<0x13:EntryFerry,到达航道
+  ///<0x14:Leftferry,驶离轮渡
+  ///<0x17:AlongRoad,沿当前道路行驶
+  ///<0x18:AlongSild,沿辅路行驶
+  ///<0x19:AlongMain,沿主路行驶
+  ///<0x20:ArriveExit,到达出口
+  ///<0x21:ArriveServiceArea,到达服务区
+  int32 assistant_action = 9;
+
+  ///<当前link是否有平行路:[/],(0,0,1),[/],(1,0),辅助信息
+  ///<0:false,无
+  ///<1:true,有
+  bool has_parallenl_road = 10;
+
+  ///<当前link是否有岔路:[/],(0,0,1),[/],(1,0),辅助信息
+  ///<0:false,无
+  ///<1:true,有
+  bool has_bifurcate = 11;
+
+  ///<当前link是否有效:[/],(0,0,1),[/],(1,0),必要信息
+  ///<0:false,无
+  ///<1:true,有
+  bool is_valid = 12;
+}
+
+/**
+ * @brief 路线内导航段信息
+ * @details  导航段
+ */
+message SegmentInfo
+{
+  ///<当前导航段信息是否有效:[/],(0,0,1),[/],(1,0),必要信息
+  ///<0:false,无
+  ///<1:true,有
+  bool sd_is_valid = 1;
+
+  ///<当前导航段内link列:[/],(/,/,/),[/],(/,/),必要信息
+  repeated LinkInfo links = 2;
+
+  ///<有途径点/目标点:[/],(0,0,2),[/],(/,/),必要信息
+  ///<0:无效
+  ///<1:有途径点
+  ///<2:有目标点
+  uint32 special_point = 3;
+}
+
+/**
+ * @brief 输入路线信息
+ * @details  输入路线
+ */
+message PathInfo
+{
+  ///<当前导航段信息是否有效:[/],(0,0,1),[/],(1,0),必要信息
+  ///<0:false,无
+  ///<1:true,有
+  bool path_is_valid = 1;
+
+  ///<路线ID:[/],(/,/,/),[/],(/,/),取值范围>0,0:表示路线无效,辅助信息
+  uint64 path_id = 2;
+
+  ///<路线内导航段信息:[/],(/,/,/),[/],(/,/),必要信息
+  repeated SegmentInfo segments = 3;
+}
+
+/**
+ * @brief 导航路线数据信息
+ * @details  输入路线
+ */
+message RequestInfo
+{
+  ///<请求异源匹配ID:[/],(/,/,/),[/],(/,/),用于区分不同路线，20230330新增
+  uint64 request_id = 1;
+
+  ///<输入路线信息:[/],(/,/,/),[/],(/,/),20230330新增
+  ///<size-1:6km
+  ///<size-3:30km*3
+  repeated PathInfo path_info = 2;
+}

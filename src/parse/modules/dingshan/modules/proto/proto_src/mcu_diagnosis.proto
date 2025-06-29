@@ -1,0 +1,287 @@
+/**
+* @file     mcu_diagnosis.proto
+* @author   caikejie
+* @details  c2 mcu诊断信息的输出接口定义
+* @date     2023-12-27
+* @version  v1.0
+* @copyright(c),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  coordinate_system_vehicle_base 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.12.27        <th>1.0                 <th>caikejie 
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3"; 
+package	McuDiagnosis;
+
+/**
+* @brief mcu诊断信息
+* @detail mcu诊断信息
+*/
+message McuDiagnosis
+{
+  ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 stsdiagnosisin_diagnosis_code = 1;
+  ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 stsdiagnosisin_heartbeart = 2;
+  ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 objectsmcu_time_stamp = 3;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 freespacemcu_time_stamp = 4;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 adc_sence_mode = 5;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmi_adfunset_rcv_cnt = 6;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmi_2mcu_rcv_cnt = 7;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 sts_rcv_cut = 8;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dnplat_rcv_cnt = 9;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dnplon_rcv_cnt = 10;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 objmcu_rcv = 11;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 spacemcu_rcv = 12;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 camera_fault_cnt = 13;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 radar_fault_cnt = 14;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 ultrasonic_radar_fault_cnt = 15;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 machine_rcv_cnt = 16;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 bcm_rcv_cnt = 17;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 lasenable_rcv_cnt = 18;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmi_edccnt = 19;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmi_readystate_cnt = 20;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmi_rcv_cnt = 21;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 state_drvmodereq_cnt = 22;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 stm_mcu_hardwarefault = 23;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dasdms_receive_counter = 24;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 busesp_receive_counter = 25;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 buseps_receive_counter = 26;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 vpdiagnosis_ac_receive_counter = 27;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 diagnosis_sc_rcv_counter = 28;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 vpdiagnosis_fc_receive_counter = 29;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 lidarfault_receive_counter = 30;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timesyncfault_receive_counter = 31;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 underlyingfault_receive_counter = 32;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 generalfault_receive_counter = 33;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 hmitomcu_receive_counter = 34;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 apaonoff = 35;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 eolstatus = 36;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 functionconfig = 37;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 fifostate_discard_cnt_1 = 38;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 fifostate_discard_cnt_2 = 39;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 fifostate_discard_cnt_3 = 40;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 fifostate_discard_cnt_4 = 41;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_1 = 42;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_2 = 43;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_3 = 44;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_4 = 45;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_5 = 46;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_6 = 47;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_7 = 48;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_8 = 49;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_9 = 50;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_10 = 51;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_11 = 52;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 tasktime_exe_12 = 53;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag1 = 54;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag2 = 55;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag3 = 56;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag4 = 57;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag5 = 58;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 dtc_diag6 = 59;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_state_machine_type_max_interval = 60;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_state_machine_type_timeout_times = 61;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_fus_objmcu_data_type_timeout_times = 62;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_fus_objmcu_data_type_max_interval = 63;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_fus_spacemcu_data_type_timeout_times = 64;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_fus_spacemcu_data_type_max_interval = 65;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_sts_stsdiagnosis_data_type_timeout_times = 66;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_sts_stsdiagnosis_data_type_max_interval = 67;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_soc_mcu_dnp_latcontrol_type_max_interval = 68;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_soc_mcu_dnp_latcontrol_type_timeout_times = 69;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_soc_mcu_dnp_loncontrol_type_max_interval = 70;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 timeoutmonitor_soc_mcu_dnp_loncontrol_type_timeout_times = 71;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 version_major = 72;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 version_minor = 73;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_adascan_bussoff = 74;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_adasacan_bussoff = 75;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_1 = 76;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_2 = 77;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_3 = 78;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_4 = 79;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_5 = 80;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_6 = 81;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_7 = 82;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 can_diag_counter_8 = 83;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved3 = 84;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved4 = 85;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved5 = 86;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved6 = 87;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved7 = 88;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved8 = 89;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved9 = 90;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved10 = 91;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved11 = 92;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved12 = 93;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved13 = 94;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved14 = 95;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved15 = 96;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved17 = 97;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved18 = 98;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved19 = 99;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved20 = 100;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved21 = 101;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved22 = 102;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved23 = 103;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved24 = 104;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved25 = 105;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved26 = 106;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved27 = 107;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved28 = 108;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved29 = 109;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved30 = 110;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved31 = 111;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved32 = 112;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved33 = 113;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved34 = 114;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved35 = 115;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved36 = 116;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved37 = 117;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved38 = 118;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved39 = 119;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved40 = 120;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved41 = 121;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved42 = 122;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved43 = 123;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved44 = 124;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved45 = 125;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved46 = 126;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved47 = 127;
+   ///< 诊断信息：[/],(/,/,/),[/],(1,0),/
+  uint32 reserved48 = 128;
+}

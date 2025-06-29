@@ -1,0 +1,71 @@
+/**
+* @file     lidar_diagnosis.proto
+* @author   huanghong
+* @details  lidar_diagnosis输出接口定义
+* @date     2023-08-15
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.8.15         <th>1.0                 <th>huanghong
+* <tr><th>2024.2.02         <th>1.1                 <th>huanghong
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package LidarDiagnosisProto;
+
+/**
+* @brief  LidarDiagnosis信息
+* @detail 激光诊断信息
+*/
+message LidarDiagnosis
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1;
+
+    ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+    ///< 0x0: 默认值, 则表示无故障
+    ///< bit 0: 左雷达硬件故障
+    ///< bit 1: 右雷达硬件故障
+    ///< bit 2: 激光感知光罩异常小于30％
+    ///< bit 3: 激光雷达拼接异常
+    ///< bit 4: 激光雷达sync angle设置异常
+    ///< bit 5: 时间同步异常故障
+    ///< bit 6: 左激光雷达输入超时故障
+    ///< bit 7: 右激光雷达输入超时故障
+    ///< bit 8: 整车信号输入超时故障
+    ///< bit 9: ins信号输入超时故障
+    ///< bit 10: 左激光雷达丢帧故障
+    ///< bit 11: 右激光雷达丢帧故障
+    ///< bit 12: CPU占用异常error
+    ///< bit 13: GPU占用异常error
+    ///< bit 14: CPU占用异常error
+    ///< bit 15: 激光感知objects输出异常故障
+    ///< bit 16: 激光感知freespace输出异常故障
+    ///< bit 17: 激光感知curb输出异常故障
+    ///< bit 18: 激光感知处理超时诊断
+    ///< bit 19: 左激光雷达标定预警异常
+    ///< bit 20: 右激光雷达标定预警异常
+    ///< bit 21: 整车信号输入超时故障
+    ///< bit 22: FF检查整车信号无效
+    ///< bit 23: 整车信号合理性故障
+    ///< bit 24: 地面线长度过短（雨天或者是刚下过雨的场景），激光感知性能有较大下降
+    uint32 diagnosis_code = 2;
+
+    ///< 额外诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+    string diagnosis_info = 3;
+
+    ///< 心跳信号：[/],(0,0,255),[/],(/,/),心跳信号
+    uint32 heartbeat = 4;
+}
+

@@ -1,0 +1,502 @@
+/**
+* @file     hmi_ad_funset.proto
+* @author   HMITEAM
+* @details  行车和泊车的车机设置开关反馈
+* @date     2023-9-25
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.1.19         <th>1.0                 <th>wangqing 
+* <tr><th>2023.12.28         <th>R13v1同步soa软开关接口       <th>huangjunfeng
+* <tr><th>2024.1.18         <th>R13v1增设注释       <th>yangyi
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package HmiInterface;
+
+
+/**
+* @brief HmiADCruiseset
+* @details HmiADCruiseset
+*/
+message HmiADCruiseset
+{
+    ///<驾驶偏好开关:[/],(1,0,3),[/],(1,0),驾驶偏好开关
+	///<0x0: acc
+	///<0x1: iacc
+	///<0x2: nid
+	///<0x3: 无效值
+    uint32 	ad_curisemode = 1;
+	
+    ///<路口辅助:[/],(1,0,2),[/],(1,0),路口辅助
+	///<0x0: off
+	///<0x1: on
+	///<0x2: 无效值
+    uint32 	ad_idaenablestatus = 2;
+
+    ///<路口辅助功能状态:[/],(1,0,3),[/],(1,0),路口辅助功能状态
+	///<0x0: off
+	///<0x1: standby
+	///<0x2: avtive
+	///<0x3：无效值
+    uint32 	ad_idastatus = 3;
+	
+    ///<换道频率开关:[/],(2,0,3),[/],(1,0),换道频率开关
+	///<0x0: low
+	///<0x1: standard
+	///<0x2: high
+	///<0x3：无效值
+    uint32 	ad_lanechangefrequency = 4;
+	
+    ///<转向灯控制换道	:[/],(1,0,2),[/],(1,0),转向灯控制换道
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_udlcenablestatus = 5;
+	
+    ///<交互提示偏好开关:[/],(2,0,3),[/],(1,0),交互提示偏好开关
+	///<0x0: off
+	///<0x1: simple
+	///<0x2：all
+	///<0x3：无效值
+    uint32 	ad_nidaudiowarstyle = 6;
+	
+    ///<智能限速开关:[/],(1,0,2),[/],(1,0),智能限速开关
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_cslaenablestatus = 7;
+	
+    ///<限速模式:[/],(0,0,2),[/],(1,0),限速模式
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_cslmodestatus = 8;
+	
+    ///<超速预警开关:[/],(1,0,2),[/],(1,0),超速预警开关
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_overspeedsoundwarningenst = 9;
+	
+    ///<智能限速偏差类型:[/],(1,0,2),[/],(1,0),智能限速偏差类型
+	///<0x0: Absolute
+	///<0x1: Related
+	///<0x2：无效值
+    uint32 	ad_cslwarnoffsettp = 10;
+	
+    ///<超速预警绝对偏差值:[km/h],(0xA,-10,20),[/],(1,-10),超速预警绝对偏差值
+	///<0x1F: reserved
+	///<0xA: default value 
+    uint32 	ad_absoverspdwarnoffset = 11;
+	
+    ///<超速预警相对偏差值	:[%],(0xA,-10,20),[/],(1,-10),超速预警相对偏差值	
+	///<0x1F: reserved 
+	///<0xA: default value  
+    uint32 	ad_reloverspdwarnoffset = 12;
+	
+    ///<驾驶风格:[/],(1,0,4),[/],(1,0),驾驶风格
+	///<0x0: leisure
+	///<0x1: comfort
+	///<0x2：Rapid
+	///<0x3：Self_define
+	///<0x4：无效值
+    uint32 	ad_autodrivestyle = 13;
+	
+    ///<加速响应风格:[/],(1,0,4),[/],(1,0),加速响应风格
+	///<0x0: leisure
+	///<0x1: comfort
+	///<0x2：Rapid
+	///<0x3：无效值
+    uint32 	ad_adaccstyle = 14;
+	
+    ///<起步响应风格:[/],(1,0,3),[/],(1,0),起步响应风格
+	///<0x0: leisure
+	///<0x1: comfort
+	///<0x2：Rapid
+	///<0x3：无效值
+    uint32 	ad_adstartstyle = 15;
+	
+    ///<过弯响应风格:[/],(1,0,3),[/],(1,0),过弯响应风格
+	///<0x0: leisure
+	///<0x1: comfort
+	///<0x2: Rapid
+	///<0x3: 无效值
+    uint32 	ad_adcurvestyle = 16;
+	
+    ///<换道响应风格:[/],(1,0,3),[/],(1,0),换道响应风格
+	///<0x0: Leisure 
+	///<0x1: comfort 
+	///<0x2: Rapid 
+	///<0x3: 无效值
+    uint32 	ad_adlanechangestyle = 17;
+	
+    ///<起步提醒开关:[/],(1,0,2),[/],(1,0),起步提醒开关
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_vehiclestartremindenable = 18;
+	
+    ///<后追尾预警开关:[/],(1,0,2),[/],(1,0),后追尾预警开关
+	///<0x0: off
+	///<0x1: on
+	///<0x2：无效值
+    uint32 	ad_rcwenablestatus = 19;
+	
+    ///<开门预警方式:[/],(1,0,2),[/],(1,0),开门预警方式
+	///<0x0: off
+	///<0x1: voice
+	///<0x2：sound
+    uint32 	ad_seamodestatus = 20;
+	
+    ///<并线辅助提醒:[/],(1,0,2),[/],(1,0),并线辅助提醒
+	///<0x0: early
+	///<0x1: normal
+	///<0x2: late 
+    uint32 	ad_bsdlcasetting = 21;
+	
+    ///<并线辅助提醒方式:[/],(1,0,3),[/],(1,0),并线辅助提醒方式
+	///<0x0: light_sound
+	///<0x1: light_vibration
+	///<0x2: light_sound_vibration
+	///<0x3: 无效值
+    uint32 	ad_bsdlcaremindmode = 22;
+
+}
+
+/**
+* @brief HmiADParkSet
+* @details 泊车设置
+*/
+message HmiADParkSet
+{
+    ///<ad_amenityparkingenable:[/],(0,0,2),[/],(1,0),无感泊车开关
+	///<0x0: OFF
+	///<0x1: ON
+    uint32 	ad_amenityparkingenable = 1;
+
+    ///<ad_parkingform:[/],(0,0,2),[/],(1,0),ad_parkingform
+	///<0x0: Inside Parking
+	///<0x1: AmenityParking
+    uint32 	ad_parkingform = 2;
+
+    ///<ad_memeryparkingenable:[/],(0,0,2),[/],(1,0),记忆泊车开关
+    ///<0x0: OFF
+	///<0x1: ON 
+	///<0x2: 无效值
+    uint32 	ad_memeryparkingenable = 3;
+}
+/**
+* @brief APASetSpeedtypeSet
+* @details 泊车速度开关设置
+*/
+message APASetSpeedtypeSet
+{
+	///<泊车速度开关设置:[/],(1,0,3),[/],(1,0),泊车速度开关设置
+	///<0x0: slow柔和
+	///<0x1: normal标准
+	///<0x2: fast 激进
+	uint32 ad_apasetspeedtype = 1;
+}
+
+/**
+* @brief AutoParkStyleSet
+* @details 泊车推荐
+*/
+message AutoParkStyleSet
+{
+	///<通知车位推荐偏好开关设置状态:[/],(0,0,2),[/],(1,0),通知车位推荐偏好开关设置状态
+	///<0x0: efficiency 效率优先
+	///<0x1: easy 易停优先
+	uint32 ad_autoparkstyle = 1;
+}
+
+
+/**
+* @brief IACCFamlrRdModSwtFbSet
+* @details 通知熟路模式换道开关设置状态
+*/
+message IACCFamlrRdModSwtFbSet
+{
+
+	///<通知熟路模式换道开关设置状态:[/],(1,0,2),[/],(1,0),熟路模式智能换道开关
+	///<0x0: OFF
+	///<0x1: ON
+	///<0x2: 无效值 
+	uint32 c2_iaccfamlrrdmodswtfb = 1;
+}
+
+/**
+* @brief ADScoreStsSet
+* @details 智能驾驶分数开关设置
+*/
+message ADScoreStsSet
+{
+	///<通知安全智驾分总得分开关设置:[/],(0,0,2),[/],(1,0),得分总开关使能请求
+	///<0x0:OFF
+	///<0x1:ON
+	///<0x2:无效值 
+	uint32 c2_adscorestsset = 1;
+}
+/**
+* @brief HmiADASSecureSet
+* @details HmiADASSecureSet
+*/
+message HmiADASSecureSet
+{
+    ///<AD_ELKEnable:[/],(1,0,2),[/],(1,0),紧急车道保持开关
+	///<0x0: OFF
+	///<0x1: ON
+	///<0x2: 无效值 
+    uint32 	ad_elkenable = 1;
+	
+    ///<AD_CESEnable:[/],(0,0,2),[/],(1,0),紧急避让辅助开关
+	///<0x0: off
+	///<0x1: on 
+	///<0x2: 无效值
+    uint32 	ad_cecenable = 2;
+	
+    ///<AD_LASModeSelectionStatus:[/],(1,0,2),[/],(1,0),车道偏离辅助模式设置
+	///<0x0: off
+	///<0x1: warning
+	///<0x2：Correction
+    uint32 	ad_lasmodeselectionstatus = 3;
+	
+	///<AD_LASIntellgentModeSelectionStatus:[/],(0,0,2),[/],(1,0),车道偏离辅助智能模式设置
+	///<0x0: normal
+	///<0x1: smart  
+	///<0x2: 无效值
+    uint32 	ad_lasintellgentmodeselectionstatus = 4;
+	
+	///<AD_LASWarningModeSelectionSts:[/],(0,0,2),[/],(1,0),车道偏离辅助提醒方式设置
+	///<0x0: Sound，
+	///<0x1: Vibration
+	///<0x2: Sound and Vibration
+    uint32 	ad_laswarningmodeselectionsts = 5;
+	
+	///<AD_ForwardColliAstType:[/],(3,0,3),[/],(1,0),前方碰撞辅助模式设置
+	///<0x0: off
+	///<0x1: warning
+	///<0x2: brake
+	///<0x3: warning&brake
+    uint32 	ad_forwardcolliasttype = 6;
+	
+	///<AD_ForwardColliAstSenStyle:[/],(1,0,2),[/],(1,0),前方碰撞预警时机设置
+	///<0x0: early
+	///<0x1: normal
+	///<0x2: late
+    uint32 	ad_forwardcolliastsenstyle = 7;
+	
+	///<AD_RearColliAstType:[/],(3,0,3),[/],(1,0),倒车碰撞辅助模式设置
+	///<0x0: off
+	///<0x1: warning
+	///<0x2: brake
+	///<0x3: warning&brake
+    uint32 	ad_rearcolliasttype = 8;
+}
+
+/**
+* @brief 通知红灯提醒开关设置
+* @detail 通知红灯提醒开关设置
+*/
+message RedLightReEnSet
+{
+	///< 通知红灯提醒开关设置：[/],(0,0,255),[/],(1,0),通知红灯提醒开关设置
+	///<0x0: off
+	///<0x1: on
+    uint32 ad_redlightremindenable = 1;
+}
+
+/**
+* @brief 通用心跳监控信息
+* @detail 用于软件模块级监控
+*/
+message DiagnosisInfo
+{
+	///< 心跳计数器：[/],(0,0,255),[/],(1,0),心跳循环0~255计数器
+    uint32 heart_beat_counter = 1;
+}
+
+/**
+* @brief 油门辅助设置通知	
+* @detail 油门辅助设置通知	
+*/
+message AccPedalForSetMsg
+{
+	///< 通知挡位辅助（前向）设置状态:[/],(1,0,255),[/],(1,0),通知挡位辅助（前向）设置状态
+	///<0x0: Off
+	///<0x1: On
+	///<0x2: 无效值
+    uint32 pedalforeable = 1;
+}
+
+/**
+* @brief 油门辅助设置通知	
+* @detail 通知挡位辅助（后向）设置状态	
+*/
+message AccPedalAftSetMsg
+{
+	///< 通知挡位辅助（后向）设置状态:[/],(1,0,255),[/],(1,0),通知挡位辅助（后向）设置状态
+	///<0x0: Off
+	///<0x1: On
+	///<0x2: 无效值
+    uint32 pedalafteable = 1;
+}
+
+
+/**
+* @brief 加速踏板保护状态	
+* @detail 加速踏板保护状态	
+*/
+message AccPedalStsChagMsg
+{
+	///< 油门辅助模块（前向）激活状态:[/],(0,0,255),[/],(1,0),油门辅助模块（前向）激活状态
+	///<0x0: not active
+	///<0x1: active
+	///<0x2: invalid
+    uint32 accpedalformode = 1;
+
+	///< 油门辅助模块（后向）激活状态:[/],(0,0,255),[/],(1,0),油门辅助模块（后向）激活状态
+	///<0x0: not active
+	///<0x1: active
+	///<0x2: invalid
+    uint32 accpedalaftmode = 2;
+}
+
+/**
+* @brief 语音控制请求	
+* @detail 语音控制请求	
+*/
+message ADASvoiceCtr
+{
+	///< 语音换道请求:[/],(0,0,255),[/],(1,0),语音换道请求
+	///<0x0: NoRequest
+	///<0x1: LaneChangeToLeft
+	///<0x2: LaneChangeToRight
+    uint32 voicelanechangereq = 1;
+
+	///< 语音激活状态:[/],(0,0,255),[/],(1,0),语音激活状态
+	///<0x0: 未激活
+	///<0x1: 关闭
+	///<0x2: 激活
+    uint32 voiceaccactive = 2;
+
+	///< 语音设置跟车时距:[/],(0,0,255),[/],(1,0),语音设置跟车时距
+	///<0x0: NoRequest
+	///<0x1: Level1
+	///<0x2: Level2
+	///<0x3: Level2
+	///<0x4: Level4
+	///<0x5~0x6: Reserved
+	///<0x7: Invalid
+
+
+    uint32 voicecruisesetdistance = 3;
+	///< 语音设定车速:[/],(0,0,255),[/],(1,0),语音设定车速
+	///<0x0: NoRequest
+	///<0x1~0xFA: 1~250
+	///<0xFB: Reserved
+	///<0xFF: Invalid
+    uint32 voicecruisesetspeed = 4;
+}
+
+/**
+* @brief 通知自学习领航开关状态	
+* @detail 通知自学习领航开关状态
+*/
+message NIDSelfLrngFb
+{
+	///< 通知自学习领航开关状态:[/],(0,0,255),[/],(1,0),通知自学习领航开关状态
+	///<0x0: off
+	///<0x1: on
+	///<0x2: 无效值
+    uint32 ad_nidselflrngfb = 1;
+}
+
+/**
+* @brief 通知并线辅助提示开关状态	
+* @detail 通知并线辅助提示开关状态
+*/
+message BSDLCAOnOffSet
+{
+	///< 通知并线辅助提示开关状态:[/],(1,0,255),[/],(1,0),通知并线辅助提示开关状态
+	///<0x0: off
+	///<0x1: on
+	///<0x2: 无效值
+    uint32 ad_bsdlcaonoff = 1;
+}
+
+/**
+* @brief 通知开门预警开关状态	
+* @detail 通知开门预警开关状态
+*/
+message SEAOnOffSts
+{
+	///< 通知开门预警开关状态:[/],(1,0,255),[/],(1,0),通知开门预警开关状态
+	///<0x0: off
+	///<0x1: on
+	///<0x2: 无效值
+    uint32 ad_seaonoffsts = 1;
+}
+
+/**
+* @brief HmiADFunset
+* @details HmiADFunset
+*/
+message HmiADFunset
+{  
+    ///<hmi_ad_cruiseset:[/],(/,/,/),[/],(/,/),hmi_ad_cruiseset
+    HmiADCruiseset hmi_ad_cruiseset = 1;
+
+	///<ADScoreStsSet:[/],(/,/,/),[/],(/,/),ADScoreStsSet
+	ADScoreStsSet ad_score_set = 2;
+
+	///<IACCFamlrRdModSwtFbSet:[/],(/,/,/),[/],(/,/),hmi_aIACCFamlrRdModSwtFbSetd_cruiseset
+	IACCFamlrRdModSwtFbSet iacc_famlrrdmodswt_set = 3;
+
+    ///<HmiADASSecureSet:[/],(/,/,/),[/],(/,/),HmiADASSecureSet
+    HmiADASSecureSet hmi_secure_set = 4;
+    
+	///<APASetSpeedtypeSet:[/],(/,/,/),[/],(/,/),APASetSpeedtypeSet
+    APASetSpeedtypeSet apa_set_speed_type = 5; 
+    
+	///<AutoParkStyleSet:[/],(/,/,/),[/],(/,/),AutoParkStyleSet
+    AutoParkStyleSet auto_park_style = 6;
+    
+    ///<HmiADParkSet:[/],(/,/,/),[/],(/,/),HmiADParkSet
+    HmiADParkSet hmi_ad_parkset = 7;
+	
+	///<RedLightReEnSet:[/],(/,/,/),[/],(/,/),RedLightReEnSet
+    RedLightReEnSet hmi_ad_redlightreenset = 8;
+	
+	///<AccPedalForSetMsg:[/],(/,/,/),[/],(/,/),AccPedalForSetMsg
+    AccPedalForSetMsg hmi_ad_accpedalforsetmsg = 9;
+	
+	///<AccPedalAftSetMsg:[/],(/,/,/),[/],(/,/),AccPedalAftSetMsg
+    AccPedalAftSetMsg hmi_ad_accpedalaftsetmsg = 10;
+	
+	///<AccPedalStsChagMsg:[/],(/,/,/),[/],(/,/),AccPedalStsChagMsg
+    AccPedalStsChagMsg hmi_ad_accpedalstschagmsg = 11;
+	
+	///<ADASvoiceCtr:[/],(/,/,/),[/],(/,/),ADASvoiceCtr
+    ADASvoiceCtr hmi_hu_adasvoicectr = 12;
+
+	///<NIDSelfLrngFb:[/],(/,/,/),[/],(/,/),NIDSelfLrngFb
+    NIDSelfLrngFb hmi_hu_nidselflrngfb = 13;
+
+	///<BSDLCAOnOffSet:[/],(/,/,/),[/],(/,/),BSDLCAOnOffSet
+    BSDLCAOnOffSet hmi_hu_bsdlcaonoffset = 14;
+	
+	///<SEAOnOffSts:[/],(/,/,/),[/],(/,/),SEAOnOffSts
+    SEAOnOffSts hmi_hu_seaonoffsts = 15;
+}

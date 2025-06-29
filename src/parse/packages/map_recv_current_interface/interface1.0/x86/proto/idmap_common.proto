@@ -1,0 +1,1145 @@
+/**
+
+* @file     idmap_common.proto
+* @author   jianghongyue
+* @details  智驾地图枚举内容，补充动静态信息
+* @date     2023-07-18
+* @version  2.3
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  GCJ02
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.12.30         <th>1.8                 <th>jianghongyue
+* <tr><th>2023.03.06         <th>1.9                 <th>jianghongyue
+* <tr><th>2023.03.29         <th>2.0                 <th>jianghongyue
+* <tr><th>2023.04.21         <th>2.1             	 <th>jianghongyue
+* <tr><th>2023.07.18         <th>2.3             	 <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+package idmap;
+
+
+
+/**
+* @brief 定位点
+* @details  提供包括请求点、形状点、层级点所在坐标等；坐标为经纬度
+*/
+message Gnss
+{
+    ///<经度:[°],(0,-180,180),[/],(0.000001,0),东经为正
+    double lng = 1;
+
+    ///<纬度:[°],(0,-90,90),[/],(0.000001,0),北纬为正
+    double lat = 2;
+
+    ///<相对高度:[m],(0,/,/),[/],(0.001,0),公开道路默认为0
+    double height = 3;
+}
+
+
+/**
+* @brief 层级组信息
+* @details  在立交时具备，最底层为1，向上加1;当前平行立交暂时无法提供
+*/
+message Zlevel
+{
+    ///<层级点坐标:[/],(/,/,/),[/],(/,0),表达层级关系的坐标点
+    Gnss zlevel_id = 1;
+
+    ///<层级点对应车道id的层级:[/],(0,0,/),[/],(1,0),标识当前车道的层级
+    uint64 lane_level = 2;
+
+    ///<所在组的总层级数量:[/],(0,0,/),[/],(1,0),/
+	///<说明:图商无法表示标志牌的层级
+    uint32 sum_of_level = 3;
+}
+
+
+/**
+* @brief 智驾地图状态
+* @details  提供智驾地图是否为可用、是否需要更新信息
+*/
+message IDMapStatus
+{
+    ///<地图是否可使用:[/],(0,0,1),[/],(1,0),判断输出地图是否正常输出
+    ///<判断条件：地图是否完整获取、解析或输入条件满足要求
+    ///<0：不可使用
+    ///<1：可使用
+    bool map_available = 1;
+
+    ///<地图更新状态:[/],(0,0,2),[/],(1,0),判断智驾地图是否正在更新
+    ///<0：未知
+    ///<1：没有处于更新状态
+    ///<2：标识地图正在更新
+    uint32 update_status = 2;
+
+	///<地图版本号：[/],(0,0,/),[/],(1,0),当前无法实现
+    uint32 map_version = 3;
+
+	///<图商软件版本：[/],(0,0,/),[/],(1,0),当前无法实现
+    uint32 api_version = 4;
+}
+
+
+/**
+* @brief 车道属性
+* @details  曲率（1/m或等级）、坡度（°）
+*/
+message LaneAttribute
+{
+    ///<属性点坐标:[/],(/,/,/),[/],(/,/),/
+	Gnss adas_point = 1;
+
+    ///<值:[/],(0,-1,5.11),[/],(0.00001,0),/
+    double attribute_value = 2;
+}
+
+
+/**
+* @brief 车道节点信息
+* @details  分歧合流起止点、停车场出入口、车道线形变化点
+*/
+message LaneNode
+{
+    ///<节点坐标:[/],(/,/,/),[/],(/,0),/
+    Gnss lane_node_id = 1;
+
+	///<节点类型:[/],(0,0,99),[/],(1,0),节点类型可以有多个
+    repeated LaneNodeType lane_node_type = 2;
+}
+
+
+/**
+* @brief 非ODD信息
+* @details  不推荐开启ODD的范围，及notODD的原因
+*/
+message NotODD
+{
+    ///<NotODD的类型:[/],(0,0,/),[/],(1,0),/
+    uint32 not_odd_type = 1;
+
+	///<NotODD起点距离车道起点的距离:[m],(0,0,/),[/],(1,0),从所在车道起点到NotODD开始的距离
+    double start_from_lane_beginning = 2;
+
+	///<NotODD起点开始的长度:[m],(0,0,/),[/],(1,0),从NotODD起点到NotODD结束的距离
+    double dis_to_start = 3;
+}
+
+
+/**
+* @brief 颠簸状态信息
+* @details  记录底盘反馈的车辆颠簸状态
+*/
+message BumpStatus
+{
+    ///<颠簸起点距离车道起点的距离:[m],(0,0,/),[/],(0.01,0),颠簸开始位置
+    double bump_from_lane_beginning = 1;
+
+	///<颠簸长度:[m],(0,0,/),[/],(0.01,0),颠簸有效距离
+    double bump_length = 2;
+
+	///<颠簸等级:[/],(0,0,3),[/],(1,0),大中小对应321
+    uint32 bump_level = 3;
+
+	///<颠簸类型:[/],(0,0,3),[/],(1,0),/
+	///<1:凹坑
+	///<2:减速带
+	///<3:路
+    uint32 bump_type = 4;
+}
+
+
+/**
+* @brief 地图数据来源
+* @details  abbr：MapDS
+*/
+enum MapDataSource
+{
+	///<无
+	kMapDSUnknown = 0;
+
+	///<长安众包
+	kMapDSChangan = 1;
+
+	///<图商，四维
+	kMapDSNavInfo = 2;
+
+	///<图商，腾讯
+	kMapDSTencent = 3;
+
+	///<图商，高德
+	kMapDSAutoNavi = 4;
+
+	///<图商，百度
+	kMapDSBaidu = 5;
+
+	///<图商，立得
+	kMapDSLeador = 6;
+
+	///<其它
+	kMapDSOthers = 99;
+}
+
+
+/**
+* @brief 车道线类型
+* @details  abbr：LineT
+*/
+enum LineType
+{
+	///<无
+	kLineTNone = 0;
+
+	///<导流区边线
+	kLineTDiversionArea = 1;
+
+	///<白色半圆状车距确认线
+	///<当前感知无法识别，众包不提供
+	kLineTDistanceConfirmation = 2;
+
+	///<车行道纵向减速标线
+	kLineTDeceleration = 3;
+
+	///<禁停区边线
+	///<当前感知不支持，不提供
+	kLineTNoParkingArea = 4;
+
+	///<停车位标线
+	///<当前感知不支持，不提供
+	kLineTSlotLine = 5;
+
+	///<车道线近端点，20230718定位增加，地图仅增加枚举
+	kLineTFrontEndPoint = 6;
+
+	///<车道线远端点，20230718定位增加，地图仅增加枚举
+	kLineTBackEndPoint = 7;
+
+	///<其它标线
+	kLineTOther = 99;
+}
+
+
+/**
+* @brief 车道线线形
+* @details  缩写：LMT
+*/
+enum LineMarkingType
+{
+	///<无车道线
+	kLMTNone = 0;
+
+	///<未知
+	kLMTUnknown = 1;
+
+	///<单实线
+	kLMTSolidLine = 2;
+
+	///<单虚线
+	kLMTDashedLine = 3;
+
+	///<双实线
+	kLMTDoubleSolidLine = 4;
+
+	///<双虚线
+	kLMTDoubleDashedLine = 5;
+
+	///<左实右虚
+	kLMTLeftSolidRightDashed = 6;
+
+	///<左虚右实
+	kLMTRightSolidLeftDashed = 7;
+
+	///<短虚线，众包不提供
+	kLMTDashedBlocks = 8;
+
+	///<四实线，众包不提供
+	kLMTFourSolidLine = 9;
+
+	///<虚拟线,20230329增加，众包不提供
+	kLMTVirtual = 10;
+
+	///<其它车道线形状
+	kLMTOther = 99;
+}
+
+
+/**
+* @brief 颜色
+* @details  对应车道线颜色、车道标志颜色
+*/
+enum Color
+{
+	///<未知
+	kUnknown = 0;
+
+	///<白色
+	kWhite = 1;
+
+	///<黄色
+	kYellow = 2;
+
+	///<橙色，众包不提供
+	kOrange = 3;
+
+	///<红色，众包不提供
+	kRed = 4;
+
+	///<蓝色，众包不提供
+	kBlue = 5;
+
+	///<绿色，众包不提供
+	kGreen = 6;
+
+	///<左黄右白
+	kLeftYellowRightWhite = 7;
+
+	///<左白右黄
+	kLeftWhiteRightYellow = 8;
+
+	///<其它
+	kOther = 99;
+}
+
+
+
+/**
+* @brief 道路边界线类型
+* @details  abbr：RoadBT
+*/
+enum RoadBoundaryType
+{
+	///<无
+	kRoadBTNone = 0;
+
+	///<护栏
+	kRoadBTGuardrail = 1;
+
+	///<路沿;有路沿石高于地面15~20cm
+	kRoadBTCurb = 2;
+
+	///<地理边界；感知不支持，众包不提供
+	///<道路铺设边缘，如草地与车道交界边缘
+	kRoadBTGeographical = 3;
+
+	///<绿化带；感知不支持，众包不提供
+	kRoadBTGreenbelt = 4;
+
+	///<停车场内柱子；感知不支持，众包不提供
+	kRoadBTCarParkColumn = 5;
+
+	///<墙体；感知不支持，众包不提供
+	kRoadBTWall = 6;
+
+	///<其它硬隔离，20230329增加；众包不提供
+	kRoadBTOtherHardIsolation = 7;
+
+	///<其它
+	kRoadBTOther = 99;
+}
+
+
+/**
+* @brief 交通标志牌
+* @details  详细标志牌图解可以查看https://www.jiazhao.com/jinggaobiaozhi/
+* ///<以下内容引用中国国标定义
+* ///<abbr:SignT
+*/
+enum SignType
+{
+	///<Unknown
+	kSignTUnknown = 0;
+
+	///<傍山险路（右侧）
+	kSignTSteepDropRight = 1;
+
+	///<傍山险路（左侧）
+	kSignTSteepDropLeft = 2;
+
+	///<村庄
+	kSignTVillage = 3;
+
+	///<堤坝路（右侧）
+	kSignTRiverBankRight = 4;
+
+	///<堤坝路（左侧）
+	kSignTRiverBankLeft = 5;
+
+	///<丁字平面交叉
+	kSignTTShapedLevelCrossing = 6;
+
+	///<渡口
+	kSignTFerryTerminal = 7;
+
+	///<二侧变窄
+	kSignTCarriageWayNarrows = 8;
+
+	///<注意落石（左侧）
+	kSignTFallingRocksLeft = 9;
+
+	///<向左反向弯路
+	kSignTLeftBend = 10;
+
+	///<向右反向弯路
+	kSignTRightBend = 11;
+
+	///<过水路面
+	kSignTRoadFloods = 12;
+
+	///<十字交叉路口
+	kSignTIntersection = 13;
+
+	///<卡字交叉路口
+	kSignTIntersectionWithMinorRoad = 14;
+
+	///<Y形交叉（左下侧）
+	kSignTYShapedIntersectionLowerLeft = 15;
+
+	///<Y形交叉（右下侧）
+	kSignTYShapedIntersectionLowerRight = 16;
+
+	///<Y形交叉（左上侧）
+	kSignTYShapedIntersectionUpperLeft = 17;
+
+	///<左侧变窄
+	kSignTCarriageWayNarrowsLeft = 18;
+
+	///<Y形交叉（右上侧）
+	kSignTYShapedIntersectionUpperRight = 19;
+
+	///<T形交叉路口
+	kSignTTJunction = 20;
+
+	///<T形交叉（左侧）
+	kSignTTJunctionLeft = 21;
+
+	///<T形交叉（右侧）
+	kSignTTJunctionRight = 22;
+
+	///<环形交叉路口
+	kSignTRoundabout = 23;
+
+	///<连续弯路
+	kSignTSeriesCurves = 24;
+
+	///<连续下坡
+	kSignTContinuousDownhill = 25;
+
+	///<路面不平
+	kSignTUnevenRoad = 26;
+
+	///<注意雨（雪）天
+	kSignTRainOrSnow = 27;
+
+	///<路面低洼
+	kSignTDip = 28;
+
+	///<路面高突
+	kSignTHump = 29;
+
+	///<慢行
+	kSignTSlow = 30;
+
+	///<上陡坡
+	kSignTSteepAscent = 31;
+
+	///<施工
+	kSignTBuiltUpArea = 32;
+
+	///<十字平面交叉
+	kSignTCrossLevelCrossing = 33;
+
+	///<事故易发地段
+	kSignTHighAccidentArea = 34;
+
+	///<双向交通
+	kSignTTwoWayTraffic = 35;
+
+	///<注意野生动物
+	kSignTWildAnimalsCrossing = 36;
+
+	///<隧道
+	kSignTTunnel = 37;
+
+	///<隧道开车灯
+	kSignTTunnelLights = 38;
+
+	///<驼峰桥
+	kSignTHumpbackBridge = 39;
+
+	///<无人看守的铁道路口
+	kSignTRailwayCrossingWithoutGates = 40;
+
+	///<下陡坡
+	kSignTSteepDescent = 41;
+
+	///<向右急转弯
+	kSignTRightCurve = 42;
+
+	///<向左急转弯
+	kSignTLeftCurve = 43;
+
+	///<易滑
+	kSignTSlipperyRoad = 44;
+
+	///<注意信号灯
+	kSignTLightSignals = 45;
+
+	///<有人看守的铁道路口
+	kSignTRailwayCrossingWithGates = 46;
+
+	///<右侧变窄
+	kSignTCarriageWayNarrowsRight = 47;
+
+	///<右侧绕行
+	kSignTRightSideDetour = 48;
+
+	///<窄桥
+	kSignTNarrowBridge = 49;
+
+	///<注意保持车距
+	kSignTMaintainSafeDistance = 50;
+
+	///<注意不利气象条件
+	kSignTBadWeather = 51;
+
+	///<注意残疾人
+	kSignTDisabled = 52;
+
+	///<注意潮汐车道
+	kSignTTidalLane = 53;
+
+	///<注意雾天
+	kSignTFog = 54;
+
+	///<注意儿童
+	kSignTChildren = 55;
+
+	///<注意非机动车
+	kSignTCyclists = 56;
+
+	///<注意行人
+	kSignTRoadWorks = 57;
+
+	///<注意合流（左侧）
+	kSignTLaneMergeLeft = 58;
+
+	///<注意合流（右侧）
+	kSignTLaneMergeRight = 59;
+
+	///<注意横风
+	kSignTSideWinds = 60;
+
+	///<注意路面结冰
+	kSignTIcyRoad = 61;
+
+	///<注意落石（右侧）
+	kSignTFallingRocksRight = 62;
+
+	///<注意危险
+	kSignTDanger = 63;
+
+	///<注意牲畜
+	kSignTDomesticAnimalsCrossing = 64;
+
+	///<左侧绕行
+	kSignTLeftSideDetour = 65;
+
+	///<左右绕行
+	kSignTLeftRightDetour = 66;
+
+	///<注意前方车辆排队
+	kSignTVehiclesLineAhead = 67;
+
+	//Y 形交叉（左右侧）
+	kSignTYIntersection = 68;
+
+	//线条粗细示意相交道路宽度的交叉路口标志
+	kSignTIntersectionCross = 69;
+
+	//陡坡标志加坡度值
+	kSignTSlope = 70;
+
+	//叉形符号
+	kSignTXSymbol = 71;
+
+	//斜杠符号
+	kSignTSlashSymbol = 72;
+
+	//注意电动自行车
+	kSignTElectricBicycle = 73;
+
+	//交通事故管理
+	kSignTTrafficAccident = 74;
+
+	//建议速度
+	kSignTRecommendedSpeed = 75;
+
+	//避险车道
+	kSignTEscapeLane = 76;
+
+	//注意车道数变少
+	kSignTPayAttentionToFewerLanes = 77;
+
+	//线形诱导标
+	kSignTLinearGuideSign = 78;
+
+	//注意积水
+	kSignTPonding = 79;
+
+	//注意合流，20230719新增
+	kSignTLaneMerge = 80;
+
+	///<禁止超车
+	kSignTOvertakingProhibited = 101;
+
+	///<禁止畜力车进入
+	kSignTAnimalPoweredVehiclesProhibited = 102;
+
+	///<禁止大型客车驶入
+	kSignTLargeBusProhibited = 103;
+
+	///<禁止电动三轮车驶入
+	kSignTElectricTricycleProhibited = 104;
+
+	///<禁止掉头
+	kSignTUTurnProhibited = 105;
+
+	///<禁止各类非机动车进入
+	kSignTNonMotorVehicleProhibited = 106;
+
+	///<禁止载货汽车左转
+	kSignTTruckToLeftProhibited = 107;
+
+	///<禁止挂车、半挂车驶入
+	kSignTTrailerProhibited = 108;
+
+	///<禁止行人进入
+	kSignTPedestrianProhibited = 109;
+
+	///<禁止机动车驶入
+	kSignTVehicleProhibited = 110;
+
+	///<禁止鸣喇叭
+	kSignTHonkingProhibited = 111;
+
+	///<禁止摩托车驶入
+	kSignTMotorcycleProhibited = 112;
+
+	///<禁止标志上所示的两种车辆驶入
+	kSignTTwoVehicleOfSignProhibited = 113;
+
+	///<禁止直行
+	kSignTGoStraightProhibited = 114;
+
+	///<禁止人力车进入
+	kSignTNoRickshaw = 115;
+
+	///<禁止人力货运三轮车进入
+	kSignTNoHumanFreightTricycle = 116;
+
+	///<禁止人力客运三轮车进入
+	kSignTNoHumanPassengerTricycle = 117;
+
+	///<禁止拖拉机驶入
+	kSignTNoTractor = 118;
+
+	///<禁止向右转弯
+	kSignTTurnRightProhibited = 119;
+
+	///<禁止向左向右转弯
+	kSignTTurnLeftOrRightProhibited = 120;
+
+	///<禁止直行和向右转弯
+	kSignTGoStraightAndTurnRightProhibited = 121;
+
+	///<禁止三轮汽车、低速货车驶入
+	kSignTNoThreeWheelAndLowSpeedTruck = 122;
+
+	///<禁止向左转弯
+	kSignTTurnLeftProhibited = 123;
+
+	///<禁止小客车向右转弯
+	kSignTMinibusTurnRightProhibited = 124;
+
+	///<禁止小型客车驶入
+	kSignTMinibusProhibited = 125;
+
+	///<禁止载货汽车驶入
+	kSignTNoTruck = 126;
+
+	///<禁止运输危险物品车辆驶入
+	kSignTNoVehiclesWthDangerousGoods = 127;
+
+	///<禁止直行和向左转弯
+	kSignTGoStraightAndTurnLeftProhibited = 128;
+
+	///<限制质量
+	kSignTLimitWeight = 129;
+
+	///<限制轴重
+	kSignTLimitedAxleLoad = 130;
+
+	///<海关
+	kSignTCustoms = 131;
+
+	///<停车检查
+	kSignTParkingInspection = 132;
+
+	///<禁止停车
+	kSignTParkingProhibited = 133;
+
+	///<禁止长时停车
+	kSignTLongTimeParkingProhibited = 134;
+
+	///<最高限制速度
+	kSignTMaxSpeedLimit = 135;
+
+	///<解除限制速度
+	kSignTEndOfSpeedLimit = 136;
+
+	///<限制高度
+	kSignTLimitHeight = 137;
+
+	///<限制宽度
+	kSignTLimitWidth = 138;
+
+	///<停车让行
+	kSignTStopAtIntersection = 139;
+
+	///<减速让行
+	kSignTSlowDownAndGiveWay = 140;
+
+	///<禁止通行
+	kSignTStop = 141;
+
+	///<会车让行
+	kSignTGiveWay = 142;
+
+	///<禁止驶入
+	kSignTNoEntrance = 143;
+
+	///<解除禁止超车
+	kSignTEndOfProhibitionOnOvertaking = 144;
+
+	///<禁止电动自行车进入
+	kSignTNoElectricBicycles = 145;
+
+	///<禁止小客车向左转弯
+    kSignTNoCarTurningLeft = 146;
+
+	///<禁止载货汽车右转
+    kSignTNoTruckTurningRight = 147;
+
+	///<口岸停车检查
+    kSignTPortParkingInspection = 148;
+
+	///<区域禁止车辆长时停放
+    kSignTNoParkingLong = 149;
+
+	///<区域禁止车辆长时停放解除
+    kSignTEndOfNoParkingLong = 150;
+
+	///<区域禁止车辆停放
+    kSignTNoParking = 151;
+
+	///<区域禁止车辆停放解除
+    kSignEndOfNoParking = 152;
+
+	///<区域限制速度
+    kSignTRegionalSpeedLimit = 153;
+
+	///<区域限制速度解除
+    kSignTEndOfRegionalSpeedLimit = 154;
+
+	///<步行
+	kSignTWalk = 201;
+
+	///<非机动车行驶
+	kSignTNonMotorVehicleDriving = 202;
+
+	///<环岛行驶
+	kSignTRoundaboutDriving = 203;
+
+	///<机动车行驶
+	kSignTVehicleDriving = 204;
+
+	///<靠右侧道路行驶
+	kSignTDriveOnTheRightSide = 205;
+
+	///<靠左侧道路行驶
+	kSignTDriveOnTheLeftSide = 206;
+
+	///<立体交叉直行和右转弯行驶
+	kSignTGradeSeparationStraightAndRightTurn = 207;
+
+	///<立体交叉直行和左转弯行驶
+	kSignTGradeSeparationStraightAndLeftTurn = 208;
+
+	///<鸣喇叭
+	kSignTHonking = 209;
+
+	///<向右转弯
+	kSignTPassRightSide = 210;
+
+	///<向左和向右转弯
+	kSignTPassLeftOrRightSide = 211;
+
+	///<向左转弯
+	kSignTPassLeftSide = 212;
+
+	///<直行
+	kSignTGoStraight = 213;
+
+	///<直行和向右转弯
+	kSignTGoStraightAndTurnRight = 214;
+
+	///<直行和向左转弯
+	kSignTGoStraightAndTurnLeft = 215;
+
+	///<单行路向左
+	kSignTDirectionToTheLeft = 216;
+
+	///<单行路向右
+	kSignTDirectionToTheRight = 217;
+
+	///<路口优先通行
+	kSignTPriorityRoad = 218;
+
+	///<会车先行
+	kSignTMeetingFirst = 219;
+
+	///<右转车道
+	kSignTRightTurnLane = 220;
+
+	///<左转车道
+	kSignTLeftTurnLane = 221;
+
+	///<直行车道
+	kSignTStraightLane = 222;
+
+	///<直行和右转合用车道
+	kSignTThroughAndRightTurnSharedLane = 223;
+
+	///<直行和左转合用车道
+	kSignTThroughAndLeftTurnSharedLane = 224;
+
+	///<掉头车道
+	kSignTUTurnLane = 225;
+
+	///<掉头和左转合用车道
+	kSignTUTurnAndLeftTurnSharedLane = 226;
+
+	///<公交线路专用车道
+	kSignTBusLane = 227;
+
+	///<机动车车道
+	kSignTMotorVehicleLane = 228;
+
+	///<非机动车车道
+	kSignTNonMotorVehicleLane = 229;
+
+	///<快速公交系统专用车道
+	kSignTBRTLane = 230;
+
+	///<多乘员车辆专用车道
+	kSignTMultiOccupantVehiclesLane = 231;
+
+	///<停车位
+	kSignTSlot = 232;
+
+	///<允许掉头
+	kSignTAllowUTurn = 233;
+
+	///<最低限速
+	kSignTMinSpeedLimit = 234;
+
+	///<人行横道
+	kSignTPedestrianCrossing = 235;
+
+	///<开车灯
+	kSignTOpenLights = 236;
+
+	///<组合设置
+    kSignTCombinationSettings = 237;
+
+	///<组合设置1
+    kSignTCombinationSettings1 = 238;
+
+	///<小型客车车道
+    kSignTMinibusLane = 239;
+
+	///<电动自行车行驶标志
+    kSignTRunningSignOfElectricBicycle = 240;
+
+	///<电动自行车车道
+    kSignTElectricBicycleLane = 241;
+
+	///<非机动车与行人分开空间通行
+    kSignTNonMotorAndPedestrianSeparate = 242;
+
+	///<非机动车与行人共享空间通行
+    kSignTNonMotorAndPedestrianShare = 243;
+
+	///<不同的专用车道标志并设
+    kSignTDifferentSpecialLaneSigns = 244;
+
+	///<非机动车推行
+    kSignTNonMotorVehiclePromotion = 245;
+
+	///<靠右侧车道行驶
+    kSignTDriveRight = 246;
+
+	///<有轨电车专用车道
+    kSignTTramLane = 247;
+
+	///<残疾人专用停车位
+    kSignTDisableParking = 248;
+
+	///<校车专用停车位标志、校车停靠站点标志
+    kSignTSchoolBusParking = 249;
+
+	///<出租车专用停车位标志
+    kSignTTaxiParking = 250;
+
+	///<非机动车专用停车位标志
+    kSignTNonMotorVehicleParking = 251;
+
+	///<公交车专用停车位标志
+    kSignTBusParking = 252;
+
+	///<充电停车位标志
+    kSignTChargingParking = 253;
+
+	///<专属停车位标志
+    kSignTExclusiveParking = 254;
+
+	///<硬路肩允许行驶标志
+    kSignTHardShoulderPermission = 255;
+
+	///<货车通行标志
+    kSignTTruckPassage = 256;
+
+	///<限时长停车位标志
+    kSignTTimeLimitedParking = 257;
+
+	///<单行路（直行）
+    kSignTOneStraight = 258;
+
+	///<其它标志牌
+	kSignTOther = 401;
+}
+
+
+/**
+* @brief 车道节点类型
+* @details  abbr:LaneNT
+*/
+enum LaneNodeType
+{
+	///<未知
+	kLaneNTUnknown = 0;
+
+	///<分歧合流起点；仅分流提供
+	kLaneNTStartBifurcation = 1;
+
+	///<分歧合流终点；仅合流提供
+	kLaneNTEndBifurcation = 2;
+
+	///<停车场入口
+	kLaneNTParkingEntrance = 3;
+
+	///<停车场出口
+	kLaneNTParkingExist = 4;
+
+	///<车道边线线形变化点
+	kLaneNTChangeLineShape = 5;
+
+	///<隧道起点
+	kLaneNTStartTunnel = 6;
+
+	///<隧道终点
+	kLaneNTEndTunnel = 7;
+
+	///<图幅切换点；tile分割点
+	kLaneNTChangeTile = 8;
+
+	///<车道截止点
+	kLaneNTEndOfLane = 9;
+
+	///<其他
+	kLaneNTOther = 99;
+}
+
+
+/**
+* @brief 地面标识
+* @details  abbr:GMT
+*/
+enum GroundMarkType
+{
+	///<无效
+	kGMTInvalid = 0;
+
+	///<人行横道
+	kGMTPedestrianCrossing = 1;
+
+	///<停止线
+	kGMTStopLine = 2;
+
+	///<减速带（20230329修改，原赋值TX-4，修改对应赋值为11）
+	kGMTSpeedBump = 3;
+
+	///<地面文字
+	kGMTWord = 4;
+
+	///<停止让行线，横向双白色实线
+	///<感知不支持，后续感知会识别到停止线，众包不区分提供
+	kGMTStopYieldLine = 5;
+
+	///<减速让行线,横向双虚线
+	///<感知不支持，后续感知会识别到停止线，众包不区分提供
+	kGMTDecelerationYieldLine = 6;
+
+	///<地面箭头
+	kGMTArrow = 7;
+
+	///<地面限速
+	kGMTGroundSpeedLimit = 8;
+
+	///<非机动车道标识，感知不支持，众包不提供
+	kGMTNonMotorizedLaneMarking = 9;
+
+	///<停车位，感知不支持，众包不提供
+	kGMTSlot = 10;
+
+	///<防滑坡道标线，众包不提供
+	kGMTAntiskidRampMarkings = 11;
+
+	///<地锁，众包不提供
+	kGMTFloorLock = 12;
+
+	///<限位器，众包不提供
+	kGMTStopper = 13;
+
+	///<行人区域，不提供
+	kGMTPedestrianArea = 14;
+
+	///<其它导流区，众包不提供
+	kGMTDiversionArea = 15;
+
+	///<V字形导流区，20230329新增，众包不提供
+	kGMTDiversionAreaV = 16;
+
+	///<直线导流区，20230329新增，众包不提供
+	kGMTDiversionAreaStraight = 17;
+
+	///<禁停区，20230329新增，众包不提供
+	kGMTNoParkingArea = 18;
+
+	///<其它减速带，20230329新增，众包不提供
+	kGMTNoOtherSpeedBump = 19;
+
+	///<库位0点，定义参考voxel_point，20230718定位增加，地图不输出
+	kGMTSlot0 = 20;
+
+	///<库位1点，定义参考voxel_point，20230718定位增加，地图不输出
+	kGMTSlot1 = 21;
+
+	///<其它面状要素
+	kGMTOther = 99;
+}
+
+/**
+* @brief 地面标识样式
+* @details  abbr:GMP
+*/
+enum GroundMarkPattern
+{
+	///<未知
+	kGMPUnknown = 0;
+
+	///<直行
+	kGMPForward = 1;
+
+	///<右转
+	kGMPRight = 2;
+
+	///<右转+直行
+	kGMPRightAndForward = 3;
+
+	///<左转
+	kGMPLeft = 4;
+
+	///<左转+直行
+	kGMPLeftAndForward = 5;
+
+	///<左转+右转
+	kGMPLeftAndRight = 6;
+
+	///<掉头
+	kGMPUturn = 7;
+
+	///<直行+掉头
+	kGMPForwardAndUturn = 8;
+
+	///<左转+掉头
+	kGMPLeftAndUturn = 9;
+
+	///<左侧汇流
+	kGMPLeftConfluence = 10;
+
+	///<右侧汇流
+	kGMPRightConfluence = 11;
+
+	///<禁止左转
+	kGMPNoLeftTurn = 12;
+
+	///<禁止右转
+	kGMPNoRightTurn = 13;
+
+	///<直行+左转+右转
+	kGMPFwardAndLeftAndRight = 14;
+
+	///<直行+左转+掉头
+	kGMPForwardAndLeftAndUturn = 15;
+
+	///<掉头+右转
+	kGMPTurnRightAndUturn = 16;
+
+	///<禁止掉头
+	kGMPNoUturn = 17;
+
+	///<最高限速样式1，感知不支持，众包不提供
+	kGMPMaximumSpeedLimitStyle1 = 18;
+
+	///<最高限速样式2，感知不支持，众包不提供
+	kGMPMaximumSpeedLimitStyle2 = 19;
+
+	///<最高限速样式3，感知不支持，众包不提供
+	kGMPMaximumSpeedLimitStyle3 = 20;
+
+	///<最底限速样式1，感知不支持，众包不提供
+	kGMPMinimumSpeedLimitStyle1 = 21;
+
+	///<最底限速样式2，感知不支持，众包不提供
+	kGMPMinimumSpeedLimitStyle2 = 22;
+
+	///<掉头+左转+右转，20230329新增
+	kGMPUturnAndLeftAndRight = 23;
+
+	///<其它样式
+	kGMPOther = 99;
+}

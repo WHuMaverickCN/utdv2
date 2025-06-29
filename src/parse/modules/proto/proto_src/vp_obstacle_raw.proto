@@ -1,0 +1,462 @@
+/**
+* @file     vp_obstacle_raw.proto
+* @author  fandongxue
+* @details  ad_base输出数据结构信息
+* @date     2022-07-26
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.26          <th>1.0                 <th>fandongxue 
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto2";
+package VpObstacleRawProto;
+
+import "vp_perception_base.proto";
+
+/**
+*@brief   用于描述车辆感知模型类别
+*@detail  感知类别包括车牌和车轮
+*/
+enum VehPropertyPerceptionType{
+  ///<感知类型为车牌：[/],(0,/,/),[/],(1,0),/
+  Veh_PerceptionType_LicensePlate = 0;
+  
+  ///<感知类型为车轮：[/],(0,/,/),[/],(1,0),/
+  Veh_PerceptionType_Wheel = 1;
+  
+  ///<计数：[/],(0,/,/),[/],(1,0),/
+  Veh_PerceptionType_Cnt = 2;
+}
+
+/**
+*@brief   FeatureMap特征
+*@detail  FeatureMap结果
+*/
+message FeatureMap {
+  ///<FeatureMap数据：[/],(0,/,/),[/],(1,0),/
+  optional bytes data = 1;
+}
+
+/**
+*@brief   2D框相关信息
+*@detail  2D框的描述
+*/
+message OBBox2D {
+  ///<目标框角点：[/],(0,/,/),[/],(1,0),/
+  optional VpPerceptionBaseProto.Point corner = 1;
+  
+  ///<目标框角点：[/],(0,/,/),[/],(1,0),/
+  repeated VpPerceptionBaseProto.Point axes_pts = 2;  // 2 points(plus corner) to describe obb
+  
+  ///<目标框轴线数量：[/],(0,/,/),[/],(1,0),/
+  repeated float size = 3;      // relative "sizes" of axes
+}
+
+/**
+*@brief   感知框的种类
+*@detail  感知框的相关信息
+*/
+message PropertyPerceptionBBox{
+  ///<感知框的种类，整框还是尾框：[/],(0,/,/),[/],(1,0),/
+  optional int32 type = 1;
+  
+  ///<感知框的框：[/],(0,/,/),[/],(1,0),/
+  optional VpPerceptionBaseProto.Rect rect = 2;
+  
+  ///<感知框的置信度：[/],(0,/,/),[/],(1,0),/
+  optional float conf = 3;
+  
+  ///<感知框的分类：[/],(0,/,/),[/],(1,0),/
+  repeated VpPerceptionBaseProto.Category category = 4;
+}
+
+/**
+*@brief   深度信息
+*@detail  深度信息
+*/
+message Depth {
+  ///<深度信息：[/],(0,/,/),[/],(1,0),/
+  optional float depth_value = 1;
+}
+
+/**
+*@brief   关键点的相关信息
+*@detail  关键点坐标种类等信息
+*/
+message KeyPoint {
+  ///<关键点坐标：[/],(0,/,/),[/],(1,0),/
+  optional VpPerceptionBaseProto.Point pt = 1;
+  
+  ///<关键点种类：[/],(0,/,/),[/],(1,0),/
+  optional float type = 2;
+  
+  ///<关键点置信度：[/],(0,/,/),[/],(1,0),/
+  optional float conf = 3;
+}
+
+/**
+*@brief   跟踪特征信息
+*@detail  跟踪目标的特征信息
+*/
+message TrackingFeatureRaw {
+  ///<模型id：[/],(0,/,/),[/],(1,0),/
+  optional int32 model_id = 1;
+  
+  ///<特征信息：[/],(0,/,/),[/],(1,0),/
+  optional bytes data = 2;
+}
+
+/**
+*@brief   道路标记相关信息
+*@detail  路标相关信息
+*/
+message LandMarking {
+  ///<道路标记关键点：[/],(0,/,/),[/],(1,0),/
+  repeated KeyPoint key_points = 1;
+  
+  ///<道路标记图像框：[/],(0,/,/),[/],(1,0),/
+  repeated PropertyPerceptionBBox property_bbox = 2;
+}
+
+/**
+*@brief  变化尺度  
+*@detail  变化尺度
+*/
+message ScaleChange {
+  ///<变化尺度：[/],(0,/,/),[/],(1,0),/
+  repeated float scale = 1;
+}
+
+/**
+*@brief   回归信息
+*@detail  回归信息
+*/
+message OritationRe {
+  ///<名称：[/],(0,/,/),[/],(1,0),/
+  optional string name = 1;
+  
+  ///<置信度：[/],(0,/,/),[/],(1,0),/
+  optional float conf = 2;
+  
+  ///<索引id：[/],(0,/,/),[/],(1,0),/
+  optional int32 id = 3;
+  
+  ///<种类：[/],(0,/,/),[/],(1,0),/
+  optional int32 type = 4;
+  
+  ///<尺度：[/],(0,/,/),[/],(1,0),/
+  optional float re_scale = 5;
+  
+  ///<数值：[/],(0,/,/),[/],(1,0),/
+  optional float value = 6;
+}
+
+/**
+*@brief   位姿信息
+*@detail  来自传感器位姿信息
+*/
+message PoseNetRaw {
+  ///<roll角度：[rad],(0,/,/),[/],(1,0),roll角度
+  optional float roll_raw = 1;
+  
+  ///<roll滤波后角度：[rad],(0,/,/),[/],(1,0),roll滤波后角度
+  optional float roll_filter = 2;
+  
+  ///<pitch角度：[rad],(0,/,/),[/],(1,0),pitch角度
+  optional float pitch_raw = 3;
+  
+  ///<pitch滤波后角度：[rad],(0,/,/),[/],(1,0),pitch滤波后角度
+  optional float pitch_filter = 4;
+  
+  ///<yaw角度：[rad],(0,/,/),[/],(1,0),yaw角度
+  optional float yaw_raw = 5;
+  
+  ///<yaw滤波后角度：[rad],(0,/,/),[/],(1,0),yaw滤波后角度
+  optional float yaw_filter = 6;
+  
+  ///<种类：[/],(0,/,/),[/],(1,0),种类
+  optional int32 type = 7;
+  
+  ///<置信度：[/],(0,/,/),[/],(1,0),置信度
+  optional float conf = 8;
+}
+
+/**
+*@brief   模型检测出目标类别
+*@detail  分类模型检测的目标的种类
+*/
+enum ObstacleRawModelType {
+  ///<汽车：[/],(0,/,/),[/],(1,0),目标框种类为汽车
+  ObstacleRawModel_Car = 0;
+  
+  ///<整车框：[/],(0,/,/),[/],(1,0),目标框种类为整车
+  ObstacleRawModel_FullCar = 1;
+  
+  ///<行人：[/],(0,/,/),[/],(1,0),目标框种类为行人
+  ObstacleRawModel_Ped = 2;
+  
+  ///<人头：[/],(0,/,/),[/],(1,0),目标框种类为人头
+  ObstacleRawModel_Head = 3;
+  
+  ///<车尾：[/],(0,/,/),[/],(1,0),目标框种类为车尾
+  ObstacleRawModel_Rare = 4;
+  
+  ///<交通标志：[/],(0,/,/),[/],(1,0),目标框种类为交通标志
+  ObstacleRawModel_TrafficSign = 5;
+  
+  ///<交通灯：[/],(0,/,/),[/],(1,0),目标框种类为交通灯
+  ObstacleRawModel_TrafficLight = 6;
+  
+  ///<道路：[/],(0,/,/),[/],(1,0),目标框种类为道路
+  ObstacleRawModel_Lane = 7;
+  
+  ///<路标：[/],(0,/,/),[/],(1,0),目标框种类为路标
+  ObstacleRawModel_RoadSign = 10;
+  
+  ///<地面箭头：[/],(0,/,/),[/],(1,0),目标框种类为地面箭头
+  ObstacleRawModel_TrafficArrow = 11;
+  
+  ///<美国标志牌停止让行：[/],(0,/,/),[/],(1,0),美国标志牌停止让行
+  ObstacleRawModel_YieldMark = 12;
+  
+  ///<交通锥：[/],(0,/,/),[/],(1,0),目标框种类为交通锥
+  ObstacleRawModel_TrafficCone = 13;
+  
+  ///<交通桶：[/],(0,/,/),[/],(1,0),目标框种类为交通桶
+  ObstacleRawModel_Barrel = 14;
+  
+  ///<限速牌：[/],(0,/,/),[/],(1,0),目标框种类为限速牌
+  ObstacleRawModel_SpeedMark = 15;
+  
+  ///<骑车人：[/],(0,/,/),[/],(1,0),目标框种类为骑车人
+  ObstacleRawModel_Cyclist = 16;
+  
+  ///<驻车锁：[/],(0,/,/),[/],(1,0),目标框种类为驻车锁
+  ObstacleRawModel_ParkingLock = 17;
+  
+  ///<限速相机：[/],(0,/,/),[/],(1,0),目标框种类为限速相机
+  ObstacleRawModel_SpeedCamera = 18;
+  
+  ///<交通灯泡：[/],(0,/,/),[/],(1,0),目标框种类为交通灯泡
+  ObstacleRawModel_TrafficLightLens = 19;
+  
+  ///<停车位：[/],(0,/,/),[/],(1,0),目标框种类为停车位
+  ObstacleRawModel_ParkingSlot = 22;
+}
+
+/**
+*@brief   关键点任务分类
+*@detail  根据监测点的类型的关键点任务类型
+*/
+enum KeyPointsTaskType {
+  ///<所有关键点任务：[/],(0,/,/),[/],(1,0),检测所有关键点
+  KeyPointsTask_All = 0;
+  
+  ///<2个关键点任务：[/],(0,/,/),[/],(1,0),检测2个关键点
+  KeyPointsTask_2Point = 1;
+  
+  ///<12个关键点任务：[/],(0,/,/),[/],(1,0),检测12个关键点
+  KeyPointsTask_12Point = 2;
+}
+
+/**
+*@brief   关键点检测结果
+*@detail  关键点检测得出的关键点信息
+*/
+message KeyPointsRaw {
+  ///<关键点信息：[/],(0,/,/),[/],(1,0),检测的关键点坐标
+  repeated KeyPoint key_points = 1;
+  ///<关键点任务类型：[/],(0,/,/),[/],(1,0),关键点来自的任务类型
+  optional int32 task_type = 2;
+}
+
+/**
+*@brief   关键点分类信息
+*@detail  关键点的分类信息
+*/
+message KpsClsRaw {
+  ///<关键点id：[/],(0,/,/),[/],(1,0),检测的关键点索引
+  repeated int32 id = 1;
+  
+  ///<关键点置信度：[/],(0,/,/),[/],(1,0),检测的关键点置信度
+  repeated float conf = 2;
+  
+  ///<关键点名字：[/],(0,/,/),[/],(1,0),检测的关键点名字
+  repeated string name = 3;
+  
+  ///<关键点种类：[/],(0,/,/),[/],(1,0),检测的关键点种类
+  optional int32 type = 4;
+}
+
+/**
+*@brief   2pe模型检测结果
+*@detail  global 2pe模型检测关于天气等信息的结果
+*/
+enum Global2peResultType {
+  ///<天气信息：[/],(0,/,/),[/],(1,0),2pe模型的天气信息结果
+  GLOBAL_2PE_RESULT_TYPE_WEATHER = 0;
+  
+  ///<明暗信息：[/],(0,/,/),[/],(1,0),2pe模型的明暗信息结果
+  GLOBAL_2PE_RESULT_TYPE_LIGHT = 1;
+  
+  ///<场景信息：[/],(0,/,/),[/],(1,0),2pe模型的场景信息结果
+  GLOBAL_2PE_RESULT_TYPE_SCENE = 2;
+  
+  ///<时间信息：[/],(0,/,/),[/],(1,0),2pe模型的时间信息结果
+  GLOBAL_2PE_RESULT_TYPE_TIME = 3;
+  
+  ///<消失点信息：[/],(0,/,/),[/],(1,0),2pe模型的消失点信息结果
+  GLOBAL_2PE_RESULT_TYPE_VANISH_POINT = 4;
+  
+  ///<位姿网络信息：[/],(0,/,/),[/],(1,0),2pe模型的位姿信息结果
+  GLOBAL_2PE_RESULT_TYPE_POSENET = 5;
+  
+  ///<障碍物分类信息：[/],(0,/,/),[/],(1,0),2pe模型的障碍物信息结果
+  GLOBAL_2PE_RESULT_TYPE_BLOCKCLS = 6;
+  
+  ///<模糊物分类信息：[/],(0,/,/),[/],(1,0),2pe模型的模糊物信息结果
+  GLOBAL_2PE_RESULT_TYPE_BLURCLS = 7;
+  
+  ///<发光物体分类：[/],(0,/,/),[/],(1,0),/
+  GLOBAL_2PE_RESULT_TYPE_GLARECLS = 8;
+  
+  ///<根据深度的pitch和roll：[/],(0,/,/),[/],(1,0),/
+  GLOBAL_2PE_RESULT_TYPE_PR_FROM_DEPTH = 9;
+}
+
+/**
+*@brief   2pe模型检测结果roll和pitch信息
+*@detail  global 2pe模型检测结果的roll和pitch信息
+*/
+message PRFromGround {
+  ///<roll信息：[rat],(0,/,/),[/],(1,0),2pe模型检测结果的roll信息
+  optional float roll = 1;
+  
+  ///<pitch信息：[rat],(0,/,/),[/],(1,0),2pe模型检测结果的pitch信息
+  optional float pitch = 2;
+  
+  ///<种类信息：[/],(0,/,/),[/],(1,0),2pe模型的种类
+  optional Global2peResultType type = 3;
+}
+
+/**
+*@brief   单个目标检测结果
+*@detail  一个目标的检测结果的信息，包括检测框等
+*/
+message ObstacleRaw {
+  ///<感知框信息：[/],(0,/,/),[/],(1,0),感知框信息包括左上，右下点等
+  optional VpPerceptionBaseProto.Rect rect = 1;
+  
+  ///<感知框置信度：[/],(0,/,/),[/],(1,0),感知框置信度
+  optional float conf = 2;
+  
+  ///<模型：[/],(0,/,/),[/],(1,0),感知框来自哪个模型
+  optional int32 model = 3;
+  
+  ///<来源：[/],(0,/,/),[/],(1,0),感知框来源
+  optional int32 source = 4;
+  
+  ///<feature map：[/],(0,/,/),[/],(1,0),感知框的feature map
+  repeated FeatureMap fmap = 5;
+  
+  ///<感知框的属性：[/],(0,/,/),[/],(1,0),目标的属性信息（卡车，小汽车）
+  repeated int32 property = 6;
+  
+  ///<感知框的属性名称：[/],(0,/,/),[/],(1,0),目标的属性名称
+  repeated string property_name = 7;
+  
+  ///<感知框的属性类别：[/],(0,/,/),[/],(1,0),目标的属性类别
+  repeated int32 property_type = 8;
+  
+  ///<感知框的属性置信度：[/],(0,/,/),[/],(1,0),目标为某种属性的置信度
+  repeated float property_conf = 9;
+  
+  ///<感知框的2D框信息：[/],(0,/,/),[/],(1,0),目标的2D框信息
+  optional OBBox2D obb = 10;
+  
+  ///<感知框的感知信息：[/],(0,/,/),[/],(1,0),感知框的感知信息（如是否有框等）
+  repeated PropertyPerceptionBBox property_bbox = 11;
+  
+  ///<关键点信息：[/],(0,/,/),[/],(1,0),关键点信息，详见KeyPoint类
+  repeated KeyPoint key_points = 12;
+  
+  ///<深度信息：[/],(0,/,/),[/],(1,0),深度信息
+  optional Depth depth = 13;
+  
+  ///<跟踪feturemap：[/],(0,/,/),[/],(1,0),跟踪feturemap
+  repeated TrackingFeatureRaw tracking_feature = 14;
+  
+  ///<道路标志物信息：[/],(0,/,/),[/],(1,0),道路标志物的相关信息详见类LandMarking
+  repeated LandMarking landmarking = 15;
+  
+  ///<改变比率：[/],(0,/,/),[/],(1,0),改变比率
+  repeated ScaleChange scale_change = 16;
+  
+  ///<回退版本：[/],(0,/,/),[/],(1,0),回退版本
+  repeated OritationRe ori_regression = 17;
+  
+  ///<输入的感兴趣区域：[/],(0,/,/),[/],(1,0),感兴趣区域输入信息
+  optional VpPerceptionBaseProto.Rect input_roi = 18;
+  
+  ///<扩大倍数：[/],(0,/,/),[/],(1,0),
+  optional int32 expand = 19;
+  
+  ///<原始关键点信息：[/],(0,/,/),[/],(1,0),检测的关键点信息
+  repeated KeyPointsRaw key_points_raw = 20;
+  
+  ///<原始关键点信息：[/],(0,/,/),[/],(1,0),检测的关键点信息
+  repeated KpsClsRaw kps_cls_raw = 21;
+  
+  ///<遮挡信息：[/],(0,/,/),[/],(1,0),目标遮挡信息
+  repeated VpPerceptionBaseProto.Category category = 22;
+}
+
+/**
+*@brief   每一帧的检测结果
+*@detail  感知结果，每一帧的信息
+*/
+message ObstacleRaws {
+  ///<感知模型头：[/],(0,/,/),[/],(1,0),感知模型的头
+  optional VpPerceptionBaseProto.Header header = 20;
+  
+  ///<摄像头id：[/],(0,/,/),[/],(1,0),摄像头id
+  optional int32 cam_id = 1;
+  
+  ///<每一个目标的感知信息：[/],(0,/,/),[/],(1,0),详见ObstacleRaw类
+  repeated ObstacleRaw obstacle = 2;
+  
+  ///<置信度比例因子：[/],(0,/,/),[/],(1,0),置信度比例因子
+  optional float conf_scale = 3;  // confidence value scale factor
+  
+  ///<位姿网络信息：[/],(0,/,/),[/],(1,0),详见PoseNetRaw
+  repeated PoseNetRaw pose_net = 4;
+  
+  ///<方向信息：[/],(0,/,/),[/],(1,0),方向信息
+  repeated OritationRe ori_regression = 5;
+  
+  ///<分类信息：[/],(0,/,/),[/],(1,0),模型分类信息
+  repeated VpPerceptionBaseProto.Category category = 6;
+  
+  ///<时间戳：[/],(0,/,/),[/],(1,0),时间戳信息
+  optional int32 time_stamp = 7;
+  
+  ///<帧id：[/],(0,/,/),[/],(1,0),帧id
+  optional int32 frame_id = 8;
+  
+  ///<相对地面的pitch和roll：[/],(0,/,/),[/],(1,0),相对地面的pitch和roll
+  repeated PRFromGround pr_from_grounds = 9;
+}
+
+// [END messages]

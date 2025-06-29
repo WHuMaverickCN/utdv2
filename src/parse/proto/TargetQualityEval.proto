@@ -1,0 +1,86 @@
+enum ObjectType{
+     OBJECT_NO_USE = 0;//不用
+     ROAD_SURFACE_LINE=1;//路面的标线
+     ROAD_SURFACE_ARROW=2;//路面的箭头
+     ROAD_SURFACE_MARK=3;//路上的标志
+     ROAD_SIGN=4;//路上的标牌
+     ROAD_TRAFFIC_LIGHT=5;//路上的信号灯
+     ROAD_BOUNDARY=6;//路边的条带
+     ROAD_POLE=7;//路边的杆子
+     ROAD_OVERHEAD=10;//路顶的高架设施
+     VISUAL_DRIVABLE_BOUNDARY=11;//视觉可行驶边界
+     ROAD_POINT=12;//路面的特征点
+     OBJECT_UNKNOWN=1000;//未知
+}
+
+enum RoadLineType{
+     LINE_NO_USE = 0;//不用
+     VIRTUAL_WIRE=1;//虚拟线
+     THIN_DASHED_LINE_SEGMENT=2;//细虚线段
+     THICK_DASHED_LINE_SEGMENT=3;//粗虚线段
+     SINGLE_DASHED_LINE=4;//单虚线
+     SINGLE_SOLID_LINE=5;//单实线
+     DOUBLE_DASHED_LINE=6;//双虚线
+     DOUBLE_SOLID_LINE=7;//双实线
+     LEFT_SOLID_RIGHT_DASHED_LINE=8;//左实右虚线
+     RIGHT_SOLID_LEFT_DASHED_LINE=9;//右实左虚线
+     LAY_EDGE_LINE=10;//铺设边缘线
+     STOP_LINE=101;//停止线
+     PEDESTRIAN_CROSSING_LINE=102;//人行横道（斑马线）
+     DECELERATE_BUMP=103;//减速带
+     DECELERATE_YIELD_LINE=104;//减速让行线
+     STOP_YIELD_LINE=105;//停车让行线
+     DISTANCE_CONFIRMATION_LINE=106;//车距确认标线
+     DIVERSION_LINE=107;//导流线
+     CENTRAL_CIRCLE=108;//中心圈
+     RETICULATED_LINE=109;//网状线
+     PROHIBIT_U_TURN_SIGN=110;//禁止掉头标记
+     PROHIBIT_TURN_SIGN=111;//禁止转弯标记
+     DECELERATE_MOUND_LINE=112;//减速丘标线
+     DECELERATE_RETICLE=113;//减速标线
+     PARKING_SPACE_LINE=114;//停车位标线
+     ROAD_SURFACE_TERRAIN_LINE=401;//路面地形线
+     DRIVABLE_AREA=402;//可行驶区域面
+     PEDESTRIAN_AREA=403;//人行区域面，辅路面
+     WARNING_AREA=404;//警示区域
+     LINE_UNKNOWN=1000;//未分类
+}
+
+enum BoundaryType{
+     BOUNDARY_TYPE_NO_USE = 0;//不用
+     CURB=1;//路缘石
+     GUARDRAIL=2;//护栏
+     WALL=3;//墙体
+     GEOGRAPHICAL_BOUNDARTES=4;//地理边界
+     GREENBELTS=5;//绿化带
+     OTHER_HARD_ISOLATION=6;//其它硬隔离
+     PARKING_POST=7;//停车场柱子
+     BOUNDARY_TYPE_UNKNOWN=1000;//未分类
+}
+
+enum ArrowType{
+     ARROW_NO_USE=0;//不使用
+     AHEAD=1;//直行
+     LEFT=2;//左转
+     RIGHT=3;//右转
+     AHEAD_LEFT=4;//直行+左转
+     AHEAD_RIGHT=5;//直行+右转
+     LEFT_RIGHT=6;//左转+右转
+     LEFT_FRONT=7;//左前方
+     RIGHT_FRONT=8;//右前方
+     AHEAD_U_TURN=9;//直行+掉头
+     LEFT_U_TURN=10;//左转+掉头
+     LEFTU_TURN_=11;//左掉头
+     RIGHTU_TURN=12;//右掉头
+     PROHIBIT_LEFT=13;//禁止左转
+     PROHIBIT_RIGHT=14;//禁止右转
+     PROHIBIT_U_TURN=15;//禁止调头
+     PROHIBIT_LEFT_RIGHT=16;//禁止左转和右转
+     PROHIBIT_LEFT_U_TURN=17;//禁止左转和调头
+     PROHIBIT_RIGHT_U_TURN=18;//禁止右 = 22;//右合流转和调头
+     LEFT_AHEAD_RIGHT=19;//左转+直行+右转
+     LEFT_RIGHT_U_TURN=20;//左转+右转+调头
+     LEFT_MERGE = 21;//左合流
+     RIGHT_MERGE = 22;//右合流
+     ARROW_UNKNOWN=1000;//未分类
+}

@@ -1,0 +1,115 @@
+/**
+* @file     encode_srv.proto
+* @author   xinchao
+* @details  
+* @date     2022-03-09
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.9          <th>1.0                 <th>kuxiaoyong
+* <tr><th>2022.8.1          <th>2.0                 <th>luliang
+* <tr><th>2022.9.11         <th>3.0                 <th>luliang
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	EncodeSrv;
+
+/**
+* @brief encode信号
+* @detail xxxxxxxx
+*/
+message EncodeH265{ 
+    ///<摄像头ID:[/],(/,/,/),[/],(1,0),摄像头ID
+    uint32 camid = 1;
+
+    ///<H265数据帧序号:[/],(/,/,/),[/],(1,0),帧ID
+    int64 frame_id = 2;
+
+    ///<H265数据帧大小:[/],(/,/,/),[/],(1,0),摄像头ID
+    uint32 frame_size = 3;
+
+    ///<framedata:[/],(/,/,/),[/],(1,0),framedata
+    bytes frame_data = 4;
+
+    ///<H265编码类型:[/],(/,/,/),[/],(1,0),H265编码类型
+    uint32 encodetype = 5;
+
+    ///<H265编码宽度:[/],(1920,1920,3940),[/],(1,0),H265编码宽度
+    uint32 encode_width = 6;
+
+    ///<H265编码高度:[/],(1080,1080,2160),[/],(1,0),H265编码高度
+    uint32 encode_height = 7;
+
+    ///<H265编码帧率:[/],(/,/,/),[/],(1,0),H265编码帧率
+    uint32 frame_ratenum = 8;
+
+    ///<摄像头帧时间戳:[/],(/,/,/),[/],(1,0),摄像头帧时间戳
+    uint64 timestamp = 9;
+}
+
+/**
+* @brief 诊断信息
+* @detail 包含时间戳，故障类型等信息
+*/
+message EncodeDiagnosis
+{
+///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+double time_stamp = 1;
+///<诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息 使用 32 个 bit 编码，0000 0010 0000 0010 0000 0000 0000 0000
+///<bit 0: 无错误
+///<bit 1: 初始化摄像头客户端失败，返回对应的retcode在diagnosis_info中输出
+///<bit 2: 创建编码器失败，返回对应的retcode在diagnosis_info中输出
+///<bit 3: 创建解码器失败，返回对应的retcode在diagnosis_info中输出
+///<bit 4: 获取帧数据失败，返回对应的retcode在diagnosis_info中输出
+///<bit 5: 摄像头获取数据无效，返回对应的retcode在diagnosis_info中输出
+///<bit 6: 编码器FeedData失败，返回对应的retcode在diagnosis_info中输出
+///<bit 7: 编码器GetData失败，返回对应的retcode在diagnosis_info中输出
+///<bit 8: 解码器FeedData失败，返回对应的retcode在diagnosis_info中输出
+///<bit 9: 解码器GetData失败，返回对应的retcode在diagnosis_info中输出
+///<bit ...:
+///<bit 31:
+uint32 diagnosis_code = 2;
+///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+string diagnosis_info = 3;
+
+///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+uint32 heartbeart = 4;
+}
+
+/**
+* @brief Jpeg帧数据
+* @detail Jpeg帧数据信息
+*/
+message EncodeJpeg
+{
+    ///<摄像头ID:[/],(/,/,/),[/],(1,0),摄像头ID
+    uint32 camid = 1;
+
+    ///<H265数据帧序号:[/],(/,/,/),[/],(1,0),帧ID
+    int64 frameid = 2;
+
+    ///<摄像头帧时间戳:[/],(/,/,/),[/],(1,0),摄像头帧时间戳
+    uint64 timestamp = 3;
+
+    ///<数据帧宽度:[/],(/,/,/),[/],(1,0),数据帧宽度
+    uint32 width = 4;
+
+    ///<数据帧长度:[/],(/,/,/),[/],(1,0),数据帧长度
+    uint32 height = 5;
+
+    ///<数据帧大小:[/],(/,/,/),[/],(1,0),数据帧大小
+    uint32 size = 6;
+
+    ///<framedata:[/],(/,/,/),[/],(1,0),framedata
+    bytes data = 7;
+}

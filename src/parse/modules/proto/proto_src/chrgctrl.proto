@@ -1,0 +1,111 @@
+
+syntax="proto3"; 
+package	ChrgCtrlProto;
+/**
+* @brief chrgctrl
+* @detail ChrgCtrl
+*/
+message ChrgCtrl{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///<充电提示信息:[/],(/,/,/),[/],(/,/),
+    ChrgTipInfo  chrg_tip_info = 2;
+
+    ///<充电机输入输出信息:[/],(/,/,/),[/],(/,/),
+    ObcChrgInpOutp  obc_chrg_inp_outp = 3;
+
+    ///<充电控制状态:[/],(/,/,/),[/],(/,/),
+    ChrgCtrlSts  chrg_ctrl_sts = 4;
+
+}
+
+/**
+* @brief chrgctrl
+* @detail ChrgTipInfo
+*/
+message ChrgTipInfo{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///<显示剩余充电时间:[min],(0,0,8191),[/],(1,0),显示剩余充电时间
+    uint32 bcu_chrg_ti_disp = 2;
+
+    ///<预约充电剩余时间:[min],(0,0,8191),[/],(1,0),预约充电剩余时间
+    uint32 bcu_chrg_ti_pred = 3;
+
+    ///<交流充电文字提示:[/],(0,0,/),[/],(1,0),0x0:无请求 0x1:充电停止 0x2:电网波动，充电时间延长 0x3:充电完成
+    uint32 bcu_text_disp_req = 4;
+
+    ///<直流充电提示信息:[/],(0,0,/),[/],(1,0),0x0:无请求 0x1:充电停止 0x2:充电完成 0x3:充电桩能力受限，充电时间延长 0x4:充电桩异常，请换桩充电
+    uint32 bcu_dc_text_disp_req = 5;
+
+    ///<充电提示信息:[/],(0,0,/),[/],(1,0),充电提示信息
+    uint32 vcu_chrg_text_disp = 6;
+    
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+}
+
+/**
+* @brief chrgctrl
+* @detail ObcChrgInpOutp
+*/
+message ObcChrgInpOutp{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///<充电机交流L1端实时输入电压:[V],(0,0,551),[/],(1,0),description
+    uint32 obc_chrg_inp_ac_u_l1 = 2;
+
+    ///<充电机交流L2端实时输入电压:[V],(0,0,551),[/],(1,0),description
+    uint32 obc_chrg_inp_ac_u_l2 = 3;
+
+    ///<充电机交流L3端实时输入电压:[V],(0,0,551),[/],(1,0),description
+    uint32 obc_chrg_inp_ac_u_l3 = 4;
+
+    ///<充电机交流L1端实时输入电流:[A],(0,0,102.3),[/],(0.1,0),description
+    uint32 obc_chrg_inp_ac_i_l1 = 5;
+
+    ///<充电机交流L2端实时输入电流:[A],(0,0,102.3),[/],(0.1,0),description
+    uint32 obc_chrg_inp_ac_i_l2 = 6;
+
+    ///<充电机交流L3端实时输入电流:[A],(0,0,102.3),[/],(0.1,0),description
+    uint32 obc_chrg_inp_ac_i_l3 = 7;
+
+    ///<充电机实时充电电流:[A],(0,0,102.3),[/],(0.1,0),description
+    uint32 obc_chrg_dc_i = 8;
+
+    ///<充电机实时充电电压:[V],(0,0,1638.3),[/],(0.1,0),description
+    uint32 obc_chrg_dc_u = 9;
+    
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 10;
+}
+
+/**
+* @brief chrgctrl
+* @detail ChrgCtrlSts
+*/
+message ChrgCtrlSts{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///<充电状态指示灯:[/],(default,min,max),[/],(1,0),description
+    uint32 vcu_chrg_sts_lamp = 2;
+
+    ///<充电状态:[/],(default,min,max),[/],(1,0),0x1:ParkingCharge 0x2:TravelCharge 0x3：NotCharge 0x4:ChargeComplete
+    uint32 vcu_veh_chrg_sts_gb = 3;
+
+    ///<电池充电模式:[/],(default,min,max),[/],(1,0),0x0:无充电模式 0x1:10A家用交流充电模式 0x2:10A缆上控制盒充电模式 0x3:16A交流充电桩/缆上控制盒充电模式 0x4:32A交流充电桩模式 0x5:63A交流充电桩模式 0x6:直流充电模式 0x7:交流/直流模式冲突 0x8:交流充电枪半连接状态 0x9:交流充电模式异常 0xA:直流充电模式异常
+    uint32 bcu_chrg_mod = 4;
+
+    ///<电池充电状态:[/],(default,min,max),[/],(1,0),0x0:uncharged 0x1:charging 0x2:fullofcharge 0x3:chargeend
+    uint32 bcu_chrg_sts = 5;
+
+    ///<充电机交流充电模式:[/],(default,min,max),[/],(1,0),description
+    uint32 obc_ac_chrg_mod = 6;
+    
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+}

@@ -1,0 +1,1475 @@
+﻿/**
+* @file     vp.camera.proto
+* @author   vp
+* @details  视觉感知消息输出接口
+* @date     2022-11-03
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.11.3        <th>6.1                 <th>vp 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package VpCameraProto;
+
+import "vp.common.proto";
+import "vp_image.proto";
+import "vp_parsing_setting.proto";
+import "vp_line_v2.proto";
+import "vp_perception_base.proto";
+import "vp_ndm_base_v2.proto";
+import "vp_odometry_fc.proto";
+import "seq_header.proto";
+import "vp_obstacle_raw.proto";
+import "vp_obstacle.proto";
+import "vp_scan_point.proto";
+import "vp_real3d_fc.proto";
+
+/**
+* @brief 环视摄像头目标
+* @detail 环视摄像头输出的感知OD目标信息，用于路沿&墙体
+*/
+message CamObjectOther
+{
+    ///< 目标时间戳：[s],(/,/,/),[/],(1,0),标识目标时间戳
+    double time_stamp = 1;
+
+    ///< 目标跟踪ID：[/],(0,-1,10000),[/],(1,0),标识目标跟踪ID  @Motovis support
+    int32 track_id = 2;
+
+    ///< 目标类别：[/],(/,/,/),[/],(1,0),标识目标类别
+    VpCommonProto.ObjectClass classification = 3;
+
+    ///< 目标类别置信度：[/], (0,0,100),[/],(1,0),标识目标类别置信度
+    double class_confidence = 4;
+
+    ///< 目标跟踪周期：[/],(0,0,254),[/],(1,0),标识目标跟踪周期
+    int32 track_age = 5;
+
+        ///< 目标纵向距离起点：[/],(/,/,/),[/],(1,0),标识目标纵向起点距离
+    double longitudinal_start_distance = 6;
+
+    ///< 目标横向距离起点：[/],(/,/,/),[/],(1,0),标识目标横向起点距离
+    double lateral_start_distance = 7;
+
+    ///< 目标纵向距离终点：[/],(/,/,/),[/],(1,0),标识目标纵向终点距离
+    double longitudinal_end_distance = 8;
+
+    ///< 目标横向距离终点：[/],(/,/,/),[/],(1,0),标识目标横向终点距离
+    double lateral_end_distance = 9;
+
+    ///< 目标运动状态：[/],(/,/,/),[/],(1,0),标识目标运动状态，固定静态
+    VpCommonProto.ObjectMotionState obj_motion_type = 10;
+}
+
+/**
+* @brief 摄像头目标
+* @detail 摄像头输出的感知目标信息
+*/
+message CamObject
+{
+    ///< 目标时间戳：[s],(/,/,/),[/],(1,0),标识目标时间戳
+    double time_stamp = 1;
+
+    ///< 目标跟踪ID：[/],(0,-1,10000),[/],(1,0),标识目标跟踪ID  @Motovis support
+    int32 track_id = 2;
+
+    ///< 目标类别：[/],(/,/,/),[/],(1,0),标识目标类别
+    VpCommonProto.ObjectClass classfication = 3;
+
+    ///< 目标类别置信度：[/], (0,0,100),[/],(1,0),标识目标类别置信度
+    double class_confidence = 4;
+
+    ///< 目标跟踪周期：[/],(0,0,254),[/],(1,0),标识目标跟踪周期
+    int32 track_age = 5;
+
+    ///< 纵向相对加速度：[m/s^2],(0,-16,16),[/],(1,0),标识目标纵向相对加速度
+    double longitudinal_relative_acceleration = 6;
+
+    ///< 横向相对加速度：[m/s^2],(0,-16,16),[/],(1,0),标识目标横向相对加速度
+    double lateral_relative_acceleration = 7;
+
+    ///< 纵向相对速度：[m/s],(0,-154,50),[/],(1,0),标识目标纵向相对速度 @Motovis support
+    double longitudinal_relative_velocity = 8;
+
+    ///< 纵向速度方差：[(m/s)^2],(0,-128,127.9375),[/],(1,0),标识纵向速度方差
+    double longitudinal_velocity_var = 9;
+
+    ///< 横向相对速度：[m/s],(0,-50,50),[/],(1,0),标识目标横向相对速度 @Motovis support
+    double lateral_relative_velocity = 10;
+
+    ///< 横向速度方差：[(m/s)^2],(0,-64,63.875),[/],(1,0),标识横向速度方差
+    double lateral_velocity_var = 11;
+
+    ///< 纵向距离：[m],(0,0,204.7),[/],(1,0),标识目标纵向距离 @Motovis support
+    double longitudinal_distance = 12;
+
+    ///< 纵向距离方差：[m^2],(0,0,50),[/],(1,0),标识纵向距离方差
+    double longitudinal_distance_var = 13;
+
+    ///< 横向距离：[m],(0,-80,80),[/],(1,0),标识目标横向距离 @Motovis support
+    double lateral_distance = 14;
+
+    ///< 横向距离方差：[m^2],(0,0,20),[/],(1,0),标识横向距离方差
+    double lateral_distance_var = 15;
+
+    ///< 目标存在置信度：[/], (0,0,100),[/],(1,0),标识目标存在置信度
+    double exit_confidence = 16;
+
+    ///< 航向角：[rad], (0,-1.57,1.57),[/],(1,0),标识目标航向角
+    double heading_angle = 17;
+
+    ///< 身体朝向：[/],(/,/,/),[/],(1,0),标识骑车人或行人的行人身体朝向(肩膀方向）
+    VpCommonProto.HeadOrientation orientation = 18;
+
+    ///< 目标高度：[m], (0,0,5.11),[/],(1,0),标识目标高度
+    double height = 19;
+
+    ///< 目标长度：[m], (0,0,25.5),[/],(1,0),标识目标长度
+    double length = 20;
+
+    ///< 目标宽度：[m], (0,0,12),[/],(1,0),标识目标宽度
+    double width = 21;
+
+    ///< 目标运动状态：[/],(/,/,/),[/],(1,0),标识目标运动状态
+    VpCommonProto.ObjectMotionState obj_motion_type = 22;
+
+    ///< 目标刹车灯状态：[/],(/,/,/),[/],(1,0),标识目标刹车灯状态
+    VpCommonProto.BrakeLight  brake_light_info = 23;
+
+    ///< 转向灯：[/],(/,/,/),[/],(1,0),标识目标转向灯
+    VpCommonProto.TurnSignal obj_turn_signal = 24;
+
+    ///< 目标所在车道：[/],(/,/,/),[/],(1,0),标识目标所在车道
+    VpCommonProto.ObjectLaneAssignment obj_lane_assignment = 25;
+
+    ///< 目标参考点类型：[/],(/,/,/),[4],(1,0),标识目标参考点类型
+    VpCommonProto.ReferencePointType refer_points_type = 26;
+
+    ///< 目标切入状态：[/],(/,/,/),[/],(1,0),标识目标切入状态
+    VpCommonProto.CutInFlag cut_in_flag = 27;
+
+    ///< 目标cutin角点纵向距离：[/],(/,/,/),[/],(1,0),标识目标X_cutin角点纵向距离
+    double x_corner_point = 28;
+
+    ///< 目标cutin角点横向距离：[/],(/,/,/),[/],(1,0),标识目标Y_cutin角点纵向距离
+    double y_corner_point = 29;
+
+    ///< 目标跨线状态：[/],(/,/,/),[/],(1,0),标识目标跨线状态
+    VpCommonProto.CrossLaneFlag cross_lane_flag = 30;
+
+    ///< 目标跨线压线量：[m],(/,/,/),[/],(1,0),标识目标跨线压线量
+    double dist_in_line = 31;
+
+    ///< 目标CIPV标志：[/],(/,/,/),[/],(1,0),标识目标CIPV标志
+    VpCommonProto.CIPVFlag cipv_flag = 32;
+
+    ///< 目标Y图像2d框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识目标Y图像2d框左上点坐标值,默认全车框，没有填充0
+    VpCommonProto.PixelPoint left_top = 33;
+
+    ///< 目标Y图像2d框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识目标Y图像2d框右下点的坐标值,默认全车框，没有填充0
+    VpCommonProto.PixelPoint right_down = 34;
+
+    ///< 车辆目标的有效性bitmap方式：[/],(/,/,/),[/],(1,0),具体含义参照 vp.common.proto中的Output_info
+    int32  output_info = 35;
+
+    ///< 车辆目标遮挡属性: [/],(/,/,/),[/],(1,0),具体含义参照 vp.common.proto中的cover_level
+    int32 cover_level = 36;
+    
+    ///<目标实际来源相机id：[/],(0,/,/),[/],(1,0),目标实际来源相机
+    int32 cam_source = 37;
+
+    ///<目标车运动类别: [/],(0,/,/),[/],(1,0),  目标车运动类别
+    VpCommonProto.ObjectMotionCategoty motion_category = 38;
+    
+    ///< 目标Y图像2d框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识目标Y图像2d框左上点坐标值,车头或车尾框,没有填充0
+    VpCommonProto.PixelPoint front_left_top = 39;
+
+    ///< 目标Y图像2d框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识目标Y图像2d框右下点的坐标值,车头或车尾框,没有填充0
+    VpCommonProto.PixelPoint front_right_down = 40;
+    
+    ///< 车头或车尾框：[/],(/,/,/),[/],(1,0),标识目标车头或车尾框,0没有，1车头，2车尾
+    int32 front_image_box_type = 41;
+
+    ///< 长焦横向距离：[m],(0,-80,80),[/],(1,0),标识目标长焦数据计算得到的横向距离
+    double lateral_distance_long = 42;
+
+    ///< 长焦纵向距离：[m],(0,0,204.7),[/],(1,0),标识目标长焦数据计算得到的纵向距离
+    double longitudinal_distance_long = 43;
+
+    ///< 长焦横向相对速度：[m/s],(0,-50,50),[/],(1,0),标识目标长焦数据计算得到的横向相对速度
+    double lateral_relative_velocity_long = 44;
+
+    ///< 长焦纵向相对速度：[m/s],(0,-154,50),[/],(1,0),标识目标长焦数据计算得到的纵向相对速度
+    double longitudinal_relative_velocity_long = 45;
+
+    ///< 短焦横向距离：[m],(0,-80,80),[/],(1,0),标识目标短焦数据计算得到的横向距离
+    double lateral_distance_short = 46;
+
+    ///< 短焦纵向距离：[m],(0,0,204.7),[/],(1,0),标识目标短焦数据计算得到的纵向距离
+    double longitudinal_distance_short = 47;
+
+    ///< 短焦横向相对速度：[m/s],(0,-50,50),[/],(1,0),标识目标短焦数据计算得到的横向相对速度
+    double lateral_relative_velocity_short = 48;
+
+    ///< 短焦纵向相对速度：[m/s],(0,-154,50),[/],(1,0),标识目标短焦数据计算得到的纵向相对速度
+    double longitudinal_relative_velocity_short = 49;
+
+    ///< 是否为初始截断的标志位: [/],(/，/,/),[/],(/,/), 初始截断的标志位
+    VpCommonProto.InitCutFlag init_flag = 50;
+
+    ///< 目标侵入车道的百分比: [/],(/，/,/),[/],(/,/), 目标侵入车道的百分比 0-100
+    int32 obj_cutin_percent = 51;
+
+    ///< 目标的AEB属性: [/],(/，/,/),[/],(/,/), 目标的AEB属性
+    repeated VpCommonProto.ObjectAEBProperty obj_aeb_prop = 52;
+    
+    ///< ObjectUpdate：[/],(/，/,/),[/],(/,/), 标识目标更新状态（是否使用DR推算-四门两盖后视镜异常状态） @Motovis support
+    ObjectUpdate object_update = 53;
+
+    ///< 环视OD的速度协方差：[/],(/，/,/),[/],(/,/), 标识环视目标速度的协方差 @Motovis support
+    float object_velocity_covariance = 54;  
+
+    ///< 减速带，柱子，人行横道端点1距自车的距离：[/],(/，/,/),[/],(/,/),  @Motovis support
+    VpCommonProto.Point2DPosition d1 = 55; 
+
+    ///< 减速带，柱子，人行横道端点2距自车的距离：[/],(/，/,/),[/],(/,/),  @Motovis support
+    VpCommonProto.Point2DPosition d2 = 56;
+    
+    ///< 柱子，人行横道端点3距自车的距离：[/],(/，/,/),[/],(/,/),  @Motovis support
+    VpCommonProto.Point2DPosition d3 = 57; 
+
+    ///< 柱子，人行横道端点4距自车的距离：[/],(/，/,/),[/],(/,/),  @Motovis support
+    VpCommonProto.Point2DPosition d4 = 58;              
+}
+
+/**
+ * @brief 目标更新状态
+ * @detail
+ */
+ enum ObjectUpdate {
+  ///< 目标正常识别状态
+  OBJECTUPDATE_WITHOUTDR = 0;
+  ///< 目标识别仅使用DR推算状态
+  OBJECTUPDATE_WITHDR = 1;
+}
+
+/**
+* @brief 车道线信息
+* @detail 摄像头输出给MCU的感知车道线信息
+*/
+message CamToMcuLine
+{
+    ///< 车道线id：[/],(0,0,100),[/],(1,0),标识车道线id
+    int32 line_track_id = 1;
+
+    ///< 三阶曲线参数常数项：[/],(0,-20,20),[/],(1,0),标识分段对应三阶曲线参数常数项
+    repeated float curve_x_parameter_a0 = 2;
+
+    ///< 三阶曲线参数一次项：[/],(0,-1,1),[/],(1,0),标识分段对应三阶曲线参数一次项
+    repeated float curve_x_parameter_a1 = 3;
+
+    ///< 三阶曲线参数二次项：[/],(0,-0.02,0.02),[/],(1,0),标识分段对应三阶曲线参数二次项
+    repeated float curve_x_parameter_a2 = 4;
+
+    ///< 三阶曲线参数三次项：[/],(0,-0.0002,0.0002),[/],(1,0),标识分段对应三阶曲线参数三次项
+    repeated float curve_x_parameter_a3 = 5;
+
+    ///< 车道线分段起始点：[/], (0,/,/),[/],(1,0),标识对应车道线分段起始点,2D VCS坐标
+    repeated VpPerceptionBaseProto.Point x_begin_point = 6;
+
+    ///< 车道线分段结束点：[/], (0,/,/),[/],(1,0),标识对应车道线分段结束点,2D VCS坐标
+    repeated VpPerceptionBaseProto.Point x_end_point = 7;
+
+    ///< 车道线类型：[/],(0,0,23),[/],(1,0),标识车道线类型
+    VpCommonProto.LineType type = 8;
+
+    ///< 车道线颜色：[/],(0,0,9),[/],(1,0),标识车道线颜色
+    VpCommonProto.LineColor color = 9;
+
+    ///< 置信度：[/], (0,0,100),[/],(1,0),标识车道线置信度
+    int32 confidence = 10;
+
+    ///< 车道线近端到本车纵向距离：[/],(0,0,/),[/],(1,0),标识车道线近端到本车纵向距离
+    float near_x_distance = 11;
+
+    ///< 车道线远端到本车纵向距离：[/],(0,0,/),[/],(1,0),标识车道线远端到本车纵向距离
+    float far_x_distance = 12;
+
+    ///< 车道线宽度: [/],(/,/,/),[/],(1,0),车道线宽度,
+    float line_x_width  = 13;
+
+    ///< 车道线测量类型：[/],(0,0,3),[/],(1,0),标识车道线测量类型
+    VpCommonProto.DetectionType detection_type = 14;
+
+
+}
+/**
+* @brief 车道线信息
+* @detail 摄像头输出的感知车道线信息
+*/
+message CamLine
+{
+    ///< 车道线时间戳：[s],(/,/,/),[/],(1,0),车道线时间戳
+    double time_stamp = 1;
+
+    ///< 车道线id：[/],(0,0,100),[/],(1,0),标识车道线id
+    int32 line_track_id = 2;
+
+    ///< 当前曲率：[/], (0,/,/),[/],(1,0),标识当前曲率
+    double current_curvature = 3;
+
+    ///< source：[/],(/,/,/),[/],(1,0),曲线来源,枚举类型详细可见LineSource描述
+    int32 line_source = 4;  // perception or tracking
+
+    ///< 车道线分段数量：[/], (0,/,/),[/],(1,0),标识当前车道线分段数量
+    int32 line_segmentation_num = 5;
+
+    ///< 三阶曲线参数常数项：[/],(0,-20,20),[/],(1,0),标识分段对应三阶曲线参数常数项
+    repeated double curve_x_parameter_a0 = 6;
+
+    ///< 三阶曲线参数一次项：[/],(0,-1,1),[/],(1,0),标识分段对应三阶曲线参数一次项
+    repeated double curve_x_parameter_a1 = 7;
+
+    ///< 三阶曲线参数二次项：[/],(0,-0.02,0.02),[/],(1,0),标识分段对应三阶曲线参数二次项
+    repeated double curve_x_parameter_a2 = 8;
+
+    ///< 三阶曲线参数三次项：[/],(0,-0.0002,0.0002),[/],(1,0),标识分段对应三阶曲线参数三次项
+    repeated double curve_x_parameter_a3 = 9;
+
+    ///< 车道线分段起始点：[/], (0,/,/),[/],(1,0),标识对应车道线分段起始点,2D VCS坐标
+    repeated VpPerceptionBaseProto.Point x_begin_point = 10;
+
+    ///< 车道线分段结束点：[/], (0,/,/),[/],(1,0),标识对应车道线分段结束点,2D VCS坐标
+    repeated VpPerceptionBaseProto.Point x_end_point = 11;
+
+    ///< 车道线类型：[/],(0,0,23),[/],(1,0),标识车道线类型
+    VpCommonProto.LineType type = 12;
+
+    ///< 车道线颜色：[/],(0,0,9),[/],(1,0),标识车道线颜色
+    VpCommonProto.LineColor color = 13;
+
+    ///< 车道线测量类型：[/],(0,0,3),[/],(1,0),标识车道线测量类型
+    VpCommonProto.DetectionType detection_type = 14;
+
+    ///< 置信度：[/], (0,0,100),[/],(1,0),标识车道线置信度
+    int32 confidence = 15;
+
+    ///< 车道线近端到本车纵向距离：[/],(0,0,/),[/],(1,0),标识车道线近端到本车纵向距离
+    double near_x_distance = 16;
+
+    ///< 车道线远端到本车纵向距离：[/],(0,0,/),[/],(1,0),标识车道线远端到本车纵向距离
+    double far_x_distance = 17;
+
+    ///< 车道线vcs坐标系下的采样点: [/],(/,/,/),[/],(1,0),车道线采样点
+    repeated VpLineV2.Contour sample_points = 18;
+
+    ///< 车道线宽度: [/],(/,/,/),[/],(1,0),车道线宽度
+    float line_x_width  = 19;
+
+    ///< position：[/],(/,/,/),[/],(1,0),曲线位置属性,枚举类型详细可见LinePosition描述
+    int32 position = 20;
+
+    ///< parsing_rles: [/],(/,/,/),[/],(1,0),车道线在语义分割图上的所有像素区域
+    repeated VpLineV2.RLE parsing_rles = 21;
+
+    ///< 匝道点标识集：[/],(/,/,/),[32],(1,0),标识匝道点标识集
+    repeated RampPoint rp = 22;
+
+    ///< 类别置信度：[/], (0,0,100),[/],(1,0),标识车道线类别置信度
+    int32 type_confidence = 23;
+
+    ///< 可靠类别：[/],(0,0,23),[/],(1,0),标识车道线可靠类别
+    VpCommonProto.LineType reliable_type = 24;   
+
+    ///< LineUpdate： [/],(/，/,/),[/],(/,/), 车道线更新状态（是否使用DR推算-四门两盖后视镜异常状态） @Motovis support
+    LineUpdate line_update = 25;
+}
+
+/**
+ * @brief 车道线更新状态
+ * @detail
+ */
+ enum LineUpdate {
+  ///< 车位正常识别状态
+  LINEUPDATE_WITHOUTDR = 0;
+  ///< 车位识别仅使用DR推算状态
+  LINEUPDATE_WITHDR = 1;
+}
+
+/**
+* @brief freespace点信息
+* @detail 摄像头输出的感知freespace点信息
+*/
+message CamFsPoint
+{
+    ///< FsPoint点时间戳：[s],(/,/,/),[/],(1,0),标识FsPoint点时间戳
+    double time_stamp = 1; 
+
+    ///< 目标FsPoint点ID：[/],(/,/,/),[/],(1,0),标识目标FsPoint点ID
+    int32 fspoint_id = 2;
+
+    ///< Freeespace点位置：[/],(/,/,/),[/],(1,0),标识Freeespace点位置 @Motovis support
+    VpCommonProto.Point3DPosition position = 3;
+
+    ///< 目标类别置信度：[/], (0,0,100),[/],(1,0),标识FsPoint类别置信度
+    double fspoint_confidence = 4;
+
+    ///< freespace点类型：[/],(0,0,7),[/],(1,0),标识freespace点类型 @Motovis support
+    VpCommonProto.PointType type = 5;
+
+    ///< Freeespace点运动状态：[/],(0,0,1),[/],(1,0),标识freespace点运动状态
+    VpCommonProto.PointState state = 6;
+
+    ///< Freeespace点来源：[/],(0,0,1),[/],(1,0),标识环视freespace点融合来源
+    VpCommonProto.FusionFreeSpaceSource source = 7;
+
+    ///< 目标FsPoint点最远端有效检测：[/],(/,/,/),[/],(1,0),标识目标FsPoint点最远端是否被有效检测 0无效 1有效
+    int32 detect_valid = 8;
+
+    ///< 目标FsPoint点更新状态：[/],(/,/,/),[/],(1,0),标识目标FsPoint点更新状态 0检测更新 1DR更新 @Motovis support
+    FSUpdate fs_update = 9;
+}
+
+/**
+ * @brief FS更新状态
+ * @detail
+ */
+ enum FSUpdate {
+  ///< FS正常识别状态
+  FSUPDATE_WITHOUTDR = 0;
+  ///< FS识别仅使用DR推算状态
+  FSUPDATE_WITHDR = 1;
+}
+
+/**
+* @brief 交通标识
+* @detail 摄像头输出的感知交通标识信息
+*/
+message TrafficSign
+{
+    ///< 交通牌时间戳：[s],(/,/,/),[/],(1,0),表示交通牌时间戳
+    double time_stamp = 1;
+
+    ///< 交通牌ID：[/],(/,/,/),[/],(1,0),标识交通牌ID
+    int32 ts_id = 2;
+
+    ///< 交通标识牌类型：[/],(/,/,/),[/],(1,0),标识交通标识牌类型
+    VpCommonProto.TrafficSignType type = 3;
+
+    ///< 限速标识数值：[/],(/,/,/),[/],(1,0),标识交通牌限速标识数值
+    VpCommonProto.SpeedLimitValue sl_value = 4;
+
+    ///< 标识限速类型：[/],(/,/,/),[/],(1,0),标识交通牌限速类型
+    VpCommonProto.SpeedLimitType sl_type = 5;
+
+    ///< 中心纵向距离：[/],(/,/,/),[/],(1,0),标识交通牌中心纵向距离
+    double longitudinal_distance = 6;
+
+    ///< 中心横向距离：[/],(/,/,/),[/],(1,0),标识交通牌中心横向距离
+    double lateral_distance = 7;
+
+    ///< 高度：[/],(/,/,/),[/],(1,0),标识交通牌高度
+    double height = 8;
+
+    ///< 标识牌盒长：[/],(/,/,/),[/],(1,0),标识交通标识牌盒长
+    double length = 9;
+
+    ///< 标识牌盒宽：[/],(/,/,/),[/],(1,0),标识交通标识牌盒宽
+    double width = 10;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识交通牌置信度
+    double confidence = 11;
+
+    ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),空中交通标识语义分割点集
+    repeated VpLineV2.RLE parsing_rles = 12;
+
+    ///< 交通牌图像2d框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识交通牌图像2d框左上点坐标值
+    VpCommonProto.PixelPoint left_top = 13;
+
+    ///< 交通牌图像2d框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识交通牌图像2d框右下点的坐标值
+    VpCommonProto.PixelPoint right_down = 14;
+
+    ///< 交通牌跟踪周期：[/],(/,/,/),[/],(1,0),标识交通牌跟踪周期
+    int32 track_age = 15;
+
+    ///< 交通标识牌是否为嵌套复合类型：[/],(/,/,/),[/],(1,0),交通标识牌是否为嵌套复合类型,详细值见TrafficSignNestType 枚举
+    VpCommonProto.TrafficSignNestType ts_nested_type = 16;
+
+    ///< 交通标识牌是否为父子类型：[/],(/,/,/),[/],(1,0),交通标识牌是否为父子类型，详细值见TrafficSignDadChildrenType 枚举
+    VpCommonProto.TrafficSignDadChildrenType ts_find_dad = 17;
+
+    ///< 交通标识牌所有父ID和子ID：[/],(/,/,/),[/],(1,0),交通标识牌所有父ID和子ID 如1.1 1.2 1.3  2.1 2.2  
+    repeated VpCommonProto.TrafficSignFamilyID  ts_family_id = 18;
+
+    ///< 交通标识牌所有子牌的排序ID：[/],(/,/,/),[/],(1,0),交通标识牌所有子牌的排序ID，默认为0，有效值从1开始排序
+    repeated int32  ts_children_id = 19;
+
+    ///< 交通牌长短焦来源：[/],(/,/,/),[/],(1,0),标识交通牌长短焦来源
+    VpCommonProto.ObjectSource source = 20;
+
+    ///< tsr_update： [/],(/，/,/),[/],(/,/), tsr更新状态（是否使用DR推算-四门两盖后视镜异常状态） @Motovis support
+    TSRUpdate tsr_update = 21;
+}
+
+/**
+ * @brief TSR更新状态
+ * @detail
+ */
+ enum TSRUpdate {
+  ///< 车位正常识别状态
+  TSRUPDATE_WITHOUTDR = 0;
+  ///< 车位识别仅使用DR推算状态
+  TSRUPDATE_WITHDR = 1;
+}
+
+
+/**
+* @brief 地面交通标识线
+* @detail 摄像头输出的感知地面交通标识线信息
+*/
+message GroundMark
+{
+    ///< 地面交通标识消息时间戳：[s],(/,/,/),[/],(1,0),地面交通标识消息时间戳
+    double time_stamp = 1;
+
+    ///< 地面交通标识线ID：[/],(/,/,/),[/],(1,0),标识地面交通标识线ID
+    int32 gm_id = 2;
+
+    ///< 地面交通标识线类型：[/],(/,/,/),[/],(1,0), 标识地面交通标识线类型
+    VpCommonProto.GroundMarkType type = 3;
+
+    ///< 中心纵向距离：[/],(/,/,/),[/],(1,0),标识地面标线中心纵向距离
+    double longitudinal_distance = 4;
+
+    ///< 中心横向距离：[/],(/,/,/),[/],(1,0),标识地面标线中心横向距离
+    double lateral_distance = 5;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识地面标线置信度
+    double confidence = 6;
+
+    ///< 标识线矩形框长：[/],(/,/,/),[/],(1,0),标识标识线矩形框长
+    double length = 7;
+
+    ///< 标识线矩形框宽：[/],(/,/,/),[/],(1,0),标识标识线矩形框宽
+    double width = 8;
+
+    ///< 标识线颜色：[/],(/,/,/),[/],(1,0),标识地面标线颜色
+    VpCommonProto.GroundMarkColor gm_color = 9;
+
+    ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),地面交通标识语义分割点集
+    repeated VpLineV2.RLE parsing_rles = 10;
+
+    ///< 地面交通标识线图像2d框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识地面交通标识线图像2d框左上点坐标值
+    VpCommonProto.PixelPoint left_top = 11;
+
+    ///< 地面交通标识线图像2d框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识地面交通标识线图像2d框右下点的坐标值
+    VpCommonProto.PixelPoint right_down = 12;
+
+    ///< 地面交通标识线跟踪周期：[/],(/,/,/),[/],(1,0),标识地面交通标识线跟踪周期
+    int32 track_age = 13;
+    
+    ///< 地面交通标识线长短焦来源：[/],(/,/,/),[/],(1,0),标识地面交通标识线长短焦来源	
+    VpCommonProto.ObjectSource source = 14;
+}
+
+/**
+* @brief 道闸横杆
+* @detail 摄像头输出的感知道闸横杆信息
+*/
+message BarrierGate
+{
+    ///< 道闸横杆消息时间戳：[s],(/,/,/),[/],(1,0),道闸横杆消息时间戳
+    double time_stamp = 1;
+
+    ///< 道闸横杆识别状态：[/],(/,/,/),[/],(1,0), 标识道闸横杆识别状态
+    VpCommonProto.BarrierGateDetect bg_detect = 2;
+
+    ///< 道闸横杆ID：[/],(/,/,/),[/],(1,0),标识道闸横杆ID
+    int32 bg_id = 3;
+
+    ///< 道闸横杆抬杆状态：[/],(/,/,/),[/],(1,0), 标识道闸横杆抬杆状态
+    VpCommonProto.BarrierGateState bg_state = 4;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识地面标线置信度
+    double confidence = 5;
+
+    ///< 道闸横杆纵向距离：[/],(/,/,/),[/],(1,0),标识道闸横杆纵向距离
+    double longitudinal_distance = 6;
+
+    ///< 道闸横杆横向距离：[/],(/,/,/),[/],(1,0),标识道闸横杆横向距离
+    double lateral_distance = 7;
+
+    ///< 道闸横杆开启角度：[/],(/,/,/),[/],(1,0),标识道闸横杆开启角度
+    double bg_angle = 8;
+
+    ///< 道闸横杆中心点像素点坐标：[m],(/,0,/),[/],(1,0),道闸横杆中心点像素点坐标
+    VpCommonProto.PixelPoint center_point = 9;
+
+    ///< 道闸横杆左端点像素点坐标：[/],(/,/,/),[/],(1,0),标识道闸横杆左端点像素点坐标
+    VpCommonProto.PixelPoint left_point = 10;
+
+    ///< 道闸横杆右端点像素点坐标：[/],(/,/,/),[/],(1,0),标识道闸横杆右端点像素点坐标
+    VpCommonProto.PixelPoint right_point = 11;
+
+    ///< 道闸横杆跟踪周期：[/],(0,0,254),[/],(1,0),标识道闸横杆跟踪周期
+    int32 track_age = 12;
+    
+    ///< 道闸横杆长短焦来源：[/],(0,0,254),[/],(1,0),标识道闸横杆长短焦来源
+    VpCommonProto.ObjectSource source = 13;
+}
+
+/**
+* @brief 语义分割后处理信息, Motovis Define R8V2
+* @detail 四路鱼眼环视输出的语义分割后处理信息
+*/
+message SegmentInfo
+{
+    ///< 语义分割标识消息时间戳：[s],(/,/,/),[/],(1,0),语义分割标识消息时间戳
+    double time_stamp = 1;
+    ///< 语义分割原图后处理信息：[/],(/,/,/),[/],(1,0), 4*36个
+    repeated VpCommonProto.SegmentInfoOne seg = 2;
+}
+
+/**
+* @brief 语义分割原始信息, Motovis Define 接口预留，不做发送R8V2
+* @detail 四路鱼眼环视输出的语义分割原始信息
+*/
+message SegmentRawInfo
+{
+    ///< 语义分割原图消息时间戳：[s],(/,/,/),[/],(1,0),四路鱼眼环视消息时间戳
+    double time_stamp = 1;
+    ///< 语义分割原图信息：[/],(/,/,/),[/],(1,0),
+    repeated VpCommonProto.SegmentRawInfoOne seg = 2;
+}
+
+/**
+* @brief 地面导向箭头
+* @detail 摄像头输出的感知地面导向箭头信息
+*/
+message GroundGuide
+{
+    ///< 地面导向箭头消息时间戳：[s],(/,/,/),[/],(1,0),地面导向箭头消息时间戳
+    double time_stamp = 1;
+
+     ///< 地面导向箭头ID：[/],(/,/,/),[/],(1,0),标识地面导向箭头ID
+    int32 gg_id = 2;
+
+    ///< 地面导向箭头类型：[/],(/,/,/),[/],(1,0), 标识地面导向箭头类型
+    VpCommonProto.GroundGuideType type = 3;
+
+    ///< 中心纵向距离：[/],(/,/,/),[/],(1,0),标识导向箭头中心纵向距离
+    double longitudinal_distance = 4;
+
+    ///< 中心横向距离：[/],(/,/,/),[/],(1,0),标识导向箭头中心横向距离
+    double lateral_distance = 5;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识导向箭头置信度
+    double confidence = 6;
+
+    ///< 导向箭头矩形框长：[/],(/,/,/),[/],(1,0),标识导向箭头矩形框长
+    double length = 7;
+
+    ///< 导向箭头矩形框宽：[/],(/,/,/),[/],(1,0),标识导向箭头矩形框宽
+    double width = 8;
+
+    ///< 导向箭头颜色：[/],(/,/,/),[/],(1,0),标识导向箭头颜色
+    VpCommonProto.GroundMarkColor gg_color = 9;
+
+    ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),地面箭头语义分割点集
+    repeated VpLineV2.RLE parsing_rles = 10;
+
+    ///< 地面导向箭头图像2d框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识地面导向箭头图像2d框左上点坐标值
+    VpCommonProto.PixelPoint left_top = 11;
+
+    ///< 地面导向箭头图像2d框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识地面导向箭头图像2d框右下点的坐标值
+    VpCommonProto.PixelPoint right_down = 12;
+
+    ///< 地面导向箭头线跟踪周期：[/],(0,0,254),[/],(1,0),标识地面导向箭头线跟踪周期	
+    int32 track_age = 13;
+    
+    ///< 地面导向箭头线长短焦来源：[/],(0,0,254),[/],(1,0),标识地面导向箭头线长短焦来源	
+    VpCommonProto.ObjectSource source = 14;
+}
+
+/**
+* @brief 地面导向箭头,@Motovis环视专用
+* @detail 摄像头输出的感知地面导向箭头信息
+*/
+message GroundGuideM
+{
+    ///< 地面导向箭头消息时间戳：[s],(/,/,/),[/],(1,0),地面导向箭头消息时间戳
+    double time_stamp = 1;
+
+     ///< 地面导向箭头ID：[/],(/,/,/),[/],(1,0),标识地面导向箭头ID
+    int32 gg_id = 2;
+
+    ///< 地面导向箭头类型：[/],(/,/,/),[/],(1,0), 标识地面导向箭头类型
+    VpCommonProto.GroundGuideType type = 3;
+
+    ///< 地面箭头框4个点离自车的距离p1：[/],(/,/,/),[/],(1,0),p1
+    VpCommonProto.Point2DPosition p1 = 4;
+
+    ///< 地面箭头框4个点离自车的距离p2：[/],(/,/,/),[/],(1,0),p2
+    VpCommonProto.Point2DPosition p2 = 5;
+
+    ///< 地面箭头框4个点离自车的距离p3：[/],(/,/,/),[/],(1,0),p3
+    VpCommonProto.Point2DPosition p3 = 6;
+
+    ///< 地面箭头框4个点离自车的距离p4：[/],(/,/,/),[/],(1,0),p4
+    VpCommonProto.Point2DPosition p4 = 7;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识导向箭头置信度
+    double confidence = 8;
+
+}
+/**
+* @brief 匝道
+* @detail 摄像头输出的感知匝道信息
+*/
+message RampPoint
+{
+    ///< 匝道点消息时间戳：[s],(/,/,/),[/],(1,0),匝道点消息时间戳
+    double time_stamp = 1;
+
+    ///< 匝道点ID：[/],(/,/,/),[/],(1,0),标识匝道点ID
+    int32 rp_id = 2;
+
+    ///< 纵向距离：[/],(/,/,/),[/],(1,0),标识匝道点纵向距离
+    double longitudinal_distance = 3;
+
+    ///< 横向距离：[/],(/,/,/),[/],(1,0),标识匝道点横向距离
+    double lateral_distance = 4;
+
+    ///< 匝道点分合状态：[/],(/,/,/),[/],(1,0),标识匝道点分裂、合并状态
+    VpCommonProto.RampPointDivMer div_status = 5;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识匝道点置信度
+    double confidence = 6;
+
+    ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),匝道语义分割点集
+    repeated VpLineV2.RLE parsing_rles = 7;
+}
+
+/**
+* @brief 交通灯
+* @detail 摄像头输出的感知交通灯信息
+*/
+message TrafficLight 
+{
+    ///< 交通灯时间戳：[/],(/,/,/),[/],(1,0),标识交通灯时间戳
+    double time_stamp = 1;
+
+    ///< 交通灯ID：[/],(/,/,/),[/],(1,0),标识交通灯ID
+    int32 tl_id = 2;
+
+    ///< 交通灯类型：[/],(/,/,/),[/],(1,0),标识交通灯灯泡类型
+    repeated VpCommonProto.TrafficLightType tf_type = 3;
+
+    ///< 交通灯颜色：[/],(/,/,/),[/],(1,0),标识交通灯灯泡颜色
+    repeated VpCommonProto.TrafficLightColor color = 4;
+
+    ///< 置信度：[/],(/,/,/),[/],(1,0),标识交通灯置信度
+    double confidence = 5;
+
+    ///< 交通灯外形方向：[/],(/,/,/),[/],(1,0),标识交通灯外形方向
+    VpCommonProto.TrafficLightOutline tl_outline = 6;
+
+    ///< 交通灯闪烁状态：[/],(/,/,/),[/],(1,0),标识交通灯闪烁状态
+    VpCommonProto.TrafficLightGlimmer tl_glimmer = 7;
+
+    ///< 交通灯读秒：[s],(/,/,/),[/],(1,0),标识交通灯读秒
+    int32 time_sec = 8;
+
+    ///< 交通灯箱矩形框长：[/],(/,/,/),[/],(1,0),标识交通灯箱矩形框长
+    double light_box_length = 9;
+
+    ///< 交通灯箱矩形框宽：[/],(/,/,/),[/],(1,0),标识交通灯箱矩形框宽
+    double light_box_width = 10;
+
+    ///< 交通灯箱矩形框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识交通灯箱矩形框左上点坐标值
+    VpCommonProto.PixelPoint light_box_left_top = 11;
+
+    ///< 交通灯箱矩形框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识交通灯箱矩形框右下点的坐标值
+    VpCommonProto.PixelPoint light_box_right_down = 12;
+
+    ///<中心点位置：[m],(/,0,/),[/],(1,0),灯箱在vcs下的中心点位置,以point结构体存储,包含(x,y,z)
+    VpNdmProtoV2.Point light_box_position = 13;
+
+    ///<结构信息：[/],(/,/,/),[/],(1,0),交通灯灯箱的结构信息,枚举类型详细可见 TrafficLightStructType 描述
+    VpCommonProto.TrafficLightStructType struct_type = 14;
+
+    ///< 交通灯泡矩形框长：[/],(/,/,/),[/],(1,0),标识交通灯泡矩形框长
+    repeated double bulb_length = 15;
+
+    ///< 交通灯泡矩形框宽：[/],(/,/,/),[/],(1,0),标识交通灯泡矩形框宽
+    repeated double bulb_width = 16;
+
+    ///< 交通灯泡矩形框左上点的坐标值：[/],(/,/,/),[/],(1,0),标识交通灯泡矩形框左上点坐标值
+    repeated VpCommonProto.PixelPoint bulb_left_top = 17;
+
+    ///< 交通灯泡矩形框右下点的坐标值：[/],(/,/,/),[/],(1,0),标识交通灯泡矩形框右下点的坐标值
+    repeated VpCommonProto.PixelPoint bulb_right_down = 18;
+
+    ///<中心点位置：[m],(/,0,/),[/],(1,0),小灯泡在vcs下的中心点位置,以point结构体存储,包含(x,y,z)
+    repeated VpNdmProtoV2.Point bulb_position = 19;
+
+    ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),灯箱语义分割点集
+    repeated VpLineV2.RLE parsing_rles = 20;
+
+    ///< 交通灯箱跟踪周期：[/],(0,0,254),[/],(1,0),标识目标跟踪周期
+    int32 track_age = 21;
+	
+    ///< 交通灯箱长短焦来源：[/],(0,0,254),[/],(1,0),标识长短焦来源
+    VpCommonProto.ObjectSource source = 22;
+
+    ///< 交通灯灯箱类型：[/],(/,/,/),[/],(1,0),交通灯灯箱分类类型
+    VpCommonProto.TrafficLightType tfcls_type = 23;
+	
+    ///< 交通灯灯箱颜色：[/],(/,/,/),[/],(1,0),交通灯灯箱分类颜色
+    VpCommonProto.TrafficLightColor clscolor = 24;	
+	
+    ///< 交通灯灯箱关键性等级：[/],(/,/,/),[/],(1,0),预留，默认为等级0，二次跟踪后的关键红绿灯为等级1
+    int32 cruciality_level = 25;
+	
+    ///< 交通灯灯箱空间排序ID：[/],(/,/,/),[/],(1,0),预留，关重交通灯灯箱空间位置ID，从左到右（同位置先上后下）编号得到，从1开始排，默认为0
+    int32 crucial_tl_spacpos_id = 26;
+}
+
+/**
+* @brief 环境
+* @detail 感知得到的环境信息
+*/
+message Weather 
+{
+    ///< 天气类型消息时间戳：[s],(/,/,/),[/],(1,0),天气类型消息时间戳
+    double time_stamp = 1;
+
+    ///< 天气类型：[/],(/,/,/),[/],(1,0),标识天气类型
+    VpCommonProto.WeatherType weather_type = 2;
+
+    ///< 天气置信度：[/],(/,/,/),[/],(1,0),标识天气置信度
+    double confidence = 3;
+
+    ///<时间信息：[/],(/,/,/),[/],(1,0),标识时间信息
+    VpCommonProto.TimeType time_type = 4;
+
+    ///<光源信息：[/],(/,/,/),[/],(1,0),标识光源信息
+    VpCommonProto.LightType light_type = 5;
+}
+
+/**
+* @brief 摄像头故障
+* @detail 对摄像头故障状态的描述信息
+*/
+message Failsafe
+{
+    ///< 摄像头故障消息消息时间戳：[s],(/,/,/),[/],(1,0),摄像头故障消息时间戳
+    double time_stamp = 1;
+
+    ///< 摄像头ID：[/],(/,/,/),[/],(1,0),故障摄像头ID标识
+    int32 camera_id = 2;
+
+    ///< 故障类型：[/],(/,/,/),[/],(1,0),标识故障类型
+    VpCommonProto.FailType fail_type = 3;
+
+    ///< 故障等级：[/],(/,/,/),[/],(1,0),标识故障等级
+    VpCommonProto.FailLevel fail_level = 4;
+
+    ///< 故障评分置信度：[/],(0,0,1),[/],(1,0),标识摄像头故障评分
+    double score = 5;
+}
+
+/**
+* @brief 摄像头工作模式
+* @detail 摄像头工作场景、模式的描述信息
+*/
+message WorkingMode
+{
+    ///< 工作场景息时间戳：[s],(/,/,/),[/],(1,0),工作场景消息时间戳
+    double time_stamp = 1;
+
+    ///< 工作场景类型：[/],(/,/,/),[/],(1,0),标识工作场景类型
+    VpCommonProto.ScenarioState state = 2;
+
+    ///< 工作模式类型：[/],(/,/,/),[/],(1,0),标识工作模式类型
+    VpCommonProto.WorkingMode mode = 3;
+}
+
+/**
+* @brief 目标集
+* @detail 摄像头输出的感知目标集信息
+*/
+message CamObjects
+{
+    ///< 目标消息时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 目标集：[/],(/,/,/),[64],(1,0),标识目标集
+    repeated CamObject objs = 3;
+
+    ///< 环视专用目标集：[/],(/,/,/),[64],(1,0),标识目标集
+    repeated CamObjectOther objs_other = 4;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 5;
+}
+
+/**
+* @brief 目标集
+* @detail 模型输出的感知目标集信息
+*/
+message ModelObjects
+{
+    ///< 目标消息时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 目标集：[/],(/,/,/),[64],(1,0),标识目标集
+    repeated CamObject objs = 3;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 4;
+}
+
+/**
+* @brief 车道线集
+* @detail 摄像头输出的感知车道线集信息
+*/
+message CamLines
+{
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 车道线数量：[/],(0,0,11),[/],(1,0),标识车道线数量，11为预留接口
+    int32 line_track_num = 3;
+
+    ///< 车道线集：[/],(/,/,/),[16],(1,0),标识车道线集
+    repeated CamLine lines = 4;
+
+    ///< Raw线集：[/],(/,/,/),[16],(1,0),标识车道线集
+    repeated CamLine raw_lines = 5;
+
+    ///< extra 车道线集：[/],(/,/,/),[16],(1,0),标识 extra 车道线集
+    repeated CamLine extra_lines = 6;
+
+    ///< Raw extra 线集：[/],(/,/,/),[16],(1,0),标识 extra 车道线集
+    repeated CamLine raw_extra_lines = 7;
+
+    ///< vcs坐标系下的采样点: [/],(/,/,/),[/],(1,0),标识车道线采样点
+    repeated VpLineV2.Contour sample_points = 8;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 9;
+}
+
+/**
+* @brief 车道线集
+* @detail 摄像头输出给MCU的感知车道线集信息
+*/
+message CamToMcuLines
+{
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+    
+    ///< 车道线集：[/],(/,/,/),[16],(1,0),标识车道线集
+    repeated CamToMcuLine lines = 3;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.DelayHeader seqheader = 4;
+}
+
+/**
+* @brief 车道线集
+* @detail 摄像头输出的感知车道线曲率
+*/
+message CamLinesCurve
+{
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 所有车道线的曲率：[/], (0,0,100000),[/],(1,0),标识所有车道线的曲率
+    LinesCurve all_lines_curve = 3;
+
+    ///< 所有车道线的曲率有效性标识：[/], (0,0,100000),[/],(1,0),标识所有车道线的曲率有效性
+    LinesCurveValid all_lines_curve_valid = 4;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 5;
+
+}
+/**
+* @brief 车道线曲率集
+* @detail 车道线曲率集
+*/
+message LinesCurve{
+
+    ///< 前方5m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方5m车道线曲率
+    float line_cuerve_5m = 1;
+
+    ///< 前方10m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方10m车道线曲率
+    float line_cuerve_10m = 2;
+
+    ///< 前方15m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方15m车道线曲率
+    float line_cuerve_15m = 3;
+
+    ///< 前方20m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方20m车道线曲率
+    float line_cuerve_20m = 4;
+
+    ///< 前方25m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方25m车道线曲率
+    float line_cuerve_25m = 5;
+
+    ///< 前方30m车道线曲率：[/], (0,0,100000),[/],(1,0),标识前方30m车道线曲率
+    float line_cuerve_30m = 6;
+}
+/**
+* @brief 车道线曲率有效标识集
+* @detail 车道线曲率有效标识集
+*/
+message LinesCurveValid{
+
+    ///< 前方5m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方5m车道线曲率有效性
+    bool line_cuerve_valid_5m = 1;
+
+    ///< 前方10m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方10m车道线曲率有效性
+    bool line_cuerve_valid_10m = 2;
+
+    ///< 前方15m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方15m车道线曲率有效性
+    bool line_cuerve_valid_15m = 3;
+
+    ///< 前方20m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方20m车道线曲率有效性
+    bool line_cuerve_valid_20m = 4;
+
+    ///< 前方25m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方25m车道线曲率有效性
+    bool line_cuerve_valid_25m = 5;
+
+    ///< 前方30m车道线曲率有效标识：[/], (0,0,1),[/],(1,0),标识前方30m车道线曲率有效性
+    bool line_cuerve_valid_30m = 6;
+}
+
+/**
+* @brief maptr模型输出车道线集
+* @detail maptr模型的感知车道线集信息
+*/
+message CamMaptrLines
+{
+    ///< 时间戳：[/],(  /,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+    
+    ///< 车道线vcs坐标系下的采样点: [/],(/,/,/),[/],(1,0),车道线采样点
+    repeated VpLineV2.Contour sample_points = 3;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 4;
+}
+
+
+/**
+* @brief BEV 动态目标模型消息
+* @detail BEV 动态目标模型消息,包括BEV模型动态目标模型消息和时间辍
+*/
+message BevModelObject {
+    ///< 目标消息时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 模型目标集：[/],(/,/,/),[64],(1,0),标识目标集
+    VpReal3DFcProto.Real3DProto bev_objs = 3;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 4;
+}
+/**
+* @brief bev 信息
+* @detail bev图像属性
+*/
+message BevSetting {
+  ///< spatial_resolution：[pixel],(0,0,/),[/],(1,0),x与y方向的像素分辨率,[x, y]
+  repeated float spatial_resolution = 1;    
+  ///< visible_range：[m],(0,0,/),[/],(1,0),bev可视半径范围,[front, back, left, right]
+  repeated float visible_range = 2;         
+}
+
+/**
+* @brief BEV Freespace模型消息
+* @detail BEV Freespace 模型消息,包括BEV模型Freespace消息和时间辍
+*/
+message BevModelFreespaceInfo {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/],(0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< bev 信息：[/],(/,/,/),[32],(1,0),bev信息图像属性
+    VpImageProto.Image image = 3; 
+
+    ///< 当前语义分割模型初始化配置信息：[/],(/,/,/),[/],(1,0),标识当前语义分割模型初始化配置信息
+    BevSetting bev_settings = 4;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 5;
+}
+
+
+/**
+* @brief Freespace点集
+* @detail 摄像头输出的感知Freespace点集信息
+*/
+message CamFreeSpace
+{
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< Freespace点集：[/],(/,/,/),[4096],(1,0),标识Freespace点集
+    repeated CamFsPoint points = 3;
+
+    ///< pts_img: [pixel], (0,0,/), [/], (1,0), 点在去畸变图像中的像素坐标
+    repeated VpPerceptionBaseProto.Point pts_img = 4; 
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 5;
+}
+
+/**
+* @brief 交通标识集
+* @detail 摄像头输出的感知交通标识集信息
+*/
+message CamTsr
+{
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 交通标识集：[/],(/,/,/),[32],(1,0),标识交通标识集
+    repeated TrafficSign ts = 3;
+
+    ///< 地面交通标线标识集：[/],(/,/,/),[32],(1,0),标识地面交通标线标识集
+    repeated GroundMark gm = 4;
+
+    ///< 地面交通导向箭头标识集：[/],(/,/,/),[32],(1,0),标识地面交通导向箭头标识集
+    repeated GroundGuide gg = 5;
+
+    ///< 交通灯集：[/],(/,/,/),[32],(1,0),标识交通灯集
+    repeated TrafficLight tl = 6;
+
+    ///< 道闸横杆集：[/],(/,/,/),[32],(1,0),标识道闸横杆集
+    repeated BarrierGate bg = 7;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 8;
+
+    ///< 地面交通导向箭头标识集：[/],(/,/,/),[8],(1,0),标识地面交通导向箭头标识集 @Motovis，环视专用
+    repeated GroundGuideM ggm = 9;
+    ///< 交通路口标识：[/],(0,0,1),[/],(1,0),交通路口标识 0 无路口 1 有路口  @Motovis，环视专用
+    int32 entrance_flag = 10;
+}
+
+/**
+* @brief 减速带集
+* @detail 摄像头输出的感知减速带集信息
+*/
+message CamSpeedBump
+{
+    ///< 减速带类型：[/],(/,/,/),[/],(1,0), 标识减速带
+    VpCommonProto.GroundMarkType type = 1;
+
+    ///< 中心纵向距离：[/],(/,/,/),[/],(1,0),标识减速带中心纵向距离
+    double longitudinal_distance = 2;
+
+    ///< 中心横向距离：[/],(/,/,/),[/],(1,0),标识减速带中心横向距离
+    double lateral_distance = 3;
+}
+
+/**
+* @brief 众包地图消息
+* @detail 众包地图消息集,包括众包地图消息基类及时间辍
+*/
+message CamParsingInfo {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 众包地图消息基类：[/],(/,/,/),[/],(1,0),众包地图消息基类
+    repeated CamParsingInfoBase pasinginfo_bases = 2;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 3;
+}
+
+/**
+* @brief 众包地图消息基类
+* @detail 众包地图消息基类,包括 原始分割数据(全景分割及车道线分割)、车道线及静态目标感知消息
+*/
+message CamParsingInfoBase {
+    ///< camera id：[/], (0,0,100000),[/],(1,0),标识摄像头索引
+    int32 camera_id = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 当前语义分割模型初始化配置信息：[/],(/,/,/),[/],(1,0),标识当前语义分割模型初始化配置信息
+    repeated VpParsingSettingProto.ParsingSetting parsing_settings = 3;
+
+    ///< 全景分割集：[/],(/,/,/),[32],(1,0),全景分割图像属性
+    repeated VpImageProto.Image parsing = 4; 
+
+    ///< 车道线分割集：[/],(/,/,/),[32],(1,0),车道线分割图像属性
+    repeated VpImageProto.Image lane_parsing = 5;
+}
+
+/**
+* @brief  视觉感知节点工作状态
+* @detail 包括当前工况、摄像头状态、工作模式
+*/
+message CamWorkStatus {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/],(0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 天气环境：[/],(/,/,/),[/],(1,0),标识当前摄像头运行的工况环境
+    repeated Weather weather = 3;
+
+    ///< 摄像头故障状态：[/],(/,/,/),[/],(1,0),标识摄像头当前故障状态
+    repeated Failsafe fail_safe = 4;
+
+    ///< 摄像头工作模式：[/],(/,/,/),[/],(1,0),标识摄像头当前工作模式
+    repeated WorkingMode working_mode = 5;
+
+    ///< 视觉输入帧率：[/],(/,/,/),[/],(30,10),视觉输入帧率
+    int32 input_fps = 6; 
+
+    ///< 停车库信息：[/],(/,/,/),[/],(0,2),停车库信息
+    repeated VpCommonProto.SceneType  scene_info = 7;
+
+    ///< 视觉状态切换状态消息：[/],(/,/,/),[/],(1,0),视觉状态切换状态消息
+    VpStateSwitchRsp switch_state = 8;
+}
+
+/**
+* @brief  视觉状态切换状态消息
+* @detail 包括当前工作状态，资源释放标志位等；
+*/
+message VpStateSwitchRsp {
+    ///< 视觉工作状态：[/],(/,/,/),[/],(1,0),标识视觉工作状态
+    ///< 前视工作状态: 0--无效,1--双+后,2--前广角
+    ///< 周视工作状态: 0--无效,1--开启,2--关闭
+    int32 vp_sts_feedback = 1;
+
+    ///< 状态机工作状态：[/],(/,/,/),[/],(1,0),标识状态机传入视觉的工作状态
+    VpCommonProto.StsTopMode vp_top_mode = 2;
+}
+
+/**
+* @brief  环视行泊切换资源占用流控
+* @detail 环视行泊切换资源占用流控
+*/
+message ScStateSwitchRsp {
+    ///< 环视工作状态：[/],(/,/,/),[/],(1,0),0--无效值，1--开启状态，2--关闭状态，3--仅IPM开启状态；
+    int32 sc_sts_feedback = 1;
+}
+
+/**
+* @brief Ins定位输出信息
+* @detail xxxxxxxx
+*/
+message InsOdometry {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 速度的坐标系:[/],(/,/,/),[/],(/,/),标识InsTwist的坐标系
+    string child_frame_id = 2;
+
+    ///< 位置姿态信息:[/],(/,/,/),[/],(/,/),标识Ins位置姿态信息
+    VpCommonProto.InsPose pose = 3;
+
+    ///< 速度信息:[/],(/,/,/),[/],(/,/),标识速度信息
+    VpCommonProto.InsTwist twist = 4;
+
+    ///< ins横滚角：[/],(/,/,/),[/],(1,0),标识横滚角,车体右倾方向为正
+    double ins_roll = 5;
+
+    ///< ins俯仰角：[/],(/,/,/),[/],(1,0),标识俯仰角,车体点头（低头）方向为正
+    double ins_pitch = 6;
+
+    ///< ins航向角：[/],(/,/,/),[/],(1,0),标识航向角,正东方向逆时针为正
+    double ins_heading = 7;
+}
+
+/**
+* @brief Ldr位姿输出信息
+* @detail xxxxxxxx
+*/
+message LdrPose {
+    ///< ldr_x: [m], (/,/,/), [/], (/,/), Ldr x坐标
+    float ldr_x = 1;
+
+    ///< ldr_y: [m], (/,/,/), [/], (/,/), Ldr y坐标
+    float ldr_y = 2;
+
+    ///< ldr_z: [m], (/,/,/), [/], (/,/), Ldr z坐标
+    float ldr_z = 3;
+
+    ///< ldr_roll: [rad], (/,/,/), [/], (/,/), Ldr翻滚角
+    float ldr_roll = 4;
+
+    ///< ldr_pitch: [rad], (/,/,/), [/], (/,/), Ldr俯仰角
+    float ldr_pitch = 5;
+
+    ///< ldr_yaw: [rad], (/,/,/), [/], (/,/), Ldr偏转角
+    float ldr_yaw = 6;
+}
+
+/**
+* @brief  当前标定状态
+* @detail 描述标定进程的状态
+*/
+message CalibStatusMsg {
+    ///< 描述当前标定类型：[/],(/,/,/),[/],(1,0),描述当前标定类型
+    VpCommonProto.CalibType calib_type = 1;
+    
+    ///< 图像传感器类型：[/],(0,0,2),[/],(1,0),描述当前标定是前视还是周视摄像头
+    VpCommonProto.CalibCameraType  camera_type = 2;
+    
+    ///< 描述当前标定进程运行状态：[/],(/,/,/),[/],(1,0),描述当前标定进程运行状态
+    VpCommonProto.CameraCalibrationStatus  calib_status = 3;
+}
+
+/**
+* @brief  摄像头标定参数(内外参)
+* @detail 包括当前工况、摄像头状态、工作模式
+*/
+message CamCalibParam {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 图像传感器参数：[/],(/,/,/),[4],(1,0),标识传感参数
+    repeated VpCommonProto.SensorParameters sensors_parameters = 3;
+
+    ///< 基于车身数据生成的odo数据：[/],(/,/,/),[6],(1,0),标识odo数据
+    VpOdometryFcProto.OdometryFrame  odo_data = 4;
+
+    ///< 存储基于Ins的odo数据：[/],(/,/,/),[6],(1,0),标识ins_odo数据
+    InsOdometry insodo_data = 5; 
+    
+    ///< 存储基于ldr的pose数据：[/],(/,/,/),[6],(1,0),标识ldr_pose数据
+    LdrPose ldr_pose = 6; 
+}
+
+/**
+* @brief  视觉感知中间消息
+* @detail 包括中间消息基类及时间辍
+*/
+message InterPerceptionMsg {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+
+    ///< 中间消息基类：[/],(/,/,/),[/],(1,0),中间消息基类
+    repeated InterPerceptionBaseMsg inter_bases = 2;
+    
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+    SeqHeaderProto.SeqHeader seqheader = 3;  
+}
+
+/**
+* @brief  视觉感知中间消息基类
+* @detail 包括freespace输出数据点、动态障碍物集、检测结果集等消息
+*/
+message InterPerceptionBaseMsg {
+    ///< camera id：[/], (0,0,100000),[/],(1,0),标识摄像头索引
+    int32 camera_id = 1;
+
+    ///< 数据帧索引：[/], (0,0,100000),[/],(1,0),标识数据帧索引
+    int32 frame_index = 2;
+
+    ///< 动态障碍物：[/],(/,/,/),[/],(1,0),动态障碍物
+    VpObstacleProto.Obstacles obstacles = 3;
+
+    ///< 感知结果：[/],(/,/,/),[/],(1,0),感知结果
+    VpObstacleRawProto.ObstacleRaws obstacleraws = 4;    
+
+    ///< freespace输出数据点：[/],(/,/,/),[/],(1,0),freespace输出数据点
+    VpScanPointProto.ScanPoints scanpoints = 5; 
+}
+
+/**
+* @brief  视觉脏污检测结果
+* @detail 每一路摄像头是否有脏污
+*/
+message FoulingDetection {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+    ///< 脏污检测结果：[/],(/,/,/),[/],(1,0),环视前摄像头 1 有脏污遮挡 0 无脏污遮挡
+    int32 ret_front = 2;
+    ///< 脏污检测结果：[/],(/,/,/),[/],(1,0),环视后摄像头 1 有脏污遮挡 0 无脏污遮挡
+    int32 ret_rear = 3;
+    ///< 脏污检测结果：[/],(/,/,/),[/],(1,0),环视左摄像头 1 有脏污遮挡 0 无脏污遮挡
+    int32 ret_left = 4;
+    ///< 脏污检测结果：[/],(/,/,/),[/],(1,0),环视右摄像头 1 有脏污遮挡 0 无脏污遮挡
+    int32 ret_right = 5;
+}
+
+/**
+* @brief  环视路口识别的结果
+* @detail 路口识别的信息
+*/
+message CamCrossingInfo {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+    ///< 路口ID：[/],(0,-1,10000),[/],(1,0),路口ID  @Motovis support
+    int32 track_id = 2;
+    ///< 路口中心离自车的距离：[/],(/,/,/),[/],(1,0),环视识别路口离自车的距离
+    double positon = 3;
+    ///< 路口置信度：[/],(/,/,/),[/],(1,0),环视路口识别的置信度
+    double confidence = 4;
+}
+
+/**
+* @brief  环视路口识别的结果 whole
+* @detail 路口识别的信息
+*/
+message CamCrossingInfowhole {
+    ///< 时间戳：[/],(/,/,/),[/],(1,0),标识时间戳
+    double time_stamp = 1;
+    ///< 路口信息：[/],(/,/,/),[/],(1,0),环视识别路口离自车的距离
+    repeated CamCrossingInfo crossinginfo = 2;
+}

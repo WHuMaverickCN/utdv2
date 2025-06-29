@@ -1,0 +1,3 @@
+/home/gyx/projects/serinf/packages/map_recv_current_interface/mybuild/CMakeFiles/rebuild_cache.dir
+/home/gyx/projects/serinf/packages/map_recv_current_interface/mybuild/CMakeFiles/edit_cache.dir
+/home/gyx/projects/serinf/packages/map_recv_current_interface/mybuild/CMakeFiles/map_recv.dir

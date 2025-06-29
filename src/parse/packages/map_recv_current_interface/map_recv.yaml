@@ -1,0 +1,10 @@
+
+name: map_recv
+interval: 10000
+sub_topic: [
+  map_static_info-idmap.StaticIDMapInfo,
+  ins_parser-localization.InsData-RawDu
+]
+pub_topic: []
+
+author: <author name>

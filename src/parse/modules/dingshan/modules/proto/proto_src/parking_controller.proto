@@ -1,0 +1,222 @@
+
+/**
+
+* @file     parkingdecision.proto
+* @author   冯荣
+* @details  SDA泊车控制接口定义
+* @date     2023-02-20
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[maxnumber],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATESYSTEMVEHICLEBASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.23         <th>1.0                  <th>冯荣
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+package parkingcontroller;
+/**
+* @brief LatCmd
+* @detail 泊车横向控制
+*/
+message LatCmd {
+  ///< apa_steeringanglereq: [degree]，(/，/，/)，[/]，(1，0)，apa_转向角度请求
+  double apa_steeringanglereq = 1;
+  ///< apa_steeringanglereqprotection: [/]，(/，/，/)，[/]，(1，0)，apa_转向控制请求
+  ///< 0x0:No Request
+  ///< 0x1:Request EPS control
+  ///< 0x2:EPS control active
+  uint32 apa_steeringanglereqprotection = 2;
+  ///< apa_steeringanglereqdebug: [degree]，(/，/，/)，[/]，(1，0)，apa_转向角度请求非握手后的信号
+  double apa_steeringanglereqdebug = 3;
+}
+/**
+* @brief LongCmd 
+* @detail 泊车纵向控制
+*/
+message LongCmd {
+  ///< apa_lscaction: [/]，(/，/，/)，[/]，(1，0)，LSC功能开启状态
+  ///< 0x0:OFF
+  ///< 0x1:ON
+  uint32 apa_lscaction = 1;
+  ///< apa_releasepressurereq: [/]，(/，/，/)，[/]，(1，0)，apa_泄压起步请求
+  ///< 0x0:No Request
+  ///< 0x1:Request
+  uint32 apa_releasepressurereq = 2;
+  ///< apa_hsahdforbbiden: [/]，(/，/，/)，[/]，(1，0)，AUtoHold功能、坡起辅助功能禁止请求
+  ///< 0x0:None
+  ///< 0x1:ReducedFunction
+  ///< 0x2:FullFunction
+  ///< 0x3:Invalid
+  uint32 apa_hsahdforbbiden = 3;
+  ///< apa_espbrakefunctionmode: [/]，(/，/，/)，[/]，(1，0)，apa_功能控制状态
+  ///< 0x0:None
+  ///< 0x1:ReducedFunction
+  ///< 0x2:FullFunction
+  ///< 0x3:Invalid
+  uint32 apa_espbrakefunctionmode = 4;
+  ///< apa_accpedshieldreq: [/]，(/，/，/)，[/]，(1，0)，加速踏板屏蔽请求
+  ///< 0x0:Unshield
+  ///< 0x1:Shield
+  uint32 apa_accpedshieldreq = 5;
+  ///< apa_transprndshiftenable: [/]，(/，/，/)，[/]，(1，0)，换档控制使能
+  ///< 0x0:Not Enable
+  ///< 0x1:Enable
+  bool apa_transprndshiftenable = 6;
+  ///< apa_transprndshiftrequest: [/]，(/，/，/)，[/]，(1，0)，目标档位请求
+  ///< 0x0:No Request
+  ///< 0x1:Park
+  ///< 0x2:Reverse
+  ///< 0x3:Neutral
+  ///< 0x4:Drive
+  ///< 0x5:invalid
+  ///< 0x6~0x7:reserved
+  uint32 apa_transprndshiftrequest = 7;
+  ///< apa_transprndshiftreqvalid: [/]，(/，/，/)，[/]，(1，0)，目标档位请求有效
+  ///< 0x0:Invalid
+  ///< 0x1:Valid
+  bool apa_transprndshiftreqvalid = 8;
+  ///< apa_targetacceleration: [m/s2]，(/，/，/)，[/]，(1，0)，apa_目标加速度
+  double apa_targetacceleration = 9;
+  ///< apa_targetaccelerationvalid: [/]，(/，/，/)，[/]，(1，0)，apa_目标加速度有效信号
+  ///< 0x0:not enable
+  ///< 0x1:enable
+  bool apa_targetaccelerationvalid = 10;
+  ///< apa_pttorqreq: [Nm]，(/，/，/)，[/]，(1，0)，apa_扭矩请求(VCU接收)
+  double apa_pttorqreq = 11;
+  ///< apa_pttrqreqvalid: [/]，(/，/，/)，[/]，(1，0)，扭矩请求有效标志位
+  ///< 0x0:Invalid
+  ///< 0x1:Valid
+  bool apa_pttrqreqvalid = 12;
+  ///< APA_EPBrequest: [Nm]，(/，/，/)，[/]，(1，0),EPB
+  ///< 0x0:no request
+  ///< 0x1:request brake
+  ///< 0x2:request release
+  double apa_epbrequest = 13;
+  ///< APA_EPBrequestValid: [/]，(/，/，/)，[/]，(1，0)，EPB请求有效标志位
+  ///< 0x0:Invalid
+  ///< 0x1:Valid
+  bool apa_epbrequestvalid = 14;
+}
+/**
+* @brief CtrlCmd
+* @detail 泊车控制指令
+*/
+message CtrlCmd {
+  ///< apa_apa_onoff: [/]，(/，/，/)，[/]，(1，0)，apa_功能开启状态
+  ///< 0x0:OFF
+  ///< 0x1:ON
+  uint32 apa_apa_onoff = 1;
+  ///< latcmd: [/]，(/，/，/)，[/]，(1，0)，横向控制指令
+  LatCmd latcmd = 2;
+  ///< loncmd: [/]，(/，/，/)，[/]，(1，0)，纵向控制指令
+  LongCmd loncmd = 3;
+}
+/**
+* @brief CtrlDebugstruct
+* @detail 泊车控制调试信号
+*/
+message CtrlDebugstruct {
+  ///< apa_steeringanglereq: [degree]，(/，/，/)，[/]，(1，0)，apa_转向角度请求
+  double apa_steeranglereq = 1;
+  ///< apa_lsc_targetvehiclespeed: [km/h]，(/，/，/)，[/]，(1，0)，apa_目标车辆速度
+  double apa_lsc_targetvehiclespeed = 2;
+  ///< apa_lsc_longcoordstatue: [/]，(/，/，/)，[/]，(1，0)，apa_纵向控制状态
+  uint32 apa_lsc_longcoordstatue = 3;
+  ///< apa_lsc_productfriction: [/]，(/，/，/)，[/]，(1，0)，apa_产品摩擦力
+  int32 apa_lsc_productfriction = 4;
+  ///< apa_lsc_productprop: [/]，(/，/，/)，[/]，(1，0)，apa_产品比例系数
+  double apa_lsc_productprop = 5;
+  ///< apa_lsc_productslope: [/]，(/，/，/)，[/]，(1，0)，apa_产品坡道
+  int32 apa_lsc_productslope = 6;
+  ///< apa_lsc_productintergal: [/]，(/，/，/)，[/]，(1，0)，apa_产品积分
+  double apa_lsc_productintergal = 7;
+  ///< apa_lsc_targetaccelerationspd: [/]，(/，/，/)，[/]，(1，0)，apa_目标加速度速度
+  double apa_lsc_targetaccelerationspd = 8;
+  ///< apa_lsc_targetaccelerationdist: [/]，(/，/，/)，[/]，(1，0)，apa_目标加速度距离
+  double apa_lsc_targetaccelerationdist = 9;
+  ///< apa_lsc_slopetorque: [/]，(/，/，/)，[/]，(1，0)，apa_坡道扭矩
+  int32  apa_lsc_slopetorque = 10;
+  ///< apa_lsc_targetspeedtorque: [/]，(/，/，/)，[/]，(1，0)，apa_目标速度扭矩
+  double apa_lsc_targetspeedtorque = 11;
+  ///< apa_lsc_targetspeedaccel: [/]，(/，/，/)，[/]，(1，0)，apa_目标速度加速度
+  double apa_lsc_targetspeedaccel = 12;
+  ///< apa_lsc_targetspeeddynamic: [/]，(/，/，/)，[/]，(1，0)，apa_目标速度
+  double apa_lsc_targetspeeddynamic = 13;
+  ///< apa_lsc_targetdist: [/]，(/，/，/)，[/]，(1，0)，apa_目标距离
+  double apa_lsc_targetdist = 14;
+  ///< apa_lsc_softwareversion: [/]，(/，/，/)，[/]，(1，0)，apa_版本号
+  uint32 apa_lsc_softwareversion = 15;
+  ///< apa_lsc_disttohint_m: [/]，(/，/，/)，[/]，(1，0)，apa_期望行驶距离
+  double apa_lsc_disttohint_m = 16;
+  ///< apa_lsc_finishsta: [/]，(/，/，/)，[/]，(1，0)，apa_结束状态
+  uint32 apa_lsc_finishsta = 17;
+  ///< apa_normalbrktostopflg: [/]，(/，/，/)，[/]，(1，0)，apa_正常刹停标志位
+  bool apa_normalbrktostopflg = 18;
+  ///< apa_targetgearprocess: [/]，(/，/，/)，[/]，(1，0)，apa_目标挡位处理
+  uint32 apa_targetgearprocess = 19;
+  ///< apa_brakepedalstatus: [/]，(/，/，/)，[/]，(1，0)，apa_刹车踏板状态
+  bool apa_brakepedalstatus = 20;
+  ///< apa_lsc_targettorque: [/]，(/，/，/)，[/]，(1，0)，apa_目标扭矩
+  int32 apa_lsc_targettorque = 21;
+  ///< apa_actualgeartype: [/]，(/，/，/)，[/]，(1，0)，apa_实际挡位类型
+  uint32 apa_actualgeartype = 22;
+  ///< apa_roadslope: [/]，(/，/，/)，[/]，(1，0)，apa_roadslope坡道信息
+  double apa_roadslope = 23;
+  ///< apa_outcsm_sts_mcucontrolstatus: [/]，(/，/，/)，[/]，(1，0)，apa_mcu握手状态
+  uint32 apa_outcsm_sts_mcucontrolstatus = 24;
+  ///< apa_outcsm_sts_handshakeabortreasondetail: [/]，(/，/，/)，[/]，(1，0)，apa_mcu握手中止原因
+  uint32 apa_outcsm_sts_handshakeabortreasondetail = 25;
+  ///< apa_out_handshakereset: [/]，(/，/，/)，[/]，(1，0)，apa_mcu握手重置
+  bool apa_out_handshakereset = 26;
+  ///<steermiddle> : [/]，(/，/，/)，[/]，(1，0)，apa_方向盘请求回正信号
+  double steermiddle = 27;
+   ///< steerangreqfinal: [degree]，(/，/，/)，[/]，(1，0)，apa_转向角度中间变量请求
+  double steerangreqfinal = 28;
+  ///< sas_angle_hold: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘转角回正保持信号
+  bool sas_angle_hold = 29;
+  ///< sas_angle_upto_deg: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘转角回正实际信号
+  bool sas_angle_upto_deg = 30;
+  ///< steer_angle_keep: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘转角请求保持信号
+  bool steer_angle_keep = 31;
+  ///< park_sst_req_debug: [/]，(/，/，/)，[/]，(1，0)，apa_泊车方向盘回正请求模式信号
+  uint32 park_sst_req_debug = 32;
+  ///< ltc_status: [/]，(/，/，/)，[/]，(1，0)，apa_横向控制模块请求激活信号
+  bool ltc_status = 33;
+  ///< steer_angle_req: [degree]，(/，/，/)，[/]，(1，0)，hzp方向盘角度请求信号
+  double steer_angle_req = 34;
+  ///< parking_dir: [/]，(/，/，/)，[/]，(1，0)，远程挪车方向盘请求信号
+  uint32 parking_dir = 35;
+  ///< eps_sas_steer_angle: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘实际回复请求信号
+  double eps_sas_steer_angle = 36;
+  ///< eps_ads_abortfeedback: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘请求中断信号
+  uint32 eps_ads_abortfeedback = 37;
+  ///< eps_ads_controlfeedback: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘控制反馈信号
+  uint32 eps_ads_controlfeedback = 38;
+  ///< eps_ads_faultstate: [/]，(/，/，/)，[/]，(1，0)，apa_方向盘故障信号
+  uint32 eps_ads_faultstate = 39;
+  ///< epos: [/]，(/，/，/)，[/]，(1，0)，apa_横向位置偏差信号
+  double epos = 40;
+  ///< eyaw: [/]，(/，/，/)，[/]，(1，0)，apa_横向航向角偏差信号
+  double eyaw = 41;
+  ///< tarc: [/]，(/，/，/)，[/]，(1，0)，apa_预瞄曲率信号
+  double tarc = 42;
+  ///< gain_eyaw: [/]，(/，/，/)，[/]，(1，0)，apa_航向偏差增益信号
+  double gain_eyaw = 43;
+  ///< gain_epos: [/]，(/，/，/)，[/]，(1，0)，apa_横向位置偏差增益信号
+  double gain_epos = 44;
+}

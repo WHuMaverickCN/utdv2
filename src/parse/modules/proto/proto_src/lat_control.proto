@@ -1,0 +1,253 @@
+/**
+
+* @file     lat_control.proto
+* @author   张熏
+* @details  行车横向控制接口定义
+* @date     2023-05-26
+* @version  V1.3
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.20          <th>1.0                 <th>孙秋
+* <table>
+* @par      修改日志:行车横向控制接口
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.26          <th>1.1                 <th>孙秋
+* <table>
+* @par      修改日志:注释修改
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.4.25          <th>1.2                 <th>张熏
+* <table>
+* @par      修改日志:新增模式信号
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.5.26          <th>1.3                 <th>张熏
+* <table>
+
+*********************************************************************************
+
+*/
+
+ syntax="proto3"; 
+ package	LATProto;
+ import "seq_header.proto";
+ 
+/**
+ * @brief LatCtrlInfo
+ * @detail  横向控制信号
+ */
+message LatCtrlInfo {
+  ///< EPS电机最大扭矩限制值:[Nm],(0,-20.48,20.44),[/],(1,0),标识EPS电机最大扭矩限制值
+  double lato_motortorq_maxlim = 1; 
+  ///< EPS电机最小扭矩限制值:[Nm],(0,-20.48,20.44),[/],(1,0),标识EPS电机最小扭矩限制值
+  double lato_motortorq_minlim = 2;
+  ///< 横向控制请求状态:[/],(0,0,1),[/],(1,0),标识横向控制的请求状态
+  bool lato_acc_latang_req_active = 3;
+  ///< 转向角度请求: [degree],(0,720,-720),[/],(1,0),标识方向盘的转向角度请求值
+  double lato_acc_latang_req = 4;
+  ///< 横向控制请求模式:[/],(0,0,5),[/],(1,0),标识横向控制的请求状态
+  uint32 lato_lat_activemode = 5;
+  ///< ADS请求控制方式:[/],(0,0,7),[/],(1,0),标识ADS请求控制方式
+  uint32 lato_ads_reqmode = 6;
+  ///< 横向控制模块状态:[/],(1,0,1),[/],(1,0),标识横向控制模块的控制状态
+  bool lato_funstatus = 7;
+  ///< 横向控制可激活状态:[/],(1,0,1),[/],(1,0),标识横向控制可激活状态
+  bool lato_latstartup_valid = 8;
+  ///< 横向控制有效状态:[/],(1,0,1),[/],(1,0),标识横向控制有效状态
+  bool lato_latcontrol_valid = 9;
+  ///< 横向控制数据记录触发类型:[/],(0,0,2),[/],(1,0),标识横向控制数据记录触发类型
+  uint32 lat_data_trigger_type = 10;
+  ///< 横向控制数据记录触发是否有效，:[/],(0,0,1),[/],(1,0),标识横向控制数据记录触发是否有效
+  bool lat_data_trigger_valid = 11;
+  ///< 预瞄时间:[s],(0,0,10),[/],(1,0),标识横向控制预瞄时间
+  double lato_prvtime = 12;
+  ///< 最小预瞄距离:[m],(0,0,1),[/],(1,0),标识横向控制最小预瞄距离
+  double lato_minprvdis = 13;
+  ///< 最小预瞄距离:[m],(0,0,100),[/],(1,0),标识横向控制最大预瞄距离
+  double lato_maxprvdis = 14;
+  ///< time_clc: [s]，(0，0，1)，[/]，(1，0)，调度时间
+  double time_clc = 15;   
+  ///< time_use: [s]，(0，0，1)，[/]，(1，0)，使用时间
+  double time_use = 16; 
+  ///< ad_latreqmode: [/]，(0，0，7)，[/]，(1，0)，AD横向请求控制方式
+  uint32 ad_latreqmode = 17;
+  ///< lato_acc_des_turn_radiu: [/]，(0，0，7)，[/]，(1，0)，平台化目标转弯半径
+  double lato_acc_des_turn_radiu = 18;
+}
+
+/**
+ * @brief LatToEE
+ * @detail  横向控制给EE的信号
+ */
+message LatToEE{
+  ///< 方向盘中位角度修正值写入:[degree],(0,-12.8,12.7),[/],(0.1,0),标识写入E方的方向盘中位角度修正值
+  double lato_ee_sasoffset_write = 1; 
+}
+
+/**
+ * @brief LatToDTC
+ * @detail  横向控制给DTC的信号
+ */
+message LatToDTC{
+  ///< SAS中位偏差过大报DTC故障信息:[/],(0,0,1),[/],(1,0),标识SAS中位偏差过大报DTC故障信息
+  bool lato_dtc_sasmeasure_error = 1; 
+  ///< 横向控制偏差和航向角过大报DTC故障信息:[/],(0,0,1),[/],(1,0),标识横向控制偏差和航向角过大报DTC故障信息
+  bool lato_dtc_latin_error = 2; 
+  ///< EPS执行器响应报DTC故障信息:[/],(0,0,1),[/],(1,0),标识EPS执行器响应报DTC故障信息
+  bool lato_dtc_eps_error = 3; 
+}
+
+/**
+ * @brief DebugLAT
+ * @detail  横向调试信号
+ */
+ 
+message DebugLAT{
+  ///< LAT控制版本号:[/],(0,0,30240000),[/],(/,0),标识LAT控制版本号
+  uint32 lat_version_num = 1; 
+  ///< 心跳信号:[/],(0,0,15),[/],(1,0),心跳信号
+  uint32 lat_heart_beats = 2; 
+  ///< LAT模块时间戳:[s],(0,0,30240000),[/],(1,0),标识LAT模块时间戳
+  double lat_fswc_timestamp = 3; 
+  ///< 输入信号丢帧数量:[/],(0,0,30240000),[/],(1,0),标识输入信号丢帧数量
+  uint32 lat_fswc_throw_num = 4; 
+  ///< 功能安全转角限制值:[deg],(0,0,500),[/],(/,0),标识功能安全转角限制值
+  double lat_safe_anglimthd = 5; 
+  ///< 功能安全转速限制值:[deg/s],(0,0,500),[/],(/,0),标识功能安全转速限制值
+  double lat_safe_avelimthd = 6; 
+  ///< 转角差限制值:[deg],(0,0,100),[/],(/,0),标识转角差限制值
+  double lat_startup_anglimthd = 7; 
+  ///< 方向盘转角请求幅值的功能安全触发状态:[/],(0,0,1),[/],(1,0),标识方向盘转角请求幅值的功能安全触发状态, 0:未触发, 1:触发
+  bool lat_anglim_errinfo = 8; 
+  ///< 方向盘转角速率请求的功能安全触发状态:[/],(0,0,1),[/],(1,0),标识方向盘转角速率请求的功能安全触发状态, 0:未触发, 1:触发
+  bool lat_avelim_errinfo = 9; 
+  ///< 车辆启停时锁定的期望方向盘转角请求:[degree],(0,-720,720),[/],(0.01,0),标识车辆启停时锁定的期望方向盘转角
+  double lat_tjp_ang = 10; 
+  ///< 转角请求原始值:[deg],(0,-500,500),[/],(/,0),标识转角请求原始值
+  double lat_expang_origin = 11; 
+  ///< 横摆角速度闭环反馈值:[deg],(0,-720,720),[/],(/,0),标识横摆角速度闭环反馈值
+  double lat_fbang_yawrate = 12; 
+  ///< 闭环控制使能标识:[/],(0,0,1),[/],(1,0),标识闭环控制使能, 0-enable, 1-not enable
+  bool lat_trajfb_notenb = 13; 
+  ///< 轨迹闭环反馈值:[deg],(0,-720,720),[/],(/,0),标识轨迹闭环反馈值
+  double lat_dang_all = 14; 
+  ///< 偏差积分控制转角值:[deg],(0,-720,720),[/],(/,0),标识偏差积分控制转角值
+  double lat_iang_all = 15; 
+  ///< 弯道偏差积分控制转角值:[deg],(0,-720,720),[/],(/,0),标识弯道偏差积分控制转角值
+  double lat_iang_curv = 16; 
+  ///< 直道偏差积分控制转角值:[deg],(0,-720,720),[/],(/,0),标识直道偏差积分控制转角值
+  double lat_iang_strait = 17; 
+  ///< 前馈转角请求:[deg],(0,-720,720),[/],(/,0),标识前馈转角请求
+  double lat_ffang_all = 18; 
+  ///< 进出弯状态识别标志:[/],(0,0,3),[/],(1,0),标识进出弯状态识别标志, 0:直道, 1:进弯过程, 2:弯道, 3:出弯过程
+  uint32 lat_curve_inoutflag = 19; 
+  ///< 方向盘转角滤波系数:[/],(0,0,1),[/],(/,0),标识方向盘转角滤波系数
+  double lat_ang_filtcoef = 20; 
+  ///< 预瞄距离:[m],(0,0,100),[/],(/,0),标识预瞄距离
+  double lat_prvdis = 21; 
+  ///< sas自学习初始化状态:[/],(0,0,1),[/],(1,0),标识sas自学习初始化状态, 0:无初始化, 1:有初始化
+  bool lat_sas_initialflag = 22; 
+  ///< sas自学习更新触发状态:[/],(0,0,1),[/],(1,0),标识sas自学习更新触发状态, 0:无更新, 1:有更新
+  bool lat_sas_update_trigflag = 23; 
+  ///< 上一次sas偏差学习值:[deg],(0,-10,10),[/],(/,0),标识上一次sas偏差学习值
+  double lat_sasoffset_last = 24; 
+  ///< sas偏差平均值:[deg],(0,-10,10),[/],(/,0),标识sas偏差平均值
+  double lat_sasoffset_mean = 25; 
+  ///< sas偏差平均值学习次数:[deg],(0,0,30240000),[/],(1,0),标识sas偏差平均值学习次数
+  uint32 lat_sas_mean_num = 26; 
+  ///< sas偏差学习实时值:[deg],(0,-10,10),[/],(/,0),标识sas偏差学习实时值
+  double lat_sasoffset_rti = 27; 
+  ///< 轨迹突变标识:[/],(0,0,1),[/],(1,0),标识轨迹突变, 0-无, 1-有
+  bool lat_trajsuddchg = 28; 
+  ///< 读取的SAS偏差存储值:[deg],(0,-10,10),[/],(0.01,0),标识读取的SAS偏差存储值
+  double latin_ee_sasoffset_memo = 29; 
+  ///< 输入的横向请求模式:[/],(0,0,3),[/],(1,0),标识输入的横向请求模式
+  uint32 latin_latreqmode = 30; 
+  ///< 输入的横向请求:[/],(0,0,1),[/],(1,0),标识输入的横向请求
+  uint32 latin_sys_latstate = 31; 
+  ///< 输入的横摆角速度:[/],(0,-100,100),[/],(/,0),标识输入的横摆角速度
+  double latin_esp_yaw_rate = 32; 
+  ///< 输入的EPS标定状态:[/],(0,0,1),[/],(1,0),标识输入的EPS标定状态
+  uint32 latin_sas_calibrated = 33; 
+  ///< 输入的方向盘转角:[deg],(0,-720,720),[/],(/,0),标识输入的方向盘转角
+  double latin_sas_steering_angle = 34; 
+  ///< 输入的车速:[km/h],(0,0,360),[/],(/,0),标识输入的车速
+  double latin_esp_vehicle_speed = 35; 
+  ///< 输入的优化期望曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的优化期望曲率
+  double latin_opt_expcurv = 36; 
+  ///< 输入的偏差优化期望曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的偏差优化期望曲率
+  double latin_opt_expcurv_epos = 37; 
+  ///< 输入的航向角优化期望曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的航向角优化期望曲率
+  double latin_opt_expcurv_eyaw = 38; 
+  ///< 输入的匹配状态:[/],(0,0,1),[/],(1,0),标识输入的匹配状态
+  bool latin_cur_matchsts = 39; 
+  ///< 输入的轨迹有效状态:[/],(0,0,1),[/],(1,0),标识输入的轨迹有效状态
+  bool latin_path_valid = 40; 
+  ///< 输入的轨迹偏差:[m],(0,-10,10),[/],(/,0),标识输入的轨迹偏差
+  double latin_cur_epos = 41; 
+  ///< 输入的航向角偏差:[rad],(0,-1,1),[/],(/,0),标识输入的航向角偏差
+  double latin_cur_eyaw = 42; 
+  ///< 输入的轨迹曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的轨迹曲率
+  double latin_cur_trajcurv = 43; 
+  ///< 输入的轨迹远点曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的轨迹远点曲率
+  double latin_far_trajcurv = 44; 
+  ///< 输入的预瞄距离:[m],(0,0,100),[/],(/,0),标识输入的预瞄距离
+  double latin_prv_poslon = 45; 
+  ///< 输入的预瞄偏差:[m],(0,0,100),[/],(/,0),标识输入的预瞄偏差
+  double latin_prv_poslat = 46; 
+  ///< 输入的参考点偏差:[m],(0,-10,10),[/],(/,0),标识输入的参考点偏差
+  double latin_refpoint_epos = 47; 
+  ///< 输入的参考点曲率:[1/m],(0,-1,1),[/],(/,0),标识输入的参考点曲率
+  double latin_refpoint_trajcurv = 48; 
+  ///< 输入的规划模式:[/],(0,0,1),[/],(1,0),标识输入的规划模式
+  int32 latin_path_planning_mode = 49; 
+  ///< 输入的换道状态:[/],(0,-10,10),[/],(1,0),标识输入的换道状态
+  int32 latin_lane_change_state = 50; 
+  ///< 输入的偏移状态:[/],(0,-2,2),[/],(1,0),标识输入的偏移状态
+  int32 latin_offset_state = 51; 
+  ///< 输入的跟车状态:[/],(0,0,1),[/],(1,0),标识输入的跟车状态
+  int32 latin_follow_car_state = 52; 
+  ///< 输入的避障状态:[/],(0,0,1),[/],(1,0),标识输入的避障状态
+  int32 latin_avoid_obstacle_state = 53; 
+  ///< debug1:[/],(0,0,30240000),[/],(/,0), debug1
+  double debug1 = 54; 
+  ///< debug2:[/],(0,0,30240000),[/],(/,0), debug2
+  double debug2 = 55; 
+  ///< debug3:[/],(0,0,30240000),[/],(/,0), debug3 
+  double debug3 = 56; 
+  ///< debug4:[/],(0,0,30240000),[/],(/,0), debug4
+  double debug4 = 57; 
+  ///< debug5:[/],(0,0,30240000),[/],(/,0), debug5
+  double debug5 = 58;  
+} 
+
+
+/**
+ * @brief LatControlOutProto
+ * @detail  横向控制输出信号
+ */
+message LatControlOutProto{
+  ///< lat_ctrl_info: [/]，(0，0，1)，[/]，(1，0)，横向控制信号
+  LatCtrlInfo lat_ctrl_info = 1;
+  ///< lat_toee: [/]，(0，0，1)，[/]，(1，0)，横向控制给EE的信号
+  LatToEE lat_toee = 2;
+  ///< lat_to_dtc: [/]，(0，0，1)，[/]，(1，0)，横向控制给DTC的信号
+  LatToDTC lat_to_dtc = 3;
+  ///< debug_lat: [/]，(0，0，1)，[/]，(1，0)，横向调试信号
+  DebugLAT debug_lat = 4;
+  ///< seq_header: [/]，(0，0，1)，[/]，(1，0)，seq_header                                   
+  SeqHeaderProto.DelayHeader seq_header = 5;
+}
+

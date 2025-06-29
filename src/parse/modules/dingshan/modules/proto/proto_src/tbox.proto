@@ -1,0 +1,149 @@
+/**
+* @file     camera.proto
+* @author   kuxiaoyong
+* @details  车机数据相关输出
+* @date     2022-03-09
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.9          <th>1.0                 <th>kuxiaoyong 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	TboxProto;
+
+/**
+* @brief Tbox
+* @detail Tbox
+*/
+message Tbox{ 
+	///<BusTboxTime：[/],(/,/,/),[32],(1,0),
+    BusTboxTime tbox_time = 1;
+	
+	///< BusTboxSts：[/],(/,/,/),[32],(1,0),
+    BusTboxSts tbox_sts = 2;
+} 
+
+/**
+* @brief BusTboxSts
+* @detail BusTboxSts信息
+*/
+message BusTboxSts{ 
+	///< 手机发送的APA控制指令：[/],(0,0,31),[/],(1,0),标识手机发送的APA控制指令
+    uint32 tbox_apa_control_enable = 1;
+	
+	///< 手机发送的APA功能选择指令：[/],(0,0,7),[/],(1,0),标识手机发送的APA功能选择指令
+    uint32 tbox_apa_function_req = 2;
+	
+	///< 手机发送的HZP功能选择指令：[/],(0,0,7),[/],(1,0),标识手机发送的HZP功能选择指令
+    uint32 tbox_hzp_function_req = 3;
+	
+	///< 远程监控请求信号：[/],(0,0,3),[/],(1,0),标识远程监控请求信号
+    uint32 tbox_remote_detect_req = 4;
+	
+	///< 远程视频监控请求：[/],(0,0,1),[/],(1,0),标识远程视频监控请求
+    uint32 tbox_remote_dis_req = 5;
+	
+	///< TBOX远程启动请求：[/],(0,0,3),[/],(1,0),标识TBOX远程启动请求
+    uint32 tbox_remote_start_req = 6;
+	
+	///< 车机网络信号质量：[/],(0,0,7),[/],(1,0),标识车机网络信号质量
+    uint32 tbox_signal_strength = 7;
+	
+	///< 车机驻网状态信号：[/],(0,0,7),[/],(1,0),标识车机驻网状态信号 0:RADIO_NULL 1:RADIO_2G 2：RADIO_3G 3：RADIO_4G 4：RADIO_5G
+    uint32 tbox_signal_type = 8;
+	
+	///< 全车视频监控请求：[/],(0,0,3),[/],(1,0),标识全车视频监控请求
+    uint32 tbox_vehicle_vedio_detect_req = 9;
+	
+	///< 手机发送的HZP控制指令：[/],(0,0,15),[/],(1,0),标识手机发送的HZP控制指令
+    uint32 tbox_hzp_control_enable = 10;
+	
+	///< 数据服务模块收到数据包时的系统时间戳：[second],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 11;
+	///< TBOX_APA_X坐标：[/],(0x0,0,1920),[/],(1,0),0xFFFF:invalid(E2E/signalvalid)
+	double tbox_app_xlevel = 12;
+	///< TBOX_APA_Y坐标：[/],(0x0,0,1920),[/],(1,0),0xFFFF:invalid(E2E/signalvalid)
+	double tbox_app_ylevel = 13;
+	///< 远程监控信号延时: [ms],(/,/,/),[/],(1,0),标识2F7,0x0:Inactive 0x1:Lessthan500ms 0x2:500ms-1s 0x3:1s-1.5s 0x4:1.5s-2s 0x5:2s-2.5s 0x6:2.5s-3s 0x7:3s-3.5s 0x8:3.5s-4s 0x9:4s-4.5s 0xA:4.5s-5s 0xB-0xF:Reserved 0xFF:invalid(E2E/signalvalid)
+	uint32 tbox_apa_signaldelay = 14;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 15;
+
+    ///< MQTT的通道状态信息：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1: IGNITION	点火
+    ///< 0x2: ACTIVATED	通知激活
+    ///< 0x3: WAKE_UP	唤醒
+    ///< 0x4: SLEEP	休眠
+    ///< 0x5: HEART_BEAT	休眠心跳
+    ///< 0x6: POWER_OFF	断电
+    ///< 0x7: NETWORK_DISCONNECT	网络断开
+    ///< 0x8: NETWORK_RECONNECT	网络恢复
+    ///< 0x9: CHECK_STATUS	查询连接状态
+    uint32 mqtt_status = 16;
+} 
+
+/**
+* @brief BusTboxTime
+* @detail BusTboxTime信息
+*/
+message BusTboxTime{ 
+	///< 本地时间日：[day],(0,0,31),[/],(1,0),标识本地时间日
+    uint32 tbox_local_ti_date = 1;
+	
+	///< 本地时间时：[hour],(0,0,31),[/],(1,0),标识本地时间时
+    uint32 tbox_local_ti_hr = 2;
+	
+	///< 本地时间分：[minute],(0,0,63),[/],(1,0),标识本地时间分
+    uint32 tbox_local_ti_mins = 3;
+	
+	///< 本地时间月：[month],(0,0,15),[/],(1,0),标识本地时间月
+    uint32 tbox_local_ti_mth = 4;
+	
+	///< 本地时间秒：[second],(0,0,63),[/],(1,0),标识本地时间秒
+    uint32 tbox_local_ti_sec = 5;
+	
+	///< 本地时间有效位：[],(0,0,1),[/],(1,0),标识本地时间有效位
+    uint32 tbox_local_ti_vld = 6;
+	
+	///< 本地时间年：[year],(0,2000,2255),[/],(1,0),标识本地时间年
+    uint32 tbox_local_ti_year = 7;
+	
+	///< 数据服务模块收到数据包时的系统时间戳：[second],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 8;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 9;
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 10;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 11;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 12;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 13;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 14;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 15;	
+	
+	///< 预留信号：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 16;	
+} 

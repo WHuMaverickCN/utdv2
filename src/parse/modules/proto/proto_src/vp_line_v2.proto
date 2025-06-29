@@ -1,0 +1,492 @@
+/**
+* @file     vp_line_v2.proto
+* @author   liufuyu
+* @details  描述前视车道线信息
+* @date     2022-07-13
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.11          <th>1.0                 <th>liufuyu
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package VpLineV2;
+
+import "vp_perception_base.proto";
+import "vp_ndm_base_v2.proto";
+
+
+/**
+*@brief   原始车道线的类型
+*@detail  从contour拟合的原始车道线的类型
+*/
+enum LineType {
+  ///< LineType_Unknown：[/],(0,/,/),[/],(1,0),不确定的类型
+  LineType_Unknown = 0;   // 0 << 0
+  
+  ///< LineType_LaneLine：[/],(2,/,/),[/],(1,0),车道线
+  LineType_LaneLine = 2;  // 1 << 1
+  
+  ///< LineType_Curb：[/],(4,/,/),[/],(1,0),路沿
+  LineType_Curb = 4;      // 1 << 2
+  
+  ///< LineType_Center：[/],(8,/,/),[/],(1,0),车道中心线 
+  LineType_Center = 8;    // 1 << 3, Center line, virtual and in the median of lane
+  
+  ///< LineType_Guardrail：[/],(16,/,/),[/],(1,0),护栏 
+  LineType_Guardrail = 16;  // 1 << 4
+  
+  ///< LineType_ConcreteBarrier：[/],(32,/,/),[/],(1,0),混泥土护栏
+  LineType_ConcreteBarrier = 32;  // 1 << 5
+  
+  ///< LineType_Fence：[/],(64,/,/),[/],(1,0),栅栏，表征道路边界
+  LineType_Fence = 64;  // 1 << 6
+  
+  ///< LineType_Wall：[/],(128,/,/),[/],(1,0),墙
+  LineType_Wall = 128;  // 1 << 7
+  
+  ///< LineType_Canopy：[/],(256,/,/),[/],(1,0),天蓬
+  LineType_Canopy = 256;  // 1 << 8
+  
+  ///< LineType_Virtual：[/],(512,/,/),[/],(1,0), 虚拟线
+  LineType_Virtual = 512;  // 1 << 9
+  
+  ///< LineType_Cone：[/],(1024,/,/),[/],(1,0),锥桶线
+  LineType_Cone = 1024;  // 1 << 10
+}
+
+/**
+*@brief   曲线类型
+*@detail  曲线拟合方法
+*/
+enum CurveType {
+  ///< CurveType_Unknown：[/],(0,/,/),[/],(1,0),不确定
+  CurveType_Unknown = 0;  // 0 << 0
+  
+  ///< CurveType_ADAS：[/],(2,/,/),[/],(1,0),ADAS方法:3次曲线，输入为x
+  CurveType_ADAS = 2;  // 1 << 1
+  
+  ///< CurveType_Cubic：[/],(4,/,/),[/],(1,0),3次曲线拟合方法：3次曲线，输入为弧长l
+  CurveType_Cubic = 4;  // 1 << 2
+  
+  ///< CurveType_Bezier：[/],(8,/,/),[/],(1,0),3D贝赛尔曲线拟合方法
+  CurveType_Bezier = 8;  // 1 << 3
+}
+
+/**
+*@brief   原始车道线线型颜色
+*@detail  从contour拟合的原始车道线的颜色
+*/
+enum LineColor {
+  ///< LineColor_Unknown：[/],(0,/,/),[/],(1,0),不确定
+  LineColor_Unknown = 0;  // 0 << 0
+  
+  ///< LineColor_WHITE：[/],(2,/,/),[/],(1,0),白色
+  LineColor_WHITE = 2;  // 1 << 1
+  
+  ///< LineColor_YELLOW：[/],(4,/,/),[/],(1,0),黄色
+  LineColor_YELLOW = 4;  // 1 << 2
+  
+  ///< LineColor_ORANGE：[/],(8,/,/),[/],(1,0),橙色
+  LineColor_ORANGE = 8;  // 1 << 3
+  
+  ///< LineColor_BLUE：[/],(16,/,/),[/],(1,0),蓝色
+  LineColor_BLUE = 16;  // 1 << 4
+  
+  ///< LineColor_GREEN：[/],(32,/,/),[/],(1,0),绿色 
+  LineColor_GREEN = 32;  // 1 << 5
+  
+  ///< LineColor_GRAY：[/],(64,/,/),[/],(1,0),灰色 
+  LineColor_GRAY = 64;  // 1 << 6
+  
+  ///< LineColor_LETF_GRAY_RIGHT_YELLOW：[/],(128,/,/),[/],(1,0),左灰右黄 
+  LineColor_LETF_GRAY_RIGHT_YELLOW = 128;  // 1 << 7
+  
+  ///< LineColor_LETF_YELLOW_RIGHT_WHITE：[/],(256,/,/),[/],(1,0),左黄右白 
+  LineColor_LETF_YELLOW_RIGHT_WHITE = 256;  // 1 << 8
+}
+
+/**
+*@brief   原始车道线线型
+*@detail  从contour拟合的原始车道线的线型
+*/
+enum LineMarking {
+  ///< LineMarking_Unknown：[/],(0,/,/),[/],(1,0),不确定
+  LineMarking_Unknown = 0;  // 0 << 0
+  
+  ///< LineMarking_SolidLine：[/],(2,/,/),[/],(1,0),实线
+  LineMarking_SolidLine = 2;  // 1 << 1
+    
+  ///< LineMarking_DashedLine：[/],(4,/,/),[/],(1,0),虚线
+  LineMarking_DashedLine = 4;  // 1 << 2
+      
+  ///< LineMarking_ShortDashedLine：[/],(8,/,/),[/],(1,0),匝道的宽虚线
+  LineMarking_ShortDashedLine = 8;  // 1 << 3
+      
+  ///< LineMarking_DoubleSolidLine：[/],(16,/,/),[/],(1,0),双实线
+  LineMarking_DoubleSolidLine = 16;  // 1 << 4
+      
+  ///< LineMarking_DoubleDashedLine：[/],(32,/,/),[/],(1,0),双虚线
+  LineMarking_DoubleDashedLine = 32;  // 1 << 5
+      
+  ///< LineMarking_LeftSolidRightDashed：[/],(64,/,/),[/],(1,0),左实右虚
+  LineMarking_LeftSolidRightDashed = 64;  // 1 << 6
+      
+  ///< LineMarking_RightSolidLeftDashed：[/],(128,/,/),[/],(1,0),右实左虚
+  LineMarking_RightSolidLeftDashed = 128;  // 1 << 7
+      
+  ///< LineMarking_DashedLine：[/],(256,/,/),[/],(1,0),导流区
+  LineMarking_ShadedArea  = 256;     // 1 << 8, diversion line
+      
+  ///< LineMarking_LaneVirtualMarking：[/],(512,/,/),[/],(1,0),车道虚拟线
+  LineMarking_LaneVirtualMarking = 512;  // 1 << 9, virtual line of lane center
+      
+  ///< LineMarking_IntersectionVirualMarking：[/],(1024,/,/),[/],(1,0),路口虚拟线
+  LineMarking_IntersectionVirualMarking = 1024; // 1 << 10,virtual line at intersection
+      
+  ///< LineMarking_CurbVirtualMarking：[/],(2096,/,/),[/],(1,0),路边缘虚拟线
+  LineMarking_CurbVirtualMarking = 2048;   // 1 << 11, virtual line of road edge
+      
+  ///< LineMarking_UnclosedRoad：[/],(4096,/,/),[/],(1,0),未封闭道路段/线
+  LineMarking_UnclosedRoad = 4096;   // 1 << 12, line for non-closure road
+      
+  ///< LineMarking_RoadVirtualLine：[/],(8192,/,/),[/],(1,0),道路虚拟线
+  LineMarking_RoadVirtualLine = 8192;   // 1 << 13, virtual line of road
+      
+  ///< LineMarking_DecelerationSolidLine：[/],(16384,/,/),[/],(1,0),减速线实线
+  LineMarking_DecelerationSolidLine = 16384;  // 1 << 14, deceleration solid line
+      
+  ///< LineMarking_DashedLine：[/],(32768,/,/),[/],(1,0),减速线虚线
+  LineMarking_DecelerationDahLine = 32768;  // 1 << 15, deceleration dash line
+}
+
+/**
+*@brief   原始车道线来源类型
+*@detail  描述车道线来源类型，备注：请按逻辑运算符位&处理
+*/
+enum LineSource {
+  ///< LINE_SOURCE_INIT：[/],(1,/,/),[/],(1,0),INIT
+  LINE_SOURCE_INIT = 0;     // (1 << 0)
+  
+  ///< LINE_SOURCE_CROSSSING：[/],(1,/,/),[/],(1,0),自车变道标志位，判断的两个阈值：车辆中心线与车道线距离小于半个车身，且横向移动速度大于0.1m/s
+  LINE_SOURCE_CROSSSING = 1;     // (1 << 0)
+  
+  ///< LINE_SOURCE_OBSTACLE_BLOCKED：[/],(4,/,/),[/],(1,0),基于拥堵跟车预测，如果被前车近距离遮挡，则会预测
+  LINE_SOURCE_OBSTACLE_BLOCKED = 4;   // (1 << 2)
+    
+  ///< LINE_SOURCE_HISTORY_BASED：[/],(16,/,/),[/],(1,0),基于历史观测进行预测
+  LINE_SOURCE_HISTORY_BASED = 16;   // (1 << 4)
+      
+  ///< LINE_SOURCE_EXTRAPOLATION：[/],(32,/,/),[/],(1,0),基于车辆运动和车道线情况，即自车行驶状态和车道线趋势一致进行预测
+  LINE_SOURCE_EXTRAPOLATION = 32;   // (1 << 5)
+      
+  ///< LINE_SOURCE_UNKNOWN：[/],(512,/,/),[/],(1,0),Tracking status-不确定
+  LINE_SOURCE_UNKNOWN = 512;   // (1 << 9)
+      
+  ///< LINE_SOURCE_NEW：[/],(1024,/,/),[/],(1,0),Tracking status-新出车道线（首次）
+  LINE_SOURCE_NEW = 1024;     // (1 << 10)
+      
+  ///< LINE_SOURCE_MEASURED：[/],(2048,/,/),[/],(1,0),Tracking status-观测（更新）车道线
+  LINE_SOURCE_MEASURED = 2048;   // (1 << 11)
+      
+  ///< LINE_SOURCE_PREDICTED：[/],(4096,/,/),[/],(1,0),Tracking status-预测车道线
+  LINE_SOURCE_PREDICTED = 4096;   // (1 << 12)
+      
+  ///< LINE_SOURCE_OBSTACLE_LEFT：[/],(8192,/,/),[/],(1,0),cone position-锥桶在车道线左边
+  LINE_SOURCE_OBSTACLE_LEFT = 8192;  // (1 << 13)
+      
+  ///< LINE_SOURCE_OBSTACLE_RIGHT：[/],(16384,/,/),[/],(1,0),Cone position-锥桶在车道线右边
+  LINE_SOURCE_OBSTACLE_RIGHT = 16384;  // (1 << 14)
+      
+  ///< LINE_EDGE_CURB：[/],(32768,/,/),[/],(1,0), 路沿石
+  LINE_EDGE_CURB = 32768;  // (1 << 15)
+      
+  ///< LINE_EDGE_GUARDRAIL：[/],(65536,/,/),[/],(1,0), 车道线由护栏组成[Reserved]
+  LINE_EDGE_GUARDRAIL = 65536; // (1 << 16)
+      
+  ///< LINE_EDGE_CONCRET_BARRIER：[/],(131072,/,/),[/],(1,0),车道线由混凝土屏障构成[Reserved]
+  LINE_EDGE_CONCRET_BARRIER = 131072;  // (1 << 17)
+      
+  ///< LINE_EDGE_WALL：[/],(262144,/,/),[/],(1,0),Road edge-墙[Reserved]
+  LINE_EDGE_WALL = 262144;  // (1 << 18)
+      
+  ///< LINE_EDGE_CANOPY：[/],(524288,/,/),[/],(1,0),Road edge-遮棚[Reserved]
+  LINE_EDGE_CANOPY = 524288;  // (1 << 19)
+      
+  ///< LINE_EDGE_CONE：[/],(1048576,/,/),[/],(1,0),Road edge-锥桶连线
+  LINE_EDGE_CONE = 1048576;  // (1 << 20)
+      
+  ///< LINE_EDGE_OTHER：[/],(2097152,/,/),[/],(1,0),Road edge-其他,指除路沿石、锥桶连线外的道路边界
+  LINE_EDGE_OTHER = 2097152;  // (1 << 21)
+      
+  ///< LINE_SOURCE_STOPLINE：[/],(33554432,/,/),[/],(1,0),停止线标志，-10~40m范围内触发
+  LINE_SOURCE_STOPLINE = 33554432;  // (1 << 25)
+      
+  ///< LINE_SOURCE_SEPARATE：[/],(67108864,/,/),[/],(1,0),非平行性和平行状态输出标志
+  LINE_SOURCE_SEPARATE = 67108864;  // (1 << 26)
+}
+
+/**
+*@brief   原始车道线位置
+*@detail  从contour拟合的原始车道线位置
+*/
+enum LinePosition {
+  ///< LinePosition_Left：[/],(0,/,/),[/],(1,0),左车道线
+  LinePosition_Left = 0;  // 0 << 0
+     
+  ///< LinePosition_Right：[/],(2,/,/),[/],(1,0),右车道线
+  LinePosition_Right = 2;  // 1 << 1
+       
+  ///< LinePosition_LeftLeft：[/],(4,/,/),[/],(1,0),左左车道线
+  LinePosition_LeftLeft = 4;  // 1 << 2
+       
+  ///< LinePosition_RightRight：[/],(8,/,/),[/],(1,0),右右车道线
+  LinePosition_RightRight = 8;  // 1 << 3
+       
+  ///< LinePosition_LeftOutside：[/],(16,/,/),[/],(1,0),导流左分支线
+  LinePosition_LeftOutside = 16;  // 1 << 4 the left out side branch for Y structure lines
+       
+  ///< LinePosition_RightOutside：[/],(32,/,/),[/],(1,0),导流右分支线
+  LinePosition_RightOutside = 32;  // 1 << 5 the right out side branch for Y structure lines 
+       
+  ///< LinePosition_LeftLeftLeft：[/],(64,/,/),[/],(1,0),左左左车道线，输出场景：车辆在三车道中最右车道会输出LLL
+  LinePosition_LeftLeftLeft = 64;  // 1 << 6
+       
+  ///< LinePosition_RightRightRight：[/],(128,/,/),[/],(1,0),右右右车道线，输出场景：车辆在三车道中最左车道会输出RRR
+  LinePosition_RightRightRight = 128;  // 1 << 7
+}
+
+/**
+*@brief   匝道口交叉点属性
+*@detail  匝道口交叉点属性：不确定，分离点，汇入点
+*/
+enum ExtraPointType {     
+  ///< EXTRA_POINT_TYPE_INIT：[/],(1,/,/),[/],(1,0),INIT
+  EXTRA_POINT_TYPE_INIT = 0;   // default type (0)
+  
+  ///< EXTRA_POINT_TYPE_UNKNOWN：[/],(1,/,/),[/],(1,0),不确定
+  EXTRA_POINT_TYPE_UNKNOWN = 1;   // default type (1 << 0)
+         
+  ///< EXTRA_POINT_TYPE_DIVISION：[/],(2,/,/),[/],(1,0),匝道口分流点
+  EXTRA_POINT_TYPE_DIVISION = 2;  // ramp division point (1 << 1)
+         
+  ///< EXTRA_POINT_TYPE_MERGE：[/],(4,/,/),[/],(1,0),匝道口合流点
+  EXTRA_POINT_TYPE_MERGE = 4;     // ramp merge point (1 << 2)
+}
+
+/**
+*@brief   匝道口交叉点消息
+*@detail  匝道口交叉点消息，包含匝道口交叉点及其属性定义
+*/
+message ExtraPoints {
+  ///< extra_points：[m],(/,/,/),[/],(1,0),匝道口交叉点坐标，包含（x，y，z）
+  repeated VpNdmProtoV2.Point extra_points = 1;  // extra point
+  
+  ///< extra_points_type：[/],(1,1,4),[/],(1,0),匝道口交叉点类型 ，详细可见ExtraPointType描述
+  repeated int32 extra_points_type = 2;  // type for extra point
+}
+
+/**
+*@brief   车道线采样点消息
+*@detail  车道线采样点信息，包含采样点及其类型定义
+*/
+message Contour {
+  ///< Point pts ：[m],(/,/,/),[/],(1,0),以多个点描述的轮廓线，每个点以point结构体存储，包含（x，y，z）
+  repeated VpNdmProtoV2.Point pts = 1;
+  
+  ///< type：[/],(/,/,/),[/],(1,0),骨骼化点类型，枚举类型与LineType一致，可见LineType描述，ContourType unknown is 0, use ==
+  int32 type = 2;
+
+  ///< confidence：[/],(/,/,/),[/],(1,0),标识点集置信度
+  float confidence = 3;  
+}
+
+/**
+ * @brief  Pitch消息
+ * @detail 车道线的Pitch信息
+ */
+message PitchInfo {
+  ///< valid：[/],(/,0,1),[/],(1,0),pitch的有效标志位
+  bool valid = 1;
+  ///< pitch：[/],(0,/,/),[/],(1,0),pitch值
+  float pitch = 2;
+}
+
+/**
+ * @brief  三次曲线消息
+ * @detail 描述曲线消息
+ */
+message CurveLine {
+  ///< points：[m],(/,/,/),[/],(1,0),VCS坐标系下曲线对应的稀疏化后的采样点。每个采样点以point结构体储存，包含（x，y，z）
+  repeated VpNdmProtoV2.Point points = 1;  // sample points of curveline
+
+  ///< pred_point：[/],(/,/,/),[/],(1,0),贝塞尔曲线端点对应的前驱控制点[未使用，reserved]
+  VpNdmProtoV2.Point pred_point = 2;  
+
+  ///< succ_point：[/],(/,/,/),[/],(1,0),贝塞尔曲线端点对应的后继控制点[未使用，reserved]
+  VpNdmProtoV2.Point succ_point = 3;  
+
+  ///< width：[m],(/,/,/),[/],(1,0),曲线宽度，即曲线垂直于Z轴方向的宽度
+  float width = 4;
+
+  ///< vir_to_real_index：[/],(/,/,/),[/],(1,0),虚线变实线的端点索引，虚线变实线的点在points中对应的下标[未使用，reserved]
+  repeated uint32 vir_to_real_index = 5; 
+
+  ///< real_to_vir_index：[/],(/,/,/),[/],(1,0),实线变虚线的端点索引，实线变虚线的点在points中对应的下标[未使用，reserved]
+  repeated uint32 real_to_vir_index = 6; 
+
+  ///< t：[m],(/,/,/),[/],(1,0),参数方程弧长，即points中每个点对应的参数方程弧长，CurveType_Cubic专用[未使用，reserved]
+  repeated double t = 7;    
+                           
+  ///< type：[/],(/,/,/),[/],(1,0),曲线类型，详细可见CurveType描述，仅输出CurveType_ADAS类型
+  int32 type = 10;
+  
+  ///< start_pt：[m],(/,/,/),[/],(1,0),ADAS曲线的起点，即曲线的近端点
+  VpNdmProtoV2.Point start_pt = 11;  // start point for ADAS curve
+  
+  ///< x_coeff：[/],(/,/,/),[/],(1,0),曲线为CurveType_Cubic形式的三阶曲线参数方程中x轴系数[CurveType_Cubic类型未使用，reserved]	
+  repeated double x_coeff = 12; 
+
+  ///< y_coeff：[/],(/,/,/),[/],(1,0),曲线为CurveType_Cubic形式的三阶曲线参数方程中y轴系数
+  repeated double y_coeff = 13; 
+
+  ///< z_coeff：[/],(/,/,/),[/],(1,0),曲线为CurveType_Cubic形式的三阶曲线参数方程中z轴系数[CurveType_Cubic类型未使用，reserved]
+  repeated double z_coeff = 14;
+  ///< up_points：[/],(/,/,/),[/],(1,0),围墙，栏杆等上沿采样点[未输出，reserved]		
+  repeated VpNdmProtoV2.Point up_points = 15;  // The upper edge point, corresponding to the variable points one by one
+
+  ///< h_coeff：[/],(/,/,/),[/],(1,0),围墙，栏杆等的高度参数方程系数[未输出，reserved]
+  repeated double h_coeff = 16;
+
+  ///< t_max：[m],(/,/,/),[/],(1,0),对于CurveType_ADAS类型表示VCS坐标下曲线x方向长度，杜宇CurveType_Cubic类型代表曲线弧长
+  double t_max = 17;     // the max arc length
+
+  ///< color：[/],(/,/,/),[/],(1,0),车道线颜色，枚举类型详细可见LineColor描述
+  int32 color = 21;  // LineColor unknown is 0, use ==
+
+  ///< marking：[/],(/,/,/),[/],(1,0),车道线线型，枚举类型详细可见LineMarking描述
+  int32 marking = 22;  // LineMarking unknown is 0, use ==
+
+  ///< parsing_conf：[/],(/,0,1),[/],(1,0),车道线检测置信度，表征车道线的观测质量，置信度[0~1]
+  float parsing_conf = 23;  // parsing_channels confidence (0 - 1)
+
+  ///< rmse：[/],(/,0,1),[/],(1,0),车道线归一化拟合误差，即观测（采样点）和线的均方误差[0~1],值越高，拟合越好
+  float rmse = 24;  // fitting error, rmse (0 - 1)
+}
+
+/**
+ * @brief  单一连通域信息
+ * @detail 描述语义分割图上同一行内
+ */
+message RLE {
+  ///< y：[/],(0,0,/),[/],(1,0),连通域所在行
+  int32 y = 1;
+  
+  ///< xstart：[/],(0,0,/),[/],(1,0),连通域起始列
+  int32 xstart = 2;
+  
+  ///< xend：[/],(0,0,/),[/],(1,0),连通域终止列
+  int32 xend = 3;
+
+  ///< source：[/],(0,0,/),[/],(1,0),摄像头来源, 0 广角 1 长焦
+  int32 source = 4;
+}
+
+/**
+ * @brief  单一车道线信息
+ * @detail 描述单一曲线（车道线、道路边界）属性信息
+ */
+message Line {
+  ///< id：[/],(/,/,/),[/],(1,0),曲线的索引ID
+  int32 id = 1;
+  
+  ///< str_id：[/],(/,/,/),[/],(1,0),字符串描述曲线的索引ID[未输出,reserved]
+  string str_id = 2; 
+    
+  ///< life_time：[ms],(/,/,/),[/],(1,0),检测到该曲线的持续时长，指曲线的生命周期
+  int32 life_time = 3;
+    
+  ///< lines_3d：[/],(/,/,/),[/],(1,0),分段曲线，每条曲线包含若干个曲线段，详细可见CurveLine描述
+  repeated CurveLine lines_3d = 4;  // 3D curve lines
+    
+  ///< type：[/],(/,/,/),[/],(1,0),曲线类型，枚举类型详细可见LineType描述
+  int32 type = 9;   // LineType unknown is 0, use &
+  
+  ///< source：[/],(/,/,/),[/],(1,0),曲线来源，枚举类型详细可见LineSource描述
+  int32 source = 10;  // LineSource, use &
+  
+  ///< position：[/],(/,/,/),[/],(1,0),曲线位置属性，枚举类型详细可见LinePosition描述
+  int32 position = 11;  // LinePosition unknown is -1, use ==
+  
+  ///< conf：[/],(/,0,1),[/],(1,0),车道线置信度
+  float conf = 12;  // confidence (0-1)
+
+  ///< cross_points：[/],(/,/,/),[/],(1,0),匝道口交叉点（主车道输出，旁车道目前未输出），详细可见ExtraPoints描述
+  ExtraPoints cross_points = 20;  // cross points
+  
+  ///< extra_type：[/],(/,/,/),[/],(1,0),保留属性，其他用途 
+  int32 extra_type = 21;  // reserved for other
+  
+  ///<parsing_rles: [/],(/,/,/),[/],(1,0),车道线在语义分割图上的所有像素区域 
+  repeated RLE parsing_rles = 22;
+}
+
+/**
+ * @brief  当前图像帧所包含的所有曲线信息
+ * @detail 描述当前图像帧所包含的所有曲线（车道线、道路边界线）信息
+ */
+message Lines {
+  ///< header：[/],(/,/,/),[/],(1,0),数据头，包含摄像头ID，图像帧ID，时间撮等
+  VpPerceptionBaseProto.Header header = 1;
+  
+  ///< lines：[/],(/,/,/),[/],(1,0),当前帧所有曲线属性信息（车道线、道路边界线）
+  repeated Line lines = 2;  
+    
+  ///< dtlc：[m],(/,/,/),[/],(1,0),自车前轮外侧到车道线內沿横向距离[仅前视有效]
+  float dtlc = 3;
+  
+  ///< ttlc：[s],(/,/,/),[/],(1,0),穿行时距，自车前轮外侧到车道线內沿横向距离/自车横向速度[仅前视有效]
+  float ttlc = 4;
+  
+  ///< src_time_stamp：[ms],(/,/,/),[/],(1,0),同步unix时间戳，用于同步输出模式（处理完一帧输出一帧）
+  int64 src_time_stamp = 5;
+  
+  ///< asyn_time_stamp：[ms],(/,/,/),[/],(1,0),异步unix时间戳，用于异步输出模式（定周期触发）[未输出，reserved]
+  int64 asyn_time_stamp = 6;
+  
+  ///< tag：[/],(/,/,/),[/],(1,0),车道线标签[未输出，reserved]
+  int32 tag = 7;
+ 
+  ///< camera_matrix：[/],(/,/,/),[/],(1,0),车道线投影矩阵，可用于获取车道线VCS-图像坐标系转换关系[未输出，reserved] 
+  VpPerceptionBaseProto.CameraMatrix camera_matrix = 8;;
+  
+  ///< lane_sample_points：[/],(/,/,/),[/],(1,0),当前图像帧VCS下曲线的所有采样点，详细可见contour描述
+  repeated Contour lane_sample_points = 9;  // front camera sample
+  
+  ///< pitch_info：[/],(/,/,/),[/],(1,0),车道线的pitch信息，详细可见PitchInfo描述 
+  PitchInfo pitch_info = 10;
+}
+
+/**
+ * @brief  更新缓存信息
+ * @detail 描述当前图像帧所包含的所有曲线（车道线、道路边界线）信息
+ */
+message UpdateCache {
+  ///< sensor_ids：[/],(/,/,/),[/],(1,0),传感器ID 
+  repeated int32 sensor_ids = 1;
+  
+  ///< timestamps：[/],(/,/,/),[/],(1,0),时间戳
+  repeated int64 timestamps = 2;  // same size with sensor_id
+}
+

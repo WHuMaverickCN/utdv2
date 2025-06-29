@@ -1,0 +1,191 @@
+/**
+
+* @file     logical_layer_v2.proto
+* @author   zhanghongjie
+* @details  BEV逻辑层相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+syntax = "proto3";
+
+import "vp_ndm_base_v2.proto";
+import "vp_line_v2.proto";
+import "vp_lane_v2.proto";
+
+package VpNdmProtoV2;
+
+
+/**
+* @brief Elevation信息
+* @detail TODO
+*/
+message Elevation {
+  ///< id信息：[/],(0,0,1),[/],(1,0),id信息
+  optional string id = 1;
+  ///< id信息：[/],(0,0,1),[/],(1,0),id信息
+  repeated string elevationplane_ids = 2;
+  ///< link信息：[/],(0,0,1),[/],(1,0),link信息
+  repeated string link_ids = 20;  
+}
+
+/**
+* @brief 停车区信息
+* @detail TODO
+*/
+message ParkingSpace {
+  ///< id信息：[/],(0,0,1),[/],(1,0),向上索引,存储其在拓扑层所属的parking(停车场)
+  optional string id = 1;
+  ///< id信息：[/],(0,0,1),[/],(1,0)，一个停车区包括一个或多个停车位
+  repeated string parkingslot_ids = 2;
+  ///< id信息：[/],(0,0,1),[/],(1,0)，边界线id,GeneralLine
+  repeated string border_ids = 3;
+  ///< 信息：[/],(0,0,1),[/],(1,0)，边界线多边形,
+  optional Polygon bounding_polygon = 4;
+  ///< link信息：[/],(0,0,1),[/],(1,0)，ParkingSpace,Section,Junction的id
+  repeated string link_ids = 20;  //
+  ///< 限制区信息：[/],(0,0,1),[/],(1,0)，无
+  optional ParkingSpaceRestriction restriction = 30;
+}
+
+/**
+* @brief 道路类型
+* @detail TODO
+*/
+enum RoadType {
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，未知
+  RoadType_UnKnown = 0; // 0x0 未知
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，普通道路
+  RoadType_Common = 1; // 0x1 普通道路
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，航道
+  RoadType_Ferry = 2; // 0x2航道
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，隧道
+  RoadType_Tunnel = 4; // 0x4隧道
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，桥梁
+  RoadType_Bridge = 8; // 0x8桥梁
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，地下通道
+  RoadType_UnderPass = 16; // 0x10地下通道
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，开合桥
+  RoadType_FoldingBridge = 32; // 0x20开合桥
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，死胡同
+  RoadType_DeadEnd = 64; // 0x40 死胡同
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，客轮码头
+  RoadType_FerryTerminal = 128; // 0x80 客轮码头
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，收费站
+  RoadType_TollBooth = 256; // 0x100 收费站
+  // < 道路类型：[/],(0,0,1),[/],(1,0)，铁路道口
+  RoadType_RailroadCrossing = 512; // 0x200铁路道口
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，行人过路处
+  RoadType_PedestrianCrossing = 1024; // 0x400行人过路处
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，速度缓冲区
+  RoadType_SpeedBump = 2048; // 0x800速度缓冲区
+  ///< 道路类型：[/],(0,0,1),[/],(1,0)，检查站
+  RoadType_CertifiedRoad = 4096; // 0x1000 检查站
+};
+
+
+/**
+* @brief 区间类型信息
+* @detail TODO
+*/
+message Section {
+  ///< id：[/],(0,0,1),[/],(1,0)，id
+  optional string id = 1;
+  ///< 车道id：[/],(0,0,1),[/],(1,0)，车道id
+  repeated string lane_ids = 2;
+  ///< 左侧边界id：[/],(0,0,1),[/],(1,0)，左侧边界id
+  repeated string l_border_ids = 3;
+  ///< 右键边界id：[/],(0,0,1),[/],(1,0)，右侧边界id
+  repeated string r_border_ids = 4;
+  ///< link信息：[/],(0,0,1),[/],(1,0)，link信息
+  repeated Link objs = 5;
+  ///< section长度:[/],(0,0,1),[/],(1,0)，section长度
+  optional double length = 6;  
+  ///< 前驱id:[/],(0,0,1),[/],(1,0)，前驱id
+  repeated string pred_ids = 20;  
+  ///< 后继id:[/],(0,0,1),[/],(1,0)，后继id
+  repeated string succ_ids = 21;  
+  ///< 左侧id:[/],(0,0,1),[/],(1,0)，左侧id
+  repeated string left_ids = 22;  
+  ///< 右侧id:[/],(0,0,1),[/],(1,0)，右侧id
+  repeated string right_ids = 23; 
+  ///< 边界多边形:[/],(0,0,1),[/],(1,0)，边界多边形
+  optional Polygon bounding_polygon = 30;
+  //optional SpecialSituationType special_situation_type = 31;
+  //optional RoadClassType road_class_type = 32;
+  ///< link_identifiers:[/],(0,0,1),[/],(1,0),无
+  repeated Link link_identifiers = 33;
+  ///< lane_group_id:[/],(0,0,1),[/],(1,0),无
+  optional int64 lane_group_id = 34;
+  ///< RoadType:[/],(0,0,1),[/],(1,0),无
+  optional uint64 road_type = 35; 
+  ///< wu:[/],(0,0,1),[/],(1,0)，pointcloud_files
+  repeated string pointcloud_files = 40;
+  ///< wu:[/],(0,0,1),[/],(1,0),pointcloud_file_md5sum
+  repeated string pointcloud_file_md5sum = 41;
+}
+
+/**
+* @brief 交汇处类型信息
+* @detail TODO
+*/
+message Junction {
+  ///< id:[/],(0,0,1),[/],(1,0),无
+  optional string id = 1;
+  ///< link信息:[/],(0,0,1),[/],(1,0),link信息
+  repeated Link objs = 2;
+  ///< laneid:[/],(0,0,1),[/],(1,0),laneid
+  repeated string lane_ids = 11;
+  ///< 边界多边形:[/],(0,0,1),[/],(1,0)，边界多边形
+  optional Polygon bounding_polygon = 18;
+  ///< Section:[/],(0,0,1),[/],(1,0)，边界多边形
+  repeated string in_link_ids = 21;  
+  ///< Section:[/],(0,0,1),[/],(1,0)，边界多边形
+  repeated string out_link_ids = 22;  
+  ///< ids:[/],(0,0,1),[/],(1,0),junction内所有车道进行分组
+  repeated string section_ids = 23;
+}
+
+/**
+* @brief bev 逻辑层信息
+* @detail TODO
+*/
+message LogicalLayer {
+  ///< 虚拟车道线:[/],(0,0,1),[/],(1,0),虚拟车道线
+  repeated VpLineV2.Line virtuallines = 1;
+  ///< 车道:[/],(0,0,1),[/],(1,0),车道
+  repeated Lane lanes = 2;
+  ///< 停车区:[/],(0,0,1),[/],(1,0),停车区
+  repeated ParkingSpace parkingspaces = 4;
+  ///< 区间:[/],(0,0,1),[/],(1,0),区间
+  repeated Section sections = 5;
+  ///< 交汇点:[/],(0,0,1),[/],(1,0),交汇点
+  repeated Junction junctions = 6;
+  ///< elevations:[/],(0,0,1),[/],(1,0),elevations
+  repeated Elevation elevations = 7;
+}

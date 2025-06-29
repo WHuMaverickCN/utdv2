@@ -1,0 +1,315 @@
+/**
+* @file     phoneset.proto
+* @author   liuhang
+* @details  车机数据相关输出
+* @date     2023-08-03
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.8.3          <th>1.0                 <th>liuhang 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	PhonesetProto;
+import "seq_header.proto";
+
+/**
+* @brief Phoneset 100ms
+* @detail Phoneset信息 100ms
+*/
+message Phoneset{
+	///< 数据服务模块收到数据包时的系统时间戳：[second],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///< BusRFBT信息：[/],(/,/,/),[/],(/,/),/
+    BusRFBT bus_rfbt = 2;
+
+    ///< 蓝牙遥控泊车指令信息：[/],(/,/,/),[/],(/,/),/
+    BleRpaCtl ble_rpa_ctl = 3;
+
+    ///< 钥匙基础信息：[/],(/,/,/),[/],(/,/),/
+    SysKeyInfo sys_key_info = 4;
+
+    ///< 钥匙基础信息：[/],(/,/,/),[/],(/,/),/
+    BlePhyKeyInfo ble_phy_key_info = 5;
+
+    ///< 统计数据帧与时间戳信息：[/],(/,/,/),[/],(/,/),
+    SeqHeaderProto.SeqHeader seqheader = 6;
+
+    ///< 钥匙设置信息：[/],(/,/,/),[/],(/,/),
+    KeySetInfo key_set_info = 7;
+}
+
+/**
+* @brief BusRFBT
+* @detail BusRFBT信息 100ms
+*/
+message BusRFBT{ 
+	///< 安全认证状态：[/],(0,0,3),[/],(1,0),标识安全认证状态
+    uint32 gw_saf_cert_sts = 1;
+	
+	///< 蓝牙连接状态：[/],(0,0,7),[/],(1,0),标识蓝牙连接状态
+    uint32 rfbt_ble_connect_sts = 2;
+	
+	///< 手机模式泊车控制取消：[/],(0,0,1),[/],(1,0),标识手机模式泊车控制取消
+    uint32 gw_rfbt_apa_maneuver_cancel = 3;
+	
+	///< 手机模式泊车控制开始：[/],(0,0,1),[/],(1,0),标识手机模式泊车控制开始
+    uint32 gw_rfbt_apa_maneuver_start = 4;
+	
+	///< 手机模式泊车控制暂停：[/],(0,0,1),[/],(1,0),标识手机模式泊车控制暂停
+    uint32 gw_rfbt_apa_maneuver_suspend = 5;
+	
+	///< 手机泊出模式选择：[/],(0,0,7),[/],(1,0),标识手机泊出模式选择
+    uint32 gw_rfbt_apapoc_mode_select = 6;
+	
+	///< ASP功能手机开关：[/],(0,0,3),[/],(1,0),标识ASP功能手机开关
+    uint32 gw_rfbt_asp_switch = 7;
+	
+	///< RPA功能手机开关：[/],(0,0,3),[/],(1,0),标识RPA功能手机开关
+    uint32 gw_rfbt_rpa_switch = 8;
+	
+	///< 手机模式用户选择的车位：[/],(0,0,7),[/],(1,0),标识手机模式用户选择的车位
+    uint32 gw_rfbt_slot_user_selected = 9;
+	
+	///< 手机泊车后退按键：[/],(0,0,1),[/],(1,0),标识手机泊车后退按键
+    uint32 gw_rfbt_verticalbackward = 10;
+	
+	///< 手机泊车前进按键：[/],(0,0,1),[/],(1,0),标识手机泊车前进按键
+    uint32 gw_rfbt_verticalforward = 11;
+	
+	///< 手机APA功能模块使能：[/],(0,0,3),[/],(1,0),标识手机APA功能模块使能
+    uint32 gw_smartphone_ap_amodule_enable = 12;
+	
+	///< 3A2_授权值：[/],(0,0,16777215),[/],(1,0),标识3A2_授权值
+    uint32 rfbt_authernticator_3_a2 = 13;
+	
+	///< 3A2_复位标志：[/],(0,0,3),[/],(1,0),标识3A2_复位标志
+    uint32 rfbt_reset_flag_3_a2 = 14;
+	
+	///< 3A2_报文计数器：[/],(0,0,63),[/],(1,0),标识3A2_报文计数器
+    uint32 rfbt_messsage_counter_3_a2 = 15;
+	
+	///< 数据服务模块收到数据包时的系统时间戳：[second],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 16;
+    
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 17;
+
+    ///< 手机闭锁信号执行状态：[/],(0x0,0,255),[/],(1,0),/
+    ///<  0x00: 空闲 IDLE
+    ///<  0x01: 执行中 RUNNING
+    ///<  0x02: 当前指令被打断 INTERRUPTED
+    ///<  0x03: 执行完成 COMPLETED
+    ///<  0xFF: 初始化 INITIALIZING
+    uint32 rke_door_lock_strl_operation_st = 18;
+
+    ///< 手机下发心跳：[/],(0x0,0,255),[/],(1,0),/
+    uint32 apa_func_heart_beat = 19;
+} 
+
+/**
+* @brief BleRpaCtl
+* @detail 蓝牙遥控泊车指令信息 100ms
+*/
+message BleRpaCtl{
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 1;
+
+    ///< 启动APA系统：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 默认发0，进入APP后，一直发1; 退出APP后发0
+    uint32 apa_open = 2;
+
+    ///< 关闭APA系统：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 默认发0，退出APP后，发10帧1（TBD）
+    uint32 apa_close = 3;
+
+    ///< 泊车状态保持：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 进入APP后，正常发1，接电话等导致进后台发0.
+    uint32 apa_inactive = 4;
+
+    ///< 启动泊车：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 默认发0，点击开始泊车后：一直发1 
+    uint32 apa_parking_start = 5;
+
+    ///< 暂停/恢复泊车：[/],(0,0,2),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed;0x2:Resume  默认发0，点击暂停发10帧1，点击恢复发10帧2
+    uint32 apa_parking_pause_resume = 6;
+
+    ///< 停止泊车：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed  默认发0，点击后：一直发1 
+    uint32 apa_parking_stop = 7;
+
+    ///< 向左方向泊出：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 默认发0，点击后：一直发1 
+    uint32 apa_parking_out_left = 8;
+
+    ///< 向右方向泊出：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed  默认发0，点击后：一直发1 
+    uint32 apa_parking_out_right = 9;
+
+    ///< 直进：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed  默认发0，点击后：一直发1 
+    uint32 apa_vertical_forward = 10;
+
+    ///< 直退：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 默认发0，点击后：一直发1 
+    uint32 apa_vertical_backward = 11;
+
+    ///< 启动RPA直进直出系统：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 进入APP后，一直发1
+    uint32 apa_straight_open = 12;
+
+    ///< 关闭RPA直进直出系统：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 退出APP后，发10帧1（TBD）
+    uint32 apa_straight_close = 13;
+
+    ///< RPA直进直出状态保持：[/],(0,0,1),[/],(1,0),/
+    ///< 0x0:Not Pressed;0x1:Pressed 进入APP后，正常发1，接电话等导致进后台发0.
+    uint32 apa_straight_inactive = 14;
+
+    ///< 计数（UINT8）：[/],(0,0,255),[/],(1,0),0x0:Not Pressed;0x1:Pressed
+    uint32 apa_counter = 15;
+
+    ///< 蓝牙钥匙序号：[/],(0,0,255),[/],(1,0),0-255
+    uint32 ble_key_index = 16;
+}
+
+/**
+* @brief SysKeyInfo
+* @detail 钥匙基础信息 100ms
+*/
+message SysKeyInfo{
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 1;
+
+    ///<钥匙序号 ：[/],(0,0,max),[/],(1,0),/
+    uint32 key_index = 2;
+
+    ///<钥匙类型 ：[/],(0,0,5),[/],(1,0),/
+    ///<0x01: RF钥匙 RFKey
+    ///<0x02: 手机钥匙 MobileKey
+    ///<0x03: 蓝牙UWB钥匙 BLEUWBKey
+    ///<0x04: 卡片NFC钥匙 CardNFCKey
+    ///<0x05: 手机NFC钥匙 MobileNFCKey
+    uint32 key_type = 3;
+
+    ///<认证状态 ：[/],(0,0,3),[/],(1,0),/
+    ///<0x00: 空闲 IDLE
+    ///<0x01: 认证过程中 AuthRunning
+    ///<0x02: 认证成功 AuthSuccess
+    ///<0x03: 认证失败 AuthFail
+    uint32 key_auth_sts = 4;
+
+    ///<钥匙区域 ：[/],(0,0,max),[/],(1,0),/
+    ///<0x0000: 无效，未找到钥匙 NotFound
+    ///<0x0001: bit0迎送宾区域 AZone
+    ///<0x0002: bit1离开闭锁区域 BZone
+    ///<0x0004: bit2左靠近解锁区 D1Zone
+    ///<0x0008: bit3右靠近解锁区 D2Zone
+    ///<0x0010: bit4行李箱感应区 D3Zone
+    ///<0x0020: bit5车内启动区域 O1Zone
+    ///<0x0040: bit6唤醒区 EZone
+    ///<0x0080: bit7左侧PE有效区 C1Zone
+    ///<0x0100: bit8右侧PE有效区 C2Zone
+    ///<0x0200: bit9后侧PE有效区 C3Zone
+    ///<0x0400: bit10车内区域 OZone
+    ///<0x0800: bit11后行李箱区域 O2Zone
+    uint32 key_zone = 5;
+
+    ///<解闭锁区域 ：[/],(0,0,max),[/],(1,0),/
+    ///<0x0:None ;0x1:etoAzone; 0x2:etoBzone; 0x3:atoBzone;  0x4:atoEzone;  0x5:atoD1zone;  0x6:atoD2zone;  0x7:atoD3zone; 0x8:atoO1zone; 0x9:BtoAzone;
+    ///<0x10:btoD1zone; 0x11:btoD2zone; 0x12:btoD3zone; 0x14:btoEzone; 0x15:D1toBzone; 0x16:D1toO1zone; 0x17:D1toD3zone; 0x18:D1toAzone; 0x19:D2toBzone; 
+    ///<0x20:D2toO1zone; 0x21:D2toD3zone; 0x22:D2toAzone; 0x23：D3toBzone; 0x24:D3toO1zone; 0x25:D3toD1zone;0x26:D3toD2zone; 0x27:D3toAzone;0x28:O1toD1zone; 
+    ///<0x29:O1toD2zone;0x30:O1toD3zone; 0x31:O1toBzone;0x32:NonetoEzone; 0x33:NonetoAzone;0x34:NonetoBzone;0x35:NonetoD1zone; 0x36:NonetoD2zone; 0x37:NonetoD3zone;
+    ///<0x38:NonetoO1zone; 0x39:etoNonezone;0x40:atoNonezone; 0x41:btoNonezone;0x41:btotoNonezone; 0x42:D1toNonezone;0x43:D2toNonezone; 0x44:D3toNonezone;0x45:O1toNonezone;
+    uint32 approach_zone = 6;
+}
+/**
+* @brief BlePhyKeyInfo
+* @detail 钥匙基础信息 100ms
+*/
+message BlePhyKeyInfo{
+        ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 1;
+
+    ///< 钥匙数据交互计数器：[/],(0x0,0,/),[/],(1,0),/
+    uint32 key_data_cnt = 2;
+
+    ///< 钥匙按键计数器：[/],(0x0,0,/),[/],(1,0),/
+    uint32 key_st_cnt = 3;
+
+    ///< 钥匙电量低状态：[/],(0x0,0,/),[/],(1,0),0x0: 电量正常；0x1:电量低；
+    uint32 ble_phy_key_pow_l_flag = 4;
+
+    ///< 钥匙充电状态：[/],(0x0,0,2),[/],(1,0),/
+    ///< 0x00: 空闲 IDLE
+    ///< 0x01: 充电中 INCharging
+    ///< 0x02: 充电完成 ChargingComplete
+    uint32 ble_phy_key_chr_st = 5;
+
+    ///< 钥匙电量百分比：[/],(0x0,0,/),[/],(1,0),/
+    uint32 ble_phy_key_power = 6;
+
+    ///< 钥匙芯壳组合状态：[/],(0x0,0,2),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 未组合 NoCompsite
+    ///< 0x02: 组合 Compsite
+    uint32 composite_st = 7;
+
+    ///< 解锁按键状态：[/],(0x0,0,3),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 按下 Pressed
+    ///< 0x02: 长按 LongPressed
+    ///< 0x03: 双击 multi2Pressed
+    uint32 unlock_key_st = 8;
+
+    ///< 闭锁按键状态：[/],(0x0,0,3),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 按下 Pressed
+    ///< 0x02: 长按 LongPressed
+    ///< 0x03: 双击 multi2Pressed
+    uint32 lock_key_st = 9;
+
+    ///< 用户自定义按键1状态：[/],(0x0,0,3),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 按下 Pressed
+    ///< 0x02: 长按 LongPressed
+    ///< 0x03: 双击 multi2Pressed
+    uint32 def_key1_st = 10;
+
+    ///< 用户自定义按键2状态：[/],(0x0,0,3),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 按下 Pressed
+    ///< 0x02: 长按 LongPressed
+    ///< 0x03: 双击 multi2Pressed
+    uint32 def_key2_st = 11;
+
+    ///< 钥匙芯按键状态：[/],(0x0,0,3),[/],(1,0),/
+    ///< 0x00: 无效 Invalid
+    ///< 0x01: 按下 Pressed
+    ///< 0x02: 长按 LongPressed
+    ///< 0x03: 双击 multi2Pressed
+    uint32 inside_key_st = 12;
+}
+
+/**
+* @brief SysKeyInfo
+* @detail 钥匙设置信息 100ms
+*/
+message KeySetInfo{
+    ///< 装载模式：[/],(0x0,0,/),[/],(1,0),/
+    ///< 0x00: 关闭 close
+    ///< 0x01: 打开 open
+    uint32 load_mod_set = 1;
+}

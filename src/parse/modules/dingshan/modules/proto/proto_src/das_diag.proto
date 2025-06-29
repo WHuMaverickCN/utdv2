@@ -1,0 +1,332 @@
+/**
+ * @file     das_diag.proto
+ * @author
+ * @details  数据抽象自诊断输出Proto信息
+ * @date     2023-05-15
+ * @version  V1.0
+ * @copyright(C),changan,2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+ * ///<车辆坐标系 原点：车辆后轴 右手法则
+ *
+ * @par      修改日志：
+ * <table>
+ * <tr><th>date              <th>version             <th>author
+ * <tr><th>2023.5.15         <th>1.0                 <th>
+ * <tr><th>2023.5.22         <th>1.1                 <th>
+ * <table>
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package DasDiagProto;
+
+import "e2e_results.proto";
+
+
+/**
+ * @brief Das 诊断详细信息
+ * @detail Das 诊断详细信息
+ *         1. e2e 校验详细结果
+ *         2. das 实时诊断详细信息
+ *         3. das 诊断统计信息
+ */
+message DasDiagnosisDetail
+{
+    ///< 时间戳：[s],(0,/,/),[/],(1,0),/
+    double time_stamp = 1;
+
+    ///<E2E校验结果详细信息：[/],(/,/,/),[/],(/,/),/ 
+    E2eResultsProto.E2eDetails details = 2;
+
+    ///<E2E校验结果汇总：[/],(/,/,/),[/],(/,/),/ 
+    E2eResultsProto.E2eSummary summary = 3;
+   
+    ///<计数器：[/],(0,0,2^32),[/],(1,0),/ 
+    uint32 e2e_count  = 4;
+
+    ///< 数据接收诊断状态码 ：[/],(/,/,/),[/],(/,/),/
+    uint32 recv_diag_code = 5;
+
+    ///< 数据接收诊断状态码拓展位 ：[/],(/,/,/),[/],(/,/),/
+    uint32 recv_diag_code_ext = 6;
+
+    ///< 数据处理诊断状态码 ：[/],(/,/,/),[/],(/,/),/
+    uint32 proc_diag_code = 7;
+
+    ///< 数据处理诊断状态码拓展位 ：[/],(/,/,/),[/],(/,/),/
+    uint32 proc_diag_code_ext = 8;
+
+    ///< 数据接收诊断结果 ：[/],(/,/,/),[1024],(/,/),/
+    repeated ReceiverDiagResult recv_diag_res = 9;
+
+    ///< 数据处理诊断结果 ：[/],(/,/,/),[1024],(/,/),/
+    repeated ProcesserDiagResult proc_diag_res = 10;
+
+    ///<数据接收统计信息 ：[/],(/,/,/),[1024],(/,/),/
+    repeated ReceiverStatisticsInfo recv_statistics = 11;
+
+    ///<数据处理统计信息 ：[/],(/,/,/),[1024],(/,/),/
+    repeated ProcesserStatisticsInfo proc_statistics = 12;   
+}
+
+
+/**
+ * @brief CommonHeader
+ * @detail 数据基础信息
+ */
+message CommonHeader {
+  ///< 消息索引 ：[/],(/,/,/),[/],(/,/),/
+  uint32 message_id = 1;
+
+  ///< 消息类型 ：[/],(/,/,/),[/],(/,/),/
+  uint32 message_type = 2;
+
+  ///< 消息周期 ：[/],(/,/,/),[/],(/,/),/
+  uint32 message_cycle = 3;
+
+  ///< 模块索引 ：[/],(/,/,/),[/],(/,/),/
+  uint32 module_id = 4;
+
+  ///< 数据hash索引 ：[/],(/,/,/),[/],(/,/),/
+  uint32 hash_id = 5;
+
+  ///< 数据名 ：[/],(/,/,/),[/],(/,/),/
+  bytes message_name = 6;
+}
+
+/**
+ * @brief CommonDelay
+ * @detail 时延统计信息
+ */
+message CommonDelay {
+
+  ///< 最小延时 ：[s],(0,/,/),[/],(1,0),/
+  double min_delay = 1;
+
+  ///< 最大延时 ：[s],(0,/,/),[/],(1,0),/
+  double max_delay = 2;
+
+  ///< 平均延时 ：[s],(0,/,/),[/],(1,0),/
+  double avg_delay = 3;
+}
+
+/**
+ * @brief ReceiverStatisticsInfo
+ * @detail Receiver 数据统计信息：通信统计、数据异常统计
+ */
+message ReceiverStatisticsInfo {
+
+  ///< 接收数据基础信息 ：[/],(/,/,/),[/],(/,/),/
+  CommonHeader header = 1;
+
+  ///< 接收数据总次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 cm_total_times = 2;
+
+  ///< 接收数据总大小 ：[/],(/,/,/),[/],(/,/),/
+  uint32 cm_total_size = 3;
+
+  ///< 丢包次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 packet_loss_times = 4;
+
+  ///< 丢包率 ：[/],(/,/,/),[/],(/,/),/
+  double packet_loss_rate = 5;
+
+  ///< crc校验错误次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 crc_err_times = 6;
+
+  ///< 超时次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 timeout_times = 7;
+}
+
+/**
+ * @brief ReceiverDiagResult
+ * @detail 数据异常诊断信息，表示当前数据本身的实时通信状态或结果
+ */
+message ReceiverDiagResult {
+
+  ///< 接收数据基础信息 ：[/],(/,/,/),[/],(/,/),/
+  CommonHeader header = 1;
+
+  ///< 数据计数连续错误次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 packet_continue_loss_times = 2;
+
+  ///< 超时时长 ：[s],(0,/,/),[/],(1,0),/
+  double timeout_duration = 3;
+
+  ///< 丢包标志 ：[/],(/,/,/),[/],(/,/),/
+  bool packet_loss_flag = 4;
+
+  ///< crc校验异常标志 ：[/],(/,/,/),[/],(/,/),/
+  bool crc_err_flag = 5;
+
+  ///< 超时标志 ：[/],(/,/,/),[/],(/,/),/
+  bool timeout_flag = 6;
+
+  ///< 接收异常错误码 ：[/],(/,/,/),[/],(/,/),/
+  uint32 recerver_err = 7;
+
+  ///< 上次接收时的 counter 值: [/],(/,/,/),[/],(/,/),/
+  uint32 last_counter = 8; 
+
+  ///< 上次接收时的时间戳: [/],(/,/,/),[/],(/,/),/
+  uint64 last_recv_time = 9;
+}
+
+/**
+ * @brief ProcesserStatisticsInfo
+ * @detail 处理过程信息统计：解析、组帧、发布、关键算法处理耗时统计，处理异常统计等
+ */
+
+message ProcesserStatisticsInfo {
+
+  ///< 处理数据基础信息 ：[/],(/,/,/),[/],(/,/),/
+  CommonHeader header = 1;
+
+  ///< 处理时延 ：[s],(0,/,/),[/],(1,0),/
+  CommonDelay parser_delay = 2;
+
+  ///< 组帧时延 ：[s],(0,/,/),[/],(1,0),/
+  CommonDelay packer_delay = 3;
+
+  ///< 发布时延 ：[s],(0,/,/),[/],(1,0),/
+  CommonDelay puber_delay = 4;
+
+  ///< 关键算法时延 ：[s],(0,/,/),[/],(1,0),/
+  CommonDelay algorithm_delay = 5;
+
+  ///< 处理异常次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 parser_err_times = 6;
+
+  ///< 组帧异常次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 packer_err_times = 7;
+
+  ///< 发布异常次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 publisher_err_times = 8;
+
+  ///< 数据发布次数 ：[/],(/,/,/),[/],(/,/),/
+  uint32 topic_publish_times = 9;
+
+  ///< 数据发布周期 ：[s],(0,/,/),[/],(1,0),/
+  uint32 topic_publish_cycle = 10;
+
+  ///< 数据发布总大小 ：[byte],(/,/,/),[/],(/,/),/
+  uint32 topic_publish_total_size = 11;
+
+  ///< 数据发布丢包率 ：[%],(0,/,/),[/],(1,0),/
+  double topic_publish_loss_rate = 12;
+
+  ///< 数据总处理次数 ：[/],(/,/,/),[/],(/,/),/
+  uint64 total_handle_times = 13; 
+
+  ///< 数据总组帧次数 ：[/],(/,/,/),[/],(/,/),/ 
+  uint64 total_framing_times = 14;
+
+  ///< 关键算法处理总次数: [/],(/,/,/),[/],(/,/),/ 
+  uint64 total_key_algo_handle_times = 15;
+}
+
+/**
+ * @brief ProcesserDiagResult
+ * @detail 数据处理异常诊断信息，表示当前数据处理的实时诊断结果或状态
+ */
+message ProcesserDiagResult {
+
+  ///< 处理数据基础信息 ：[/],(/,/,/),[/],(/,/),/
+  CommonHeader header = 1;
+
+  ///< 申请资源异常结果 ：[/],(/,/,/),[/],(/,/),/
+  uint32 resource_alloc_err = 2;
+
+  ///< 初始化异常结果 ：[/],(/,/,/),[/],(/,/),/
+  uint32 init_err = 3;
+
+  ///< 数据协议异常结果 ：[/],(/,/,/),[/],(/,/),/
+  uint32 data_protocol_err = 4;
+
+  ///< 当前处理时延 ：[s],(0,/,/),[/],(1,0),/
+  double now_parser_delay = 5;
+
+  ///< 当前组帧时延 ：[s],(0,/,/),[/],(1,0),/
+  double now_packer_delay = 6;
+
+  ///< 当前发布时延 ：[s],(0,/,/),[/],(1,0),/
+  double now_publisher_delay = 7;
+
+  ///< 当前关键算法时延 ：[s],(0,/,/),[/],(1,0),/
+  double now_algorithm_delay = 8;
+
+  ///< 处理异常错误码 ：[/],(/,/,/),[/],(/,/),/
+  uint32 parser_err = 9;
+
+  ///< 组帧异常错误码 ：[/],(/,/,/),[/],(/,/),/
+  uint32 packer_err = 10;
+
+  ///< 发布异常错误码 ：[/],(/,/,/),[/],(/,/),/
+  uint32 publisher_err = 11;
+}
+
+/**
+* @brief DasDiagnosis信息
+* @detail xxxxxxxx
+*/
+message DasDiagnosis
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1;
+
+    ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+    ///< 0x0: 默认值，无故障
+    ///< bit0: 前雷达以太网超时故障          
+    ///< bit1: 前雷达CAN超时故障
+    ///< bit2: 前角雷达超时故障
+    ///< bit3: 后角雷达超时故障
+    ///< bit4: 左激光雷达超时故障
+    ///< bit5: 右激光雷达超时故障
+    ///< bit6: USS超时故障
+    ///< bit7: 导航信息超时故障
+    ///< bit8: 整车超时故障
+    ///< bit9: ADAS地图超时故障
+    ///< bit10: 整车模块运行异常故障
+    ///< bit11: Nalocation模块运行异常故障
+    ///< bit12: USS模块运行异常故障
+    ///< bit13: 前雷达模块运行异常故障
+    ///< bit14: 角雷达模块运行异常故障
+    ///< bit15: 左激光雷达模块运行异常故障
+    ///< bit16: 右激光雷达模块运行异常故障
+    uint32 diagnosis_code = 2;
+
+    ///< 额外诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+    string diagnosis_info = 3;
+	
+    ///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+    uint32 heartbeart = 4;
+}
+
+/**
+* @brief GwDiagnosis信息
+* @detail xxxxxxxx
+*/
+message GwDiagnosis
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1;
+
+    ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+    ///< 0x0: 默认值，无故障
+    ///< bit0: gw请求应用服务故障          
+    ///< bit1: gw请求VIU服务故障
+    ///< bit2: gw请求EDC服务故障
+    ///< bit3: gw接收MCU数据超时
+    ///< bit4: gw接收应用数据超时
+    uint32 diagnosis_code = 2;
+
+    ///< 额外诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+    string diagnosis_info = 3;
+	
+	///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+    uint32 heartbeart = 4;
+}

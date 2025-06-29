@@ -1,0 +1,250 @@
+﻿/***************************************************************************
+* @file     apa_slot_sector.proto
+* @author   tian xiaokang
+* @details  摄像头数据相关输出
+* @date     2022-12-27
+* @version  V1.1 modifed by motovis
+* @copyright(C),changan,2050
+* 通讯message为：ApaSlotInfos、Sectors
+
+# ***************************************************************************/
+
+syntax = "proto3";
+package CaApaSlotSectorProto;
+import "seq_header.proto";
+
+/**
+ * @brief 1116：3D点
+ * @detail
+ */
+message Pos3D {
+  ///< x： [/],(/，/,/),[/],(/,/), 坐标x
+  int32 x = 1;
+  ///< y： [/],(/，/,/),[/],(/,/), 坐标y
+  int32 y = 2;
+  ///< z： [/],(/，/,/),[/],(/,/), 坐标z
+  int32 z = 3;
+}
+
+/**
+ * @brief 1116：2D点
+ * @detail
+ */
+message Pos2D {
+  ///< ： [/],(/，/,/),[/],(/,/), 坐标x
+  int32 x = 1;
+  ///< ： [/],(/，/,/),[/],(/,/), 坐标y
+  int32 y = 2;
+}
+/**
+ * @brief 1116：目标停车位置，预留给规划输出
+ * @detail
+ */
+message Target2D {
+  ///< ： [/],(/，/,/),[/],(/,/), 坐标x
+  int32 x = 1;
+  ///< ： [/],(/，/,/),[/],(/,/), 坐标y
+  int32 y = 2;
+  ///< ： [/],(/，/,/),[/],(/,/), 坐标z
+  int32 theta = 3;
+}
+
+/**
+ * @brief 车位来源
+ * @detail
+ */
+enum SlotSource {
+  ///< 0：空间车位
+  SLOTSOURCE_USS_SLOT = 0;
+  ///< 1：视觉车位
+  SLOTSOURCE_SOD_SLOT = 1;
+  ///< 2：融合车位
+  SLOTSOURCE_FUS_SLOT = 2;  
+}
+
+/**
+ * @brief 车位线类型
+ * @detail
+ */
+enum SlotLineType {
+  ///< 0-普通划线
+  SLOTLINETYPE_PARK_MARK_LINE_NORMAL = 0;
+  ///< 1-划线车位有OD（预留）
+  SLOTLINETYPE_PARK_MARK_LINE_THIRDD = 1;
+  ///< 2-虚拟划线车位（假定的车位，用于自选车位）
+  SLOTLINETYPE_PARK_MARK_LINE_VIRTUAL = 2;
+  ///< 3高障碍物 高度使用超声信
+  SLOTLINETYPE_OBJECT_OBSTACLE_HIGH = 3; // 暂不提供
+  ///< 4未知障碍物
+  SLOTLINETYPE_OBJECT_OBSTACLE_UNKNOW = 4; // 暂不提供
+  ///< 5低障碍物
+  SLOTLINETYPE_OBJECT_OBSTACLE_LOW = 5; // 暂不提供
+  ///< 6路沿普通划线
+  SLOTLINETYPE_OBJECT_OBSTACLE_CURB = 6; // 暂不提供
+}
+
+/**
+ * @brief 车位类型
+ * @detail
+ */
+enum SlotType {
+  ///<
+  SLOTTYPE_INVALID = 0;
+  ///<
+  SLOTTYPE_HORIZENTAL = 1;
+  ///<
+  SLOTTYPE_VERTICAL = 2;
+  ///< 水平斜列
+  SLOTTYPE_TILT = 3;
+  ///< 垂直斜列，@Motovis新增，环视专用
+  SLOTTYPE_TILTV = 4;
+}
+/**
+ * @brief 车位特殊类型，@Motovis新增，环视专用
+ * @detail
+ */
+enum SloSpecialtType {
+  ///< 普通车位
+  SLOTSPECIALTYPE_NORMAL = 0;
+  ///<  残疾人车位
+  SLOTSPECIALTYPE_DISABLED = 1;
+  ///<  充电车位
+  SLOTSPECIALTYPE_CHARGE = 2;
+}
+
+/**
+ * @brief 车位状态
+ * @detail
+ */
+enum SlotStatus {
+  ///< 车位不可用状态
+  SLOTSTATUS_UNAVAILABLE = 0;
+  ///< 车位可用状态
+  SLOTSTATUS_AVAILABLE = 1;
+}
+
+/**
+ * @brief 车位更新状态
+ * @detail
+ */
+ enum SlotUpdate {
+  ///< 车位正常识别状态
+  SLOTUPDATE_WITHOUTDR = 0;
+  ///< 车位识别仅使用DR推算状态
+  SLOTUPDATE_WITHDR = 1;
+}
+
+/**
+ * @brief 地锁状态
+ * @detail
+ */
+enum GroundLockStatus {
+  ///< 无地锁
+  GROUNDLOCKSTATUS_NONE = 0;
+  ///< 地锁开
+  GROUNDLOCKSTATUS_OPEN = 1;
+  ///< 地锁关
+  GROUNDLOCKSTATUS_CLOSE = 2;
+}
+
+/**
+ * @brief 车位信息
+ * @detail
+ */
+message SlotInfo {
+  ///< ： [/],(/，/,/),[/],(/,/), 车位id @Motovis support
+  int32 slot_id = 1;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位类型 @Motovis support
+  SlotType type = 2;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位来源
+  SlotSource source = 3;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位状态 @Motovis support
+  SlotStatus slot_sts = 4;
+  ///< ： [/],(/，/,/),[20],(/,/), mm 1116：baselink @Motovis support
+  repeated Pos3D vertexes_base = 5;
+  ///< ： [/],(/，/,/),[20],(/,/), mm 1116：dr
+  repeated Pos3D vertexes_odom = 6;
+  ///< ： [/],(/，/,/),[20],(/,/),  车位线框
+  repeated SlotLineType slot_lines = 7;
+  ///< ： [/],(/，/,/),[/],(/,/), (mm, mm, rad * 1000)  //MOTOVIS 已经确认，第一阶段不需要发送 @Motovis support only "theta"
+  Target2D target_pose = 8;
+  ///< ： [/],(/，/,/),[20],(/,/), mm 1211: baselink，档轮杆位置信息 @Motovis support
+  repeated Pos2D limiter = 9;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位特殊类型，@Motovis新增，环视专用
+  SloSpecialtType special_type = 10;
+  ///< ： [/],(/，/,/),[/],(/,/), 停车位号码 未识别值=-1，@Motovis新增，环视专用
+  string tag_number = 11;
+  ///< ： [/],(/，/,/),[/],(/,/), 地锁信息，@Motovis新增，环视专用
+  GroundLockInfo ground_lock = 12;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位被占据类型
+  SlotOccupiedType occupied_type = 13;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位更新状态（是否使用DR推算-四门两盖后视镜异常状态） @Motovis support
+  SlotUpdate slot_update = 14;
+  ///< ： [/],(/，/,/),[/],(/,/), 车位置信度(0-1) @Motovis support
+  float slot_confidence = 15;
+  ///< ： [/],(/，/,/),[20],(/,/), mm 1211: dr,档轮杆位置信息 @Motovis support
+  repeated Pos2D limiter_odom = 16;
+}
+
+/**
+ * @brief 地锁信息，@Motovis新增，环视专用
+ * @detail
+ */
+message GroundLockInfo {
+  ///< ： [/],(/，/,/),[/],(/,/), 地锁状态
+  GroundLockStatus statu = 1;
+  ///< ： [/],(/，/,/),[/],(/,/), 地锁位置
+  Pos3D vertexes_base = 2;
+}
+
+/**
+ * @brief apa状态机
+ * @detail
+ */
+enum ApaStage {
+  ///< 0-无
+  APASTAGE_NOT_IN_APA = 0;
+  ///< 1-可用
+  APASTAGE_PREPARE_TRACK = 1;
+  ///< 2-跟踪过程中
+  APASTAGE_TRACKING = 2;
+  ///< 3-完成跟踪
+  APASTAGE_FINISH_TRACKING = 3;
+  ///< 4-车位搜索过程中
+  APASTAGE_SEARCHING = 4;
+}
+
+/**
+ * @brief apa状态，包含车位
+ * @detail
+ */
+message ApaSlotInfos {
+  ///< ： [/],(/，/,/),[/],(/,/), 时间戳
+  double time_stamp = 1;
+  ///< ： [/],(/，/,/),[/],(/,/), MOTOVIS 已经确认，第一阶段发送4车位搜索
+  ApaStage apa_stage = 2;
+  ///< ： [/],(/，/,/),[20],(/,/), 车位
+  repeated SlotInfo slots = 3;
+  ///< ： [/],(/，/,/),[/],(/,/), 延时统计：[/],(/,/,/),[/],(1,0),标识publish输出时间戳
+  SeqHeaderProto.SeqHeader seqheader = 4;
+}
+/**
+ * @brief 车位被占据类型
+ * @detail
+ */
+enum SlotOccupiedType {
+  ///< 0-默认
+  UNKNOWN_OCCUPIED = 0;
+  ///< 1-车辆占据
+  VEHICLE_OCCUPIED = 1;
+  ///< 2-行人占据
+  PEDESTRIAN_OCCUPIED = 2;
+  ///< 3-两轮车占据
+  DOGCART_OCCUPIED = 3;
+  ///< 4-锥桶占据
+  CONICAL_BARREL_OCCUPIED = 4;
+  ///< 5-地锁占据
+  GROUND_LOCK_OCCUPIED = 5;
+  ///< 6-其他占据
+  OTHER_OCCUPIED = 6;
+}

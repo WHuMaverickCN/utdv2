@@ -1,0 +1,331 @@
+/**
+
+* @file     hmi_interface.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义
+* @date     2022-08-22
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述 
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则 
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>汪哲文
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+import "hmi_common.proto";
+
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+
+message ObjectInfo
+{
+    ///<目标的纵向相对速度：[m/s] [/],(/,/,/),[/],(/,/), same description 
+	double obj_long_vel_rel = 1;
+	///<目标的横向相对速度：[m/s] [/],(/,/,/),[/],(/,/), same description 
+	double obj_lat_vel_rel = 2;
+	///<目标参考点类型: [/],(/,/,/),[/],(/,/), same description 
+	ObjectReferPointType obj_refer_points_type = 3;
+	///<目标的参考点纵向距离：[m] [/],(/,/,/),[/],(/,/), same description 
+	double obj_refer_pointslongitudinal_distance = 4;
+	///<目标的参考点横向距离：[m] [/],(/,/,/),[/],(/,/), same description  [/],(/,/,/),[/],(/,/), same description 
+	double obj_refer_pointslateral_distance = 5;
+	///<目标的ID: [/],(/,/,/),[/],(/,/), same description 
+	uint32 obj_trackid = 6;
+	///<目标的类型: [/],(/,/,/),[/],(/,/), same description 
+	ObjectType obj_type = 7;
+	///<目标的运动状态: [/],(/,/,/),[/],(/,/), same description 
+	ObjectStatus obj_status = 8;
+	///<目标的置信度: [/],(/,/,/),[/],(/,/), same description 
+	uint32 obj_confidence = 9;
+	///<目标的航向角:[rad] [/],(/,/,/),[/],(/,/), same description 
+	double obj_heading_angle = 10;
+	///<目标的纵向相对位置：[m] [/],(/,/,/),[/],(/,/), same description 
+	double obj_long_rel = 11;
+	///<目标的横向相对位置：[m] [/],(/,/,/),[/],(/,/), same description 
+	double obj_lat_rel = 12;
+	///<目标的纵向绝对速度:[m/s] [/],(/,/,/),[/],(/,/), same description 
+    double obj_long_vel = 13;
+    ///<目标的横向绝对速度: [m/s] [/],(/,/,/),[/],(/,/), same description 
+    double obj_lat_vel = 14;
+    ///<目标的纵向绝对加速度:[m/s^2] [/],(/,/,/),[/],(/,/), same description 
+    double obj_long_acc = 15;
+    ///<目标的横向绝对加速度:[m/s^2] [/],(/,/,/),[/],(/,/), same description 
+    double obj_lat_acc = 16;
+	///<目标的高度:[/] [/],(/,/,/),[/],(/,/), same description 
+    double obj_heigh = 17;
+	///<目标的长度:[m] [/],(/,/,/),[/],(/,/), same description 
+    double obj_length = 18;
+    ///<目标的宽度:[m] [/],(/,/,/),[/],(/,/), same description 
+    double obj_width = 19;
+    ///<目标的跟踪周期 :[/],(/,/,/),[/],(/,/), same description 
+    uint32 obj_age = 20;
+	///<目标的跨线标志位: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_cross_lane_flag = 21;
+    ///<目标的跨线距离:[m] [/],(/,/,/),[/],(/,/), same description 
+    double obj_cross_lane_value = 22;
+	///<目标的cut-in状态: [/],(/,/,/),[/],(/,/), same description 
+    ObjectCutStatus obj_cut_status = 23;
+	///<目标的左转向灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_left_light_status = 24;
+	///<目标所在区域: [/],(/,/,/),[/],(/,/), same description 
+    uint32 obj_obstacle_area = 25;  //暂无该信号
+	///<目标的右转向灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_right_light_status = 26;
+	///<目标的故障灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_warning_light_status = 27;  //暂无该信号
+	///<目标的刹车灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_brake_light_status = 28;  //暂无该信号
+	///<目标的雾灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool obj_fog_light_status = 29;  //暂无该信号
+	///<目标的识别情况: [/],(/,/,/),[/],(/,/), same description 
+    ObjectDetectionStatus obj_detection = 30;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message AccTargetInfo
+{
+	///<目标的识别情况: [/],(/,/,/),[/],(/,/), same description 
+    ObjectDetectionStatus acc_target_detection = 1;  //暂无该信号
+	///<目标的ID: [/],(/,/,/),[/],(/,/), same description 
+	uint32 acc_target_trackid = 2;
+	///<目标的类型: [/],(/,/,/),[/],(/,/), same description 
+	ObjectType acc_target_type = 3;
+    ///<目标的方向: [/],(/,/,/),[/],(/,/), same description 
+	ObjectDirection acc_target_direction = 4;
+	///<目标的航向角:[rad] [/],(/,/,/),[/],(/,/), same description 
+	double acc_target_heading_angle = 5;
+	///<目标的横向距离：[m] [/],(/,/,/),[/],(/,/), same description 
+	double acc_target_lat_range = 6;
+	///<目标的纵向距离：[m] [/],(/,/,/),[/],(/,/), same description 
+	double acc_target_lng_range = 7;
+	///<目标的转向灯状态: [/],(/,/,/),[/],(/,/), same description 
+	TurnLightStatus acc_target_turn_light_status = 8;
+	///<目标的刹车灯状态: [/],(/,/,/),[/],(/,/), same description 
+    bool acc_target_brake_light_status = 9;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message LineInfo
+{
+	///<三阶曲线参数常数项：[/],(0,-20,20),[/],(1,0),标识三阶曲线参数常数项 [/],(/,/,/),[/],(/,/), same description 
+    double curve_parameter_c0 = 1;
+	///<三阶曲线参数一次项：[/],(0,-1,1),[/],(1,0),标识三阶曲线参数一次项 [/],(/,/,/),[/],(/,/), same description 
+    double curve_parameter_c1 = 2;
+	///<三阶曲线参数二次项：[/],(0,-0.02,0.02),[/],(1,0),标识三阶曲线参数二次项 [/],(/,/,/),[/],(/,/), same description 
+    double curve_parameter_c2 = 3;
+	///<三阶曲线参数三次项：[/],(0,-0.0002,0.0002),[/],(1,0),标识三阶曲线参数三次项 [/],(/,/,/),[/],(/,/), same description 
+    double curve_parameter_c3 = 4;
+	///<车道线近端到本车纵向距离：[/],(0,0,300),[/],(1,0),标识x方向车道线起始点距离 [/],(/,/,/),[/],(/,/), same description 
+    double start_x = 5;
+	///<车道线远端到本车纵向距离：[/],(0,0,300),[/],(1,0),标识x方向车道线终点距离 [/],(/,/,/),[/],(/,/), same description 
+    double end_x = 6;
+	///<车道线检测状态: [/],(/,/,/),[/],(/,/), same description 
+    LineDetection line_detection = 7;
+	///<车道线类型: [/],(/,/,/),[/],(/,/), same description 
+    LineType type = 8;
+	///<车道线颜色: [/],(/,/,/),[/],(/,/), same description 
+    LineColor color = 9;
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message TlaInfo
+{
+	///<交通灯方向: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightDirection tla_dirction = 1;
+	///<交通灯颜色: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightColor tla_color = 2;
+	///<交通灯状态: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightStatus tla_status = 3;  //暂无该信号
+	///<交通灯类型: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightType tla_type = 4;  //暂无该信号
+	///<交通灯识别情况: [/],(/,/,/),[/],(/,/), same description 
+	bool tla_detection = 5;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message EgoTrifficLightInfo
+{
+	///<交通灯状态: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightStatus ego_light_status = 1;  //暂无该信号
+	///<交通灯类型: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightType ego_light_type = 2;  //暂无该信号
+	///<交通灯颜色: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightColor ego_light_color = 3;  //暂无该信号
+	///<交通灯识别情况: [/],(/,/,/),[/],(/,/), same description 
+	TrafficLightLevel ego_light_level = 4;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message TsrInfo
+{
+	///<警告标志: [/],(/,/,/),[/],(/,/), same description 
+	uint32 tsr_warning_sign = 1;  //暂无该信号
+	///<禁令标志: [/],(/,/,/),[/],(/,/), same description 
+	uint32 tsr_prohibition_sign = 2;  //暂无该信号
+	///<指示标志: [/],(/,/,/),[/],(/,/), same description 
+	uint32 tsr_mandatory_sign = 3;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message SpeedLimitInfo
+{
+	///<本车道限速值: [/],(/,/,/),[/],(/,/), same description 
+	uint32 host_speed_limit = 1;  //暂无该信号
+	///<道路融合限速类型: [/],(/,/,/),[/],(/,/), same description 
+	SpeedLimitType speed_limit_type = 2;  //暂无该信号
+	///<超速预警图像报警: [/],(/,/,/),[/],(/,/), same description 
+	bool over_speed_visual_warn = 3;  //暂无该信号
+	///<前方变更后限速值: [/],(/,/,/),[/],(/,/), same description 
+	uint32 host_next_speed_limit = 4;  //暂无该信号
+	///<前方限速变化点距离: [/],(/,/,/),[/],(/,/), same description 
+	uint32 host_next_speed_limit_dist = 5;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message RoadSignInfo
+{
+	///<车道路面标识类型: [/],(/,/,/),[/],(/,/), same description 
+	RoadSignType road_sign_type = 1;
+	///<车道路面标识纵向距离: [/],(/,/,/),[/],(/,/), same description 
+	uint32 road_sign_lng_range = 2;
+	///<车道路面标识匹配车道: [/],(/,/,/),[/],(/,/), same description 
+	uint32 road_sign_detection = 3;  //暂无该信号
+	
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message MapInfo
+{
+	///<匝道信息: [/],(/,/,/),[/],(/,/), same description 
+	RampInfo path_through_ramp = 1;
+	///<匝道方向: [/],(/,/,/),[/],(/,/), same description 
+	RampSide ramp_side = 2;
+	///<匝道状态 :[/],(/,/,/),[/],(/,/), same description 
+	RampStatus ramp_status = 3;
+	///<隧道状态: [/],(/,/,/),[/],(/,/), same description 
+	TunnelStatus tunnel_status = 4;
+	///<隧道距离 :[/],(/,/,/),[/],(/,/), same description 
+	uint32 tunnel_dis = 5;
+	///<当前位置坡度: [/],(/,/,/),[/],(/,/), same description 
+	double slope_gradient = 6;  //暂无该信号
+	///<前方50m位置坡度: [/],(/,/,/),[/],(/,/), same description 
+	double slope_gradient_50 = 7;  //暂无该信号
+	///<前方100m位置坡度: [/],(/,/,/),[/],(/,/), same description 
+	double slope_gradient_100 = 8;  //暂无该信号
+	///<前方200m位置坡度: [/],(/,/,/),[/],(/,/), same description 
+	double slope_gradient_200 = 9;  //暂无该信号
+	///<前方300m位置坡度: [/],(/,/,/),[/],(/,/), same description 
+	double slope_gradient_300 = 10;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message Point1
+{
+	///<纵向距离: [/],(/,/,/),[/],(/,/), same description 
+	double x = 1;
+	///<横向距离: [/],(/,/,/),[/],(/,/), same description 
+	double y = 2;
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message PathPlan
+{
+	///<规划轨迹: [/],(/,/,/),[100],(/,/), same description 
+	repeated Point1 point = 1;
+	///<轨迹显示状态: [/],(/,/,/),[/],(/,/), same description 
+	PathStatus path_status = 2;  //暂无该信号
+}
+/**
+* @brief HmiInterface
+* @details HmiInterface
+*/
+message LocInfo
+{
+	///<当前位置车道数: [/],(/,/,/),[/],(/,/), same description 
+	uint32 current_lanes_num = 1;
+	///<当前所在车道编号: [/],(/,/,/),[/],(/,/), same description 
+	uint32 current_lane_id = 2;
+	///<当前自车航向角: [/],(/,/,/),[/],(/,/), same description 
+	double current_heading = 3;
+	///<当前自车纬度: [/],(/,/,/),[/],(/,/), same description 
+	double current_lat = 4;
+	///<当前自车经度: [/],(/,/,/),[/],(/,/), same description 
+	double current_lon = 5;
+	///<当前自车速度: [/],(/,/,/),[/],(/,/), same description 
+	double veh_speed = 6;
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装所有信号，包括目标、车道线、交通灯等
+*/
+message HmiInfo
+{
+	///<目标属性（所有目标）: [/],(/,/,/),[32],(/,/), same description 
+	repeated ObjectInfo objects = 1;
+	///<目标选择结果: [/],(/,/,/),[/],(/,/), same description 
+	AccTargetInfo acc_target = 2;  //暂无该信号
+	///<车道线属性（6根）: [/],(/,/,/),[6],(/,/), same description 
+	repeated LineInfo lines = 3;
+	///<交通灯信息 :[/],(/,/,/),[6],(/,/), same description 
+	repeated TlaInfo traffic_lights = 4;
+	///<本车道交通灯信息: [/],(/,/,/),[/],(/,/), same description 
+	EgoTrifficLightInfo ego_traffic_light = 5;  //暂无该信号
+	///<本车道交通标识信息: [/],(/,/,/),[/],(/,/), same description 
+	TsrInfo tsr = 6;
+	///<本车道限速信息: [/],(/,/,/),[/],(/,/), same description 
+	SpeedLimitInfo speed_limit = 7;
+	///<路面标识信息: [/],(/,/,/),[6],(/,/), same description 
+	repeated RoadSignInfo road_sign = 8;
+	///<距离人行横道距离: [/],(/,/,/),[/],(/,/), same description 
+	uint32 cross_walk_lng_range = 9;
+	///<距离停止线距离: [/],(/,/,/),[/],(/,/), same description 
+	uint32 stop_line_lng_range = 10;
+	///<本车道交通标识信息: [/],(/,/,/),[/],(/,/), same description 
+	MapInfo map = 11;
+	///<规划信息: [/],(/,/,/),[/],(/,/), same description 
+	PathPlan path_plan = 12;
+	///<定位信息: [/],(/,/,/),[/],(/,/), same description 
+	LocInfo loc = 13;
+}
+
+
+
+

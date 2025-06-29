@@ -1,0 +1,164 @@
+/**
+* @file     vp.diagnosis.proto
+* @author   vp
+* @details  视觉感知诊断消息输出接口
+* @date     2023-05-25
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.05.25        <th>6.1                 <th>vp 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package VpDiagnosisProto;
+
+/**
+* @brief 视觉感知错误消息类型
+* @detail 描述视觉感知错误消息类型
+*/
+enum ErrorType {
+    ///< 未发生错误
+    ERROR_NOT_HAPPEN = 0;
+    
+    ///< 图像无输入错误 1<<0
+    ERROR_IMAGE_NO_INPUT = 1;
+
+    ///< 消息池满错误 1<<1
+    ERROR_MESSAGE_BUF_FULL = 2;
+}
+
+/**
+* @brief 视觉图像诊断消息类型
+* @detail 视觉图像诊断消息类型
+*/
+enum ImageCheckType {
+    ///< 未发生警告
+    WARNING_IMAGE_NOT_HAPPEN = 0;
+
+    ///< 图像遮挡 1<<2
+    WARNING_IMAGE_COVERED = 4;
+
+    ///< 图像模糊 1<<3
+    WARNING_IMAGE_BLURRED = 8;
+
+    ///< 图像强光 1<<4
+    WARNING_IMAGE_GLARE = 16;
+
+    ///< 摄像头未标定 1<<5
+    WARNING_IMAGE_NOT_CALIB = 32;
+}
+
+/**
+* @brief 视觉摄像头图像诊断消息输出
+* @detail 视觉摄像头图像诊断消息输出
+*/
+message ImageDiagnosis
+{
+    ///< 视觉图像诊断消息：[/],(0,0,1),[/],(1,0),图像诊断消息
+    ImageCheckType imgcheck_type = 1;
+
+    ///< 视觉图像诊断对应摄像头ID：[/],(/,/,/),[/],(1,0),图像诊断对应摄像头,0-3周视、8-10前视
+    int32 cam_id = 2;
+}
+
+/**
+* @brief 视觉感知警告消息类型
+* @detail 视觉感知警告消息类型
+*/
+enum WarningType {
+    ///< 未发生警告
+    WARNING_NOT_HAPPEN = 0;
+
+    ///< 图像输出帧率低 1<<6
+    WARNING_FPS_LOW = 64;
+
+    ///< 图像输出延迟高 1<<7
+    WARNING_DELAY_HIGH = 128;
+
+    ///< CPU占用异常 1<<8
+    WARNING_CPU_ABNORMAL = 256;
+
+    ///< 内存占用异常 1<<9
+    WARNING_MEM_ABNORMAL = 512;
+
+    ///< CAN速度信号超出范围 1<<10
+    WARNING_NO_CAN_SPEED = 1024;
+
+    ///< CAN速度信号输入超时 1<<11
+    WARNING_NO_CAN_SPEED_TIMEOUT = 2048;
+    
+    ///< CAN yawrate信号超出范围 1<<12
+    WARNING_NO_CAN_YAWRATE = 4096;
+
+    ///< CAN yawrate信号输入超时 1<<13
+    WARNING_NO_CAN_YAWRATE_TIMEOUT = 8192;
+
+    ///< CAN lat_accel信号超出范围 1<<14
+    WARNING_NO_CAN_LAT_ACCEL = 16384;
+
+    ///< CAN long_acc信号超出范围 1<<15
+    WARNING_NO_CAN_LONG_ACC = 32768;
+
+    ///< CAN wheel_angle信号超出范围 1<<16
+    WARNING_NO_CAN_WHEEL_ANGLE = 65536;
+}
+
+/**
+* @brief 视觉感知诊断消息输出
+* @detail 视觉感知输出的诊断消息
+*/
+message VpDiagnosis
+{
+    ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+    double time_stamp = 1;
+
+    ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+    ///< 0x0: 默认值，无故障
+    ///< bit 0: 图像无输入错误 error
+    ///< bit 1: 消息池满错误 error
+    ///< bit 2: 图像遮挡 error
+    ///< bit 3: 图像模糊 error
+    ///< bit 4: 图像强光 error
+    ///< bit 5: 摄像头未标定 error
+    ///< bit 6: 图像输出帧率低 error
+    ///< bit 7: 图像输出延迟高 error
+    ///< bit 8: CPU占用异常 error
+    ///< bit 9: 内存占用异常 error
+    ///< bit 10: CAN速度信号超出范围 error
+    ///< bit 11: CAN速度信号输入超时 error
+    ///< bit 12: CAN yaw rate 信号超出范围 error
+    ///< bit 13: CAN yaw_rate 信号输入超时 error
+    ///< bit 14: CAN lat_accel 横向加速度 超出范围
+    ///< bit 15: CAN long_acc  纵向加速度超出范围
+    ///< bit 16: CAN wheel_angle 方向盘转角超出范围
+    ///< bit 17: calib param accuracy error 标定参数精度异常 
+    ///< bit 18: fusion param error 融合参数异常
+    ///< bit 19: forward order error 工作流时序异常
+    ///< bit 20: CAN速度信号输入判定为无效 error
+    ///< bit 21: CAN yaw_rate 信号输入判定为无效 error
+    ///< bit 23: CAN lat_accel 信号输入超时 error
+    ///< bit 24: CAN lat_accel 信号输入判定为无效 error
+    ///< bit 25: CAN long_acc 信号输入超时 error
+    ///< bit 26: CAN long_acc 信号输入判定为无效 error
+    uint32 diagnosis_code = 2;
+
+    ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+    string diagnosis_info = 3;
+
+    ///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+    uint32 heartbeart = 4;
+
+    ///< 图像诊断信息：[/],(/,/,/),[/],(/,/),针对外域的图像诊断信息
+    repeated  ImageDiagnosis image_check = 5;
+}

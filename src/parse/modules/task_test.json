@@ -1,0 +1,12 @@
+{
+    "task_id": 9299,
+    "task_name": "task1",
+    "dat_files": [
+        "/mnt/c/work/dat/all/4/S7_003494_2024-01-20_19-24-00.dat",
+        "/mnt/c/work/dat/all/4/S7_003494_2024-01-20_19-25-00.dat",
+        "/mnt/c/work/dat/all/3/S7_004104_2024-03-08_15-02-00.dat",
+        "/mnt/c/work/dat/all/3/S7_007067_2024-01-17_21-39-00.dat",
+        "/mnt/c/work/dat/all/3/S7_007067_2024-01-17_21-42-00.dat",
+        "/mnt/c/work/dat/all/3/S7_007907_2024-02-03_16-05-00.dat"
+    ]
+}

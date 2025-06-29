@@ -1,0 +1,96 @@
+/**
+* @file     ca_appendix.proto
+* @author   yangzhao
+* @details  定位输出接口定义
+* @date     2022-03-11
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.11         <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3";
+package localization;
+import "seq_header.proto";
+
+/**
+* @brief 位输出类型信息
+* @detail xxxxxxxx
+*/
+enum SensorType {
+  ///< 0：未知
+  kUnKnown = 0;
+
+  ///< 1：航迹推算
+  kDeadReckon = 1;
+
+  ///< 2：语义定位
+  kSemantic = 2;
+
+  ///< 3：gnss定位
+  kGnss = 3;
+
+  ///< 4：视觉特征定位
+  kVisionFeature = 4;
+
+  ///< 20： KalmanFilter融合定位
+  kFusion = 20;
+}
+
+/**
+* @brief 定位状态信息
+* @detail xxxxxxxx
+*/
+enum LocStatus{
+  ///< 0：无效（默认值）
+  kInvalid = 0;
+
+  ///< 1：未初始化
+  kUninitialized = 1;
+
+  ///< 2：定位异常
+  kFailure = 2;
+
+  ///< 3：GNSS滤波定位
+  kGnssFilter = 3;
+
+  ///< 4：融合定位（仅横向位置有效）
+  kFusionFilterLat = 4;
+
+  ///< 5：融合定位（横纵向位置有效）
+  kFusionFilter = 5;
+}
+
+/**
+* @brief 长安附加字段信息
+* @detail xxxxxxxx
+*/
+message CaAppendix{
+  ///< 延时统计：[/],(/,/,/),[/],(/,/),标识publish输出时间戳
+  SeqHeaderProto.SeqHeader seq_header = 1;
+
+  ///< 航向角:[deg],(0,0,360),[/],(/,/,/),标识航向角,正东方向逆时针为正
+  double heading = 2;
+
+  ///< 置信度:[/],(0,0.0,1.0),[/],(/,/),标识置信度
+  double confidence = 3;
+
+  ///< 定位类型:[/],(/,/,/),[/],(/,/),标识定位类型
+  SensorType type = 4;
+
+  ///< 融合定位状态:[/],(/,/,/),[/],(/,/),标识融合定位输出状态
+  LocStatus loc_status = 5;
+
+  ///< 楼层名称:[/],(/,/,/),[/],(/,/),标识定位楼层输出状态
+  string floor_name = 6;
+}

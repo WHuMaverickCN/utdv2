@@ -1,0 +1,64 @@
+/**
+* @file     tripsum.proto
+* @author   xiaoyou,lvbo 
+* @details  trip sum相关信号的输出接口定义
+* @date     2022-08-23
+* @version  V2.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.07.07         <th>1.0                <th>xiaoyou,lvbo
+* <tr><th>2023.08.23         <th>2.0                 <th>xiaoyou,lvbo
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package DrsProto;
+/**
+* @brief trip sum信息
+* @detail xxxxxxxx
+*/
+message TripSum
+{
+    ///< 行驶总里程：[/],(0,0,1),[/],(1,0),/
+    float ads_total_miles = 1;
+    ///< 本次自动辅助驾驶行驶总里程（ACC及以上）：[/],(0,0,1),[/],(1,0),/
+    float ads_nid_miles = 2;
+    ///< 本次自动驾驶风险规避总次数（护航）：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_safe_fun_tritime = 3;
+    ///< 前方预警风险规避次数AEB,FCTB,RCTB,LAEB,RAEB：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_aeb_tritime = 4;
+    ///< AES触发次数统计:AES,DES,CES：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_aes_tritime = 5;
+    ///< ELK触发次数统计:Oncoming，Overtaking，Roadedge：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_elk_tritime = 6;
+    ///< 过匝道口数量：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_through_ramp_time = 7;
+    ///< 过路口数量：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_through_intersection_time = 8;
+    ///< 换道次数：[/],(0,0,1),[/],(1,0),/
+    uint32  ads_lane_change_time = 9;
+    ///< 接管次数：[/],(0,0,1),[/],(1,0),/
+    uint32  ads_takeover_time = 10;
+    ///< 绕障次数：[/],(0,0,1),[/],(1,0),/
+    uint32  ads_obs_avoid_time = 11;
+    ///< 最长连续使用智驾功能没有接管距离统计：[/],(0,0,1),[/],(1,0),/
+    float ads_nid_longest_miles = 12;
+    ///< 泊车次数统计：[/],(0,0,1),[/],(1,0),/
+    uint32  apa_use_time = 13;
+    ///< 泊车节约时间统计：[/],(0,0,1),[/],(1,0),/
+    uint32  apa_save_time = 14;
+    ///< 用户ID帐号：[/],(0,0,1),[/],(1,0),/
+    string c2_user_idnumber = 15;
+    ///< 智驾功能使用时间（包括ACC,IACC,C-NID使用时间）：[/],(0,0,1),[/],(1,0),/
+    uint32 ads_ads_use_time = 16;
+}

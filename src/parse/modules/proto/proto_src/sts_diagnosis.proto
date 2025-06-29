@@ -1,0 +1,58 @@
+/**
+ * @file     sts_diagnose.proto
+ * @brief    状态机
+ * @author   wangqing
+ * @details  主要包含状态机自诊断信息
+ * @date     2023-11-20
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2022.07.11 <th>V2.2         <th>tan,lian    <th>创建初始版本
+ * <tr><th>2022.10.13 <th>V2.9         <th>tan,lian    <th>update 2.9
+ * <tr><th>2022.11.03 <th>V3.1         <th>tan,lian    <th>update 3.1
+ * <tr><th>2022.11.17 <th>V3.2         <th>tan,lian    <th>update 3.2
+ * <tr><th>2022.12.1  <th>V3.3         <th>tan,lian    <th>更新参考线生成
+ * <tr><th>2022.12.1  <th>V3.4         <th>jin,shufeng <th>新增安全预警信号
+ * <tr><th>2023.1.5   <th>V3.5         <th>tan,lian    <th>新增融合限速信号
+ * <tr><th>2023.02.02 <th>V3.6         <th>tan,lian    <th>新增横向、ots
+ *Debug信号、Hmi信号 <table>
+ *
+ **********************************************************************************
+ */
+ syntax = "proto3";
+ package Sts;
+ 
+ /**
+* @brief 状态机自诊断信息
+* @detail 包含时间戳，故障类型等信息
+*/
+message StsDiagnosis
+{
+  ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+  ///<诊断编码： [/],(0,1,65535),[/],(1,0),通过查找标志位识别具体错误信息
+  ///<使用32个bit编码：0000 0010 0000 0010 0000 0000 0000 0000
+  ///<bit0: sab timeout
+  ///<bit1: sab diagnose vehicle signal error
+  ///<bit2: hmi timeout
+  uint32 diagnosis_code = 2;
+ ///<心跳信号：[/],(0,0,255),[/],(1,0),传递心跳信号值 
+  uint32 heartbeart = 3;
+  ///<sts模式配置:[/],(0,0,6),[/],(1,0),sts模式配置 
+  ///<0：正常模式 
+  ///<1：道路测试 
+  ///<2：场地测试 
+  ///<3：单体HIL测试 
+  ///<4：系统HIL测试 
+  ///<5：SIL测试 
+  ///<6：功能安全测试
+  uint32 sts_run_mode = 4;
+  ///<预留1: [/],(0,0,4294967295),[/],(1,0),预留1
+  uint32 reserved1 = 5;
+}

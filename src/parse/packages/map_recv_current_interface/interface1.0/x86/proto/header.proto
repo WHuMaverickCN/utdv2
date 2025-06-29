@@ -1,0 +1,45 @@
+/**
+* @file     header.proto
+* @author   yangzhao
+* @details  header接口定义
+* @date     2022-03-2
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name: [uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+
+/**
+* @brief 数据头信息
+* @detail xxxxxxxx
+*/
+message Header {
+  ///< 数据时间戳:[s],(/,/,/),[/],(/,/),标识数据时间戳
+  double time_stamp = 1;
+
+  ///< 数据帧号:[s],(/,/,/),[/],(/,/),标识数据帧号
+  uint32 seq = 2;
+
+  ///< 坐标系名称:[s],(/,/,/),[/],(/,/),标识坐标系名称
+  string frame_id = 3;
+
+  ///< 时间同步有效:[/],(0,0,1),[/],(/,/),标识时间同步有效
+  bool time_valid = 4;
+
+  ///< 版本信息:[/],(/,/,/),[/],(/,/),表示发送组件的版本信息
+  string version = 5;
+}

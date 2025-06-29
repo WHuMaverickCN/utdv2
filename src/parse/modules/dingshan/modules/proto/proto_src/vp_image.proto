@@ -1,0 +1,278 @@
+/**
+* @file     vp_image.proto
+* @author   wuchuanping
+* @details  图像输出数据信息
+* @date     2022-07-28
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.28          <th>1.0                 <th>wuchuanping
+* <table>
+**********************************************************************************
+*/
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+syntax = "proto2";
+package VpImageProto;
+
+
+import "vp_perception_base.proto";
+
+
+
+/**
+*@brief   图像压缩格式
+*@detail  图像压缩格式
+*/
+enum CompressionFormat{
+  ///< ORIGINAL_IMAGE： [/], (/,/,/), [/], (1,0),原图
+  ORIGINAL_IMAGE = 0;  // 原图
+
+  ///< ORIGINAL_IMAGE_HALF： [/], (/,/,/), [/], (1,0),宽高1/2的压缩方式
+  ORIGINAL_IMAGE_HALF = 1; // 宽高1/2的压缩方式
+
+  ///< ORIGINAL_IMAGE_QUARTER： [/], (/,/,/), [/], (1,0), 1/4压缩
+  ORIGINAL_IMAGE_QUARTER = 2;  // 1/4压缩
+
+  ///< COMPRESSION_JPEG： [/], (/,/,/), [/], (1,0),jpeg格式压缩
+  COMPRESSION_JPEG = 3;  // jpeg格式压缩
+
+  ///< COMPRESSION_H265_I： [/], (/,/,/), [/], (1,0),h265码流I格式压缩
+  COMPRESSION_H265_I = 4;  // h265码流I格式压缩
+
+  ///< COMPRESSION_H265_P： [/], (/,/,/), [/], (1,0),h265码流p格式压缩
+  COMPRESSION_H265_P = 5;  // h265码流p格式压缩
+}
+/**
+*@brief   描述图像格式
+*@detail  不同格式的图像
+*/
+enum ImageFormat{
+  ///< GRAY： [/], (/,/,/), [/], (1,0),灰度格式
+  GRAY = 0;  // 灰度格式
+
+  ///< YV12： [/], (/,/,/), [/], (1,0),YV12格式
+  YV12 = 1;  // YV12格式
+
+  ///< JPEG： [/], (/,/,/), [/], (1,0),JPEG格式
+  JPEG = 2;  // JPEG格式
+
+  ///< PNG： [/], (/,/,/), [/], (1,0),PNG格式
+  PNG = 3;  // PNG格式
+
+  ///< CR12： [/], (/,/,/), [/], (1,0),CR格式
+  CR12 = 4; // CR格式
+
+  ///< BAD： [/], (/,/,/), [/], (1,0),BAD格式
+  BAD = 5;  // BAD格式
+
+  ///< NV12： [/], (/,/,/), [/], (1,0),NV12格式
+  NV12 = 6;  // NV12格式
+
+  ///< NV21： [/], (/,/,/), [/], (1,0),NV21格式
+  NV21 = 7;  // NV21格式
+
+  ///< TIMEOUT： [/], (/,/,/), [/], (1,0),获取超时 
+  TIMEOUT = 8;  // 获取超时 
+
+  ///< BYPASS_ONLY： [/], (/,/,/), [/], (1,0),跳过
+  BYPASS_ONLY = 9;  // 跳过
+
+  ///< YUYV： [/], (/,/,/), [/], (1,0),YUYV格式
+  YUYV = 10;  // YUYV格式
+
+  ///< UYVY： [/], (/,/,/), [/], (1,0),UYVY格式
+  UYVY = 11;  // UYVY格式
+
+  ///< RAW12_PLANAR： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12_PLANAR = 12;  // 未知
+
+  ///< RAW12_PLANAR_JPEG： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12_PLANAR_JPEG = 13;  // 未知
+
+  ///< RAW12_PLANAR_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12_PLANAR_JPEG_LOSSLESS = 14;  // 未知
+
+  ///< RAW12： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12 = 15;  // 未知
+
+  ///< RAW12_JPEG： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12_JPEG = 16;  // 未知
+
+  ///< RAW12_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW12_JPEG_LOSSLESS = 17;  // 未知
+
+  ///< RAW16： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16 = 18;  // 未知
+
+  ///< RAW16_JPEG： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_JPEG = 19;  // 未知
+
+  ///< RAW16_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_JPEG_LOSSLESS = 20;  // 未知
+
+  ///< RAW20： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20 = 21;  // 未知
+
+  ///< RAW20_JPEG： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20_JPEG = 22;  // 未知
+
+  ///< RAW20_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20_JPEG_LOSSLESS = 23;  // 未知
+
+  ///< RAW20_PLANAR： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20_PLANAR = 24;  // 未知
+
+  ///< RAW20_PLANAR_JPEG： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20_PLANAR_JPEG = 25;  // 未知
+
+  ///< RAW20_PLANAR_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW20_PLANAR_JPEG_LOSSLESS = 26;  // 未知
+
+  ///< RAW16_WITH_FRONT： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_WITH_FRONT = 27;  // 未知
+
+  ///< RAW16_WITH_REAR： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_WITH_REAR = 28;  // 未知
+
+  ///< RAW16_WITH_FRONT_REAR： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_WITH_FRONT_REAR = 29;  // 未知
+
+  ///< RAW16_PLANAR_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW16_PLANAR_JPEG_LOSSLESS = 30;  // 未知
+
+  ///< RAW14_PLANAR_JPEG_LOSSLESS： [/], (/,/,/), [/], (1,0),// 未知
+  RAW14_PLANAR_JPEG_LOSSLESS = 31;  // 未知
+
+  ///< BITSTREAM： [/], (/,/,/), [/], (1,0),// 未知
+  BITSTREAM = 32;  // h265码流
+}
+/**
+*@brief   描述采样格式
+*@detail  不同数据采样
+*/
+enum ParsingFormat {
+  ///<ParsingFormat_Raw：  [/], (/,/,/), [/], (1,0),raw图采样格式
+  ParsingFormat_Raw = 0;  
+  ///<ParsingFormat_Label：  [/], (/,/,/), [/], (1,0),标签采样格式
+  ParsingFormat_Label = 1; 
+  ///<ParsingFormat_Label_RLE：  [/], (/,/,/), [/], (1,0),连通域的标签采样
+  ParsingFormat_Label_RLE = 2;  
+}
+/**
+*@brief   鸟瞰图呈现格式选择
+*@detail  不同的鸟瞰图呈现选择
+*/
+enum IPMSelect{
+  ///<NINETY_DISTANT：  [/], (/,/,/), [/], (1,0),ninety_distany
+  NINETY_DISTANT    = 0;  
+  ///<FORTY_DISTANT：  [/], (/,/,/), [/], (1,0),forty_distany
+  FORTY_DISTANT     = 1;  
+  ///<FORTY_HALF_WIDTH：  [/], (/,/,/), [/], (1,0),forty_half_width
+  FORTY_HALF_WIDTH  = 2;  
+  ///<TWENTY_DISTANT：  [/], (/,/,/), [/], (1,0),twenty distant
+  TWENTY_DISTANT    = 3;  
+}
+
+/**
+*@brief   感知的状态
+*@detail  感知的状态，表明是否有模型感知结果
+*/
+enum PerceptionStatus {
+  ///< NO_PERCEPTION： [/], (/,/,/), [/], (1,0),没有感知结果
+  NO_PERCEPTION     = 0;  
+  ///<WITH_PERCEPTION： [/], (/,/,/), [/], (1,0),有感知结果
+  WITH_PERCEPTION   = 1;  
+}
+/**
+*@brief   图像的状态
+*@detail  图像的状态，表明当前图像数据是否正常
+*/
+enum ImageStatus {
+  ///<IMAGE_STATUS_NORMAL： [/], (/,/,/), [/], (1,0),图像数据正常
+  IMAGE_STATUS_NORMAL = 0;  
+  ///<IMAGE_STATUS_NO_INTERRUPT： [/], (/,/,/), [/], (1,0),图像数据不全截断
+  IMAGE_STATUS_NO_INTERRUPT = 1;  
+}
+/**
+*@brief   感兴趣区域的信息
+*@detail  roi对应要调的模型id以及具体rect的图像未知信息
+*/
+message RoiMap {
+  ///< model_id： [int32], (0,0,/), [/], (1,0), 感知模型id
+  optional int32 model_id = 1;
+  ///< type： [VpPerceptionBaseProto.Rect], (0,0,/), [/], (1,0), roi对应的矩形框位置信息
+  optional VpPerceptionBaseProto.Rect model_roi = 2; 
+}
+
+/**
+ *@brief  基础图像信息
+ *@detail  描述图像描述信息
+ */
+message Image {
+  ///< width： [int32], (0,0,/), [/], (1,0), 图像宽
+  optional int32 width = 1;  
+  ///< height： [int32], (0,0,/), [/], (1,0), 图像高
+  optional int32 height = 2;
+  ///< channel： [int32], (3,0,/), [/], (1,0), 图像通道
+  optional int32 channel = 3;
+  ///< time_stamp： [int64], (0,0,/), [/], (1,0), 单位时间戳
+  optional int64 time_stamp = 4;
+  ///< send_mode： [int32], (0,0,4), [/], (1,0), 图像数据分辨率的ETH输出模式
+  optional int32 send_mode = 5;
+  
+  ///< format： [int32], (32,0,32), [/], (1,0), 图像格式
+  optional int32 format = 6;
+  ///< index： [int32], (0,0,/), [/], (1,0), 相机索引编号
+  optional int32 index = 7;
+  ///< count： [int32], (0,0,/), [/], (1,0), 未知
+  optional int32 count = 8; 
+  ///< depth： [int32], (3,0,/), [/], (1,0), 图像深度信息
+  optional int32 depth = 9;
+  ///< align： [int32], (0,0,/), [/], (1,0), 图像对齐方式
+  optional int32 align = 10;
+  ///< image_counter： [uint32], (0,0,/), [/], (1,0), 图像计数器，对应vio图像数据结构中的frame_id类型
+  optional uint32 image_counter = 11;  
+  ///< bypass_time_diff： [int64], (0,0,/), [/], (1,0), 时间差
+  optional int64 bypass_time_diff = 12;
+  ///< perception_status： [int32], (0,0,/), [/], (1,0), 感知状态
+  optional int32 perception_status = 13;
+  
+  ///< compression_format： [int32], (0,0,/), [/], (1,0), 图像压缩格式
+  optional int32 compression_format = 14;
+  ///< status： [int32], (0,0,/), [/], (1,0), 图像获取状态，正常还是被截断
+  optional int32 status = 15; 
+  ///< roi_map： [RoiMap], (0,0,/), [/], (1,0), 感兴趣区域信息
+  repeated RoiMap roi_map = 16;
+  ///< perception_mode： [int32], (0,0,/), [/], (1,0), 感知模式
+  optional int32 perception_mode = 17;
+  ///< postprocessor_status： [int32], (0,0,/), [/], (1,0), 后处理状态
+  optional int32 postprocessor_status = 18;
+  ///< frame_id： [int32], (0,0,/), [/], (1,0), 图像帧id
+  optional int32 frame_id = 21;
+  ///< time_stamp_us： [int64], (0,0,/), [/], (1,0), 图像时间戳
+  optional int64 time_stamp_us = 22;
+  ///< step： [int32], (3840,0,/), [/], (1,0), 图像步长
+  optional int32 step = 23;
+  ///< hw_time_stamp： [uint64], (0,0,/), [/], (1,0), 在J3或者J5上面的硬件时间戳
+  optional uint64 hw_time_stamp = 24;
+}
+
+
+

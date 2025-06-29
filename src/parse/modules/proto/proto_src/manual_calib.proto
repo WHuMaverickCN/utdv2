@@ -1,0 +1,52 @@
+/**
+* @file     manualcalib.proto
+* @author   zhangfan
+* @details  manualcalib
+* @date     2023-12-20
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.12.20          <th>1.0                 <th>zhangfan 
+* <table>
+**********************************************************************************
+*/
+
+
+syntax = "proto3";
+  
+package ManualCalib;  
+
+/**
+* @brief ZMFpoint
+* @detail ZMFpoint
+*/
+message ZMFpoint {
+    ///<图像像素x坐标值 ：[/],(/,/,/),[/],(1,0),/  
+    double x = 1; 
+    ///<图像像素y坐标值 ：[/],(/,/,/),[/],(1,0),/ 
+    double y = 2;  
+}  
+
+/**
+* @brief CalibInfo
+* @detail CalibInfo
+*/
+message CalibInfo {  
+    ///<未使用 ：[/],(/,/,/),[32],(1,0),未使用，填0 
+    uint32 pattern_type = 1;
+	
+    ///<通道是否异常 ：[/],(/,/,/),[32],(1,0),4个通道都能获取到角点时填0xF，否则填0  
+    uint32 valid_channels = 2;
+	
+    ///<图像角点集合 ：[/],(/,/,/),[32],(/,/),此处将二维数组展开成一维数组，数组下标0-7填充前视8个角点数据，数组下标8-15(左视图)，数组下标16-23(后视图)，数组下标24-31(右视图) 
+    repeated ZMFpoint points = 3;
+}

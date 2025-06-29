@@ -1,0 +1,753 @@
+/**
+
+* @file     hmi_Basic_SmartDrivingTips.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义  Basic_SmartDrivingTips - Ntf_SmartDriveTips
+* @date     2023-08-25
+* @version  V1.8.4
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE``
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+/**
+* @brief SpeedLimitShowDemand
+* @detail 限速显示信息
+*/
+message SpeedLimitShowDemand
+{
+	///<本车道限速值:[/],(0,0,/),[/],(1,0),本车道限速值 
+	float las_tsrhostspdlimit = 1;
+
+	///<超速预警图像报警:[/],(0,0,1),[/],(1,0),超速预警图像报警
+	///<0:不报警
+	///<1:报警	
+	uint32 las_overspeedvisualwarning = 2;
+
+	///<超速预警声音报警:[/],(0,0,1),[/],(1,0),超速预警声音报警
+	///<0:不报警
+	///<1:报警	 		
+	uint32 las_overspeedsoundwarning = 3;
+
+	///<一键设定巡航车速请求:[/],(0,0,1),[/],(1,0),一键设定巡航车速请求
+	///<0x0: 不显示SET图标 是
+	///<0x1: 显示SET图标 是 	
+	uint32 acc_cslsetreq = 4;
+
+	///<当前限速状态:[/],(0,0,2),[/],(1,0),当前限速状态
+	///<0x0: 未限速
+	///<0x1: 基于限速牌限速
+	///<0x2: 基于电子眼限速  	
+	uint32 ads_spdlimitedstatus = 5;
+
+	///<道路融合限速值类型:[/],(0,0,/),[/],(1,0),道路融合限速值类型 		
+	uint32 ads_spdlmttype = 6;
+
+	///<前方变更点后限速值:[/],(0,0,/),[/],(1,0),前方变更点后限速值 		
+	float ads_tsrhostnextspdlimit = 7;
+
+	///<前方限速变化点距离:[m],(0,0,/),[/],(1,0),前方限速变化点距离
+	float ads_tsrhostnextspdlimitdist = 8;		
+}
+/**
+* @brief CNANotice
+* @detail CAN提示信息
+*/
+message CNANotice
+{
+	///<CNA提示信息:[/],(0,0,/),[/],(1,0),CNA提示信息 
+	///<0x0:nodisplay
+	///<0x1:CNA已激活
+	///<0x2:CNA已退出
+	///<0x3:前方城区汇流请注意观察路况
+	///<0x4:邻车道缓行限速
+	///<0x5:即将向左换道前方路口本车道不可通行
+	///<0x6:即将向右换道前方路口本车道不可通行
+	///<0x7:即将直行通过路口
+	///<0x8:即将左转通过路口
+	///<0x9:即将右转通过路口
+	uint32 ads_cnatextinfo = 1;		
+}
+/**
+* @brief ADCNotice
+* @detail 智驾提示信息
+*/
+message ADCNotice
+{
+	///<智能驾驶提示信息:[/],(0,0,/),[/],(1,0),智能驾驶提示信息
+	///<0x1: ACC:ACC is OFF；
+    ///<0x2: ACC:ACC system error；
+    ///<0x3: ACC:ACC Error by EMS/VCU/TCU；
+    ///<0x4: ACC:ACC Error by EPBI；
+    ///<0x5: ACC:SAS Error；
+    ///<0x6: ACC:Button Error；
+    ///<0x7: ACC:IP Fail；
+    ///<0x8: ACC:ACC temporary unavailable by others；
+    ///<0x9: ACC:ACC error by Front Camera；
+    ///<0xA: ACC:ACC error by Front Radar；
+    ///<0xB: ACC:Engine No Running；
+    ///<0xC: ACC:door is open；
+    ///<0xD: ACC:bonnet is Open；
+    ///<0xE: ACC:Trunk is Open；
+    ///<0xF: ACC:Tire Status is abnormal；
+    ///<0x10: ACC:Bad weather；
+    ///<0x11: ACC:Seatbelt unbuckled；
+    ///<0x12: ACC:ESP off；
+    ///<0x13: ACC:No forward gear；
+    ///<0x14: ACC:APA  is on；
+    ///<0x15: ACC:EPB activate；
+    ///<0x16: ACC:ACC cannot active by snow mode；
+    ///<0x17: ACC:SteeringAngle is over；
+    ///<0x18: ACC:brake pedal is applied；
+    ///<0x19: ACC:Speed over 150kph；
+    ///<0x1A: ACC:caution about driving safty；
+    ///<0x1B: ACC:Road wet and slippery；
+    ///<0x1C: ACC:Road bumpy；
+    ///<0x1D: ACC:Have Pedestrain or Riders；
+    ///<0x1E: ACC:Out of slope or curvature range ；
+    ///<0x1F: ACC:ACC active control is cancelled；
+    ///<0x20: ACC:ACC cannot active by Race mode；
+    ///<0x21: ACC:ACC unintended exit warning；
+    ///<0x22: ACC:emergency brake suddenly；
+    ///<0x23: ACC:减速带减速；
+    ///<0x24: ACC:speed reduce by ramp；
+    ///<0x25: ACC:speed reduce by SpdLimited；
+    ///<0x26: ACC:speed reduce by Tollstation；
+    ///<0x27: ACC:speed reduce by tunnel；
+    ///<0x28: ACC:unable to activate ACC；
+    ///<0x29: ACC:车辆起步提醒（前车驶离）；
+    ///<0x2A: ACC:激活成功提醒；
+    ///<0x2B: ACC:前方红绿灯-智能限速；
+    ///<0x2C: ACC:前方人行横道-请注意减速慢行；
+    ///<0x2D: ACC:前方人行横道-智能限速；
+    ///<0x2E: ACC:前方收费站-请注意减速慢行；
+    ///<0x2F: ACC:前方收费站-智能限速；
+    ///<0x30: ACC:前方弯道-智能限速；
+    ///<0x31: ACC:前雷达不可用-ACC退出；
+    ///<0x32: ACC:前摄像头不可用-ACC退出；
+    ///<0x33: ACC:推荐调节巡航车速-避让并行车辆；
+    ///<0x34: ACC:巡航驻车退出；
+    ///<0x35: ACC:雨天道路湿滑-自动增加跟车时距；
+    ///<0x36: ACC:智能加速避让并行车辆；
+    ///<0x37: ACC:智能减速避让并行车辆；
+    ///<0x38: ACC:主动提速提醒；
+    ///<0x39: ACC:主动退出提醒（稍强）；
+    ///<0x3A: ACC:巡航驻车（Stand Wait mode）；
+    ///<0x3B: ACC:操作反馈-设定车速达到上限
+    ///<0x3C: ACC:操作反馈-设定车速达到下限
+    ///<0x3D: ACC:操作反馈-设定车速达到限速值
+    ///<0x3E: ACC:操作反馈-超速接近纵向控制极限，即将退出
+    ///<0x3F: ACC:out of curvature range
+    ///<0x40: ACC:巡航或领航降级至ACC
+    ///<0x41: ACC:减速提示-城区汇流限速
+    ///<0x42: ACC:减速提示-高速汇流限速
+    ///<0x43: ACC:减速提示-邻车道缓行限速
+    ///<0x44: ACC:减速提示-路口限速
+    ///<0x45: ACC:隧道限速解除
+    ///<0x46: ACC:匝道限速解除
+    ///<0x47: ACC:弯道限速解除
+    ///<0x48: ACC:人行横道限速解除
+    ///<0x49: ACC:城区汇流限速解除
+    ///<0x4A: ACC:高速汇流限速解除
+    ///<0x4B: ACC:邻车道缓行限速解除
+    ///<0x4C: ACC:路口限速解除
+    ///<0x4D: ACC:行人限速解除
+    ///<0x4E: ACC:用户主动解决跟停模式
+    ///<0x4F: ACC:避让并行车辆结束
+    ///<0x50: ACC:减速提示-行人限速
+    ///<0x51: ACC/IACC:不可激活原因-传感器遮挡
+    ///<0x52: ACC/IACC:不可激活原因-安全功能激活
+    ///<0x53: ACC/IACC:不可激活原因-安全气囊弹出
+    ///<0x54: ACC/IACC:不可激活原因-车辆后溜
+    ///<0x55: ACC/IACC:不可激活原因-车辆前滑
+    ///<0x56: ACC/IACC:不可激活原因-制动盘过热
+    ///<0x57: ACC/IACC:不可激活原因-充电口未关
+    ///<0x58: ACC:减速提示-能见度低
+    ///<0x59: ACC/IACC:不可激活原因-充电口打开
+    ///<0x5A: ACC/IACC:不可激活原因-处于超级省电模式
+    ///<0x5B: ACC/IACC:不可激活原因-车道过宽
+    ///<0x5C: ACC/IACC:不可激活原因-车道过窄
+    ///<0x5D: ACC/IACC:不可激活原因-远近光灯故障；
+    ///<0x5E: 减速提示-传感器逆光；
+    ///<0x5F: 减速提示-坡度变化；
+    ///<0x60: 减速提示-减速线
+    ///<0x61: 减速提示-前方学校；
+    ///<0x62: ACC:减速提示-停车场限速
+    ///<0x63: ACC-前方绿灯，即将通行；
+    ///<0x64: 减速提示-前方医院
+    ///<0x65: IACC:IACC not available by EPS；
+    ///<0x66: IACC:longitudinal control not available；
+    ///<0x67: IACC:ADR/DVR Status not Match；
+    ///<0x68: IACC:other system error；
+    ///<0x69: IACC:prohibition request for safestop；
+    ///<0x6A: IACC:Please turn on IACC in incall ；
+    ///<0x6B: IACC:Driver Drowsy or Distracted；
+    ///<0x6C: IACC:SteeringAngle is over；
+    ///<0x6D: IACC:exceed speed limit；
+    ///<0x6E: IACC:turn light switch on；
+    ///<0x6F: IACC:Hands on plz；
+    ///<0x70: IACC:driver overrides steering；
+    ///<0x71: IACC:caution about driving safty；
+    ///<0x72: IACC:unable to active for not in lane/crossing lane；
+    ///<0x73: IACC:lane condition not available；
+    ///<0x74: IACC:unable to active in curve；
+    ///<0x75: IACC:unable to active in Bad weather；
+    ///<0x76: IACC:system error；
+    ///<0x77: IACC:LKA Takeover Req；
+    ///<0x78: IACC:ELK active；
+    ///<0x79: IACC:HeadingAngle is over；
+    ///<0x7A: IACC:LAT invalid；
+    ///<0x7B: IACC:LAT invalid in safety stargy；
+    ///<0x7C: IACC:Hands on plz；
+    ///<0x7D: IACC:IACC active；
+    ///<0x7E: IACC:IACC Cancel；
+    ///<0x7F: IACC:IACC deactivate；
+    ///<0x80: IACC:iacc override；
+    ///<0x81: IACC:IACC unintended exit；
+    ///<0x82: IACC:车道对中-跟随目标丢失
+    ///<0x83: IACC:Longitude Exit；
+    ///<0x84: IACC:Prohibition request for rdf；
+    ///<0x85: IACC:takeover request with safety stop completed；
+    ///<0x86: IACC:takeover request with safety stoping；
+    ///<0x87: IACC:unable to activate IACC；
+    ///<0x88: IACC:未认证用户使用智能驾驶功能提醒
+    ///<0x89: IACC:超速接近横向控制的极限即将退出
+    ///<0x8A: IACC:车辆临时靠左行驶，避让并行车辆
+    ///<0x8B: IACC:车辆临时靠右行驶，避让并行车辆
+    ///<0x8C: IACC:车辆临时靠左行驶，避让护栏
+    ///<0x8D: IACC:车辆临时靠右行驶，避让护栏
+    ///<0x8E: IACC:从ACC升级到巡航
+    ///<0x8F: IACC:车道线不清晰
+    ///<0x90: IACC:推荐使用巡航功能
+    ///<0x91: IACC:巡航功能禁用已解除
+    ///<0x92: IACC:邻车道车辆压线行驶，向左偏移
+    ///<0x93: IACC:邻车道与大车并行行驶，向左偏移
+    ///<0x94: IACC:行人偏移，向左
+    ///<0x95: IACC:骑行者偏移，向左
+    ///<0x96: IACC:动物偏移，对向
+    ///<0x97: IACC:绿化带偏移，向左
+    ///<0x98: IACC:绿化带偏移，向右
+    ///<0x99: IACC:动物偏移，同向
+    ///<0x9A: IACC:偏移，障碍物（锥桶、水马）占用本车道-向左
+    ///<0x9B: IACC:智慧偏移结束
+    ///<0x9C: IACC:领航降级至巡航
+    ///<0x9D: IACC:连续偏移；
+    ///<0x9E: 减速提示-前方小区
+    ///<0x9F: 减速提示-前方公交站
+    ///<0xA1: IACC:邻车道车辆压线行驶，向右偏移
+    ///<0xA2: IACC:邻车道与大车并行行驶，向右偏移
+    ///<0xA3: IACC:行人偏移，向右
+    ///<0xA4: IACC:骑行者偏移，向右
+    ///<0xA5: IACC:偏移，障碍物（锥桶、水马）占用本车道-向右
+    ///<0xA6: 通用向左偏移
+    ///<0xA7: 通用向右偏移
+    ///<0xA8: ALC:车辆向右换道，前方路口
+    ///<0xA9: ALC:车辆向右换道至高通行效率车道
+    ///<0xAA: OA:前方车辆异常，向左绕障
+    ///<0xAB: OA:前方车辆故障，向左绕障
+    ///<0xAC: OA:前方车辆异常，向右绕障
+    ///<0xAD: OA:前方车辆故障，向右绕障
+    ///<0xAE: ALC-换道至导航目的地侧车道
+    ///<0xC9: UDLC:UDLC exit，触发式换道已退出，（UDLC不再等待换道并且不再主导控制）；
+    ///<0xCA: UDLC:UDLC return，触发式换道回退原车道（驾驶员取消换道而回退）；
+    ///<0xCB: UDLC:UDLC finished，请拨回转向灯（换道完成或回退对中完成时）；
+    ///<0xCD: UDLC:change lane  to both sides for the  traffic jam,两边车道均可支持变道；
+    ///<0xCE: UDLC:Lane change request by ramp；
+    ///<0xCF: UDLC:change lane  to left side for the  traffic jam,左边车道可支持变道；
+    ///<0xD0: UDLC:change lane  to right side for the  traffic jam,右边车道可支持变道；
+    ///<0xD1: UDLC:out of ODD暂时不满足换道条件，不尝试换道；
+    ///<0xD2: UDLC:Please turn on the UDLC in HU请在主机中打开主动换道设置开关；
+    ///<0xD3: UDLC:speed out of range车速超出范围，自动换道条件不满足；
+    ///<0xD4: UDLC:UDLC System Error自动换道系统故障；
+    ///<0xD5: UDLC:雨量过大，自动换道条件不满足；
+    ///<0xD6: UDLC:wait over time,换道尝试超时中止；
+    ///<0xD7: UDLC:推荐向左换道-道路更畅通；
+    ///<0xD8: UDLC:推荐向左换道-超越前车；
+    ///<0xD9: UDLC:推荐向左换道-避让前方障碍物；
+    ///<0xDA: UDLC:推荐向左换道-避让前方异常车辆；
+    ///<0xDB: UDLC:推荐向左换道-道路前方有道路施工；
+    ///<0xDC: UDLC:推荐向左换道-提前避让右侧汇入车辆；
+    ///<0xDD: UDLC:推荐向左换道-避让右侧汇入车辆；
+    ///<0xDE: UDLC:推荐向左换道-前方道路即将向左合并；
+    ///<0xDF: UDLC:推荐向左换道-避让右侧大型车辆；
+    ///<0xE0: UDLC:推荐向左换道-避让后方大型车辆；
+    ///<0xE1: UDLC:推荐向右换道-道路更畅通；
+    ///<0xE2: UDLC:推荐向右换道-超越前车；
+    ///<0xE3: UDLC:推荐向右换道-道路前方有障碍物；
+    ///<0xE4: UDLC:推荐向右换道-道路前方有异常车辆；
+    ///<0xE5: UDLC:推荐向右换道-道路前方有道路施工；
+    ///<0xE6: UDLC:推荐向右换道-提前避让左侧汇入车辆；
+    ///<0xE7: UDLC:推荐向右换道-避让左侧汇入车辆；
+    ///<0xE8: UDLC:推荐向右换道-前方道路即将向右合并；
+    ///<0xE9: UDLC:推荐向右换道-避让左侧大型车辆；
+    ///<0xEA: UDLC:推荐向右换道-避让后方大型车辆；
+    ///<0xEB: UDLC:避让侧后方来车，返回原车道；
+    ///<0xEC: UDLC:避让危险车辆，返回原车道；
+    ///<0xED: UDLC:避让行人，返回原车道；
+    ///<0xEE: UDLC:避让障碍物，返回原车道；
+    ///<0xEF: UDLC:非驾驶员操作通用原因，返回原车道；
+    ///<0xF0: 换道辅助系统故障，请立即接管
+    ///<0xF1:  换道辅助系统故障
+    ///<0xF2: 换道辅助系统退出
+    ///<0xF3: 换道辅助系统退出，请立即接管
+    ///<0xF4: 正在向左换道
+    ///<0xF5: 正在向右换道 
+    ///<0xF6:  正在返回原车道
+    ///<0xF7: 换道完成，请关闭转向灯
+    ///<0xF8: 胎压异常，暂不支持辅助换道
+    ///<0xF9: 车速过高，暂不支持辅助换道
+    ///<0xFA:  换道条件不满足
+    ///<0xFB:  当前急弯，暂不支持辅助换道
+    ///<0xFE: 换道条件不满足，本次换道取消
+    ///<0xFF: 换道失败，请立即接管
+	uint32 acc_adcnotice = 1;		
+}
+/**
+* @brief TJPNotice
+* @detail TJP提示信息
+*/
+message TJPNotice
+{
+	///<TJP提示信息:[/],(0,0,/),[/],(1,0),TJP提示信息
+	///<0x0: 不显示
+	///<0x1: 激活推荐 
+	///<0x2: 激活成功提示 
+	///<0x3: TJP不可激活无法检测驾驶员状态 
+	///<0x4: TJP不可激活雷达异常 
+	///<0x5: TJP不可激活摄像头异常 
+	///<0x6: TJP不可激活不满足电子围栏要求  
+	///<0x7: TJP不可激活定位异常 
+	///<0x8: TJP激活中检测疲劳驾驶 
+	///<0x9: TJP激活中未检测到头部 
+	///<0xA: TJP降级提示 
+	///<0xB: 用户主动退出TJP两次按键确认提示 
+	uint32 ads_tjptextinfo = 1;		
+}
+/**
+* @brief NewRecommend
+* @detail 新手推荐信息
+*/
+message NewRecommend
+{
+	///<新手模式推荐:[/],(0,0,/),[/],(1,0),新手模式推荐
+	///<0x0: no display；
+    ///<0x1: ACC recommend；
+    ///<0x2: IACC recommend；
+    ///<0x3: NID recommend；
+    ///<0x4: 长按加速按键推荐；
+    ///<0x5: 长按减速按键推荐；
+    ///<0x6: 时距增加调节按键推荐；
+    ///<0x7: 时距减少调节按键推荐；
+    ///<0x8: 目标导致本车减速；
+    ///<0x9: 加速至道路限速值
+    ///<0xA: 减速至道路限速值
+    ///<0xB: 设置道路限速为巡航车速
+    ///<0xC: 偏移远离大车
+    ///<0xD: 偏移结束说明功能
+    ///<0xE: 打灯向左换道
+    ///<0xF: 打灯向右换道
+    ///<0x10: 打灯换道完成
+    ///<0x11: 绕障障碍物
+    ///<0x12: 绕障结束说明功能
+    ///<0x13: 换道至高通行效率车道
+    ///<0x14: 换道结束说明功能
+    ///<0x15: 左转通过路口
+    ///<0x16: 右转通过路口
+    ///<0x17: 直行通过路口
+    ///<0x18: 通过路口说明功能
+    ///<0x19: 向右下匝道
+    ///<0x1A: 向左下匝道
+    ///<0x1B: 通过匝道结束说明功能
+    ///<0x1C: 引导调节限速值
+    ///<0x1D: ACC升级到巡航
+    ///<0x1E: ACC升级到领航
+    ///<0x1F: 巡航升级到领航
+    ///<0x20: 领航降级到ACC
+    ///<0x21: 领航降级到巡航
+    ///<0x22: 巡航降级到ACC
+    ///<0x23: 油门加速
+    ///<0x24: 用户控制方向盘
+    ///<0x25: 脱手
+    ///<0x26: 脱眼
+    ///<0x27: 安全停车中
+    ///<0x28: 安全停车完成
+    ///<0x29: 说明静默状态
+    ///<0x2A: 静默状态解除
+    ///<0x2B: 智能驾驶辅助系统退出
+    ///<0x2C: 陪练助手全部场景完成
+    ///<0x2D: 短按加速按键推荐
+    ///<0x2E: 短按减速按键推荐；
+    ///<0x2F: 偏移远离行人
+    ///<0x30: 偏移远离动物
+    ///<0x31: 偏移远离骑行者
+    ///<0x32: 偏移远离障碍物
+    ///<0x33: 偏移远离护栏
+    ///<0x34: 偏移远离绿化带
+    ///<0x35: 偏移远离异常路面
+    ///<0x36: 绕障车辆
+    ///<0x37: 绕障行人
+    ///<0x38: 绕障骑行者
+    ///<0x39: 绕障动物
+    ///<0x3A: 绕障异常路面
+    ///<0x3B: 绕障危险区域
+    ///<0x3C: 换道避让左侧大型车辆
+    ///<0x3D: 换道避让右侧大型车辆
+    ///<0x3E: 换道避让前车缓行
+    ///<0x3F: 换道避让分流
+    ///<0x40: 换道避让汇入主路
+    ///<0x41: 换道避让通行路口
+    ///<0x42: 换道避让通行匝道
+    ///<0x43: 换道避让前方障碍物
+    ///<0x44: 换道避让前方异常车辆
+    ///<0x45: 换道避让前方特殊车辆
+    ///<0x46: 向左汇入主路
+    ///<0x47: 向右汇入主路
+    ///<0x48: 柔和驾驶模式下的加速响应
+    ///<0x49: 柔和驾驶模式下的起步响应
+    ///<0x4A: 柔和驾驶模式下的过弯限速
+    ///<0x4B: 柔和驾驶模式下的换道风格
+    ///<0x4C: 舒适驾驶模式下的加速响应
+    ///<0x4D: 舒适驾驶模式下的起步响应
+    ///<0x4E: 舒适驾驶模式下的过弯限速
+    ///<0x4F: 舒适驾驶模式下的换道风格
+    ///<0x50: 激进驾驶模式下的加速响应
+    ///<0x51: 激进驾驶模式下的起步响应
+    ///<0x52: 激进驾驶模式下的过弯限速
+    ///<0x53: 激进驾驶模式下的换道风格
+    ///<0x54: 推荐使用其他驾驶模式（行驶稳定）
+    ///<0x55: 推荐使用其他驾驶模式（驾驶员干预次数）
+    ///<0x56: 接管雨刮故障
+    ///<0x57: 接管灯光故障
+    ///<0x58: 接管动力系统异常
+    ///<0x59: 接管传感系统异常
+    ///<0x5A: 接管转向系统异常
+    ///<0x5B: 接管制动系统异常
+    ///<0x5C: 接管交互系统异常
+    ///<0x5D: 接管驻车系统异常
+    ///<0x5E: 接管系统异常
+    ///<0x5F: 接管胎压异常
+    ///<0x60: 接管胎温异常
+    ///<0x61: 接管数据记录异常
+    ///<0x62: 接管按键故障
+    ///<0x63: 接管档位失效
+    ///<0x64: 接管通讯故障
+    ///<0x65: 接管制动灯异常
+    ///<0x66: 接管远近灯故障
+    ///<0x67: 接管转向灯故障
+    ///<0x68: 接管超出曲率范围
+    ///<0x69: 接管超出坡度范围
+    ///<0x6A: 接管道路颠簸
+    ///<0x6B: 接管道路湿滑
+    ///<0x6C: 接管前舱盖未关
+    ///<0x6D: 接管后备箱未关
+    ///<0x6E: 接管车门未关
+    ///<0x6F: 接管充电盖未关
+    ///<0x70: 接管安全带未系
+    ///<0x71: 接管油门超越
+    ///<0x72: 接管车速过高
+    ///<0x73: 接管道路天气环境差
+    ///<0x74: 接管远近光灯关闭
+    ///<0x75: 接管电量过低
+    ///<0x76: 接管制动盘过热
+    ///<0x77: 接管车辆存在失稳
+    ///<0x78: 接管道路出现危险目标
+    ///<0x79: 接管前方车辆倒车
+    ///<0x7A: 换道避让汇流口
+    ///<0x7B: 换道-目的侧车道
+    ///<0x7C: 换道-避让行人
+    ///<0x7D: 换道-避让骑行者
+    ///<0x7E: 掉头通过路口
+    ///<0x7F: 正在向左偏移
+    ///<0x80: 正在向右偏移
+    ///<0x81: 正在绕障
+    ///<0x82: 正在向左换道
+    ///<0x83: 正在向右换道 
+	uint32 ads_newrecommend = 1;		
+}
+/**
+* @brief NIDShowDemand
+* @detail NID显示信息
+*/
+message NIDShowDemand
+{
+	///<NID提示信息:[/],(0,0,0x79),[/],(1,0),NID提示信息
+	///<0x0: no display
+    ///<0x1: Out of Road ODD（驶离HPP高速区域）
+    ///<0x2: NDA Limit（NDA限制）
+    ///<0x3: Weather Limit（天气限制）
+    ///<0x4: Turn Limit（弯道限制）
+    ///<0x5: System Limit（驾驶员状态检测限制）
+    ///<0x6: Toll Exit（收费站退出）
+    ///<0x7: TrafficAccident Exit（交通事故退出）
+    ///<0x8: Construction Exit（施工区域退出）
+    ///<0x9: 到达目的地，可使用记忆泊车
+    ///<0xA~0x11: reserved；
+    ///<0x12: NDA退出提示；
+    ///<0x13: NDA激活提示；
+    ///<0x14~0x16: reserved；
+    ///<0x17: NID已退出，已到达导航目的地
+    ///<0x18: NID意外退出
+    ///<0x19~0x1D: reserved；
+    ///<0x1E: 请控制方向，750m后将退出NID
+    ///<0x1F: 请控制方向，1km后将退出NID
+    ///<0x20: 请控制方向，500m后将退出NID
+    ///<0x21: 请控制方向，250m后将退出NID
+    ///<0x22: 请控制方向，50m后将退出NID 
+    ///<0x23: 请控制方向，100m后将退出NID
+    ///<0x24: ACC/巡航升级至领航
+    ///<0x25: NID已禁用，重启车辆后才能再次使用NID功能
+    ///<0x26: 即将进入匝道
+    ///<0x27:  即将汇入主路
+    ///<0x28: 换道取消
+    ///<0x29: 车速过高，请注意控制车速
+    ///<0x2A: 前方急弯
+    ///<0x2B: 从IACC升级至NID
+    ///<0x2C: 2km后进入领航可运行区域
+    ///<0x2D: 1750m后进入领航可运行区域
+    ///<0x2E: 1500m后进入领航可运行区域
+    ///<0x2F: 1250m后进入领航可运行区域
+    ///<0x31: 1000m后进入领航可运行区域
+    ///<0x32: 750m后进入领航可运行区域
+    ///<0x33: 500m后进入领航可运行区域
+    ///<0x34: 250m后进入领航可运行区域
+    ///<0x35: 前方1500米进入匝道
+    ///<0x36: 前方1000米进入匝道
+    ///<0x37: 前方750米进入匝道
+    ///<0x38: 前方500米进入匝道
+    ///<0x39: 前方250米进入匝道
+    ///<0x3A: 前方2000米通过路口
+    ///<0x3B: 前方1500米通过路口
+    ///<0x3C: 前方1000米通过路口
+    ///<0x3D: 前方750米通过路口
+    ///<0x3E: 前方500米通过路口
+    ///<0x3F: 前方250米通过路口
+    ///<0x40: 匝道辅助:正在等待汇入匝道
+    ///<0x41: 匝道辅助:车辆准备汇入匝道
+    ///<0x42: 匝道辅助:汇入匝道结束
+    ///<0x43: 匝道辅助:正在等待汇入主路
+    ///<0x44: 匝道辅助:车辆准备汇入主路
+    ///<0x45: 匝道辅助:汇入主路结束
+    ///<0x46: 路口辅助:车辆前方直行通过路口
+    ///<0x47: 路口辅助:车辆前方左转通过路口
+    ///<0x48: 路口辅助:车辆前方右转通过路口
+    ///<0x49: 路口辅助:车辆前方路口掉头
+    ///<0x4A: 路口辅助:车辆即将直行通过路口
+    ///<0x4B: 路口辅助:车辆即将左转通过路口
+    ///<0x4C: 路口辅助:车辆即将右转通过路口
+    ///<0x4D: 路口辅助:车辆车辆即将路口掉头
+    ///<0x4E: 路口辅助:黄灯闪烁，注意观察周围环境
+    ///<0x4F: 路口辅助:反打转向灯或取消转向灯-转向已取消
+    ///<0x50: 路口辅助:调头完成
+    ///<0x51: 路口辅助:转向完成
+    ///<0x52: 路口辅助:长时间脱手,智能驾驶辅助退出
+    ///<0x53: 路口辅助:行人长时间不通行路口，车辆即将起步通行
+    ///<0x54: 路口辅助:交通灯由其他颜色（红/黄）变为绿色
+    ///<0x55: 路口辅助:反打转向灯或取消转向灯-调头已取消
+    ///<0x56: 路口辅助:长时间脱眼,智能驾驶辅助退出
+    ///<0x57: 前方2000米进入匝道
+    ///<0x58: 前方150米进入匝道
+    ///<0x59: 前方100米进入匝道
+    ///<0x5A: 前方50米进入匝道
+    ///<0x5B: 150米通过路口
+    ///<0x5C: 100米通过路口
+    ///<0x5D: 50米通过路口
+    ///<0x5E: 匝道辅助:匝道汇入主路驾驶员打断不回退
+    ///<0x5F: 匝道辅助:主路汇入匝道关闭转向灯打断回退
+    ///<0x60: 匝道辅助:主路汇入匝道驾驶员打断不回退
+    ///<0x61: 匝道辅助:主路汇入匝道反打转向灯打断回退
+    ///<0x62: 匝道辅助:主路汇入匝道驾驶员主动关闭/开启反向转向灯
+    ///<0x63: 已进入高精地图覆盖区域
+    ///<0x64: 路口辅助:车辆直行通过路口
+    ///<0x65: 路口辅助:车辆左转通过路口
+    ///<0x66: 路口辅助:车辆右转通过路口
+    ///<0x67: 路口辅助:车辆掉头通过路口
+    ///<0x68: 路口辅助:黄灯不可通行
+    ///<0x69: 路口辅助:红灯不可通行
+    ///<0x6A: 路口辅助:待行区不可通行
+    ///<0x6B: 路口辅助:待行区可通行
+    ///<0x6C: 路口辅助:即将左转通过路口，无法取消
+    ///<0x6D: 路口辅助:即将右转通过路口，无法取消
+    ///<0x6E: 路口辅助:即将掉头通过路口，无法取消
+    ///<0x6F: 路口辅助:正在左转通过路口，无法取消
+    ///<0x70: 路口辅助:正在右转通过路口，无法取消
+    ///<0x71: 路口辅助:正在掉头通过路口，无法取消
+    ///<0x72: 路口辅助:待行区饱和
+    ///<0x73: 路口辅助：待行区不可通行（左转）
+    ///<0x74: 路口辅助：待行区可通行（左转）
+    ///<0x75: 路口辅助：待行区饱和（左转）
+    ///<0x76: 路口辅助：未识别红绿灯，注意交通灯状态
+    ///<0x77: 路口辅助：红灯不可通行
+    ///<0x78: 路口辅助：黄灯不可通行
+    ///<0x79: 路口辅助：通过路口，未识别红绿灯，提醒注意交通灯 
+	uint32 ads_ndatextinfo = 1;
+
+	///<当前位置到电子围栏终点的距离:[m],(0,0,/),[/],(1,0),当前位置到电子围栏终点的距离
+	float ads_ndafenceterminaldis = 2;
+
+	///<绕障显示状态:[/],(0,0,9),[/],(1,0),绕障显示状态
+	///<0x0: 不显示
+	///<0x1: 绕障关闭 
+	///<0x2: 绕障故障 
+	///<0x3: 可激活待机 
+	///<0x4: 不可激活待机 	
+	///<0x5: 绕障抑制 
+	///<0x6: 绕障激活 
+	///<0x7: 绕障回退 
+	///<0x8: 超越 
+	///<0x9: 绕障完成
+	uint32 ads_oastatus = 3;
+
+	///<绕障方向:[/],(0,0,/),[/],(1,0), 绕障方向
+	///<0x0: 未绕障
+	///<0x1: 向左绕障 
+	///<0x2: 向右绕障  
+	uint32 ads_oadirection = 4;
+
+	///<绕障距离:[m],(0,-10,10),[/],(1,0),绕障距离 	
+	uint32 ads_oalatdistance = 5;
+
+	///<显示绕障结束位置:[m],(0,0,/),[/],(1,0),显示绕障结束位置 	
+	uint32 ads_oalngdistance = 6;	
+	
+}
+/**
+* @brief UDLCShowDemand
+* @detail UDLC显示信息
+*/
+message UDLCShowDemand
+{
+	///<轨迹显示状态:[/],(0,0,7),[/],(1,0),轨迹显示状态
+	///<0x0: 不显示
+	///<0x1: 换道等待
+	///<0x2: 换道开始
+	///<0x3: 换道回退
+	///<0x4: 换道抑制 	
+	///<0x5: 智慧偏移路径
+	///<0x6: 跟车行驶路径
+	///<0x7: 推荐路径
+	uint32 ads_pathshow_status = 1;
+
+	///<距目标位置实时横向距离:[/],(0,0,/),[/],(1,0),距目标位置实时横向距离 		
+	float ads_totargetlatdistance = 2;	
+}
+
+/**
+* @brief ACCShowDemand
+* @detail ACC显示信息
+*/
+message ACCShowDemand
+{
+	///<ACC目标巡航车速:[km/h],(0,0,/),[/],(1,0),ACC目标巡航车速 		
+	float acc_setspeed = 1;
+
+	///<ACC跟车时距设置:[/],(0,0,/),[/],(1,0),ACC跟车时距设置 	
+	uint32 acc_timegapset = 2;
+
+	///<车辆起步提醒状态:[/],(0,0,3),[/],(1,0),车辆起步提醒状态
+	///<0x1: 不可激活
+	///<0x2: 待机
+	///<0x3: 已激活
+	uint32 acc_vehiclestartremindsts = 3;		
+}
+
+/**
+* @brief ADAScruiseRecflag
+* @detail 行车推荐
+*/
+message ADAScruiseRecflag
+{
+	///<功能推荐:[/],(0,0,5),[/],(1,0),功能推荐
+    ///<0x0: no recommend
+    ///<0x1: IACC Recommend by goodRoad condition
+    ///<0x2: IACC Recommend byLongtime no active
+    ///<0x3: IACC Recommend by trafficjam
+    ///<0x4: NID Active recommend
+    ///<0x5: NID switch on recommend
+	uint32 ad_adascruiserecflag = 1;
+}
+/**
+* @brief ADSNIDOutDis
+* @detail NID退出距离信息
+*/
+message ADSNIDOutDis
+{
+	///<NID退出距离:[m],(0,1000,/),[/],(1,0),NID退出距离
+	float ads_nidoutdis = 1;
+}
+
+
+/**
+* @brief smartdrivetips
+* @detail 只能提示信息
+*/
+message SmartDrivingTips
+{
+	///<ACC提示信息:[/],(0,0,/),[/],(1,0),ACC提示信息 
+	ACCShowDemand acc_fun = 1;
+
+	///<UDLC提示信息:[/],(0,0,/),[/],(1,0),UDLC提示信息 		
+	UDLCShowDemand udlc_fun = 2;
+
+	///<NID提示信息:[/],(0,0,/),[/],(1,0),新手模式推荐 		
+	NIDShowDemand nid_fun = 3;
+
+	///<新手模式推荐:[/],(0,0,/),[/],(1,0),新手模式推荐 	
+	NewRecommend recommend_fun = 4;
+
+	///<TJP提示信息:[/],(0,0,/),[/],(1,0),TJP提示信息 	
+	TJPNotice tjp_fun = 5;
+
+	///<高配融合ACC，IACC，UDLC，ALC提示信息:[/],(0,0,/),[/],(1,0),高配融合ACC，IACC，UDLC，ALC提示信息 	
+	ADCNotice adc_funtips = 6;
+
+	///<暂时不用:[/],(0,0,/),[/],(1,0),暂时不用 	
+	CNANotice cna_fun = 7;
+
+	///<限速功能:[/],(0,0,/),[/],(1,0),限速功能 
+	SpeedLimitShowDemand speedlimit_fun = 8;
+
+	///<横向禁用倒计时:[/],(0,0,/),[/],(1,0),横向禁用倒计时 	
+	float ads_latprohibitcountdown = 9;	
+
+	///<安全带解开系统退出倒计时:[/],(0,0,/),[/],(1,0),安全带解开系统退出倒计时 	
+	float ads_sbuncountdown = 10;
+
+	///<功能推荐:[/],(0,0,/),[/],(1,0),功能推荐
+	ADAScruiseRecflag ads_adascruiserec = 11;
+
+	///<NID退出距离:[/],(0,0,/),[/],(1,0),NID退出距离
+	ADSNIDOutDis ads_nidoutdistance = 12;		
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装所有信号，包括目标、车道线、交通灯等
+*/
+message BasicSmartDrivingTips
+{
+	///<智能驾驶提示信息:[/],(0,0,/),[/],(1,0),事件触发	-	 
+	SmartDrivingTips smartdrivetips = 1;		
+}
+
+
+
+

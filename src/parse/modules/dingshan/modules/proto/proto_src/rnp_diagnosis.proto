@@ -1,0 +1,55 @@
+syntax = "proto3";
+package rnp;
+
+
+/**
+* @brief RNP 预测模块自检信息 发布
+* @details TOPIC: prediction-prediction.RnpDiagnosis
+*
+*/
+message RnpDiagnosis
+{
+	///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+	double time_stamp = 1;
+
+	///<诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+	///<诊断编码:[s],(/,/,/),[/],(1,0),使用32个bit编码，0000 0010 0000 0010 0000 0000 0000 0000
+	///<如果所有bit都是0，则表示无故障：[/],(/,/,/),[/],(/,/),description
+	///<bit 0: DATABOX数据表空：[/],(/,/,/),[/],(/,/),description
+  	///<bit 1: 地图数据为空：[/],(/,/,/),[/],(/,/),description
+	///<bit 2: 定位数据为空：[/],(/,/,/),[/],(/,/),description
+	///<bit 3: 融合数据为空：[/],(/,/,/),[/],(/,/),description
+	///<bit 4: 视觉车道线数据为空：[/],(/,/,/),[/],(/,/),description
+	///<bit 5: M0_延时补偿处理失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 6: M1_目标预处理处理失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 7: M2_车道线拓扑结构处理失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 8: M3_算法选择失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 9: R1_规则车辆预测失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 10: R2_规则行人预测失败：[/],(/,/,/),[/],(/,/),description
+  	///<bit 11: A3_Grapph车辆预测失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 12: P1_轨迹后处理失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 13: 自车当前所在车道匹配失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 14: 搜索候选车道集为空：[/],(/,/,/),[/],(/,/),description
+	///<bit 15: edc_render 执行失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 16: 交通信息处理失败：[/],(/,/,/),[/],(/,/),description
+  	///<bit 17: 参考线处理失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 18: 当前所在车道无效：[/],(/,/,/),[/],(/,/),description
+  	///<bit 19: 内存资源异常：[/],(/,/,/),[/],(/,/),description
+  	///<bit 20: cpu资源异常：[/],(/,/,/),[/],(/,/),description
+	///<bit 21: 整车信号输入超时故障：[/],(/,/,/),[/],(/,/),description
+	///<bit 22: FF检查整车信号无效：[/],(/,/,/),[/],(/,/),description
+	///<bit 23: 整车信号合理性故障：[/],(/,/,/),[/],(/,/),description
+	///<bit 24: ego_env_interaction_模块失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 25: offline_map_extract_模块失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 26: pubulish数据失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 27: env_postprocess_模块失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 28: local_map_module_模块失败：[/],(/,/,/),[/],(/,/),description
+	///<bit 30: 订阅topic超时错误：[/],(/,/,/),[/],(/,/),description
+	///<bit 31: 其他类型错误：[/],(/,/,/),[/],(/,/),description
+	uint32 diagnosis_code = 2;
+  
+	///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+	string diagnosis_info = 3;
+  	///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值
+ 	uint32 heartbeart = 4;
+}

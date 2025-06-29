@@ -1,0 +1,285 @@
+/**
+
+* @file     hmi_basic_apainteract.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-泊车交互
+* @date     2023-08-24
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023-08-24         <th>1.0                 <th>HMITEAM
+* <table>
+* @par      修改日志： 修改proto格式
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2024-01-22         <th>1.1                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+/**
+* @brief Point2DStruct
+* @details Point2DStruct
+*/
+message Point2DStruct
+{
+	///<x:[cm],(/,/,/),[/],(/,/),x
+	///<0: 0
+	int32 x = 1;
+
+	///<y:[cm],(/,/,/),[/],(/,/),y
+	///<0: 0
+	int32 y = 2;
+
+  ///<heading:[/],(/,/,/),[/],(/,/),heading
+	///<0: 0
+	float theta = 3;
+
+}	
+
+/**
+* @brief Point2DArray
+* @details Point2DArray
+*/
+message Point2DArray
+{
+	///<point2d_struct:[/],(/,/,/),[/],(/,/),point2d_struct
+	Point2DStruct point2d_struct = 1;
+}
+
+/**
+* @brief Point2Dguideline
+* @details Point2Dguideline
+*/
+message Point2Dguideline
+{
+	///<point2d_struct:[/],(/,/,/),[/],(/,/),point2d_struct
+	Point2DStruct point2d_struct = 1;
+}
+/**
+* @brief 目标车位
+* @details 目标车位
+*/
+message TarposeData
+{
+  ///<x:[mm],(/,/,/),[/],(/,/),x
+	///<0: 0
+  int32 x = 1;
+  
+  ///<y:[mm],(/,/,/),[/],(/,/),y
+	///<0: 0 
+  int32 y = 2;
+
+  ///<theta:[/],(/,/,/),[/],(/,/),theta
+	///<0: 0
+  float theta = 3;
+}
+
+/**
+* @brief 自定义车位初始数据
+* @details 自定义车位初始数据
+*/
+message ADAPACustSlotData
+{ 
+  ///<自定义车位:[/],(/,/,/),[4],(/,/),自定义车位
+  repeated Point2DStruct ad_apacustslotini = 1;
+
+  ///<车位有效性:[/],(/,/,/),[/],(/,/),车位有效性
+	///<0x0: 默认
+	///<0x1: 无效
+  ///<0x1: 有效
+	uint32 ad_apacustslotvld = 2;	
+}
+
+/**
+* @brief 泊车动态引导数据
+* @details 泊车动态引导数据
+*/
+message ADAPADynguidanceData
+{
+  ///<标志位:[/],(/,/,/),[/],(/,/),标志位
+	///<0x0: 无效
+	///<0x1: apa有效
+  ///<0x2: rads有效
+  uint32 ad_apasyspahflg = 1;
+
+  ///<ad_aparemaindst:[/],(/,/,/),[/],(/,/),剩余近距离
+	///<0x0: 默认
+  float ad_aparemaindst = 2;
+
+  ///<ad_apaguidepiont:[/],(/,/,/),[100],(/,/),轨迹点
+  repeated Point2DStruct ad_apaguidepiont = 3;
+  
+  ///<ad_apatarpose:[/],(/,/,/),[/],(/,/),目标车位
+  TarposeData ad_apatarpose = 4;
+
+  ///<ad_aparoadtrfcinfo:[/],(/,/,/),[/],(/,/),禁停提示
+	///<0x0: 无提示
+	///<0x1: 禁止停车
+  ///<0x2: 临时停车
+  uint32 ad_aparoadtrfcinfo = 5;
+   
+  ///<ad_apatarposevldflg:[/],(/,/,/),[/],(/,/),预览姿态有效标志位
+	///<0x0: 无效
+	///<0x1: 有效
+  uint32 ad_apatarposevldflg = 6;
+}
+
+
+/**
+* @brief 泊车动态推荐
+* @details 泊车动态推荐
+*/
+message ADAPADynrecommdData	
+{
+  ///<ad_apapocdirrecommd:[/],(/,/,/),[/],(/,/),方向推荐
+  ///<0x0: Norecommend
+  ///<0x1: L_recommdedRforward
+  ///<0x2: LR_recommdedforward
+  ///<0x3: L_recommdedforward
+  ///<0x4: R_recommdedforward
+  ///<0x5: L_recommdedRbackwards
+  ///<0x6: LR_recommdedbackwards
+  ///<0x7: L_recommdedbackwards
+  ///<0x8: R_recommdedbackwards
+  uint32 ad_apapocdirrecommd = 1;
+
+  ///<ad_apaparkinmoderecommd:[/],(/,/,/),[/],(/,/),泊车方式推荐
+  ///<0x0: Norrecommend
+  ///<0x1: APArecommend_RPA
+  ///<0x2: APA_RPArecommend
+  ///<0x3: APArecommend_EPA
+  ///<0x4: APA_EPArecommend
+  ///<0x5: 直进直出
+  uint32 ad_apaparkinmoderecommd = 2;
+
+  ///<ad_apagetoff:[/],(/,/,/),[/],(/,/),遥控泊车及无感泊车
+  ///<0x0: Invalid
+  ///<0x1: RPA遥控泊车
+  ///<0x2: EPA无感泊车
+  uint32 ad_apagetoff = 3;
+
+  ///<ad_apacustavlsta:[/],(/,/,/),[/],(/,/),自定义泊车按钮状态
+  ///<0x0: 不显示
+  ///<0x1: 可用
+  ///<0x2: 不可用
+  uint32 ad_apacustavlsta = 4;
+}
+
+/**
+* @brief 泊车提示信息
+* @details 泊车提示信息，具体键值见soa工具链网站Basc_APAInteract->Ntf_AD_APAFctnIndnMsg
+*/
+message ADAPAFctnIndnMsgData
+{
+  ///<ad_apaunavlreas:[/],(/,/,/),[/],(/,/),泊车不可激活提示
+  ///<0x0: 
+  uint32 ad_apaunavlreas = 1;
+
+  ///<ad_apaprocinfo:[/],(/,/,/),[/],(/,/),泊车过程动态提示
+  ///<0x0: 默认
+  uint32 ad_apaprocinfo = 2;
+
+  ///<ad_apaabnormexitreas:[/],(/,/,/),[/],(/,/),泊车异常退出提示
+  ///<0x0: 默认
+  uint32 ad_apaabnormexitreas = 3;
+
+  ///<ad_radsunavlreas:[/],(/,/,/),[/],(/,/),rads不可激活提示
+  ///<0x0: 默认
+  uint32 ad_radsunavlreas = 4;
+
+  ///<ad_radsprocinfo:[/],(/,/,/),[/],(/,/),rads过程动态提示
+  ///<0x0: 默认
+  uint32 ad_radsprocinfo = 5;
+
+  ///<ad_radsexitreas:[/],(/,/,/),[/],(/,/),rads异常退出提示
+  ///<0x0: 默认
+  uint32 ad_radsexitreas = 6;
+
+  ///<AD_RPAOutdInteract:[/],(/,/,/),[/],(/,/),车外交互
+  ///<0x0: 默认
+  uint32 ad_rpaoutdinteract = 7;
+
+  ///<AD_RPAOutdInteractFlag:[/],(/,/,/),[/],(/,/),车外交互标志位
+  ///<0x0: 默认
+  uint32 ad_rpaoutdinteractflag = 8;
+}
+
+/**
+* @brief 泊车push消息
+* @details 泊车push信息
+*/
+message PushRequest
+{
+  ///<pushrequest_data:[/],(/,/,/),[/],(/,/),推送消息
+  ///<0x0: 默认
+  uint32 pushrequest_data = 1;
+}
+
+/**
+* @brief 远程功能服务
+* @details 远程功能服务
+*/
+message APAFunctionRes
+{
+  ///<apafunction:[/],(/,/,/),[/],(/,/),远程信息
+  ///<0X0: off
+  ///<0X1: ButtonOn
+  ///<0X2: RemotVerticalInandOutOn
+  ///<0x3: RemoteByAPPOn
+  ///<0x4: RemoteByOneKeyOn
+  ///<0x5: Remotefunctionon
+  ///<0x6: ASPActivatedByAPP
+  ///<0x7: ASPActivatedByHU
+  ///<0x8: ASPActivatedByKey
+  ///<0x9: RemoteVerticalInOutOn
+  ///<0xA: GRemoteParkingOut
+  ///<0xB: GRemotefunctionon
+  ///<0xC: GParkHoming
+  ///<0xD: GParkingOn
+  ///<0xE: HZPParkin
+  ///<0xF: HZPParkout
+  ///<0x10: AVPParkin
+  ///<0x11: AVPParkout
+  ///<0x12: Summon
+  uint32 apafunction = 1;
+}
+
+/**
+* @brief ready
+* @details ready
+*/
+message ReadyState
+{
+  ///<readystateinfo:[/],(/,/,/),[/],(/,/),ready
+  ///<0x1: 默认
+  ///<0x2: ready请求
+  uint32 carreadyinfo = 1;
+}
+
+/**
+* @brief ready
+* @details ready
+*/
+message APAOnOff
+{
+  ///<APAOnOff:[/],(/,/,/),[/],(/,/),APAOnOff
+  uint32 hmi_ad_apaonoff = 1;
+}

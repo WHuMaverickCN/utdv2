@@ -1,0 +1,434 @@
+/**
+* @file     lidar_object.proto
+* @author   huanghong
+* @details  lidar输出接口定义
+* @date     2023-05-24
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.23         <th>1.0                 <th>huanghong 
+  <tr><th>2022.5.20         <th>1.1                 <th>huanghong
+  <tr><th>2022.11.14        <th>1.2                 <th>huanghong
+  <tr><th>2023.5.24         <th>1.3                 <th>huanghong
+  <tr><th>2023.11.21        <th>1.4                 <th>huanghong
+  <tr><th>2024.02.02        <th>1.5                 <th>huanghong
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package LidarObjectProto;
+import "seq_header.proto";
+
+/**
+* @brief Objects信息
+* @detail 包含时间戳、目标数量和目标的信息
+*/
+message Objects
+{
+    ///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+    double timestamp = 1;
+
+    ///< 目标数量：[/],(/,/,/),[/],(1,0),输出目标的数量
+    int32 object_num = 2;
+
+    ///< 目标集：[/],(/,/,/),[256],(1,0),输出目标集
+    repeated Object obj = 3;
+    
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识输出时间戳
+    SeqHeaderProto.SeqHeader seq_header = 4;
+}
+
+
+/**
+* @brief  CoreInfos信息
+* @detail 输出目标的核心信息
+*/
+message CoreInfos
+{
+    ///< priority_id：[/],(/,/,/),[/],(1,0),目标的优先级排序
+    int32 priority_id = 1;
+
+    ///< 置信度: [/], (0，0,1),[/],(1,0),目标存在的置信度
+    float exist_confidence = 2;
+
+    ///< bbox中心点坐标：[m],((0,0,0), (-200,-200,-200), (200,200,200))，[/],(1,0), bbox中心点坐标
+    Vector3f center = 3;
+
+    ///< bbox中心点坐标的协方差矩阵：[/],(/,/,/)，[/],(1,0),bbox中心点坐标的协方差矩阵
+    Vector3f center_cov = 4;
+
+    ///< bbox的长宽高尺寸：[m],((0,0,0), (0,0,0), (30,4,5)),[/],(1,0),bbox的长宽高尺寸
+    Vector3f size = 5;
+
+    ///< bbox尺寸的协方差矩阵：[/],(/,/,/)，[/],(1,0),bbox尺寸的协方差矩阵
+    Vector3f size_cov = 6;
+
+    ///< 目标主方向：[rad], ((0,0,0), (-2,-2,-2), (2,2,2)),[/],(1,0),目标主方向
+    Vector3f direction = 7;
+
+    ///< 目标主方向的协方差矩阵：[/],(/,/,/)，[/],(1,0)，目标主方向的协方差矩阵
+    Vector3f direction_cov = 8;
+
+    ///< 目标类型：[/], (0,0,7)，[/],(1,0),目标类型
+    ObjectType type = 9;
+
+    ///< 目标类型的置信度：[/], (0，0,1),[/],(1,0),目标类型的置信度
+    float type_confidence = 10;
+
+    ///< 运动状态预测：[/], (0,0,4),[/],(1,0),运动状态预测
+    MotionType motion_state = 11;
+
+    ///< 车道位置：[/], (0,0,14),[/],(1,0),车道位置
+    LanePosition lane_pos = 12;
+
+    ///< 目标跟踪ID：[/],(/,/,/),[/],(1,0),目标跟踪ID
+    int32 tracker_id = 13;
+
+    ///< 存在帧数: [/],(0，0,2000),[/],(1,0),存在帧数
+    int32 age = 14;
+
+    ///< 目标速度：[m/s], ((0,0,0), (-100,-100,-100), (100,100,100)),[/],(1,0),目标速度
+    Vector3f velocity = 15;
+
+    ///< 目标相对速度：[m/s], ((0,0,0), (-100,-100,-100), (100,100,100)),[/],(1,0),目标相对速度
+    Vector3f relative_velocity = 16;
+
+    ///< 速度协方差矩阵：[/],(/,/,/),[/],(1,0),速度协方差矩阵
+    Vector3f velocity_cov = 17;
+
+    ///< 相对速度协方差矩阵：[/],(/,/,/),[/],(1,0),相对速度协方差矩阵
+    Vector3f relative_velocity_cov = 18;
+
+    ///< 目标加速度：[m/s^2], ((0,0,0), (-20,-20,-20), (20,20,20)),[/],(1,0),目标加速度
+    Vector3f acceleration = 19;
+
+    ///< 加速度协方差矩阵：[/],(/,/,/),[/],(1,0),加速度协方差矩阵
+    Vector3f acceleration_cov = 20;
+
+    ///< 目标角速度：[rad/s], ((0,0,0), (-10,-10,-10), (10,10,10)),[/],(1,0),目标角速度
+    float angle_velocity = 21;
+
+    ///< 角速度协方差矩阵：[/],(/,/,/),[/],(1,0),角速度协方差矩阵
+    float angle_velocity_cov = 22;
+
+    ///< 目标角加速度：[rad/s^2], ((0,0,0), (-5,-5,-5), (5,5,5)),[/],(1,0),目标角加速度
+    float angle_acceleration = 23;
+
+    ///< 角加速度协方差矩阵：[/],(/,/,/),[/],(1,0),角加速度协方差矩阵
+    float angle_acceleration_cov = 24;
+}
+
+/**
+* @brief  SupplementInfos
+* @detail 输出目标的补充信息
+*/
+message SupplementInfos 
+{
+    ///< 单帧检测ID：[/],(/,/,/),[/],(1,0),单帧检测ID
+    int32 unique_id = 1;
+
+    ///< 障碍物凸包：[/],(/,/,/),[256],(1,0),障碍物凸包
+    repeated Vector3f polygon = 2;
+
+    ///< 凸包最左侧点云索引：[/],(/,/,/),[/],(1,0),凸包最左侧点云索引
+    int32 left_point_index = 3;
+
+    ///< 凸包最右侧点云索引：[/],(/,/,/),[/],(1,0),凸包最右侧点云索引
+    int32 right_point_index = 4;
+
+    ///< 点云索引：[/],(/,/,/),[174208],(1,0),点云索引
+    repeated int32 cloud_indices = 5;
+
+    ///< 点云类型：[/],(/,/,/),[3],(1,0),点云类型
+    repeated float latent_types = 6;
+
+    ///< 障碍物大小：[/],(0,0,3),[/],(1,0),障碍物大小
+    SizeType size_type = 7;
+
+    ///< 障碍物来源：[/],(0,0,3),[/],(1,0),障碍物来源
+    DataSource source = 8;
+
+    ///< 是否在ROI区域：[/],(/,/,/),[/],(1,0),是否在ROI区域
+    bool in_roi = 9;
+
+    ///< 跟踪状态：[/],(0,0,1),[/],(1,0),跟踪状态
+    TrackingState tracking_state = 10;
+
+    ///< 障碍物几何中心：[m],((0,0,0), (-200,-200,-200), (200,200,200))，[/],(1,0)，障碍物几何中心
+    Vector3f geo_center = 11;
+
+    ///< 障碍物几何大小：[/],(0,0,1),[/],(1,0),障碍物几何大小
+    Vector3f geo_size = 12;
+
+    ///< 障碍物历史轨迹：[/],(0,0,1),[100],(1,0),障碍物历史轨迹
+    repeated Vector3f trajectory = 13;
+
+    ///< 障碍物历史速度：[/],(0,0,1),[100],(1,0),障碍物历史速度
+    repeated Vector3f history_velocity = 14;
+
+    ///< 障碍物历史类型：[/],(0,0,1),[100],(1,0),障碍物历史类型
+    repeated ObjectType history_type = 15;
+
+    ///< AI目标框内点云个数：[/],(0,0,178204),[/],(1,0),AI目标框内点云个数
+    int32 num_pointcloud = 16;
+
+    ///< 目标三个方向内点云尺寸与目标框尺寸的比例：[/],(0,0,1),[/],(1,0),目标朝向三个方向内点云尺寸与目标框尺寸的比例
+    Vector3f pointcloud_size_ratio  = 17;
+
+    ///< 状态age：[/],(0,0,1000),[/],(1,0),状态age
+    int32 state_age = 18;
+
+    ///< 实际是目标角点与默认范围的横向距离：[/],(/,/,/),[/],(1,0), 实际是目标角点与默认范围的横向距离：0x0: 初始化，表示object_vertices_dis_from_curb无异常， 0x1: 表示object_vertices_dis_from_curb不可信
+    int32 dis_invalid = 19;
+
+    ///< object_vertices_dis_from_curb：[/], (/,/,/),[/],(1,0), 聚类目标角点与最近路沿的最大横向距离
+    float object_vertices_dis_from_curb = 20;
+
+    ///< seg_points_type：[/],(/,/,/),[/],(1,0), 聚类目标点云语义分割类型 0x0：初始化以及表示目标点云类别不可靠 0x1: 表示目标的点云大多数类别为背景点 0x2：表示目标的点云大多数类别为噪点
+    int32 seg_points_type = 21;
+
+    ///< points_expand：[/],(/,/,/),[/],(1,0), 聚类目标点云膨胀标志位（高反点云占比和分布）
+    int32 points_expand = 22;
+
+    ///< AI检测框内语义分割噪声点数与框内点云总数的比值是否异常：[/],(/,/,/),[/],(1,0),AI检测框内语义分割噪声点数与框内点云总数的比值是否异常: 0x0: 正常; 0x1: 异常
+    int32 noise_ratio_abnormal = 23;
+
+    ///< ray_occlusion：[/],(/,/,/),[/],(1,0),以自车为射线起点出发，判断AI目标框在射线角度下是否被大面积遮挡: 0x0: 未被遮挡; 0x1: 被遮挡
+    int32 ray_occlusion = 24;
+
+    ///< pc_bbox_size_ratio_abnormal：[/],(/,/,/),[/],(1,0),AI目标框内点云形成的尺寸相比于目标框的尺寸过小: 0x0: 点云占据目标框比例合理; 0x1: 代表框内点云占据目标框比例整体或某个方向上过小
+    int32 pc_bbox_size_ratio_abnormal = 25;
+
+    ///< exist_conf_abnormal：[/],(/,/,/),[/],(1,0),目标的置信度仅略高于后处理AI过滤边界，单激光难以确认该目标真实性: 0x0: 代表目标置信度较高; 0x1: 代表目标置信度仅比激光设置的阈值略高
+    int32 exist_conf_abnormal = 26;
+
+    ///< AEB_crowd_abnormal：[/],(/,/,/),[/],(1,0),针对复杂人群、复杂骑行者等目标密集存在大量遮挡的场景，有的目标的位置偏差或误关联可能引起速度问题: 0x0: 代表目标无异常; 0x1: 代表密集遮挡场景下单激光目标属性不可信
+    int32 aeb_crowd_abnormal = 27;
+
+    ///< AEB 横穿转直行标志位：[/],(/,/,/),[/],(1,0), 横穿转直行标志位: false：未变化; true：变化
+    bool aeb_is_turn = 28;
+
+    ///< AEB场景遮挡行人横穿标志位：[/],(/,/,/),[/],(1,0),aeb场景遮挡行人横穿标志位: false：代表无遮挡行人横穿; true：代表有遮挡行人横穿
+    bool aeb_is_crossing_ped = 29;
+
+    ///< AEB横穿终止标志位：[/],(/,/,/),[/],(1,0),AEB横穿终止标志位: false：代表横穿未终止; true：代表横穿终止
+    bool aeb_is_crossing_stop  = 30;
+
+    ///< AEB密集目标场景标志位：[/],(/,/,/),[/],(1,0),AEB密集目标场景标志位: false：代表非密集目标场; true：代表密集目标场
+    bool aeb_is_dense_targets = 31;
+}
+
+
+/**
+* @brief  Object信息
+* @detail 输出目标的信息
+*/
+message Object
+{
+    ///< 目标核心信息：[/],(0,0,1),[/],(1,0),目标核心信息
+    CoreInfos core_info = 1;
+    ///< 目标补充信息：[/],(0,0,1),[/],(1,0),目标补充信息
+    SupplementInfos sup_info = 2;
+}
+
+/**
+* @brief Vector3f定义
+* @detail 车辆坐标系 原点：车辆后轴 右手法则
+*/
+message Vector3f
+{
+    ///< x方向坐标: [m],(0,-200,200),[/],(1,0),x方向坐标
+    float x = 1;
+
+    ///< y方向坐标: [m],(0,-200,200),[/],(1,0),y方向坐标
+    float y = 2;
+
+    ///< z方向坐标: [m],(0,-200,200),[/],(1,0),z方向坐标
+    float z = 3;
+}
+
+/**
+* @brief 检测目标类型定义
+* @detail xxxxxxxx
+*/
+enum ObjectType
+{
+    ///< 小汽车
+    CAR = 0;
+
+    ///< 大车
+    BIG_VEHICLE = 1;
+
+    ///< 超大车
+    HUGE_VEHICLE = 2;
+
+    ///< 骑行者
+    RIDERN = 3;
+
+    ///< 行人
+    PEDESTRIAN = 4;
+
+    ///< 锥形桶
+    CONE = 5;
+
+    ///< 水马
+    WATERHORSE = 6;
+
+    ///< 三轮车
+    TRICYCLE = 7;
+
+    ///< 其他障碍物
+    OBSTACLE_ELSE = 8;
+
+    ///<警示柱
+    WARNING_COLUMN = 9;
+
+    ///< 未知
+    UNKNOWN_OBJ = 10;
+}
+
+/**
+* @brief 运动状态类型定义
+* @detail xxxxxxxx
+*/
+enum MotionType 
+{
+    ///< 未知运动,默认
+    UNKNOW_MOTION = 0;
+
+    ///< MOVING
+    MOVING = 1;
+
+    ///< MOVABLE
+    MOVABLE = 2;
+
+    ///< STATIONARY
+    STATIONARY = 3;
+    
+    ///< MAX_MOTION_STATE_NUM
+    MAX_MOTION_STATE_NUM = 4;
+}
+
+/**
+* @brief 车道位置定义
+* @detail xxxxxxxx
+*/
+enum LanePosition
+{
+    ///< 未知车道
+    UNKNOW_LANE = 0;
+
+    ///< 左六车道
+    LEFT_SIXTH = 1;
+    
+    ///< 左五车道
+    LEFT_FIFTH = 2;
+
+    ///< 左四车道
+    LEFT_FOURTH = 3;
+
+    ///< 左三车道
+    LEFT_THIRD = 4;
+
+    ///< 左二车道
+    LEFT_ADJACENT = 5;
+
+    ///< 左一车道
+    LEFT_EGO = 6;
+
+    ///< 自车车道
+    EGO_LANE = 7;
+
+    ///< 右一车道
+    RIGHT_EGO = 8;
+
+    ///< 右二车道
+    RIGHT_ADJACENT = 9;
+
+    ///< 右三车道
+    RIGHT_THIRD = 10;
+
+    ///< 右四车道
+    RIGHT_FOURTH = 11;
+
+    ///< 右五车道
+    RIGHT_FIFTH = 12;
+
+    ///< 右六车道
+    RIGHT_SIXTH = 13;
+
+    ///< 不可行驶
+    OFF_DRIVABLE = 14;
+
+}
+
+
+/**
+* @brief 障碍物大小
+* @detail  障碍物大小
+*/
+enum SizeType {
+
+    ///< SMALL
+    SMALL = 0;
+
+    ///< MEDIUM
+    MEDIUM = 1;
+
+    ///< LARGE
+    LARGE = 2;
+
+    ///< MAX_SIZE_TYPE_NUM
+    MAX_SIZE_TYPE_NUM = 3;
+}
+
+
+/**
+* @brief 感知障碍物来源
+* @detail 感知障碍物来源
+*/
+enum DataSource {
+
+    ///< 无
+    NONE = 0;
+
+    ///< 深度学习
+    DL = 1;
+
+    ///< 聚类
+    SEG = 2;
+
+    ///< 融合
+    FUSION = 3;
+}
+
+
+/**
+* @brief 跟踪状态
+* @detail 跟踪状态
+*/
+enum TrackingState {
+
+    ///< 无
+    UNKNOWN = 0;
+
+    ///< 初始化
+    INIT = 1;
+
+    ///< 稳定
+    STABLE = 2;
+
+    ///< 预测
+    PREDICTION = 3;
+}
+

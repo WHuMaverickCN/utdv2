@@ -1,0 +1,455 @@
+/**
+
+* @file     idmap_parking.proto
+* @author   jianghongyue
+* @details  补充停车场地图相关信息
+* @date     2023-03-06
+* @version  1.9
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate: 相对坐标系，提供采集点为原点的相对高度
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.12.30         <th>1.8                 <th>jianghongyue
+* <tr><th>2023.03.06         <th>1.9                 <th>jianghongyue
+* <tr><th>2023.07.10         <th>2.3                 <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+import "idmap_common.proto";
+package idmap;
+
+/**
+ * @brief 停车场背景信息
+ * @details
+ * 停车场的元数据信息，包含类型、名称、限高等基本背景信息，目前众包只能提供编号
+ */
+message ParkingInfo
+{
+  ///<停车场编号:[/],(0,0,/),[/],(1,0),众包可以提供
+  uint64 parking_id = 1;
+
+  ///<停车场名称:[/],(/,/,/),[/],(/,/),/
+  bytes parking_name = 2;
+
+  ///<停车场类型:[/],(0,0,3),[/],(1,0),/
+  ///< 0:未知
+  ///< 1:室外停车场
+  ///< 2:室内停车场
+  ///< 3:综合停车场
+  int32 parking_type = 3;
+
+  ///<楼层总数:[/],(0,0,15),[/],(1,0),/
+  int32 floors_total = 4;
+
+  ///<停车位总数:[/],(/,/,/),[/],(/,/),/
+  int32 slots_total = 5;
+
+  ///<停车场限高:[m],(0,0,4),[/],(0.01,0),/
+  double parking_limit_height = 6;
+
+  ///<停车场详细地址:[/],(/,/,/),[/],(/,/),/
+  bytes address = 7;
+
+  ///<停车场所在省份:[/],(/,/,/),[/],(/,/),/
+  bytes province = 8;
+
+  ///<停车场所在城市:[/],(/,/,/),[/],(/,/),/
+  bytes city = 9;
+
+  ///<停车场所在区县:[/],(/,/,/),[/],(/,/),/
+  bytes district = 10;
+
+  ///<停车场是否有充电站:[/],(0,0,1),[/],(1,0),/
+  ///< 0:没有
+  ///< 1:有
+  bool having_charging_pile = 11;
+}
+
+/**
+ * @brief 车道对应楼层信息
+ * @details  楼层及通道信息，简写为frg
+ */
+message FloorAndRampGroup
+{
+  ///<楼层编号:[/],(0,/,/),[/],(1,0),/
+  ///<说明:通道单独有编号
+  uint64 frg_id = 1;
+
+  ///<是否为通道:[/],(0,0,1),[/],(1,0),/
+  ///< 0:不是
+  ///< 1:是
+  bool is_rampgroup = 2;
+
+  ///<楼层说明:[/],(-10,0,10),[/],(1,0),现实楼层层级
+  ///<说明:带正负号的整数，F1表示为1，B1表示为-1
+  int32 floor_level = 3;
+
+  ///<层级名称:[/],(/,/,/),[/],(/,/),ramp1-2表示楼层间的通道
+  string frg_name = 4;
+
+  ///<停车位分区信息:[/],(/,/,/),[10],(/,/),/
+  repeated ParkingBlock parking_blocks = 5;
+
+  ///<关联车道编号:[/],(0,0,/),[/],(1,0),/
+  repeated uint64 associated_lane_id = 6;
+}
+
+/**
+ * @brief 分区信息
+ * @details  停车场内部分区ABC，众包无法提供
+ */
+message ParkingBlock
+{
+  ///<分区编号:[/],(0,0,/),[/],(1,0),/
+  uint64 parking_block_id = 1;
+
+  ///<分区名称:[/],(/,/,/),[/],(/,/),/
+  bytes parking_block_name = 2;
+
+  ///<边界形状点:[/],(/,/,/),[60],(/,/),/
+  repeated Gnss block_point_list = 3;
+}
+
+/**
+ * @brief 车道补充信息
+ * @details 车道相关信息，众包无法提供
+ */
+message ParkingLane
+{
+  ///<车道限高:[m],(0,0,10),[/],(0.01,0),/
+  double lane_hight_limit = 1;
+
+  ///<车道id:[/],(0,0,/),[/],(1,0),/
+  uint64 lane_id = 2;
+}
+
+/**
+ * @brief 停车位信息
+ * @details  表示路口与直行道路段之间的连接关系
+ */
+message ParkingSlot
+{
+  ///<停车位编号:[/],(0,0,/),[/],(1,0),众包对齐地面标识id
+  uint64 slot_id = 1;
+
+  ///<停车位库位号:[/],(/,/,/),[/],(1,0),/
+  bytes slot_code = 2;
+
+  ///<停车位类型:[/],(0,0,99),[/],(1,0),有图案、感知可识别的众包后续可以支持
+  ///< 0:invalid
+  ///< 1:标准公共车位
+  ///< 2:残疾人车位
+  ///< 3:微型车位
+  ///< 4:母子车位
+  ///< 5:充电停车位
+  ///< 6:私有车位
+  ///< 7:女士车位
+  ///< 8:立体车位
+  ///< 99:其它
+  uint32 slot_type = 3;
+
+  ///<停车位方向:[/],(0,0,4),[/],(1,0),开口对应道路的相对方向，众包不支持
+  ///< 0:invalid
+  ///< 1:未知
+  ///< 2:垂直式
+  ///< 3:平行式
+  ///< 4:倾斜式
+  uint32 slot_direction = 4;
+
+  ///<备注:todo confirm
+  ///<长边偏航角:[°],(0,-180,180),[/],(0.01,0),开口对应道路时长边相对于道路的方向，众包不支持
+  double yaw_angle = 5;
+
+  ///<所属层级编号:[/],(0,/,/),[/],(1,0),众包不支持
+  uint64 associated_floor_id = 6;
+
+  ///<关联地锁编号:[/],(0,/,/),[/],(1,0),众包不支持
+  uint64 slot_lock_id = 7;
+
+  ///<关联限位器编号:[/],(0,/,/),[/],(1,0),众包不支持
+  uint64 slot_limiter_id = 8;
+}
+
+/**
+ * @brief 停车场出入口信息
+ * @details
+ * 描述停车场地面出入口信息，包括类型、关联关系、名称和绝对坐标等描述，众包当前不支持
+ */
+message ParkingGate
+{
+  ///<出入口编号:[/],(0,0,/),[/],(1,0),与POI编号一致
+  uint64 parking_gate_id = 1;
+
+  ///<出入口名称:[/],(/,/,/),[/],(/,/),/
+  bytes parking_gate_name = 2;
+
+  ///<出入口类型:[/],(0,0,3),[/],(1,0),/
+  ///< 0:invalid
+  ///< 1:出入口
+  ///< 2:出口
+  ///< 3:入口
+  int32 parking_gate_type = 3;
+
+  ///<关联的车道编号:[/],(0,0,/),[8],(1,0),/
+  repeated uint64 associated_lane_ids = 4;
+
+  ///<所属层级编号:[/],(0,0,/),[/],(1,0),/
+  uint64 associated_floor_id = 5;
+
+  ///<经纬度坐标:[/],(/,/,/),[1],(/,/),/
+  Gnss gnss_point = 6;
+
+  ///<原坐标系坐标x:[/],(0,-1000,1000),[1],(0.01,0),/
+  double original_coordinates_x = 7;
+
+  ///<原坐标系坐标y:[/],(/,-1000,1000),[1],(0.01,0),/
+  double original_coordinates_y = 8;
+
+  ///<原坐标系坐标z:[/],(/,-1000,1000),[1],(0.01,0),/
+  double original_coordinates_z = 9;
+}
+
+/**
+ * @brief 障碍物信息
+ * @details  包括墙等信息
+ */
+message Barrier
+{
+  ///<障碍物编号:[/],(0,/,/),[/],(1,0),对应static中道路边界线id
+  uint64 barrier_id = 1;
+
+  ///<障碍物类型:[/],(0,0,2),[/],(1,0),/
+  ///< 0:未知类型
+  ///< 1:墙体
+  ///< 2:墙柱
+  int32 barrier_type = 2;
+
+  ///<关联的车道编号:[/],(0,/,/),[4],(1,0),/
+  repeated uint64 associated_lane_ids = 3;
+
+  ///<所属层级编号:[/],(0,0,/),[/],(1,0),/
+  uint64 associated_floor_id = 4;
+
+  ///<障碍物几何坐标:[/],(/,/,/),[20],(/,/),可以围成面
+  repeated Gnss geometry_point_list = 5;
+
+  ///<障碍物高度:[m],(0,0,20),[/],(0.01,0),/
+  int32 barrier_height = 6;
+}
+
+/**
+ * @brief 交通标志牌补充信息
+ * @details  提供交通标志牌类型、内容等信息
+ */
+message AvpMapTrafficSign
+{
+  ///<交通标志牌编号:[/],(0,0,/),[/],(1,0),/
+  uint64 avpmap_sign_id = 1;
+
+  ///<交通标志牌作用:[/],(0,0,5),[/],(1,0),/
+  ///< 0：invalid
+  ///< 1: 入口标志牌
+  ///< 2：出口标志牌
+  ///< 3：出口指示
+  ///< 4：方向指示
+  ///< 5：其他
+  uint32 function = 2;
+
+  ///<交通标志牌是否动态变化:[/],(0,0,1),[/],(1,0),/
+  ///< 0:没有
+  ///< 1:有
+  bool is_variable = 3;
+
+  ///<与正北方向夹角:[°],(0,-180,180),[/],(0.01,0),/
+  double angle_to_north = 4;
+
+  ///<标志牌底色:[/],(0,0,7),[/],(1,0),/
+  ///< 0:invalid,未知
+  ///< 1:WHITE,白色
+  ///< 2:YELLOW,黄色
+  ///< 3:BLUE,蓝色
+  ///< 4:RED,红色
+  ///< 5:BLACK,黑
+  ///< 6:GREEN,绿色
+  ///< 7:other,其它
+  uint32 avpmap_sign_color = 5;
+
+  ///<交通标志牌面状坐标:[/],(/,/,/),[/],(/,/),/
+  repeated Gnss avpmap_sign_point = 6;
+}
+
+/**
+ * @brief 墙面标志信息
+ * @details  包括警示线、防撞胶条等信息,众包无法提供
+ */
+message WallMarking
+{
+  ///<墙面标识编号:[/],(0,0,/),[/],(1,0),/
+  uint64 wall_marking_id = 1;
+
+  ///<墙面标识类型:[/],(0,0,3),[/],(1,0),/
+  ///< 0:未知类型
+  ///< 1:防撞胶条
+  ///< 2:立柱诱导标线
+  ///< 3:墙面警示线
+  int32 wall_marking_type = 2;
+
+  ///<墙面标识颜色:[/],(0,0,8),[/],(1,0),/
+  ///< 0:invalid,未知
+  ///< 1:WHITE,白色
+  ///< 2:YELLOW,黄色
+  ///< 3:BLUE,蓝色
+  ///< 4:RED,红色
+  ///< 5:BLACK,黑相间
+  ///< 6:other,其它
+  uint32 wall_marking_color = 3;
+
+  ///<墙面标志几何坐标:[/],(/,/,/),[20],(/,/),/
+  repeated Gnss wm_point_list = 4;
+}
+
+/**
+ * @brief 设施信息
+ * @details  包括信号灯、凸出的消防箱等信息
+ */
+message Facility
+{
+  ///<设施编号:[/],(0,0,/),[/],(1,0),/
+  uint64 facility_id = 1;
+
+  ///<设施类型:[/],(0,0,4),[/],(1,0),/
+  ///< 0:未知类型
+  ///< 1:信号灯
+  ///< 2:凸面镜
+  ///< 3:消防箱
+  ///< 4:道闸
+  int32 facility_type = 2;
+
+  ///<关联的车道编号:[/],(0,/,/),[4],(1,0),/
+  repeated uint64 associated_lane_id = 3;
+
+  ///<所属层级编号:[/],(0,0,/),[/],(1,0),/
+  uint64 associated_floor_id = 4;
+
+  ///<设施几何坐标:[/],(/,/,/),[20],(/,/),/
+  repeated Gnss geometry_point_list = 5;
+}
+
+/**
+ * @brief 兴趣点信息
+ * @details
+ * 描述重要POI的位置、类型、名称等内容，制作为点要素，例如电梯口、停车场出入口等
+ */
+message POI
+{
+  ///<兴趣点编号:[/],(0,0,/),[/],(1,0),/
+  uint64 poi_id = 1;
+
+  ///<兴趣点类型:[/],(0,0,99),[/],(1,0),/
+  ///< 0：商场入口
+  ///< 1：直梯口
+  ///< 2：扶梯口
+  ///< 3：楼梯口
+  ///< 4：停车场出口
+  ///< 5：停车场入口
+  ///< 6：洗车店
+  ///< 7：卫生间
+  ///< 8：停车场出入口
+  ///< 9：办公楼
+  ///< 10：门点（实际有门，但不能确定其功能用途的记录为门点，如设备检修门）
+  ///< 99:其它
+  int32 poi_type = 2;
+
+  ///<关联的车道编号:[/],(0,0,/),[8],(1,0),/
+  repeated uint64 associated_lane_ids = 3;
+
+  ///<坐标点:[/],(/,/,/),[/],(/,/),/
+  Gnss poi_point = 4;
+
+  ///<兴趣点名称:[/],(/,/,/),[/],(/,/),/
+  bytes poi_name = 5;
+}
+
+/**
+ * @brief 柱状物信息
+ * @details  提供警示柱等信息
+ */
+message Polo
+{
+  ///<柱状物编号:[/],(0,0,/),[/],(1,0),/
+  uint64 polo_id = 1;
+
+  ///<柱状物类型:[/],(0,0,2),[/],(1,0),/
+  ///< 0：invalid
+  ///< 1: 警示柱
+  ///< 2：其它
+  uint32 polo_type = 2;
+
+  ///<柱体直径:[m],(0,0,1),[/],(0.01,0),/
+  double polo_diameter = 3;
+
+  ///<柱状物坐标点:[/],(/,/,/),[/],(/,/),/
+  Gnss polo_point = 4;
+}
+
+/**
+ * @brief 信息集合
+ * @details  作为整体补充信息的综合
+ */
+message PakingIDMapInfo
+{
+  ///<停车场背景信息:[/],(/,/,/),[/],(/,/),/
+  ParkingInfo parking_info = 1;
+
+  ///<层级信息:[/],(/,/,/),[/],(/,/),/
+  repeated FloorAndRampGroup floor_ramp = 2;
+
+  ///<车道补充信息:[/],(/,/,/),[/],(/,/),/
+  repeated ParkingLane parking_lane = 3;
+
+  ///<停车位信息:[/],(/,/,/),[/],(/,/),/
+  repeated ParkingSlot parking_slots = 4;
+
+  ///<出入口信息:[/],(/,/,/),[/],(/,/),/
+  repeated ParkingGate parking_gates = 5;
+
+  ///<障碍物信息:[/],(/,/,/),[/],(/,/),/
+  repeated Barrier barriers = 6;
+
+  ///<交通标志牌补充信息:[/],(/,/,/),[/],(/,/),/
+  repeated AvpMapTrafficSign avpmap_traffic_signs = 7;
+
+  ///<墙面标志信息:[/],(/,/,/),[/],(/,/),/
+  repeated WallMarking wall_marking = 8;
+
+  ///<交通设施信息:[/],(/,/,/),[/],(/,/),/
+  repeated Facility facilities = 9;
+
+  ///<兴趣点信息:[/],(/,/,/),[/],(/,/),/
+  repeated POI pois = 10;
+
+  ///<柱状物信息:[/],(/,/,/),[/],(/,/),/
+  repeated Polo parking_polo = 11;
+
+  ///<推荐行驶路径:[/],(/,/,/),[/],(/,/),用于漫游场景，点对点在navi中标识
+  repeated uint64 path_lane_id = 12;
+
+  ///<请求parking状态:[/],(0,0,5),[/],(1,0),/
+  ///<0:成功
+  ///<1:失败，未获取停车场数据
+  ///<2:路径计算失败，缺失起点
+  ///<3:路径计算失败，缺失终点
+  ///<4:数据未完成准备
+  ///<5:超时
+  uint32 status_code = 13;
+}

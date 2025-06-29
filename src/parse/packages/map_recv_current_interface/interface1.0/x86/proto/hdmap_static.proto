@@ -1,0 +1,460 @@
+/**
+
+* @file     hdmap_static.proto
+* @author   jianghongyue
+* @details  高精地图静态模块相关信号的输出接口定义，静态模块主要提供高精地图车道组、车道线、地面标志等不会自身发生变化的信息
+* @date     2022-06-14
+* @version  V2.5
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+
+* ///<coordinate:  GCJ02
+
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2022.03.03         <th>2.4                 <th>jianghongyue
+
+* <tr><th>2022.03.10         <th>2.4                 <th>jianghongyue
+
+* <tr><th>2022.06.14         <th>2.5                 <th>jianghongyue
+
+* <table>
+
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+import "hdmap_enum.proto";
+package hdmap;
+
+
+/**
+* @brief 定位点
+* @details  提供包括请求点、POI所在坐标等
+*/
+message Gnss
+{
+    ///<经度:[°],(0,-180,180),[/],(0.0000001,0),东经为正
+    double lng = 1;
+
+    ///<纬度:[°],(-0,-90,90),[/],(0.0000001,0),北纬为正
+    double lat = 2;
+}
+
+/**
+* @brief 高精地图状态
+* @details  提供高精地图是否为可用、是否需要更新信息
+*/
+message HDMapStatus
+{
+    ///<本地地图是否可使用:[/],(0,0,1),[/],(1,0),判断地图是否正常使用
+    ///<0：本地地图不可使用，需要更新
+    ///<1：本地地图可使用，不需要更新
+    bool map_status = 1;
+
+    ///<地图更新状态:[/],(0,0,1),[/],(1,0),判断高精地图是否正在更新
+    ///<0：标识地图没有处于更新状态
+    ///<1：标识地图正在更新
+    bool update_status = 2;
+}
+
+/**
+* @brief 路段信息
+* @details  路段为横向水平打断的一组车道，下包括路段属性与路段内车道、交通标志物等信息
+*/
+message Link
+{
+    ///<路段编号:[/],(0,0,4294967295),[/],(1,0),路段编号为唯一值
+    ///<注:无效值0
+    uint64 link_id = 1;
+
+    ///<路段的长度:[m],(0,0,2000),[/],(0.01,0),/
+    double link_length = 2;
+
+    ///<道路类型:[/],(0,0,3),[/],(1,0),区分路段为高速、匝道、城区
+    RoadType type = 3;
+
+    ///<车道属性集合:[/],(/,/,/),[16],(/,/),/
+    repeated LaneAttribute lane_attributelists = 4;
+
+    ///<车道线集合:[/],(/,/,/),[32],(/,/),/
+    repeated Line lines = 5;
+
+    ///<地面标识:[/],(/,/,/),[4],(/,/),人行横道、停止线、减速带、文字等
+    repeated GroundMarking ground_markings = 6;
+
+    ///<交通灯信息:[/],(/,/,/),[8],(/,/),/
+    repeated MapTrafficLight traffic_light = 7;
+
+    ///<交通标志牌信息:[/],(/,/,/),[16],(/,/),/
+    repeated MapTrafficSign traffic_info = 8;
+
+    ///<是否为路口link:[/],(0,0,1),[/],(1,0),/
+    bool complex_intersection = 9;
+
+    ///<后继link编号:[/],(0,0,4294967295),[16],(1,0),/
+	repeated uint64 successive_link_ids = 10;
+
+    ///<当前link是否在导航路径上:[/],(0,0,1),[/],(1,0),/
+	bool is_routing_path = 11;
+
+    ///<分流汇流状态:[/],(/,/,/),[4],(/,/),/
+    repeated RoadSplitMergeInfo split_merge_list = 12;
+
+    ///<道路等级:[/],(0,0,99),[/],(1,0),/
+    RoadGrade grade = 13;
+
+    ///<link是否为隧道:[/],(0,0,1),[/],(1,0),/
+    bool is_in_tunnel = 14;
+
+    ///<link是否为收费站:[/],(0,0,1),[/],(1,0),/
+    bool is_in_toll_booth = 15;
+
+    ///<link是否为检查站:[/],(0,0,1),[/],(1,0),/
+    bool is_in_certified_road = 16;
+
+    ///<link是否在ODD范围内:[/],(0,0,1),[/],(1,0),/
+    bool is_in_odd = 17;
+}
+
+/**
+* @brief 道路分歧点信息
+* @details  道路分流点、汇流点信息，在主路与匝道连接中一般体现为导流线起止点
+*/
+message RoadSplitMergeInfo
+{
+    ///<道路分歧点类型:[/],(0,0,4),[/],(1,0),/
+    RoadTransitionType type = 1;
+
+    ///<道路分歧点到link起点的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    double dis = 2;
+}
+
+/**
+* @brief 车道线属性信息
+* @details  车道线及车道线属性
+*/
+message LineMarking
+{
+    ///<车道线线形:[/],(0,0,10),[/],(1,0),/
+    LineMarkingType type = 1;
+
+    ///<车道线颜色:[/],(0,0,8),[/],(1,0),/
+    Color color = 2;
+
+    ///<车道线类型变化偏移量:[m],(-1,0,2000),[/],(0.01,0),/
+    ///<备注:给实际生效的变化位置与link起点之间的距离
+    double dis = 3;
+
+    ///<当前车道线是否异常:[/],(1,0,2),[/],(1,0),体现在车道边线上
+    ///<0:unknown
+    ///<1:正常
+    ///<2:异常，如ODD规则中重合、磨损、不清晰等
+    bool is_abnormal = 4;
+}
+
+/**
+* @brief 车道线相关信息
+* @details  包括车道线索引、属性、轨迹点等
+*/
+message Line
+{
+    ///<车道线索引:[/],(-1,0,4294967295),[/],(1,0),无索引顺序
+    ///<注:无效值-1
+    uint32 index = 1;
+
+    ///<车道线类型:[/],(0,0,7),[/],(1,0),/
+    LineType line_type = 2;
+
+    ///<车道线属性集合:[/],(/,/,/),[4],(/,/),/
+    repeated LineMarking markings = 3;
+
+    ///<车道线轨迹点集合:[/],(/,/,/),[400],(/,/),/
+    repeated Gnss line_points = 4;
+}
+
+/**
+* @brief 车道属性
+* @details  车道宽度m、曲率1/m、坡度%
+*/
+message LaneWidthCurvature
+{
+    ///<距离link开始端的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+	double dis = 1;
+
+    ///<值:[/],(0,-1,5.11),[/],(1,0),/
+    double value = 2;
+}
+
+/**
+* @brief 车道连接关系
+* @details  从自车位置开始，向行驶方向顺序给出范围内路段编号及车道编号
+*/
+message LaneConnectivityInfo
+{
+    ///<Link编号:[/],(0,0,4294967295),[/],(1,0),/
+	uint64 link_id = 1;
+
+    ///<车道索引:[/],(-1,0,16),[/],(1,0),从左到右，从0开始
+    ///<注:无效值-1
+    uint32 lane_num = 2;
+}
+
+/**
+* @brief 限速信息
+* @details  限速信息对应到每一个车道
+*/
+message SpeedLimit
+{
+    ///<车道限速:[km/h],(0,0,255),[/],(1,0),/
+    uint32 value = 1;
+
+    ///<限速类型:[/],(1,0,9),[/],(1,0),/
+    SpeedLimitType type = 2;
+}
+
+/**
+* @brief 车道相关信息
+* @details 提供车道索引、属性、关联关系等内容
+*/
+message LaneAttribute
+{
+    ///<车道索引:[/],(-1,0,16),[/],(1,0),从左到右
+    ///<注：无效值-1
+    uint32 index = 1;
+
+    ///<车道类型:[/],(0,0,18),[/],(1,0),/
+    LaneType type = 2;
+
+    ///<车道限速:[km/h],(0,0,255),[/],(1,0),/
+    SpeedLimit speed_limit = 3;
+
+    ///<左车道线索引:[/],(0,0,4294967295),[/],(1,0),/
+	uint32 left_index = 4;
+
+    ///<中心线索引:[/],(0,0,4294967295),[/],(1,0),/
+	uint32 center_index = 5;
+
+    ///<右车道线索引:[/],(0,0,4294967295),[/],(1,0),/
+	uint32 right_index = 6;
+
+    ///<车道宽度集合:[m],(/,/,/),[400],(0.01,0),车道宽度普遍取值在0到5.12米
+	repeated LaneWidthCurvature lane_width_list = 7;
+
+    ///<车道曲率集合:[1/m],(/,/,/),[400],(0.00001,0),车道曲率取值范围为±1
+    ///<参考ADAS：-0.01024~0.01024
+    repeated LaneWidthCurvature lane_curvature_list = 8;
+
+    ///<车道连接关系:[/],(/,/,/),[8],(/,/),/
+	repeated LaneConnectivityInfo lane_connectivity_list = 9;
+
+    ///<车道内的箭头:[/],(/,/,/),[16],(/,/),/
+    repeated LaneArrow lane_arrows = 10;
+
+    ///<车道纵坡:[°],(/,/,/),[400],(/,/),/
+    repeated LaneWidthCurvature lane_slope_list = 11;
+}
+
+/**
+* @brief 地面标识
+* @details  包括人行横道、停止线、减速带等信息
+*/
+message GroundMarking
+{
+    ///<地面标识类型:[/],(0,0,4),[/],(1,0),/
+    GroundMarkType type = 1;
+
+    ///<该信息物到所在link起点位置的距离:[m],(0xFFFF,0,2000),[/],(0.01,0),非顺向车道无此属性
+    ///<注:无效值0xFFFF
+    double dis = 2;
+
+    ///<几何形状点绝对坐标:[/],(/,/,/),[4],(/,/),/
+    ///<注释：人行横道外接矩形框4个点，目前高德提供3个角点
+	repeated Gnss points = 3;
+}
+
+/**
+* @brief 地面箭头
+* @details  地面箭头对应到每一车道
+*/
+message LaneArrow
+{
+    ///<车道地面箭头类型:[/],(0,0,39),[/],(1,0),/
+    LaneArrowType arrow_type = 1;
+
+    ///<中心点:[/],(/,/,/),[1],(/,/),/
+    Gnss center_point = 2;
+
+    ///<外框坐标:[/],(/,/,/),[16],(/,/),通常为外接矩形顶点坐标
+    ///<高德提供的外框坐标为：左上、右上、右下三点
+    repeated Gnss bounding_box_points = 3;
+}
+
+/**
+* @brief 交通灯相关信息
+* @details  根据ADASISv3协议提供相对位置关系，当前横纵向位置无法播发
+*/
+message MapTrafficLight
+{
+    ///<纵向位置:[/],(0,0,2),[/],(1,0),横纵向关系相对于路口
+    TrafficLightLongitudinal longitudinal_position = 1;
+
+    ///<横向位置:[/],(0,0,8),[/],(1,0),/
+    TrafficLightLateral lateral_position = 2;
+
+    ///<相对高度:[m],(-1,-1,100),[/],(1,0),/
+    ///<注:无效值-1
+    double relative_altitude = 3;
+
+    ///<绝对坐标:[/],(/,/,/),[1],(/,/),提供交通灯投射坐标
+    Gnss gnss_position = 4;
+}
+
+/**
+* @brief 交通标志牌补充信息
+* @details 提供交通标识牌补充信息，有即提供
+*/
+message AdditionalPanel
+{
+    ///<交通标志牌补充信息类型:[/],(0,0,8),[/],(1,0),/
+    ConditionType type = 1;
+
+    ///<是否有效对当前车辆有效:[/],(0,0,1),[/],(1,0),/
+    ///<0:无效
+    ///<1:有效
+    uint32 avaliable = 2;
+
+    ///<交通标识牌补充信息类型细分:[/],(0,0,8),[/],(1,0),/
+    ///<备注:目前有的类型的值都可以使用无符号整形表示
+	ConditionPanelType panel_value_type = 3;
+
+    ///<标志牌值:[/],(0,0,65535),[/],(1,0),/
+    ///<备注:标识时间的情况下高位的两个字节标识起始分钟数，低位2字节标识结束分钟数
+	string panel_value = 4;
+}
+
+/**
+* @brief 交通标志牌
+* @details  提供交通标志牌类型、内容等信息
+*/
+message MapTrafficSign
+{
+    ///<交通标志牌类型:[/],(0,0,256),[/],(1,0),/
+    SignType sign_type = 1;
+
+    ///<距离交通标志牌的实际距离:[m],(0xFFFF,0,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    ///<注：dis=sign_distance + shift
+    double dis_to_sign = 2;
+
+    ///<交通标志牌上面的值:[/],(0,0,4294967295),[/],(1,0),/
+    uint32 sign_value = 3;
+
+    ///<交通标识牌所在位置到实际生效位置的距离:[m],(0xFFFF,-2000,2000),[/],(0.01,0),/
+    ///<注:无效值0xFFFF
+    ///<如：交通标志牌STOP在路口，当前车道停止线距离交通标志牌的距离
+    int32 sign_distance = 4;
+
+    ///<交通标志牌实际生效的长度:[m],(0,0,2000),[/],(0.01,0),/
+    ///<如：“前方限速60kph,长度100m”，length为100m;注意弯曲道路计算的length为起止点直线距离
+    int32 sign_length = 5;
+
+    ///<交通标志变化与否:[/],(0,0,1),[/],(1,0),/
+	uint32 changable = 6;
+
+    ///<交通信号牌补充信息:[/],(/,/,/),[8],(/,/),/
+	repeated AdditionalPanel panels = 7;
+
+    ///<交通标志牌形状:[/],(0,0,99),[/],(1,0),/
+    SignShape sign_shape = 8;
+
+    ///<交通标志牌到link起点的距离:[m],(0xFFFF,0,2000),[/],(0.1,0),/
+    ///<注：无效值0xFFFF
+    double dis_to_link_s = 9;
+}
+
+/**
+* @brief 地图背景信息
+* @details  提供地图应用区域、单位、版本号等
+*/
+message GobalMapInfo
+{
+    ///<国家代码:[/],(156,0,894),[/],(1,0),中国为156
+	uint32 country_code = 1;
+
+    ///<区域代码:[/],(0,1,375),[/],(1,0),参考ISO 3166-2
+	uint32 region_code = 2;
+
+    ///<驾驶方向:[/],(0,0,1),[/],(1,0),中国右侧驾驶位
+    ///<0:RightHandDriving
+    ///<1:LeftHandDriving
+	bool driving_side = 3;
+
+    ///<单位系统:[/],(1,0,1),[/],(1,0),采用公制单位
+    ///<0: Impirial英制单位
+    ///<1：Metric公制单位
+	bool unit_system = 4;
+
+    ///<EHP软件版本号:[/],(/,/,/),[/],(/,/),仅使用EHP时存在
+    ///<备注：供应商提供EHP运行的系统硬件的版本号
+    ///<备注：该信号表示EHP软件版本号
+	uint32 version_software = 5;
+
+    ///<地图版本:[/],(/,/,/),[/],(/,/),地图数据版本号
+    ///<备注：当前车辆位置所用地图的版本号
+	uint32 version_map = 6;
+
+    ///<世界时时区:[/],(8,0,8),[/],(1,0),中国默认8:UTC+8
+    ///<备注：以分钟为单位提供法定时间与UTC的当前偏移量
+    ///<0：UTC
+    ///<1:UTC+1
+    ///<2:UTC+2
+    ///<3:UTC+3
+    ///<4:UTC+4
+    ///<5:UTC+5
+    ///<6:UTC+6
+    ///<7:UTC+7
+    ///<8:UTC+8
+	uint32 time_zone_offset = 7;
+}
+
+/**
+* @brief 静态信息集合
+* @details  作为整体静态信息的综合
+*/
+message StaticHDMapInfo
+{
+    ///<锚点坐标:[/],(/,/,/),[/],(/,/),请求定位点坐标
+	Gnss anchor_pos = 1;
+
+    ///<高精地图状态信息:[/],(/,/,/),[/],(/,/),/
+	HDMapStatus hdmap_status = 2;
+
+    ///<路段相关的信息:[/],(/,/,/),[50],(/,/),/
+	repeated Link links = 3;
+
+    ///<地图背景信息:[/],(/,/,/),[/],(/,/),/
+	GobalMapInfo map_info = 4;
+
+    ///<静态地图发出的时间:[ms],(/,/,/),[/],(/,/),记录地图数据播发的时间
+    double time_to_send = 5;
+}

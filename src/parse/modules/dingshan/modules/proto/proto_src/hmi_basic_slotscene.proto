@@ -1,0 +1,125 @@
+/**
+
+* @file     hmi_basic_slotscene.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-车位渲染信息交互
+* @date     2022-08-22
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>汪哲文
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+package HmiInterface;
+
+/**
+* @brief 三维坐标值
+* @details 三维坐标值
+*/
+message Pos3D { 
+  ///<x轴坐标值:[cm],(/,/,/),[/],(/,/),x轴坐标值
+  int32 x = 1;
+
+  ///<y轴坐标值:[cm],(/,/,/),[/],(/,/),y轴坐标值
+  int32 y = 2;
+
+  ///<z轴坐标值:[cm],(/,/,/),[/],(/,/),z轴坐标值
+  int32 z = 3;
+}
+/**
+* @brief 二维坐标值
+* @details 二维坐标值
+*/
+message Pos2D { 
+  ///<x轴坐标值:[cm],(/,/,/),[/],(/,/),x轴坐标值
+  int32 x = 1;
+
+  ///<y轴坐标值:[cm],(/,/,/),[/],(/,/),y轴坐标值
+  int32 y = 2;
+
+}
+
+
+/**
+* @brief 车位信息
+* @details 车位id、车位类别、车位是否有效等
+*/
+message EDCSlotInfo {
+  ///<车位id:[/],(/,/,/),[/],(/,/),车位id
+  int32 slot_id = 1;  
+
+  ///<车位是否可用:[/],(/,/,/),[/],(/,/),车位是否可用
+  ///<0x0: 无效
+  ///<0x1: 有效
+  ///<0x2: 抛弃
+  ///<0x3: 汽车占用
+  ///<0x4: 两轮~
+  ///<0x5: 三轮~
+  ///<0x6: 锥桶~
+  ///<0x7: 地锁~
+  ///<0x8: 其他
+  uint32 slot_valid = 2;  
+
+  ///<车位类别:[/],(/,/,/),[/],(/,/),车位类别
+  ///<0x0: 一般
+  ///<0x1: 无障碍
+  ///<0x2: 充电
+  ///<0x3: VIP
+  ///<0x4: 女士
+  ///<0x5: 出租车
+  ///<0x6: 特殊
+  uint32 type = 3;   
+
+  ///<三维坐标值:[/],(/,/,/),[4],(/,/),cm 按照P0，P1，P2，P3点进行排列
+  repeated Pos3D vertexes_base = 4; 
+  
+  ///<限位器状态:[/],(/,/,/),[/],(/,/),限位器状态
+  ///<0x0: 无效
+  ///<0x1: 有效
+  uint32 limit_stop_sts = 5;
+  
+  ///<地锁状态：[/],(/,/,/),[/],(/,/),地锁状态
+  ///<0x0: 无效
+  ///<0x1: 有效
+  uint32 lock_sts = 6;
+  
+  ///<限位器坐标起点:[/],(/,/,/),[/],(/,/),限位器坐标起点
+  Pos2D limit_stop_start = 7;
+  
+  ///<限位器坐标终点:[/],(/,/,/),[/],(/,/),限位器坐标终点
+  Pos2D limit_stop_end = 8;
+}
+
+/**
+* @brief C2发给EDC的渲染车位信息
+* @details C2发给EDC的渲染车位信息
+*/
+message C22EDCSlotInfos {
+  ///<time stamp:[/],(/,/,/),[/],(/,/),time stamp
+  double time_stamp = 1;
+  
+  ///<推荐车位id:[/],(/,/,/),[/],(/,/),推荐车位id
+  int32 apa_recommend_slotid = 2;  
+
+  ///<所有的车位:[/],(/,/,/),[30],(/,/),所有的车位
+  repeated EDCSlotInfo slots = 3; 
+}
+
+

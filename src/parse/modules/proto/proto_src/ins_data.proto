@@ -1,0 +1,257 @@
+/**
+* @file     ins_data.proto
+* @author   gulinfeng
+* @details  组合惯导输出接口定义
+* @date     2023-09-25
+* @version  V2.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name: [uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <tr><th>2022.3.11         <th>2.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+import "header.proto";
+import "wheel_data.proto";
+import "seq_header.proto";
+
+/**
+* @brief 定位状态信息
+* @detail xxxxxxxx
+*/
+enum GpsStatus {
+  ///< 0:定位不可用或定位无效
+  kNone = 0;
+
+  ///< 1:单点定位
+  kSingle = 1;
+
+  ///< 2:伪距差分或SBAS定位
+  kPsrDiffSBAS = 2;
+
+  ///< 3:DGPS（差分全球定位）
+  kDGPS = 3;
+
+  ///< 4:RTK浮点解 RTK_FLOAT
+  kRtkFloat = 4;
+
+  ///< 5:RTK固定解 RTK_INT, 位置和姿态均收敛
+  kRtkInt = 5;
+
+  ///< 6:惯导定位
+  kInsPos = 6;
+
+  ///< 7:位置收敛, 姿态未收敛
+  kPosInt = 7;
+}
+
+
+/**
+* @brief 组合惯导输出
+* @detail xxxxxxxx
+*/
+message InsData {
+  ///< 周内秒:[ms],(/,/,/),[/],(/,/),标识GPS周内秒
+  double sec_of_week = 1;
+
+  ///< GPS周:[s],(/,/,/),[/],(/,/),标识GPS周
+  double gps_week_number = 2;
+
+  ///< utc时间:[s],(/,/,/),[/],(/,/),标识UTC时间戳
+  double utc = 3;
+
+  ///< GPS定位状态信息:[/],(/,/,/),[/],(/,/),标识GPS定位状态
+  GpsStatus position_type = 4;
+
+  ///<观测卫星数量:[/],(/,/,/),[/],(/,/),标识观测卫星数
+  uint32 numsv = 5;
+
+  ///< 组合惯导状态:[/],(/,/,/),[/],(/,/),标识组合惯导状态
+  ///< 0:Invalid
+  ///< 1:硬件初始化
+  ///< 2:定位算法初始化（姿态和航向初始化）
+  ///< 3:系统故障
+  ///< 4:定位初始化失败
+  ///< 5:状态正常
+  uint32 ins_status = 6;
+
+  ///<设备内部温度:[F],(/,/,/),[/],(/,/),标识组合惯导内部温度
+  double temperature = 7;
+
+  ///<纬度,正为N半球:[deg],(0,-90,+90),[/],(/,/),标识维度信息
+  double latitude = 8;
+
+  ///<经度,正为E半球:[deg],(0,-180,+180),[/],(/,/),标识经度信息
+  double longitude = 9;
+
+  ///<高度，精度1e-3:[m],(/,/,/),[/],(/,/),标识高度信息
+  double altitude = 10;
+
+  ///<北向速度:[m/s],(/,/,/),[/],(/,/),标识北向速度
+  double north_velocity = 11;
+
+  ///<东向速度:[m/s],(/,/,/),[/],(/,/),标识东向速度
+  double east_velocity = 12;
+
+  ///<地向速度:[m/s],(/,/,/),[/],(/,/),标识地向速度
+  double ground_velocity = 13;
+
+  ///<横滚角:[deg],(0,-90,90),[/],(/,/),标识横滚角,车体右倾方向为正
+  double roll = 14;
+
+  ///<俯仰角:[deg],(0,-180,180),[/],(/,/),标识俯仰角,车体点头（低头）方向为正
+  double pitch = 15;
+
+  ///<航向角:[deg],(0,0,360),[/],(/,/),标识航向角,正东方向逆时针为正
+  double heading = 16;
+
+  ///<X轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪X轴角速度,顺时针旋转为正
+  double x_angular_velocity = 17;
+
+  ///<Y轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Y轴角速度,顺时针旋转为正
+  double y_angular_velocity = 18;
+
+  ///<Z轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Z轴角速度,顺时针旋转为正
+  double z_angular_velocity = 19;
+
+  ///<X轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计X轴加速度,正向为正
+  double x_acc = 20;
+
+  ///<Y轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Y轴加速度,正向为正
+  double y_acc = 21;
+
+  ///<Z轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Z轴加速度,正向为正
+  double z_acc = 22;
+
+  ///< 纬度误差:[mm],(/,/,/),[/],(/,/),标识纬度误差
+  double latitude_std = 23;
+
+  ///< 经度误差:[mm],(/,/,/),[/],(/,/),标识经度误差
+  double longitude_std = 24;
+
+  ///< 高度误差:[mm],(/,/,/),[/],(/,/),标识高度误差
+  double altitude_std = 25;
+
+  ///<北向速度误差:[mm/s],(/,/,/),[/],(/,/),标识北向速度误差
+  double north_velocity_std = 26;
+
+  ///<东向速度误差:[mm/s],(/,/,/),[/],(/,/),标识东向速度误差
+  double east_velocity_std = 27;
+
+  ///<地向速度误差:[mm/s],(/,/,/),[/],(/,/),标识地向速度误差
+  double ground_velocity_std = 28;
+
+  ///<翻滚角误差:[deg],(/,/,/),[/],(/,/),标识翻滚角误差
+  double roll_std = 29;
+
+  ///<俯仰角误差:[deg],(/,/,/),[/],(/,/),标识俯仰角误差
+  double pitch_std = 30;
+
+  ///<航向角误差:[deg],(/,/,/),[/],(/,/),标识航向角误差
+  double heading_std = 31;
+
+  ///<失准角_roll:[deg],(0,-180，180),[/],(/,/),标识INS到车体失准角,前roll右pitch下yaw，旋转顺序yaw-pitch-roll，满足右手准则
+  double atb_0 = 32;
+
+  ///<失准角_pitch:[deg],(0,-180，180),[/],(/,/),标识INS到车体失准角,前roll右pitch下yaw，旋转顺序yaw-pitch-roll，满足右手准则
+  double atb_1 = 33;
+
+  ///<失准角_yaw:[deg],(0,-180，180),[/],(/,/),标识INS到车体失准角,前roll右pitch下yaw，旋转顺序yaw-pitch-roll，满足右手准则
+  double atb_2 = 34;
+
+  ///<q_x:[/],(0,-1,1),[/],(/,/),标识姿态Hamilton四元数，东北天坐标系
+  double q_x = 35;
+
+  ///<q_y::[/],(0,-1,1),[/],(/,/),标识姿态Hamilton四元数，东北天坐标系
+  double q_y = 36;
+
+  ///<q_z:[/],(0,-1,1),[/],(/,/),标识姿态Hamilton四元数，东北天坐标系
+  double q_z = 37;
+
+  ///<q_w:[/],(1,-1,1),[/],(/,/),标识姿态Hamilton四元数，东北天坐标系
+  double q_w = 38;
+
+  ///<轮速信息:[/],(/,/,/),[/],(/,/),标识轮速相关信息
+  WheelData wheel_data = 39;
+
+  ///<组合惯导Header:[/],(/,/,/),[/],(/,/),标识组合惯导Header
+  Header header = 40;
+
+  ///<统计延时Header:[/],(/,/,/),[/],(/,/),标识publish时间戳
+  SeqHeaderProto.SeqHeader seq_header = 41;
+
+  ///<X轴角速度零偏:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪X轴角速度零偏,顺时针旋转为正
+  double x_angular_velocity_bias = 42;
+
+  ///<Y轴角速度零偏:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Y轴角速度零偏,顺时针旋转为正
+  double y_angular_velocity_bias = 43;
+
+  ///<Z轴角速度零偏:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Z轴角速度零偏,顺时针旋转为正
+  double z_angular_velocity_bias = 44;
+
+  ///<X轴加速度零偏:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计X轴加速度零偏,正向为正
+  double x_acc_bias = 45;
+
+  ///<Y轴加速度零偏:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Y轴加速度零偏,正向为正
+  double y_acc_bias = 46;
+
+  ///<Z轴加速度零偏:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Z轴加速度零偏,正向为正
+  double z_acc_bias = 47;
+
+  ///< ptp数据时间戳:[s],(/,/,/),[/],(/,/),标识ptp数据时间戳
+  double ptp_time = 48;
+
+  ///< 系统耗时数据时间戳:[ms],(/,/,/),[/],(/,/),标识系统耗时数据时间戳
+  double sys_elapsed_time = 49;
+
+  ///< cpu耗时数据时间戳:[ms],(/,/,/),[/],(/,/),标识cpu耗时数据时间戳
+  double cpu_elapsed_time = 50;
+
+  ///< ins设备时间戳:[s],(/,/,/),[/],(/,/),标识ins设备时间戳
+  double device_time = 51;
+
+  ///< ins时间同步状态:[/]，(1,0,1),[/],(/,/)，标识ins时间同步状态，默认为true
+  bool time_sync = 52;
+
+  ///< 保留数据:[],(/,/,/),[/],(/,/),标识保留数据
+  double temp_data = 53;
+
+  ///< 原始纬度,正为N半球:[deg],(0,-90,+90),[/],(/,/),标识维度信息
+  double raw_latitude = 54;
+
+  ///< 原始经度,正为E半球:[deg],(0,-180,+180),[/],(/,/),标识经度信息
+  double raw_longitude = 55;
+
+  ///< 原始高度，精度1e-3:[m],(/,/,/),[/],(/,/),标识高度信息
+  double raw_altitude = 56;
+
+  ///< 原始X轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪X轴角速度,顺时针旋转为正
+  double raw_x_angular_velocity = 57;
+
+  ///< 原始Y轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Y轴角速度,顺时针旋转为正
+  double raw_y_angular_velocity = 58;
+
+  ///< 原始Z轴角速度:[deg/s],(0,-250,+250),[/],(/,/),标识陀螺仪Z轴角速度,顺时针旋转为正
+  double raw_z_angular_velocity = 59;
+
+  ///< 原始X轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计X轴加速度,正向为正
+  double raw_x_acc = 60;
+
+  ///< 原始Y轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Y轴加速度,正向为正
+  double raw_y_acc = 61;
+
+  ///< 原始Z轴加速度:[m/s2],(0,-40,+40),[/],(/,/),标识加速度计Z轴加速度,正向为正
+  double raw_z_acc = 62;
+}

@@ -1,0 +1,701 @@
+/**
+* @file     fault_info.proto
+* @author   kuxiaoyong
+* @details  下线电检
+* @date     2023-07-17
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.7.17          <th>1.0                 <th>kuxiaoyong 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	FaultInfo;
+
+/**
+* @brief CameraFaultInfo
+* @detail CameraFaultInfo 摄像头故障信息
+*/
+message CameraFaultInfo{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 前视近距离故障：[/],(0,0,8),[/],(1,0),标识前视近距离故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 硬件故障（电源故障、温度、内部组件错误)
+///<bit1: 遮挡  R12
+///<bit2: 未标定  R12
+uint32 front_camera_close_range_fault = 2;
+	
+///< 前视远距离故障：[/],(0,0,8),[/],(1,0),标识前视远距离故障
+uint32 front_camera_long_range_fault = 3;
+
+///< 后视故障：[/],(0,0,8),[/],(1,0),标识后视故障
+uint32 rear_camera_fault = 4;
+
+///< 4V环视前：[/],(0,0,8),[/],(1,0),标识4V环视前
+uint32 avm_surround_camera_front = 5;
+
+///< 4V环视左：[/],(0,0,8),[/],(1,0),标识4V环视左
+uint32 avm_surround_camera_left = 6;
+
+///< 4V环视后：[/],(0,0,8),[/],(1,0),标识4V环视后
+uint32 avm_surround_camera_rear = 7;
+
+///< 4V环视右：[/],(0,0,8),[/],(1,0),标识4V环视右
+uint32 avm_surround_camera_right = 8;
+
+///< 左前周视：[/],(0,0,8),[/],(1,0),标识左前周视
+uint32 left_front_around_camera = 9;
+
+///< 左后周视：[/],(0,0,8),[/],(1,0),标识左后周视
+uint32 left_back_around_camera = 10;
+
+///< 右前周视：[/],(0,0,8),[/],(1,0),标识右前周视
+uint32 right_front_around_camera = 11;
+
+///< 右后周视：[/],(0,0,8),[/],(1,0),标识右后周视
+uint32 right_back_around_camera = 12;
+}
+
+/**
+* @brief RadarFault
+* @detail RadarFault 雷达故障信息
+*/
+message RadarFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 前雷达故障：[/],(0,0,2),[/],(1,0),标识前雷达故障，按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<<bit0: 故障
+///<<bit1: 遮挡
+///<<bit2: 未标定
+uint32 front_radar_fault = 2;
+	
+///< 左后侧向雷达故障：[/],(0,0,2),[/],(1,0),标识左后侧向雷达故障
+uint32 left_back_cr_fault = 3;
+
+///< 右后侧向雷达故障：[/],(0,0,2),[/],(1,0),标识右后侧向雷达故障
+uint32 right_back_cr_fault = 4;
+
+///< 左前侧向雷达故障：[/],(0,0,2),[/],(1,0),标识左前侧向雷达故障
+uint32 left_front_cr_fault = 5;
+
+///< 右前侧向雷达故障：[/],(0,0,2),[/],(1,0),标识右前侧向雷达故障
+uint32 right_front_cr_fault = 6;
+} 
+
+/**
+* @brief UltrasonicRadarFault
+* @detail UltrasonicRadarFault 超声波雷达故障信息
+*/
+message UltrasonicRadarFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 12U左前边：[/],(0,0,2),[/],(1,0),标识12U左前边,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 硬件故障(电源、内部组件、信号异常)
+///<bit1: 遮挡
+uint32 uss_fls = 2;
+	
+///< 12U左前角：[/],(0,0,2),[/],(1,0),标识12U左前角
+uint32 uss_flo = 3;
+
+///< 12U左前中：[/],(0,0,2),[/],(1,0),标识12U左前中
+uint32 uss_flm = 4;
+
+///< 12U右前中：[/],(0,0,2),[/],(1,0),标识12U右前中
+uint32 uss_frm = 5;
+
+///< 12U右前角：[/],(0,0,2),[/],(1,0),标识12U右前角
+uint32 uss_fro = 6;
+
+///< 12U右前边：[/],(0,0,2),[/],(1,0),标识12U右前边
+uint32 uss_frs = 7;
+
+///< 12U左后边：[/],(0,0,2),[/],(1,0),标识12U左后边
+uint32 uss_rls = 8;
+
+///< 12U左后角：[/],(0,0,2),[/],(1,0),标识12U左后角
+uint32 uss_rlo = 9;
+
+///< 12U左后中：[/],(0,0,2),[/],(1,0),标识12U左后中
+uint32 uss_rlm = 10;
+
+///< 12U右后中：[/],(0,0,2),[/],(1,0),标识12U右后中
+uint32 uss_rrm = 11;
+
+///< 12U右后角：[/],(0,0,2),[/],(1,0),标识12U右后角
+uint32 uss_rro = 12;
+
+///< 12U右后边：[/],(0,0,2),[/],(1,0),标识12U右后边
+uint32 uss_rrs = 13;
+}
+
+/**
+* @brief LidarFault
+* @detail LidarFault 雷达故障信息 R11V2新增
+*/
+message LidarFault{
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 左激光雷达故障：[/],(0,0,1),[/],(1,0),标识激光雷达故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 雷达本体故障（电压、温度）
+///<bit1: 控制器运行异常（时钟频率、程序流、处理器）
+///<bit2: 数据不可信（校验失败、接收功能、时间不同步）
+///<bit3: 数据完全消失（编码器故障）
+///<bit4: 雷达多通道瞎线（发射端、接收端异常）
+///<bit5: 安全机制失效（自检失败、保护失效）
+///<bit6: 启动失败
+///<bit7: 无影响的失效
+///<bit8: 以太网连接故障（连接断开、信号质量）
+///<bit9: 30%以上脏污
+uint32 left_lidar_fault = 2;
+
+///< 右激光雷达故障：[/],(0,0,1),[/],(1,0),标识激光雷达故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 雷达本体故障（电压、温度）
+///<bit1: 控制器运行异常（时钟频率、程序流、处理器）
+///<bit2: 数据不可信（校验失败、接收功能、时间不同步）
+///<bit3: 数据完全消失（编码器故障、脏污）
+///<bit4: 雷达多通道瞎线（发射端、接收端异常）
+///<bit5: 安全机制失效（自检失败、保护失效）
+///<bit6: 启动失败
+///<bit7: 无影响的失效
+///<bit8: 以太网连接故障（连接断开、信号质量）
+///<bit9: 30%以上脏污
+uint32 right_lidar_fault = 3;
+
+///< 左激光雷达的状态: [/],(0,0,8),[/],(1,0),
+///<0: Normal
+///<1: Warning
+///<2: PrePerformanceDegradation
+///<3: PerformanceDegradation
+///<4: PreShutdown
+///<5: ShutdownOrOutputuntrusted
+///<6: PreReset
+///<7: Reset(N/A)
+uint32 left_fault_state = 4;
+
+///< 右激光雷达的状态: [/],(0,0,8),[/],(1,0),
+///<0: Normal
+///<1: Warning
+///<2: PrePerformanceDegradation
+///<3: PerformanceDegradation
+///<4: PreShutdown
+///<5: ShutdownOrOutputuntrusted
+///<6: PreReset
+///<7: Reset(N/A)
+uint32 right_fault_state = 5;
+
+///<左激光雷达罩沾污诊断FeatureFlag结果: [/],(/,/,/),[/],(/,/),
+///<byte2byte25: 解析为8x12个区域任何一个区间状态不等于零则确定光罩表面存在附着物
+bytes left_feature_flag = 6;
+
+///<右激光雷达罩沾污诊断FeatureFlag结果: [/],(/,/,/),[/],(/,/),
+///<byte2byte25: 解析为8x12个区域任何一个区间状态不等于零则确定光罩表面存在附着物
+bytes right_feature_flag = 7;
+
+///<左激光DTC: [/],(/,/,/),[/],(/,/),
+bytes left_dtc = 8;
+
+///<右激光DTC: [/],(/,/,/),[/],(/,/),
+bytes right_dtc = 9;
+} 
+
+/**
+* @brief GeneralFault
+* @detail GeneralFault 关联控制器的故障
+*/
+message GeneralFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< INS故障：[/],(0,0,2),[/],(1,0),标识INS故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: CNV状态信号故障
+///<bit1: 信号为无效或故障
+uint32 ins_fault = 2;
+	
+///< EDC故障：[/],(0,0,1),[/],(1,0),标识EDC故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 仪表故障
+uint32 edc_fault = 3;
+
+///< VIU_FL故障：[/],(0,0,1),[/],(1,0),标识VIU_FL故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 信号故障
+uint32 viu_fl_fault = 4;
+
+///< ADASCAN故障：[/],(0,0,5),[/],(1,0),标识ADASCAN故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 总线关闭
+///<bit1: VIUFL节点通信报文超时
+///<bit2: VIUFL节点CRC或RC校验错误
+///<bit3: INS节点通信报文超时 R11 add
+///<bit4: INS节点CRC或RC校验错误 R11 add
+uint32 adascan_fault = 5;
+
+///< ADASACAN故障：[/],(0,0,3),[/],(1,0),标识ADASACAN故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: 总线关闭
+///<bit1: FR节点通信报文超时
+///<bit2: FR节点CRC或RC校验错误
+uint32 adasacan_fault = 6;
+
+///< C2故障：[/],(0,0,2),[/],(1,0),标识C2状态,按位区分故障 0无故障1有故障 
+///<0x0: 默认值，无故障 
+///<bit0: 主电源电压故障 
+///<bit1: 冗余电源电压故障 
+///<bit2: MCU故障（过温） 
+///<bit3: SOC故障（过温、心跳异常） 
+///<bit4: 内部故障（内部通讯异常、板级过温） 
+uint32 c2_fault = 7;
+
+///< 时间同步故障：[/],(0,0,1),[/],(1,0),标识时间同步状态，按位区分故障 0无故障 1有故障 R11V2
+///<0x0: 默认值，无故障
+///<bit0: 时间同步故障
+uint32 tsn_fault = 8;
+
+///< EPS故障状态：[/],(0,0,2),[/],(1,0), EPS故障状态，按位区分故障 0无故障1有故障 R12V2
+///<0x0: 默认值，无故障
+///<bit0: EPS故障
+uint32 eps_fault = 9;
+
+///< ESP故障状态：[/],(0,0,1),[/],(1,0),标识ESP状态，按位区分故障 0无故障1有故障 R12V2
+///<0x0: 默认值，无故障
+///<bit0: ESP故障
+uint32 esp_fault = 10;
+
+///< 胎压胎温故障状态：[/],(0,0,1),[/],(1,0),标识胎压胎温状态,按位区分故障 0无故障1有故障 R12V2
+///<0x0: 默认值，无故障
+///<bit0: 左前轮胎压力报警
+///<bit1: 左前轮胎温度报警
+///<bit2: 左后轮胎压力报警
+///<bit3: 左后轮胎温度报警
+///<bit4: 右前轮胎压力报警
+///<bit5: 右前轮胎温度报警
+///<bit6: 右后轮胎压力报警
+///<bit7: 右后轮胎温度报警
+uint32 tpms_fault = 11;
+
+}
+
+/**
+* @brief UnderlyingFault
+* @detail UnderlyingFault C2平台状态的监控
+*/
+message UnderlyingFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< mcu调试数据通道：[/],(/,/,/),[/],(/,/),调试数据通道
+bytes mcu_state = 2;
+
+///< 397_芯片温度：[/],(0,0,100),[/],(1,0),标识397_芯片温度
+uint32 mcu_temp = 3;
+
+///< Orin1_芯片温度：[/],(0,0,100),[/],(1,0),标识Orin1_芯片温度
+uint32 orin_temp = 4;
+
+///< Orin1_CPU负载率：[/],(0,0,800),[/],(1,0),标识Orin1_CPU占用比
+uint32 orin_load_rate = 5;
+
+///< Orin1_内存占用：[/],(0,0,100),[/],(1,0),标识Orin1_内存占用比
+uint32 orin_memory_usage = 6;
+
+///< Orin1_磁盘使用量：[/],(0,0,100),[/],(1,0),标识Orin1_磁盘使用量
+uint32 orin_disk_usage = 7;
+
+///< ECC错误监控：[/],(/,/,/),[/],(/,/),标识397_MCU系统状态数据
+bytes ecc_error = 8;
+}
+
+/**
+* @brief CommunicationFault
+* @detail CommunicationFault 通信监控状态故障
+*/
+message CommunicationFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< FR_H_ETH故障：[/],(0,0,5),[/],(1,0),标识FR_H_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: FR_H_以太网非预期的链接断开
+///<bit1: FR_H_以太网CRC错误
+///<bit2: FR_H_链接稳定后以太网信号质量低
+///<bit3: FR_H_以太网线缆故障
+uint32 fr_h_eth = 2;
+	
+///< Left_Lidar_ETH故障：[/],(0,0,5),[/],(1,0),标识Lidar_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: Lidar__以太网非预期的链接断开
+///<bit1: Lida __以太网CRC错误
+///<bit2: Lidar__链接稳定后以太网信号质量低
+///<bit3: Lidar__以太网线缆故障
+uint32 left_lidar_eth = 3;
+
+///< Right_Lidar_ETH故障：[/],(0,0,5),[/],(1,0),标识Lidar_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: Lidar__以太网非预期的链接断开
+///<bit1: Lida __以太网CRC错误
+///<bit2: Lidar__链接稳定后以太网信号质量低
+///<bit3: Lidar__以太网线缆故障
+uint32 right_lidar_eth = 4;
+
+///< INS_ETH故障：[/],(0,0,5),[/],(1,0),标识INS_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: INS_以太网非预期的链接断开
+///<bit1: INS_以太网CRC错误
+///<bit2: INS_链接稳定后以太网信号质量低
+///<bit3: INS_以太网线缆故障
+uint32 ins_eth = 5;
+
+///< EDC_ETH故障：[/],(0,0,5),[/],(1,0),标识EDC_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: EDC_以太网非预期的链接断开
+///<bit1: EDC_以太网CRC错误
+///<bit2: EDC_链接稳定后以太网信号质量低
+///<bit3: EDC_以太网线缆故障
+uint32 edc_eth = 6;
+
+///< VIU_FL_ETH故障：[/],(0,0,5),[/],(1,0),标识VIU_FL_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: VIU_FL_以太网非预期的链接断开
+///<bit1: VIU_FL_以太网CRC错误
+///<bit2: VIU_FL_链接稳定后以太网信号质量低
+///<bit3: VIU_FL_以太网线缆故障
+uint32 viu_fl_eth = 7;
+
+///< VIU_FR_ETH故障：[/],(0,0,5),[/],(1,0),标识VIU_FR_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: VIU_FR_以太网非预期的链接断开
+///<bit1: VIU_FR_以太网CRC错误
+///<bit2: VIU_FR_链接稳定后以太网信号质量低
+///<bit3: VIU_FR_以太网线缆故障
+uint32 viu_fr_eth = 8;
+
+///< SOC_ETH故障：[/],(0,0,5),[/],(1,0),标识VIU_SOC_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: SOC_以太网非预期的链接断开
+///<bit1: SOC_以太网CRC错误
+///<bit2: SOC_链接稳定后以太网信号质量低
+///<bit3: SOC_以太网线缆故障
+uint32 soc_eth = 9;
+
+
+///< MCU_ETH故障：[/],(0,0,5),[/],(1,0),标识VIU_MCU_ETH故障,按位区分故障 0无故障1有故障
+///<0x0: 默认值，无故障
+///<bit0: MCU_以太网非预期的链接断开
+///<bit1: MCU_以太网CRC错误
+///<bit2: MCU_链接稳定后以太网信号质量低
+///<bit3: MCU_以太网线缆故障
+uint32 mcu_eth = 10;
+}
+
+/**
+* @brief TimeSyncFault
+* @detail TimeSyncFault 时间同步故障, 125ms周期发送
+*/
+message TimeSyncFault{ 
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 时间同步故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障  R11V2新增
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 tsn_fault = 2;
+
+///< 左激光时间同步状态：[/],(0,0,1),[/],(1,0),标识左激光时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 left_lidar_status = 3;
+
+///< 左激光TSN时间偏差：[/],(/,/,/),[/],(/,/),标识左激光TSN时间与GM的偏差值 单位ns
+double left_lidar_tsn_offset = 4;
+	
+///< 右激光时间同步状态：[/],(0,0,1),[/],(1,0),标识右激光时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 right_lidar_status = 5;
+
+///< 右激光TSN时间偏差：[/],(/,/,/),[/],(/,/),标识激光TSN时间与GM的偏差值 单位ns
+double right_lidar_tsn_offset = 6;
+
+///< INS时间同步状态：[/],(0,0,1),[/],(1,0),标识INS时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 ins_status = 7;
+
+///< INS的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识INS的TSN时间与GM的偏差值 单位ns
+double ins_tsn_offset = 8;
+
+///< FR时间同步状态：[/],(0,0,1),[/],(1,0),标识FR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 fr_status = 9;
+
+///< FR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识FR的TSN时间与GM的偏差值 单位ns
+double fr_tsn_offset = 10;
+
+///< FLR时间同步状态：[/],(0,0,1),[/],(1,0),标识FLR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 flr_status = 11;
+
+///< FLR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识FLR的TSN时间与GM的偏差值 单位ns
+double flr_tsn_offset = 12;
+
+///< FRR时间同步状态：[/],(0,0,1),[/],(1,0),标识FRR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 frr_status = 13;
+
+///< FRR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识FRR的TSN时间与GM的偏差值 单位ns
+double frr_tsn_offset = 14;
+
+///< RLR时间同步状态：[/],(0,0,1),[/],(1,0),标识RLR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 rlr_status = 15;
+
+///< RLR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识RLR的TSN时间与GM的偏差值 单位ns
+double rlr_tsn_offset = 16;
+
+///< FRR时间同步状态：[/],(0,0,1),[/],(1,0),标识RRR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 rrr_status = 17;
+
+///< FRR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识RRR的TSN时间与GM的偏差值 单位ns
+double rrr_tsn_offset = 18;
+
+///< SOC时间同步状态：[/],(0,0,1),[/],(1,0),标识SOC时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 soc_status = 19;
+
+///< SOC的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识SOC的TSN时间与GM的偏差值 单位ns
+double soc_tsn_offset = 20;
+
+///< MCU时间同步状态：[/],(0,0,1),[/],(1,0),标识MCU时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 mcu_status = 21;
+
+///< MCU的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识MCU的TSN时间与GM的偏差值 单位ns
+double mcu_tsn_offset = 22;
+
+///< VIU_FR时间同步状态：[/],(0,0,1),[/],(1,0),标识VIU_FR时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 viu_fr_status = 23;
+
+///< VIU_FR的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识VIU_FR的TSN时间与GM的偏差值 单位ns
+double viu_fr_offset = 24;
+
+///< VIU_R时间同步状态：[/],(0,0,1),[/],(1,0),标识VIU_R时间同步状态
+///<0x0: offset有效
+///<0x1: offset无效，sync、followup等丢帧 
+///<0x2: offset无效，因终端节点自身原因
+uint32 viu_r_status = 25;
+
+///< VIU_R的TSN时间偏差：[/],(/,/,/),[/],(/,/),标识VIU_R的TSN时间与GM的偏差值 单位ns
+double viu_r_tsn_offset = 26;
+}
+
+
+/**
+* @brief HardwareFault
+* @detail HardwareFault 硬件失效故障
+*/
+message HardwareFault{
+
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< SOC_以太网故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_eth_fault = 2;
+
+///< SOC_心跳异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_heartbeat_fault = 3;
+
+///< SOC_温度监控异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 高温故障
+///<0x2: 预警温度
+uint32 soc_temp_fault = 4;
+
+///< SOC_上电异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_power_on_fault = 5;
+
+///< SOC_故障重启：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_reset_fault = 6;
+
+///< SOC_VIC故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_vic_fault = 7;
+
+///< SOC_RCE故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_rce_fault = 8;
+
+///< SOC_OFA故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_ofa_fault = 9;
+
+///< SOC_NVE故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_nve_fault = 10;
+
+///< SOC_ISP故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_isp_fault = 11;
+
+///< SOC_HOST1x故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_host1x_fault = 12;
+
+///< SOC_GPU故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_gpu_fault = 13;
+
+///< SOC_FSI故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_fsi_fault = 14;
+
+///< SOC_DLA故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_dla_fault = 15;
+
+///< SOC_96712故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 deserializer_supply_fault = 16;
+
+///< SOC_1GB以太网网口故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_eth_avb_fault = 17;
+
+///< SOC_1GB以太网故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_mgbe_fault = 18;
+
+///< MCU_自检失败：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 高温故障
+uint32 mcu_ist_fault = 19;
+
+///< MCU_温度监控故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 mcu_temp_fault = 20;
+
+///< MCU_MCU_故障重启：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 mcu_reset_fault = 21;
+
+///< MCU_Mcu_Foh故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 mcu_foh_fault = 22;
+
+///< C2_USS供电异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 uss_supply_fault = 23;
+
+///< C2_PMIC35584自检异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 pmic_abist_fault = 24;
+
+///< C2_PMIC35584供电故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 pmic_supply_fault = 25;
+
+///< C2_ETH供电异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 eth_supply_fault = 26;
+
+///< C2_CAN供电故障：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 can_supply_fault = 27;
+
+///< C2_20087供电异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 camera_supply_fault = 28;
+
+///< C2_SOC自检异常：[/],(0,0,1),[/],(1,0),0无故障 1有故障 R11V2新增
+///<0x0: 默认值，无故障
+///<0x1: 有故障
+uint32 soc_ist_fault = 29;
+
+}
+
+
+
+
+
+
+
+
+
+

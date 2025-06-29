@@ -1,0 +1,578 @@
+/**
+ * @file     dnp_debug.proto
+ * @brief    决策规划统一 dnp_debug.proto文件
+ * @author   tan,lian
+ * @details  主要包含决策输出信息、横向规划输出、纵向规划输出调试信息
+ * @date     2022-07-11
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2022.07.11 <th>V2.2         <th>tan,lian    <th>创建初始版本
+ * <tr><th>2022.10.13 <th>V2.9         <th>tan,lian    <th>update2.9
+ * <tr><th>2022.11.17 <th>V3.2         <th>tan,lian    <th>新增跛行模式
+ * <tr><th>2023.01.05 <th>V3.5         <th>tan,lian    <th>新增融合限速信号
+ * <tr><th>2023.02.02 <th>V3.6         <th>tan,lian
+ *<th>新增横向、otsDebug信号、Hmi信号 <table>
+ *
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+import "dnp_common.proto";
+import "seq_header.proto";
+package dnp;
+
+/**
+ * @brief dnp_debug
+ * @detail PlanningPaths 横向规划输出信号
+ */
+message PlanningPaths {
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1; // 消息头
+  ///< 延时统计：[/],(/,/,/),[/],(/，/),延时统计
+  SeqHeaderProto.SeqHeader seq_header = 2;
+  ///< 消息头：[/],(/,/,/),[3],(/，/),标识消息头
+  repeated dnp.PlanningPath planned_paths = 3; // 横向规划路径信息
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.PlanningPathInfo planning_path_info = 4; // 横向规划信息
+  ///< 消息头：[/],(/,/,/),[3],(/，/),标识消息头
+  repeated dnp.PlanningPath planned_line_paths = 5; // 车道线横向规划路径信息
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.LinePathPlanningWarning line_path_planning_warning = 6;//车道线规划报警信息
+  ///< IACC和领航轨迹偏差：[/],(/,/,/),[/],(/，/),IACC和领航轨迹偏差
+  double path_diff_dist = 7;
+}
+
+/**
+ * @brief PlanningPathsDebug
+ * @detail PlanningPathsDebug 横向规划调试输出信号
+ */
+message PlanningPathsDebug{
+  ///< 消息头：[/],(/,/,/),[3],(/，/),标识消息头
+  repeated PlanningPathDebug planning_path_debug = 1; //横向规划debug信息
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  LinePathPlanningDebug line_path_planning_debug = 2; //车道线规划debug信息
+  ///< 模块运行诊断：[/],(/,/,/),[/],(/，/),标识模块运行诊断
+  ModuleExecuteDebug execute_debug = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail PlanningPathDebug 规划路径Debug信息
+ */
+ message PlanningPathDebug {
+  ///< 路口偏移使能信号：[/],(0,0,1),[/],(/,/),路口偏移使能信号
+  ///< 0：未使能
+  ///< 1: 使能
+  uint32 intersection_offset_active = 1;
+  ///< 目标决策trackid：[/],(0,0,/),[33],(/,/),目标决策trackid
+  repeated uint32 decision_track_id = 2;
+  ///< 目标偏移量：[m],(0,0,/),[33],(/,/),目标偏移量
+  repeated double obstacle_offset = 3;
+  ///< 目标决策类型：[/],(0,1,3),[33],(/,/),目标决策类型
+  ///< 0：无决策
+  ///< 1：偏移
+  ///< 2: 绕障（考虑障碍物）
+  ///< 3：大横向位移绕障（不考虑障碍物）
+  repeated uint32 obstacle_decision_type = 4;
+  ///< 最终目标决策trackid：[/],(0,0,/),[33],(/,/),最终目标决策trackid
+  repeated uint32 decision_track_id_final = 5;
+  ///< 最终目标偏移量：[m],(0,0,/),[33],(/,/),最终目标偏移量
+  repeated double obstacle_offset_final = 6;
+  ///< 最终目标决策类型：[/],(0,1,3),[33],(/,/),最终目标决策类型
+  ///< 0：无决策
+  ///< 1：偏移
+  ///< 2: 绕障（考虑障碍物）
+  ///< 3：大横向位移绕障（不考虑障碍物）
+  repeated uint32 obstacle_decision_type_final = 7;
+  ///< 前保中心距离参考线的距离：[m],(0,/,/),[/],(/,/),前保中心距离参考线的距离
+  double min_l_front = 8;
+  ///< 原始目标个数：[/],(0,0,33),[/],(/,/),原始目标个数
+  uint32 obs_num = 9;
+  ///< 局部路径规划版本号：[/],(0,/,/),[/],(/,/),局部路径规划版本号
+  uint32 version_num = 10;
+}
+
+/**
+ * @brief dnp_common
+ * @detail LinePathPlanningDebug 车道线规划路径Debug信息
+ */
+ message LinePathPlanningDebug {
+  ///<< lpp_sts_out: [/],(0,0,20),[/],(1,0),lpp_sts_out
+  LppStsOut lpp_sts_out = 1;
+  ///<< lpp_path_out: [/],(0,0,20),[/],(1,0),lpp_path_out
+  LppPathOut lpp_path_out = 2;
+  ///<< road_line_modle_sts_out: [/],(0,0,20),[/],(1,0),road_line_modle_sts_out
+  RoadLineModleStsOut road_line_modle_sts_out = 3;
+  ///<< road_line_modle_path_out: [/],(0,0,20),[/],(1,0),road_line_modle_path_out
+  RoadLineModlePathOut road_line_modle_path_out = 4;
+  ///<< lpp_sts_out: [/],(/,/,/),[/],(/,0),lpp_warning
+  LPPWarning lpp_warning = 5;
+}
+
+/**
+ * @brief LPPWarning 车道线规划报警debug信号
+ * @detail xxxxxxxx
+ */
+ message LPPWarning{
+  ///<< 横向压线报警: [/], (0，0,1),[/],(1,0),标识横向压线报警
+  ///<< 0：无报警
+  ///<< 1：报警
+  uint32 lane_depature_decreq = 1;
+
+  ///<< 横向报警: [/], (0，0,1),[/],(1,0),标识横向报警
+  ///<< 0：无报警
+  ///<< 1：报警
+  uint32 latwarning_sts = 2;
+
+  ///<< 匝道报警: [/], (0，0,1),[/],(1,0),标识匝道报警
+  ///<< 0：无报警
+  ///<< 1：报警
+  uint32 ramp_warningflag = 3;
+
+  ///<< 三车道模型报警: [/], (0，0,1),[/],(1,0),标识三车道模型报警
+  ///<< 0：无报警
+  ///<< 1：报警
+  uint32 rlm_warning = 4;
+
+  ///<< 车道线状态报警: [/], (0，0,1),[/],(1,0),标识车道线状态报警
+  ///<< 0：无报警
+  ///<< 1：报警
+  uint32 pcs_diagn_warning = 5;
+}
+
+/**
+ * @brief 道路模型轨迹输出
+ * @detail xxxxxxxx
+ */
+ message RoadLineModlePathOut {
+
+  ///<本车道轨迹:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation current_line_ceof = 1;
+
+  ///<左车道轨迹:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation left_line_ceof = 2;
+
+  ///<右车道轨迹:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation right_line_ceof = 3;
+
+  ///<跟踪左侧车道线:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation tracked_left_line_ceof = 4;
+
+  ///<跟踪右侧车道线:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation tracked_right_line_ceof = 5;
+
+  ///<跟踪左左侧车道线:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation tracked_lleft_line_ceof = 6;
+
+  ///<跟踪右右侧车道线:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation tracked_rright_line_ceof = 7;
+
+  ///<< 本车道宽度: [m], (0,0,6),[/],(1,0),本车道宽度
+  double cl_lane_width = 8;
+
+  ///<< 车道线属性矩阵: [/], (0,-100,100),[54],(1,0),本车道宽度
+  repeated double line_maker_mat = 9;
+}
+
+/**
+ * @brief LinePathPlanning样条曲线轨迹系数
+ * @detail xxxxxxxx
+ */
+ message LppPathEquation {
+
+  ///<< 轨迹横向Offset: [m], (0,-16,16),[/],(1,0),标识轨迹横向Offset
+  double a0 = 1;
+
+  ///<< 轨迹航向角: [rad], (0,-0.5,0.5),[/],(1,0),标识轨迹横向Offset
+  double a1 = 2;
+
+  ///<< 轨迹曲率系数: [1/m], (0,-0.05，0.05),[/],(1,0),标识轨迹曲率系数
+  double a2 = 3;
+  ///< 轨迹曲率变化率系数：[/],(/,/,/),[/],(/,/),轨迹曲率变化率系数
+  double a3 = 4;  ///<< 轨迹曲率变化率系数: [1/m2],///<(0,-0.005,0.005),[/],(1,0),轨迹曲率变化率系数
+  ///<< 轨迹长度: [m], (0,0，200),[/],(1,0),轨迹长度
+  double range = 5;
+}
+
+/**
+ * @brief LinePathPlanning道路模型状态输出
+ * @detail xxxxxxxx
+ */
+ message RoadLineModleStsOut {
+
+  ///<< 左侧选线ID: [/], (0,-1,2),[/],(1,0),左侧选线ID
+  ///<< -1：no lanes
+  ///<< 0：use both lanes
+  ///<< 1：use only right lane
+  ///<< 2：use only left lane
+  int32 left_lane_selection_id = 1;
+
+  ///<< 当前选线ID: [/], (0,-1,2),[/],(1,0),当前选线ID
+  ///<< -1：no lanes
+  ///<< 0：use both lanes
+  ///<< 1：use only right lane
+  ///<< 2：use only left lane
+  int32 current_lane_selection_id = 2;
+
+  ///<< 右侧选线ID: [/], (0,-1,2),[/],(1,0),右侧选线ID
+  ///<< -1：no lanes
+  ///<< 0：use both lanes
+  ///<< 1：use only right lane
+  ///<< 2：use only left lane
+  int32 right_lane_selection_id = 3;
+
+  ///<< 规划选线ID: [/], (0,0,50),[/],(1,0),规划选线ID
+  uint32 fnl_line_id = 4;
+
+  ///<< 选线ID: [/],(0,0,20),[/],(1,0),选线ID
+  int32 final_lane_selection_id = 5;
+}
+
+/**
+ * @brief LinePathPlanning最终轨迹输出
+ * @detail xxxxxxxx
+ */
+ message LppPathOut {
+
+  ///<最终规划轨迹:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation path_final_ceof = 1;
+
+  ///<滤波前车道线轨迹系数:[/],(/,/,/),[/],(/,/),/
+  LppPathEquation final_coefficient_befor_filt = 2;
+}
+
+/**
+ * @brief LinePathPlanning规划状态输出
+ * @detail xxxxxxxx
+ */
+ message LppStsOut {
+
+  ///<< 版本号: [/], (0，0,10000),[/],(1,0),标识LinePathPlanning模型版本号
+  double version_num = 1;
+
+  ///<< 规划轨迹有效性: [/], (0，0,1),[/],(1,0),标识规划轨迹有效性
+  ///<< 0：无效
+  ///<< 1：有效
+  bool path_valid = 2;
+
+  ///<< 换道状态标志: [/], (0，0,2),[/],(1,0),标识换道状态标志
+  ///<< 0：不换道
+  ///<< 1：向左换道
+  ///<< 2：向右换道
+  uint32 lane_change_inprogress = 3;
+
+  ///<< 规划模式: [/], (0，0,3),[/],(1,0),规划模式
+  ///<< 0：无效
+  ///<< 1：跟车规划
+  ///<< 2：reserve
+  ///<< 3：跟线规划
+  uint32 path_mode = 4;
+}
+
+/**
+ * @brief dnp_debug
+ * @detail PlanningVels 纵向规划输出信号
+ */
+message PlanningVels {
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1; // 消息头
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  SeqHeaderProto.SeqHeader seq_header = 2;
+  ///< 纵向规划轨迹信息：[/],(/,/,/),[3],(/，/),纵向规划轨迹信息
+  repeated dnp.DpqpVelPlanProto planned_velocities = 3; // 纵向规划轨迹信息
+}
+
+/**
+ * @brief PlanningVelsDebug
+ * @detail PlanningVelsDebug 纵向规划调试输出信号
+ */
+message PlanningVelsDebug{
+  ///< 纵向规划debug信息：[/],(/,/,/),[3],(/，/),标识纵向规划debug信息
+  repeated dnp.DpqpVelPlanDebugProto planned_velocities_debug = 1; // 纵向规划debug信息
+  ///< 模块运行诊断：[/],(/,/,/),[/],(/，/),标识模块运行诊断
+  ModuleExecuteDebug execute_debug = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail DpqpVelPlanDebugProto 纵向规划中间监控信号
+ */
+ message DpqpVelPlanDebugProto {
+  ///<实际被筛选到ST图上的目标个数:[个],(0,0,32),[/],(/,/),实际被筛选到ST图上的目标个数
+  uint32 real_obstacle_num = 1;
+  ///< LNP版本号: [/],(0,0,9999),[/],(/,/),版本号
+  uint32 lnp_version = 2;
+  ///<目标跟车距离: [m],(0,0.2,1000),[/],(/,/),目标跟车距离
+  double target_dis_ref = 3;
+  ///<前车速度: [km/h],(0,0,200),[/],(/,/),前车速度
+  double front_car_vel = 4;
+  ///<弯道限速: [km/h],(0,0,1000),[/],(/,/),弯道限速
+  double cur_spd_limit_kph = 5;
+  ///<当前弯道半径: [m],(0,0,9999),[/],(/,/),当前弯道半径
+  double cuurent_bend_radius = 6;
+  ///< TTC: [s],(0,0,100),[/],(/,/),TTC
+  double ttc = 7;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var1 = 8;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var2 = 9;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var3 = 10;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var4 = 11;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var5 = 12;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var6 = 13;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var7 = 14;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var8 = 15;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var9 = 16;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var10 = 17;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var11 = 18;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var12 = 19;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var13 = 20;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var14 = 21;
+  ///<备用信号接口: [s],(0,0,1000),[10],(/,/),备用信号接口
+  repeated double var15 = 22;
+}
+
+/**
+ * @brief dnp_debug
+ * @detail PlanningVels 泊车横向规划输出信号
+ */
+message ParkPlanningPaths {
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1; // 消息头
+  ///< 消息头：[/],(/,/,/),[3],(/，/),标识消息头
+  repeated dnp.PlanningPath planned_paths = 2; // 横向规划路径信息
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.PlanningPathInfo planning_path_info = 3; // 横向规划信息
+}
+
+/**
+ * @brief dnp_common
+ * @detail PriorLaneChangeDebugInfo
+ */
+message PriorLaneChangeDebugInfo {
+  ///< 优先级变道条件监控信号：[/],(/,/,/),[/],(/，/),标识优先级变道监控信号
+  int32 meet_prior_lane_change_condition = 1;  // 是否满足强制变道 0X00 =（不满足）；// 0x01 = 前方是死路； 0x02 = 参考线或者探索距离相差过大； 0x03 =// 前方达到终点； 0x04 = 探索距离都小于600m； 0x05 =// 距离匝道距离小于700m（高精地图需要）。
+
+}
+
+/**
+ * @brief dnp_common
+ * @detail BasedRuleModelDebugInfo 
+ */
+message BasedRuleModelDebugInfo {
+  ///< 规则模型左转代价函数监控信号：[/],(/,/,/),[/],(/，/),标识规则模型左转代价函数监控信号
+  BasedRuleModelBenefitDebugInfo turn_right_benefit = 1;
+  ///< 规则模型右转代价函数监控信号：[/],(/,/,/),[/],(/，/),标识规则模型右转代价函数监控信号
+  BasedRuleModelBenefitDebugInfo turn_left_benefit = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail BasedRuleModelBenefitDebugInfo
+ */
+message BasedRuleModelBenefitDebugInfo {
+  ///< 参考路径长度代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识参考路径长度代价函数监控信号
+  double ref_path_len_benefit = 1;
+  ///< 探索距离代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识探索距离代价函数监控信号
+  double exploration_dis_benefit = 2;
+  ///< 导航路径代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识导航路径代价函数监控信号
+  double path_len_benefit = 3;
+  ///< 规划代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识规划距离代价函数监控信号
+  double plan_path_len_benefit = 4;
+  ///< 汇入主路代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识汇入主路代价函数监控信号
+  double into_main_benefit = 5;
+  ///< 不走最右侧代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识不走最右侧代价函数监控信号
+  double prior_non_right_benefit = 6;
+  ///< 综合代价函数监控信号：[/],(/,-10000,10000),[/],(/，/),标识综合代价函数监控信号
+  double sum_benefits = 7;
+}
+/**
+ * @brief dnp_common
+ * @detail OtsDebugInfo 轨迹选择debug信号
+ */
+message OtsDebugOut {
+  ///< 优先级变道监控信号：[/],(/,/,/),[/],(/，/),标识优先级变道监控信号
+  PriorLaneChangeDebugInfo priority_change_debug_info = 1;
+  ///< 规则模型监控信号：[/],(/,/,/),[/],(/，/),标识规则模型监控信号
+  BasedRuleModelDebugInfo based_rule_model_debug_info = 2;
+  ///< 代价函数监控信号：[/],(/,/,/),[/],(/，/),标识代价函数监控信号
+  BasedRuleModelBenefitDebugInfo based_rule_model_benefit_debug_info = 3;
+  ///< 模块运行诊断：[/],(/,/,/),[/],(/，/),标识模块运行诊断
+  ModuleExecuteDebug execute_debug = 4;
+}
+
+/**
+ * @brief LatOffsetIACC
+ * @detail LatOffsetIACC
+ */
+ message LatOffsetIACC{
+  ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+  dnp.Header header = 1; // 消息头
+  ///< 目标偏移量:[m],(0,-1,1),[/],(1,0),目标偏移量
+  double offset_lat_target = 2;
+  ///< 智慧偏移目标:[/],(/,/,/),[/],(1,0),智慧偏移目标
+  uint32 offset_trackedobj_target_tohmi = 3;
+  ///< 目标偏移执行时间:[s],(0,0,100),[/],(1,0),目标偏移执行时间
+  double offset_time_target = 4;
+  ///< 智慧偏移debug信号:[/],(/,/,/),[/],(/,/),智慧偏移debug信号
+  dnp.OffsetBusDebug offset_bus_debug = 5;
+}
+
+/**
+ * @brief dnp diagnose
+ * @detail receive信息
+ */
+ enum ErrorType{
+  ERROR_NO_BUS_ESP_INPUT = 0; //未接收到sab-BusespProto.BusEsp
+  ERROR_NO_VCU_INPUT = 1;  //未接收到sab-VcuProto.Vcu
+  ERROR_NO_BUS_BCM_INPUT = 2; //未接收到sab-BusbcmProto.BusBcm
+  ERROR_NO_BUS_MFS_INPUT = 3; //未接收到sab-BusmfsProto.Busmfs
+  ERROR_NO_BUS_ADAS_MAP_INPUT = 4; //未接收到sab-BusadasmapProto.BusAdasMap
+  ERROR_NO_POINT_LLH_INPUT = 5; //未接收到sab-Das.PointLLH
+  ERROR_NO_CAM_LINES_FC_INPUT = 6; //未接收到ca_adas_fc_sender-VpCameraProto.CamLines-fc
+  ERROR_NO_CAM_TSR_FC_INPUT = 7; //未接收到ca_adas_fc_sender-VpCameraProto.CamTsr-fc
+  ERROR_NO_CAM_WORK_STATUS_FC_INPUT = 8; //未接收到ca_adas_fc_sender-VpCameraProto.CamWorkStatus-fc
+  ERROR_NO_STATE_MACHINE_INPUT = 9; //未接收到state_switch-Sts.StateMachine
+  ERROR_NO_FROM_STS_INPUT = 10; //未接收到state_switch-Sts.FromSTS
+  ERROR_NO_HMI_AD_FUNSET_INPUT = 11; //未接收到hmi_interface-HmiInterface.HmiADFunset
+  ERROR_NO_UTMLOCALIZATION = 12; //未接收到rnp-rnp.UTMLocalization
+  ERROR_NO_DRIVING_ENV_INFO = 13; //未接收到rnp-rnp.DrivingEnvInfo
+  ERROR_NO_IACC_NID_SWITCH = 14; //未接收到rnp-rnp.IACCNIDSwitch
+  ERROR_NO_PREDICTED_OBJECTS = 15; //未接收到rnp-rnp.PredictedObjects
+  ERROR_NO_REFERENCE_LINE_WITH_CONSTRAINTS = 16; //未接收到rnp-rnp.ReferenceLineWithConstraints
+  ERROR_NO_LOCAL_LANE_TOPOLOGY = 17; //未接收到rnp-rnp.LocalLaneTopology
+  ERROR_NOT_HAPPEN = 18; //错误未发生
+ }
+
+ /**
+ * @brief dnp diagnose
+ * @detail warning信息
+ */
+enum WarningType{
+  WARNING_DECISION_EXECUTE_OVERTIME = 0;  //decision运行超时
+  WARNING_LAT_PLANNING_EXECUTE_OVERTIME = 1; //横向规划超时
+  WARNING_LON_PLANNING_EXECUTE_OVERTIME = 2;  //纵向规划超时
+  WARNING_OTS_EXECUTE_OVERTIME = 3;  //轨迹选择超时
+  WARNING_CTP_EXECUTE_OVERTIME = 4;  // 控制预处理超时
+  WARNING_NOT_HAPPEND = 5;  //警告未发生
+}
+/**
+ * @brief dnp_common
+ * @detail ObjectDecisionDebugInfo
+ */
+message ObjectDecisionDebugInfo {
+  ///<自车道有换道标签的最近目标id: [s],(0,0,1000),[/],(/,/),自车道有换道标签的最近目标id
+  double ego_lane_side_pass_id = 1; // 
+  ///<左侧车道有换道标签的最近目标id: [s],(0,0,1000),[/],(/,/),左侧车道有换道标签的最近目标id
+  double left_lane_side_pass_id = 2; // 
+  ///<右侧车道有换道标签的最近目标id: [s],(0,0,1000),[/],(/,/),右侧车道有换道标签的最近目标id
+  double right_lane_side_pass_id = 3; // 
+  ///<自车道有借道标签的最近目标id: [s],(0,0,1000),[/],(/,/),自车道有借道标签的最近目标id
+  double ego_lane_lane_borrow_id = 10; // 
+  ///<自车道借道目标侵入量: [s],(0,0,1000),[/],(/,/),自车道借道目标侵入量
+  double ego_lane_lane_borrow_value = 11; // 
+  ///<左侧车道有借道标签的最近目标id: [s],(0,0,1000),[/],(/,/),左侧车道有借道标签的最近目标id
+  double left_lane_lane_borrow_id = 12; // 
+  ///<左侧车道借道目标侵入量: [s],(0,0,1000),[/],(/,/),左侧车道借道目标侵入量
+  double left_lane_lane_borrow_value = 13; // 
+  ///<右侧车道有借道标签的最近目标id: [s],(0,0,1000),[/],(/,/),右侧车道有借道标签的最近目标id
+  double right_lane_lane_borrow_id = 14; // 
+  ///<右侧车道借道目标侵入量: [s],(0,0,1000),[/],(/,/),右侧车道借道目标侵入量
+  double right_lane_lane_borrow_value = 15; // 
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var0 = 20;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var1 = 21;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var2 = 22;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var3 = 23;
+  ///<备用信号接口: [s],(0,0,1000),[/],(/,/),备用信号接口
+  double var4 = 24;
+  ///<备用信号接口: [s],(0,0,1000),[100],(/,/),备用信号接口
+  repeated double var5 = 25;
+}
+
+/**
+ * @brief dnp
+ * @detail DecisionDiagnose
+ */
+ message DecisionDebugOut {
+  ///< 接收消息诊断：[/],(/,/,/),[20],(/，/),标识接收消息诊断
+  repeated ErrorType  error_type = 1;
+  ///< 模块运行诊断：[/],(/,/,/),[/],(/，/),标识模块运行诊断
+  ModuleExecuteDebug execute_debug = 2;
+  ///< 模块功能是否正常：[/],(/,/,/),[/],(/，/),标识模块功能是否正常
+  bool running = 3;
+  ///< 警告：[/],(/,/,/),[20],(/，/),标识警告码
+  repeated WarningType warning_type = 4;
+  ///< 目标决策调试信息：[/],(/,/,/),[/],(/，/),标识目标决策调试信息
+  ObjectDecisionDebugInfo object_decision_debug_info = 5;
+  ///< 参考线+横向决策信息：[/],(/,/,/),[3],(/，/),标识决策信息,无决策状态机处理
+  repeated dnp.Decision decisions = 6;
+}
+
+/**
+ * @brief dnp
+ * @detail ModuleExecuteDebug
+ */
+message ModuleExecuteDebug {
+  ///< 运行时间诊断：[/],(/,/,/),[/],(/，/),标识运行时间诊断
+  uint32 execute_time_diagnose = 1;
+  ///< 心跳诊断：[/],(/,/,/),[/],(/，/),标识心跳诊断
+  uint32 rolling_cut_diagnose = 2;
+  ///< 运行时间：[ms],(/,/,/),[/],(/，/),标识运行时间
+  float execute_time = 3;
+  ///< 不发送消息诊断状态码：[/],(/,/,/),[/],(/，/),标识不发送消息
+  uint32 not_publish_diagnose_id = 4;
+  ///< 诊断码集合：[ms],(/,/,/),[20],(/，/),标识运行诊断码
+  repeated uint32 diagnose_codes = 6; 
+  ///< 备用信号：[/],(/,/,/),[10],(/，/),标识备用信号
+  repeated float var1 = 7;
+  ///< 备用信号：[/],(/,/,/),[/],(/，/),标识备用信号
+  float var2 = 8;
+}
+
+/**
+ * @brief dnp
+ * @detail ControlPreprocessDiagnose
+ */
+message ControlPreprocessDebugOut {
+  ///< 接收消息诊断：[/],(0,0,/),[20],(/，/),标识接收消息诊断
+  repeated ErrorType  error_type = 1;
+  ///< 模块运行诊断：[/],(0,0,/),[/],(/，/),标识模块运行诊断
+  ModuleExecuteDebug execute_debug = 2;
+  ///< 模块功能是否正常：[/],(/,/,/),[/],(/，/),标识模块功能是否正常
+  bool running = 3;
+  ///< 警告：[/],(/,/,/),[20],(/，/),标识警告码
+  repeated WarningType warning_type = 4;
+}
+
+/**
+ * @brief dnp
+ * @detail LatOffsetIACCDebugOut
+ */
+message LatOffsetIACCDebugOut{
+  ///< 模块运行诊断(针对系统层级的cpu、内存、运行时间等监控)：[/],(/,/,/),[/],(/，/),标识模块运行诊断(针对系统层级的cpu、内存、运行时间等监控)
+  ModuleExecuteDebug execute_debug = 1;
+}
+

@@ -1,0 +1,42 @@
+/**
+ * @file     drs_diagnose.proto
+ * @brief    drs诊断 drs_diagnosis.proto文件
+ * @author   xiaoyou,lvbo
+ * @details  主要包含drs诊断信息
+ * @date     2023-10-26
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ *
+ **********************************************************************************
+ */
+ syntax = "proto3";
+ package DrsProto;
+ 
+ /**
+  * @brief 诊断信息
+  * @detail DrsDiagnose
+  */
+ message DrsDiagnosis {
+   ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+   double time_stamp = 1;
+   ///<诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+   ///<诊断编码:[s],(/,/,/),[/],(1,0),使用32个bit编码，0000 0010 0000 0010 0000 0000 0000 0000
+   ///<如果所有bit都是0，则表示无故障：[/],(/,/,/),[/],(/,/),description
+   ///<bit 0: 未收到上游数据error：[/],(/,/,/),[/],(/,/),description
+   ///<bit 1: 模块内部运行异常：[/],(/,/,/),[/],(/,/),description
+   ///<bit 2: 上游数据运行超时：[/],(/,/,/),[/],(/,/),description
+   ///<bit 3: 上游数据异常：[/],(/,/,/),[/],(/,/),description
+   ///<bit 4: 上游数据长时间超时：[/],(/,/,/),[/],(/,/),description
+   uint32 diagnosis_code = 2;
+   ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+   string diagnosis_info = 3;
+   ///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+   uint32 heartbeart = 4;
+ }

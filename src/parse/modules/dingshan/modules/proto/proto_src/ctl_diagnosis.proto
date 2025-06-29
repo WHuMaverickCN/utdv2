@@ -1,0 +1,51 @@
+/**
+ * @file     ctl_diagnose.proto
+ * @brief    控制模块诊断 ctl_diagnose.proto文件
+ * @author   tan,lian
+ * @details  主要包含横向规划、纵向规划、方向盘转角信息等诊断信息
+ * @date     2023-11-02
+ * @version  V1.0
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2023.11.02 <th>V1.0         <th>zhangxun    <th>控制诊断信息初版
+ *Debug信号、Hmi信号 <table>
+ *
+ **********************************************************************************
+ */
+syntax = "proto3";
+package ctl;
+
+/**
+ * @brief ctl
+ * @detail ctlDiagnose
+ */
+message CtlDiagnosis {
+  ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+	///<诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+	///<诊断编码:[s],(/,/,/),[/],(1,0),使用32个bit编码，0000 0010 0000 0010 0000 0000 0000 0000
+	///<如果所有bit都是0，则表示无故障：[/],(/,/,/),[/],(/,/),description
+  ///<bit 0: 未收到上游数据error：[/],(/,/,/),[/],(/,/),description
+  ///<bit 1: 方向盘故障诊断信息：[/],(/,/,/),[/],(/,/),description
+  ///<bit 2: 横向规划轨迹故障信息：[/],(/,/,/),[/],(/,/),description
+  ///<bit 3: 横向规划心跳异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 4: 横向控制上游数据异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 5: 速度范围异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 6: 刹车可用状态异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 7: 上游规划周期异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 8: 实际加速度范围异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 9: soc-mcu通讯异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 10: 方向盘回正异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 11: ins定位异常：[/],(/,/,/),[/],(/,/),description
+  uint32 diagnosis_code = 2;
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+  string diagnosis_info = 3;
+  ///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+  uint32 heartbeart = 4;
+}

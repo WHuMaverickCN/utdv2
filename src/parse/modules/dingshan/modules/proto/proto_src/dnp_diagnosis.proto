@@ -1,0 +1,63 @@
+/**
+ * @file     dnp_diagnose.proto
+ * @brief    决策规划统一 dnp_common.proto文件
+ * @author   tan,lian
+ * @details  主要包含决策信息、横向规划、纵向规划、轨迹选择信息等诊断信息
+ * @date     2023-03-07
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2022.07.11 <th>V2.2         <th>tan,lian    <th>创建初始版本
+ * <tr><th>2022.10.13 <th>V2.9         <th>tan,lian    <th>update 2.9
+ * <tr><th>2022.11.03 <th>V3.1         <th>tan,lian    <th>update 3.1
+ * <tr><th>2022.11.17 <th>V3.2         <th>tan,lian    <th>update 3.2
+ * <tr><th>2022.12.1  <th>V3.3         <th>tan,lian    <th>更新参考线生成
+ * <tr><th>2022.12.1  <th>V3.4         <th>jin,shufeng <th>新增安全预警信号
+ * <tr><th>2023.1.5   <th>V3.5         <th>tan,lian    <th>新增融合限速信号
+ * <tr><th>2023.02.02 <th>V3.6         <th>tan,lian    <th>新增横向、ots
+ *Debug信号、Hmi信号 <table>
+ *
+ **********************************************************************************
+ */
+syntax = "proto3";
+package dnp;
+
+/**
+ * @brief dnp
+ * @detail DnpDiagnose
+ */
+message DnpDiagnosis {
+  ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+	///<诊断编码：[/],(0x0,0x0,0x16),[/],(1,0),通过查找标志位识别具体错误信息
+	///<诊断编码:[/],(0x0,0x0,0x16),[/],(1,0),使用32个bit编码，0000 0010 0000 0010 0000 0000 0000 0000
+	///<如果所有bit都是0，则表示无故障：[/],(/,/,/),[/],(/,/),description
+  ///<bit 0: 未收到上游数据error：[/],(/,/,/),[/],(/,/),description
+  ///<bit 1: decision运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 2: lat planning运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 3: lon planning运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 4: 轨迹选择运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 5: 控制预处理运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 6: 模块内部运行异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 7: 上游数据运行超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 8: 上游数据异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 9: 上游数据长时间超时：[/],(/,/,/),[/],(/,/),description
+  ///<bit 10: 内存资源异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 11: cpu资源异常：[/],(/,/,/),[/],(/,/),description
+  ///<bit 12: 横向规划失败：[/],(/,/,/),[/],(/,/),description
+  ///<bit 13: 纵向规划失败：[/],(/,/,/),[/],(/,/),description
+  ///<bit 14: 整车信号输入超时故障：[/],(/,/,/),[/],(/,/),description
+  ///<bit 15: FF检查整车信号无效：[/],(/,/,/),[/],(/,/),description
+  ///<bit 16: 整车信号合理性故障：[/],(/,/,/),[/],(/,/),description
+  uint32 diagnosis_code = 2;
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+  string diagnosis_info = 3;
+  ///<心跳信号：[/],(0,0,255),[/],(1,0),传递心跳信号值
+  uint32 heartbeart = 4;
+}

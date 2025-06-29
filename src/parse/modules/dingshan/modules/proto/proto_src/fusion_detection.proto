@@ -1,0 +1,75 @@
+/**
+* @file     fusion_detection.proto
+* @author   chenjianbing
+* @details  fusion detection相关信号的输出接口定义
+* @date     2022-03-05
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.5          <th>1.0                 <th>chenjianbing 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package FusionProto;
+
+/**
+* @brief fusion detection信息
+* @detail xxxxxxxx
+*/
+
+message FusDetection
+{
+    ///< 纵向距离: [m], (0，-90,300),[/],(1,0),纵向距离
+    float longitudinal_distance = 1;
+    ///< 横向距离: [m], (0，-30,30),[/],(1,0),横向距离	
+    float lateral_distance = 2;
+	///< 垂直距离: [m], (0，-30,30),[/],(1,0),垂直距离	
+    float vertical_distance = 3;
+	///< 方位角: [rad], (0，-4,4),[/],(1,0),方位角	
+    float azimuth = 4; 
+	///< 俯仰角: [rad], (0，-2,2),[/],(1,0),俯仰角	
+    float elevation_angle = 5; 
+    ///< 俯仰角是否有效：[rad],(false,/,/),[/],(1,0),俯仰角是否有效
+    bool elevation_validy = 6;  
+    ///< 径向相对加速度：[m/s^2],(0,-20,20),[/],(1,0),径向相对加速度
+    float radial_rel_acceleration = 7;
+    ///< 径向相对速度：[m/s],(0,-100,100),[/],(1,0),径向相对速度
+    float radial_rel_velocity = 8; 
+	///< 径向绝对加速度: [m/s^2], (0，-20,20),[/],(1,0),径向绝对加速度	
+    float radial_abs_acceleration = 9;
+    ///< 径向绝对速度：[m/s],(0,-100,100),[/],(1,0),径向绝对速度
+    float radial_abs_velocity = 10;
+    ///< 径向距离：[m],(0,0,300),[/],(1,0),标识径向距离
+    float radius = 11;
+    ///< 反射强度：[dbsm],(0,0,100),[/],(1,0),标识反射强度
+    float rcs = 12;
+    ///< 信噪比：[db],(0,0,100),[/],(1,0),标识信噪比
+    float snr = 13;
+	///< 所属目标id: [/], (0，0,255),[/],(1,0),所属目标id	
+    int32 obj_id = 14;
+}
+
+
+/**
+* @brief fusion detections信息
+* @detail xxxxxxxx
+*/
+
+message FusDetections
+{
+    ///< 时间戳：[s],(0,0,/),[/],(1,0),时间戳
+    double time_stamp = 1; //时间戳
+    ///< 点云集：[/],(/,/,/),[4096],(1,0),点云集
+    repeated FusDetection points = 2; //点集
+}

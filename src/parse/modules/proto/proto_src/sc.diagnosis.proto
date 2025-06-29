@@ -1,0 +1,65 @@
+﻿/**
+* @file     sc.diagnosis.proto
+* @author   sc
+* @details  环视诊断消息输出接口
+* @date     2023-05-25
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.05.25        <th>6.1                 <th>sc 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package ScDiagnosisProto;
+
+
+/**
+* @brief 环视诊断信息
+* @detail 包含时间戳，故障类型等信息
+*/
+message ScDiagnosis
+{
+  ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+
+  ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+  ///< 0x0: 默认值，无故障
+  ///< bit 0: 预留位
+  ///< bit 1: 摄像头(左)输入异常 error
+  ///< bit 2: 摄像头(前)输入异常 error
+  ///< bit 3: 摄像头(右)输入异常 error
+  ///< bit 4: 摄像头(后)输入异常 error  
+  ///< bit 5：摄像头(左)有遮挡 error
+  ///< bit 6：摄像头(前)有遮挡 error
+  ///< bit 7：摄像头(右)有遮挡 error
+  ///< bit 8：摄像头(后)有遮挡 error
+  ///< bit 9: cpu负载异常 error
+  ///< bit 10: 内存占用异常 error
+  ///< bit 11: 环视输出帧率异常 error
+  ///< bit 12: ins输入丢失 error
+  ///< bit 13: sab输入丢失 error
+  ///< bit 14: 环视功能延时过高 error
+  ///< bit 15: 摄像头未标定 error
+  ///< bit 16: 整车信号输入超时故障 error
+  ///< bit 17: FF检查整车信号无效 error
+  ///< bit 18: 整车信号合理性故障 error
+  uint32 diagnosis_code = 2;
+
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+  string diagnosis_info = 3;
+  
+  ///<心跳信号：[/],(0,0,255),[/],(/,/),传递心跳信号值 
+  uint32 heartbeart = 4;
+
+}

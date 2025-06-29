@@ -1,0 +1,752 @@
+/**
+* @file     vp_ad_base.proto
+* @author   huyoucheng
+* @details  ad_base输出数据结构信息
+* @date     2022-07-26
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.26          <th>1.0                 <th>huyoucheng
+* <table>
+**********************************************************************************
+*/
+
+
+syntax = "proto3";
+package VpAdBaseProto;
+
+/**
+*@brief   Header
+*@detail  消息头
+*/
+message Header {
+   ///< seq: [uint32], (/,/,/), [/], (/,/),序列号
+  uint32 seq = 1; //序列号 
+  ///< stamp: [int64], (/,/,/), [/], (/,/),时间蹉信息
+  int64 stamp = 2; // 时间蹉信息
+   ///< stamp: [string], (/,/,/), [/], (/,/),当前帧数
+  string frame_id = 3;//当前帧数
+  ///< stamp: [string], (/,/,/), [/], (/,/),当前使用的模块名
+  string module_name = 4;//当前使用的模块名
+}
+/**
+*@brief   三维点坐标
+*@detail  用来存在三维点
+*/
+message Point {
+   ///< x: [double], (/,/,/), [/], (/,/),点的x坐标
+  double x = 1;//点的x坐标
+  ///< y: [double], (/,/,/), [/], (/,/),点的y坐标
+  double y = 2;//点的z坐标
+  ///< z: [double], (/,/,/), [/], (/,/),点的z坐标
+  double z = 3;
+}
+/**
+*@brief  位置和姿态描述
+*@detail  自车车辆的空间位置和姿态描述
+*/
+message Pose {
+  ///< x: [double], (/,/,/), [/], (/,/), x方向距离
+  double x = 1;//x方向距离
+  ///< y: [double], (/,/,/), [/], (/,/), y方向距离
+  double y = 2;//y方向距离
+  ///< z: [double],  (/,/,/), [/], (/,/), z方向距离
+  double z = 3;//z方向距离
+  ///< roll: [double],  (/,/,/), [/], (/,/), 翻滚角
+  double roll = 4;//翻滚角
+  ///< pitch: [double],  (/,/,/), [/], (/,/), 俯仰角
+  double pitch = 5;//俯仰角
+  ///< yaw: [double], (/,/,/), [/], (/,/), 偏转角
+  double yaw = 6;//偏转角
+}
+/**
+*@brief  将一个量用向量表示
+*@detail  比如可以用来表示Odo加速度
+*/
+message Vector3 {
+  ///< x: [double], (/,/,/), [/], (/,/), x 方向加速度 （车辆前进方向）
+  double x = 1;// x 方向加速度 （车辆前进方向）
+
+  ///< y: [double], (/,/,/), [/], (/,/),  y 方向加速度 （车辆横向加速度）
+  double y = 2;// y 方向加速度 （车辆横向加速度）
+
+  ///<  z: [double], (/,/,/), [/], (/,/), z 方向加速度 （垂直地面向上）
+  double z = 3;// z 方向加速度 （垂直地面向上）
+}
+/**
+*@brief  未知
+*@detail  
+*/
+enum LaneBehavior {
+  ///< LANE_BEHAVIOR_UNKNOWN : [double], (/,/,/), [/], (/,/), 未知
+  LANE_BEHAVIOR_UNKNOWN = 0;
+
+  ///< LANE_BEHAVIOR_KEEP : [double], (/,/,/), [/], (/,/), 未知
+  LANE_BEHAVIOR_KEEP = 1;
+
+  ///< LANE_BEHAVIOR_LEFT : [double], (/,/,/), [/], (/,/), 未知
+  LANE_BEHAVIOR_LEFT = 2;
+
+  ///< LANE_BEHAVIOR_RIGHT : [double], (/,/,/), [/], (/,/), 未知
+  LANE_BEHAVIOR_RIGHT = 3;
+}
+/**
+*@brief 目标车的运动状态
+*@detail 描述目标车行驶情况
+*/
+enum MotionState {
+  ///< MOTION_STATE_MOVING : [double], (/,/,/), [/], (/,/), 运动
+  MOTION_STATE_MOVING = 0;//运动
+
+  ///< MOTION_STATE_STATIONARY : [double], (/,/,/), [/], (/,/), /对向来车
+  MOTION_STATE_STATIONARY = 1;//对向来车
+
+  ///< MOTION_STATE_ONCOMING : [double], (/,/,/), [/], (/,/), 接近,靠近
+  MOTION_STATE_ONCOMING = 2;//接近,靠近
+
+  ///< MOTION_STATE_STATIONARY_CANDIDATE : [double], (/,/,/), [/], (/,/), --
+  MOTION_STATE_STATIONARY_CANDIDATE = 3;//--
+
+  ///< MOTION_STATE_UNKNOWN : [double], (/,/,/), [/], (/,/), 未知
+  MOTION_STATE_UNKNOWN = 4;//未知
+
+  ///< MOTION_STATE_CROSSING_STATIONARY : [double], (/,/,/), [/], (/,/), 横穿静止状态
+  MOTION_STATE_CROSSING_STATIONARY = 5;//横穿静止状态
+
+  ///< MOTION_STATE_CROSSING_MOVING : [double], (/,/,/), [/], (/,/), 横穿移动状态
+  MOTION_STATE_CROSSING_MOVING = 6;//横穿移动状态
+
+  ///< MOTION_STATE_STOPPED : [double], (/,/,/), [/], (/,/), 停止
+  MOTION_STATE_STOPPED = 7;//停止
+}
+/**
+*@brief  未知
+*@detail  
+*/
+enum MeasState {
+ ///< MEAS_STATE_DELETED : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_DELETED = 0;
+
+ ///< MEAS_STATE_NEW : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_NEW = 1;
+
+ ///< MEAS_STATE_MEASURED : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_MEASURED = 2;
+
+ ///< MEAS_STATE_PREDICTED : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_PREDICTED = 3;
+
+ ///< MEAS_STATE_DELETED_FOR : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_DELETED_FOR = 4;
+
+ ///< MEAS_STATE_NEW_FROM_MERGE : [double], (/,/,/), [/], (/,/), 未知
+  MEAS_STATE_NEW_FROM_MERGE = 5;
+}
+/**
+*@brief 颜色类型
+*@detail 颜色类型
+*/
+enum CommonColor {
+ ///< COMMON_COLOR_WHITE : [double], (/,/,/), [/], (/,/), 白色
+  COMMON_COLOR_WHITE = 0;//白色
+
+ ///< COMMON_COLOR_RED : [double], (/,/,/), [/], (/,/), 红色
+  COMMON_COLOR_RED = 1;//红色
+
+ ///< COMMON_COLOR_GREEN : [double], (/,/,/), [/], (/,/), 绿色
+  COMMON_COLOR_GREEN = 2;//绿色
+
+ ///< COMMON_COLOR_YELLOW : [double], (/,/,/), [/], (/,/), 黄色
+  COMMON_COLOR_YELLOW = 3;//黄色
+}
+/**
+*@brief 未使用
+*@detail 未使用
+*/
+message PointSL {
+ ///< s: [double], (/,/,/), [/], (/,/), 未知
+  double s = 1;
+
+ ///< l: [double], (/,/,/), [/], (/,/), 未知
+  double l = 2;
+}
+/**
+*@brief 未使用
+*@detail 未使用
+*/
+message PointSV {
+ ///< s: [double], (/,/,/), [/], (/,/), 未知
+  double s = 1;
+
+ ///< v: [double], (/,/,/), [/], (/,/), 未知
+  double v = 2;
+}
+/**
+*@brief 未使用
+*@detail 未使用
+*/
+message PointTS {
+ ///< t: [double], (/,/,/), [/], (/,/), 未知
+  double t = 1;
+
+ ///< s: [double], (/,/,/), [/], (/,/), 未知
+  double s = 2;
+}
+/**
+*@brief 物体姿态表示
+*@detail 描述物体在三维坐标下姿态
+*/
+message EulerAngle {
+    ///< roll: [double],  (/,/,/), [/], (/,/), 翻滚角
+  double roll = 1;
+    ///< pitch: [double],  (/,/,/), [/], (/,/), 俯仰角
+  double pitch = 2;
+   ///< yaw: [double], (/,/,/), [/], (/,/), 偏转角
+  double yaw = 3;
+}
+/**
+*@brief 未使用
+*@detail 未使用
+*/
+message FrenetPoint {
+ ///< s: [double], (/,/,/), [/], (/,/), 未知
+  double s = 1;
+
+ ///< l: [double], (/,/,/), [/], (/,/), 未知
+  double l = 2;
+
+ ///<k: [double], (/,/,/), [/], (/,/), 未知
+  double k = 3;
+
+ ///< dk_ds : [double], (/,/,/), [/], (/,/), 未知
+  double dk_ds = 4;
+
+ ///< dl_ds : [double], (/,/,/), [/], (/,/), 未知
+  double dl_ds = 5;
+
+ ///< ddl_ds2 : [double], (/,/,/), [/], (/,/), 未知
+  double ddl_ds2 = 6;
+
+ ///< ds_dt : [double], (/,/,/), [/], (/,/), 未知
+  double ds_dt = 7;
+
+ ///< dds_dt2 : [double], (/,/,/), [/], (/,/), 未知
+  double dds_dt2 = 8;
+}
+/**
+*@brief 未使用
+*@detail 未使用
+*/
+message LinePoint {
+ ///< x: [double], (/,/,/), [/], (/,/), 未知
+  float x = 1;
+
+ ///< y : [double], (/,/,/), [/], (/,/), 未知
+  float y = 2;
+
+ ///< z: [double], (/,/,/), [/], (/,/), 未知
+  float z = 3;
+
+ ///< yaw : [double], (/,/,/), [/], (/,/), 未知
+  float yaw = 4;
+
+ ///< pitch : [double], (/,/,/), [/], (/,/), 未知
+  float pitch = 5;
+
+ ///< roll : [double], (/,/,/), [/], (/,/), 未知
+  float roll = 6;
+
+ ///< s: [double], (/,/,/), [/], (/,/), 未知
+  float s = 7;
+
+ ///< k : [double], (/,/,/), [/], (/,/), 未知
+  float k = 8;
+
+ ///< l : [double], (/,/,/), [/], (/,/), 未知
+  float l = 9;
+
+ ///< dk_ds : [double], (/,/,/), [/], (/,/), 未知
+  float dk_ds = 10;
+
+ ///< dl_ds : [double], (/,/,/), [/], (/,/), 未知
+  float dl_ds = 11;
+
+ ///< ddl_ds : [double], (/,/,/), [/], (/,/), 未知
+  float ddl_ds = 12;
+}
+/**
+*@brief 物体的姿态
+*@detail 物体的姿态和协防差矩阵
+*/
+message PoseWithCovariance {
+///< pose : [/], (/,/,/), [/], (/,/), 物体姿态
+  Pose pose = 1;//物体姿态
+
+///< covariance : [/], (/,/,/), [/], (/,/), 协方差矩阵
+  repeated float covariance = 2; // 6*6 matrix
+}
+/**
+*@brief 未知
+*@detail 未知
+*/
+message Twist {
+///< linear : [/], (/,/,/), [/], (/,/), 未知
+  Point linear = 1;
+
+///< angular : [/], (/,/,/), [/], (/,/),未知
+  Point angular = 2;
+}
+/**
+*@brief 未知
+*@detail 未知
+*/
+message Odometry {
+///< header : [/], (/,/,/), [/], (/,/),未知
+  Header header = 1;
+
+///< child_frame_id : [/], (/,/,/), [/], (/,/),未知
+  string child_frame_id = 2;
+
+///< pose : [/], (/,/,/), [/], (/,/),未知
+  PoseWithCovariance pose = 3;
+
+///<twist : [/], (/,/,/), [/], (/,/),未知
+  Twist twist = 4;
+}
+/**
+*@brief 交通信号灯的颜色类型
+*@detail 交通信号灯颜色类型
+*/
+enum ColorType {
+///< COLOR_TYPE_UNKNOWN : [/], (/,/,/), [/], (/,/),未知
+  COLOR_TYPE_UNKNOWN = 0;
+
+///< COLOR_TYPE_WHITE : [/], (/,/,/), [/], (/,/),白色
+  COLOR_TYPE_WHITE = 1;//白色
+
+///<COLOR_TYPE_RED : [/], (/,/,/), [/], (/,/),红色
+  COLOR_TYPE_RED = 2;//红色
+
+///<COLOR_TYPE_GREEN : [/], (/,/,/), [/], (/,/),绿色
+  COLOR_TYPE_GREEN = 3;//绿色
+
+///<COLOR_TYPE_YELLOW : [/], (/,/,/), [/], (/,/),黄色
+  COLOR_TYPE_YELLOW = 4;//黄色
+}
+/**
+*@brief 交通信号灯的颜色类型
+*@detail 交通信号灯颜色类型
+*/
+message Color {
+///< type : [/], (/,/,/), [/], (/,/),未知
+  ColorType type = 1;
+
+///< r: [/], (/,/,/), [/], (/,/),红色
+  float r = 2;//红色
+
+///<g: [/], (/,/,/), [/], (/,/),绿色
+  float g = 3;//绿色
+
+///< b: [/], (/,/,/), [/], (/,/),蓝色
+  float b = 4;//蓝色
+
+///< a: [/], (/,/,/), [/], (/,/),黄色
+  float a = 5;//黄色
+}
+/**
+*@brief 数据来源
+*@detail 描述物体数据来源的结果
+*/
+enum DataSource {
+  ///< DATA_SOURCE_UNKNOWN : [/], (/,/,/), [/], (/,/),数据来源未知
+  DATA_SOURCE_UNKNOWN = 0;//数据来源未知
+
+ ///< DATA_SOURCE_SENSOR : [/], (/,/,/), [/], (/,/),来自于摄像机
+  DATA_SOURCE_SENSOR = 1;//来自于摄像机
+
+ ///< DATA_SOURCE_TRACKING : [/], (/,/,/), [/], (/,/),来自于跟踪的目标结果
+  DATA_SOURCE_TRACKING = 2;//来自于跟踪的目标结果
+
+ ///<DATA_SOURCE_HDMAP : [/], (/,/,/), [/], (/,/),来自于高清地图的结果
+  DATA_SOURCE_HDMAP = 3;//来自于高清地图的结果
+
+ ///< DATA_SOURCE_INFER : [/], (/,/,/), [/], (/,/),来自于模型推理
+  DATA_SOURCE_INFER = 4;//来自于模型推理
+}
+/**
+*@brief 数据来源
+*@detail 描述物体数据来源的结果
+*/
+enum SideType {
+ ///< SIDE_TYPE_UNKNOWN : [/], (/,/,/), [/], (/,/),未知
+  SIDE_TYPE_UNKNOWN = 0;
+
+///<SIDE_TYPE_ROAD : [/], (/,/,/), [/], (/,/),来自于道路
+  SIDE_TYPE_ROAD = 1;
+
+///<SIDE_TYPE_FENCE : [/], (/,/,/), [/], (/,/),来自于栅栏
+  SIDE_TYPE_FENCE = 2;
+}
+/**
+*@brief 车道线模型来源
+*@detail 车道线模型来源
+*/
+enum LineModel {
+///<LINE_MODEL_RAW : [/], (/,/,/), [/], (/,/),来自于RAW线
+  LINE_MODEL_RAW = 0;
+
+///<LINE_MODEL_ROAD : [/], (/,/,/), [/], (/,/),来自于Roadmodel线
+  LINE_MODEL_ROAD = 1;
+
+///<LINE_MODEL_POAL : [/], (/,/,/), [/], (/,/),来自于poal线
+  LINE_MODEL_POAL = 2;
+
+///<LINE_MODEL_ROAD_UNPARALLEL : [/], (/,/,/), [/], (/,/),来自不平行roadmodel线
+  LINE_MODEL_ROAD_UNPARALLEL = 3;
+}
+/**
+*@brief 车道线导流线状态
+*@detail 车道线导流线状态
+*/
+enum LineDiversion {
+///<LINE_DIVERSION_UNKNOWN : [/], (/,/,/), [/], (/,/),未知
+  LINE_DIVERSION_UNKNOWN = 0;
+
+///<LINE_DIVERSION_INSIDE : [/], (/,/,/), [/], (/,/),导流内侧线
+  LINE_DIVERSION_INSIDE = 1;
+
+///<LINE_DIVERSION_OUTSIDE : [/], (/,/,/), [/], (/,/),导流外侧线
+  LINE_DIVERSION_OUTSIDE = 2;
+}
+/**
+*@brief 多边形
+*@detail 用来描述多边形的一种结构
+*/
+message Polygon {
+///< points : [/], (/,/,/), [/], (/,/),储存多边形的点
+  repeated Point points = 1;//储存多边形的点
+}
+/**
+*@brief 关联车道线的起始点和终止点
+*@detail 关联车道线的起始点和终止点
+*/
+message PairStartEndS {
+///< start_s : [/], (/,/,/), [/], (/,/),起始点
+  float start_s = 1;
+
+///< end_s : [/], (/,/,/), [/], (/,/),终止点
+  float end_s = 2;
+}
+
+/**
+*@brief   原始车道线线型
+*@detail  从contour拟合的原始车道线的线型
+*/
+enum LineType {
+  ///< LINE_TYPE_UNKNOWN[/],(0,/,/),[/],(1,0),不确定
+  LINE_TYPE_UNKNOWN = 0; // 0 << 0
+
+  ///< LINE_TYPE_DASH[/],(1,/,/),[/],(1,0),虚线
+  LINE_TYPE_DASH = 1;
+
+   ///< LINE_TYPE_SOLID[/],(2,/,/),[/],(1,0),实线
+  LINE_TYPE_SOLID = 2;
+
+    ///< LINE_TYPE_DOUBLE_DASH[/],(3,/,/),[/],(1,0),双虚线
+  LINE_TYPE_DOUBLE_DASH = 3;
+
+   ///< LINE_TYPE_DOUBLE_SOLID[/],(4,/,/),[/],(1,0),双实线
+  LINE_TYPE_DOUBLE_SOLID = 4;
+
+ ///< LINE_TYPE_DASH_SOLID[/],(5,/,/),[/],(1,0),左实右虚
+  LINE_TYPE_DASH_SOLID = 5;
+
+   ///< LINE_TYPE_SOLID_DASH[/],(6,/,/),[/],(1,0),右实左虚
+  LINE_TYPE_SOLID_DASH = 6;
+
+  ///< LINE_TYPE_DASH_FISH_BONES[/],(7,/,/),[/],(1,0),虚鱼骨线
+  LINE_TYPE_DASH_FISH_BONES = 7;
+
+  ///< LINE_TYPE_DASH_FISH_BONES[/],(8,/,/),[/],(1,0), 实鱼骨线
+  LINE_TYPE_SOLID_FISH_BONES = 8;
+
+  ///< LINE_TYPE_DASH_FISH_BONES[/],(8,/,/),[/],(1,0), 导流区线
+  LINE_TYPE_DIVERSION = 9;
+
+  ///< LINE_TYPE_DASH_FISH_BONES[/],(8,/,/),[/],(1,0), 虚拟线
+  LINE_TYPE_VIRTUAL = 10;
+}
+/**
+*@brief 车道线类型
+*@detail 交通信号灯颜色类型
+*/
+message PairSLineType {
+  ///< s: [/],(/,/,/),[/],(1,0)，未知
+  float s = 1;
+
+  ///< type: [/],(/,/,/),[/],(1,0), 车道线描述
+  LineType type = 2; //车道线描述
+}
+/**
+*@brief 速度变化范围
+*@detail 交通信号灯颜色类型
+*/
+message PairSV {
+  ///< s: [/],(0,/,/),[/],(0,/), 未知
+  float s = 1;
+
+  ///< min_v: [/],(0,/,/),[/],(0,/),最低限速
+  float min_v = 2;//最低限速
+
+    ///< max_v: [/],(0,/,/),[/],(0,/),最高限速
+  float max_v = 3; //最高限速 区分道路的最高限速　最低限速
+}
+/**
+*@brief 未知
+*@detail 未知
+*/
+message PairSId {
+///< s: [/],(0,/,/),[/],(0,/),未知
+  float s = 1;
+
+///<  id: [/],(0,/,/),[/],(0,/),车道线ID
+  string id = 2;//车道线ID
+}
+/**
+*@brief 车道类型
+*@detail 描述当前车道类型
+*/
+enum LaneType {
+ ///< LANE_TYPE_UNKNOWN  [/],(0,/,/),[/],(0,/),不确定
+  LANE_TYPE_UNKNOWN = 0;//不确定
+
+ ///< LANE_TYPE_NORMAL [/],(0,/,/),[/],(0,/),正常车道
+  LANE_TYPE_NORMAL = 1;//
+
+ ///< LANE_TYPE_PASSING [/],(0,/,/),[/],(0,/),超车车道
+  LANE_TYPE_PASSING = 2;
+
+ ///< LANE_TYPE_BUS [/],(0,/,/),[/],(0,/),公交车道
+  LANE_TYPE_BUS = 3;//公交车道
+
+ ///< LANE_TYPE_HOV [/],(0,/,/),[/],(0,/),高乘载车辆专用车道
+  LANE_TYPE_HOV = 4;//
+
+ ///< LANE_TYPE_UTURN [/],(0,/,/),[/],(0,/),城市道路
+  LANE_TYPE_UTURN = 5;
+
+ ///< LANE_TYPE_DECELERATION [/],(0,/,/),[/],(0,/),减速车道
+  LANE_TYPE_DECELERATION = 6;//减速车道
+
+ ///< LANE_TYPE_ACCElERATION [/],(0,/,/),[/],(0,/),加速车道
+  LANE_TYPE_ACCElERATION = 7;
+
+ ///< LANE_TYPE_CROSSING [/],(0,/,/),[/],(0,/),十字路口
+  LANE_TYPE_CROSSING = 8;//十字路口
+
+ ///< LANE_TYPE_MIX [/],(0,/,/),[/],(0,/),混合车道
+  LANE_TYPE_MIX = 9;
+
+ ///< LANE_TYPE_DANGER [/],(0,/,/),[/],(0,/), 危险车道
+  LANE_TYPE_DANGER = 10;
+
+ ///< LANE_TYPE_TURN_WAITING [/],(0,/,/),[/],(0,/), 转向等候车道
+  LANE_TYPE_TURN_WAITING = 11;
+
+ ///< LANE_TYPE_STRAIGHT_WAITING [/],(0,/,/),[/],(0,/), 直行等待
+  LANE_TYPE_STRAIGHT_WAITING = 12;//直行等待
+
+ ///< LANE_TYPE_BICYCLE [/],(0,/,/),[/],(0,/), 自行车道
+  LANE_TYPE_BICYCLE = 13;//自行车道
+
+ ///< LANE_TYPE_SIDEWALK [/],(0,/,/),[/],(0,/), 行人车道
+  LANE_TYPE_SIDEWALK = 14;//行人车道
+
+ ///< LANE_TYPE_PARKING [/],(0,/,/),[/],(0,/), 停车道
+  LANE_TYPE_PARKING = 15;//停车道
+
+ ///< LANE_TYPE_RAMP [/],(0,/,/),[/],(0,/),匝道
+  LANE_TYPE_RAMP = 16;//匝道
+
+ ///< LANE_TYPE_EMERGENCY [/],(0,/,/),[/],(0,/), 应急车道
+  LANE_TYPE_EMERGENCY = 17;//应急车道
+}
+/**
+*@brief 车道线类型
+*@detail 车道线类型描述
+*/
+message PairSLaneType {
+ ///< s: [/],(0,/,/),[/],(0,/), 未知
+  float s = 1;
+
+ ///< type: [/],(0,/,/),[/],(0,/), 车道类型
+  LaneType type = 2;//车道类型
+}
+
+/**
+ * @brief   NOA degrade reason
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief NOA降级原因
+*@detail NOA降级原因
+*/
+enum NOADegradeReason {
+///< OUT_ODD_REASON_NONE [/],(0,/,/),[/],(0,/), 未知
+  NOA_DEGRADE_REASON_NONE = 0;
+
+///< NOA_DEGRADE_REASON_NOT_VEHICLE_STATUS [/],(0,/,/),[/],(0,/), 没有车辆状态
+  NOA_DEGRADE_REASON_NOT_VEHICLE_STATUS = 1;
+
+///< NOA_DEGRADE_REASON_NOT_NDM_LOC [/],(0,/,/),[/],(0,/), NOT_NDM_LOC
+  NOA_DEGRADE_REASON_NOT_NDM_LOC = 2;
+
+///< NOA_DEGRADE_REASON_LOC_LOW_PRECISION [/],(0,/,/),[/],(0,/), LOC_LOW_PRECISION 
+  NOA_DEGRADE_REASON_LOC_LOW_PRECISION = 3;
+
+///< NOA_DEGRADE_REASON_NOT_NDM_MAP [/],(0,/,/),[/],(0,/), NOT_NDM_MAP
+  NOA_DEGRADE_REASON_NOT_NDM_MAP = 4;
+
+///< NOA_DEGRADE_REASON_NOT_NDM_NAV [/],(0,/,/),[/],(0,/), NOT_NDM_NAV 
+  NOA_DEGRADE_REASON_NOT_NDM_NAV = 5;
+
+///< NOA_DEGRADE_REASON_HAS_LOC_NOT_NDM_MAP [/],(0,/,/),[/],(0,/), HAS_LOC_NOT_NDM_MAP
+  NOA_DEGRADE_REASON_HAS_LOC_NOT_NDM_MAP = 6;
+
+///< NOA_DEGRADE_REASON_TOLLBOOTH [/],(0,/,/),[/],(0,/), TOLLBOOTH
+  NOA_DEGRADE_REASON_TOLLBOOTH = 7;
+
+///< NOA_DEGRADE_REASON_CONSTRUCTION [/],(0,/,/),[/],(0,/), CONSTRUCTION
+  NOA_DEGRADE_REASON_CONSTRUCTION = 8;
+}
+
+/**
+ * @brief   Out odd reason
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 不在ODD（目标场景）范围的原因
+*@detail 不在ODD（目标场景）范围的原因
+*/
+enum OutOddReason {
+///< OUT_ODD_REASON_NONE [/],(0,/,/),[/],(0,/), out odd 原因-未知
+  OUT_ODD_REASON_NONE = 0;
+
+///< OUT_ODD_REASON_TOllBOOTH [/],(0,/,/),[/],(0,/), out odd 原因-过路收费站
+  OUT_ODD_REASON_TOllBOOTH = 10;
+
+///< OUT_ODD_REASON_ROAD_CONSTRUCTION [/],(0,/,/),[/],(0,/), out odd 原因-道路建设
+  OUT_ODD_REASON_ROAD_CONSTRUCTION = 50;
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/), out odd 原因-out map
+  OUT_ODD_REASON_OUT_MAP = 51;
+}
+
+/**
+ * @brief   Take over reason
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 驾驶员接管原因
+*@detail 驾驶员接管原因
+*/
+enum TakeOverReason {
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/), 未知
+  TAKE_OVER_REASON_NONE = 0;
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/), 车道线无效
+  TAKE_OVER_REASON_VISION_LINE_INVALID = 1;
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/), 目标无效
+  TAKE_OVER_REASON_FUSION_OBJS_INVALID = 2;
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/), 未知
+  TAKE_OVER_REASON_EMPTY_TRAJ = 50;
+
+///< OUT_ODD_REASON_OUT_MAP [/],(0,/,/),[/],(0,/),紧急情况
+  TAKE_OVER_REASON_LON_EMERGENCY = 51;
+}
+
+/**
+ * @brief   Out odd more information
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 未知
+*@detail 未知
+*/
+message PairSOutOdd {
+///< s: [/],(0,/,/),[/],(0,/), 未知
+  float s = 1;
+
+///< noa_degrade_s: [/],(0,/,/),[/],(0,/), 未知
+  float noa_degrade_s = 2;
+
+///< out_odd_reason: [/],(0,/,/),[/],(0,/), 不在ODD范围的原因
+  OutOddReason out_odd_reason = 3;
+}
+
+/**
+ * @brief   NOA odd warning information
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 出ODD范围警告
+*@detail 出ODD范围警告
+*/
+message NOAOddWarning {
+///< out_odd_warning_flag: [/],(0,/,/),[/],(0,/), Noa ODD范围的警告标志位
+  bool out_odd_warning_flag = 1;
+
+///< out_odd_reasons: [/],(0,/,/),[/],(0,/), 出ODD范围的原因
+  repeated PairSOutOdd out_odd_reasons = 2;
+}
+
+/**
+ * @brief   Take over emergency information
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 紧急接管消息
+*@detail 紧急接管消息
+*/
+message TakeOverEmergency {
+///< take_over_flag: [/],(0,/,/),[/],(0,/), 紧急接管标志位
+  bool take_over_flag = 1;
+
+///< take_over_reasons: [/],(0,/,/),[/],(0,/), 紧急接管原因
+  repeated TakeOverReason take_over_reasons = 2;
+}
+
+/**
+ * @brief   Warning and emergency status
+ * @author  xionglei.zhao
+ * @date    2021.11.01
+ */
+/**
+*@brief 警告危险状态消息
+*@detail 警告危险状态消息
+*/
+message WarningEmergencyStatus {
+///< noa_odd_warning: [/],(0,/,/),[/],(0,/), noa ODD范围的警告
+  NOAOddWarning noa_odd_warning = 1;
+
+///< take_over_emergency: [/],(0,/,/),[/],(0,/), 危险紧急接管
+  TakeOverEmergency take_over_emergency = 2;
+}

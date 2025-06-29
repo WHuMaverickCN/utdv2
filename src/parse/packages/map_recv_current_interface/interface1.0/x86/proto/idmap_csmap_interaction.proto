@@ -1,0 +1,41 @@
+/**
+* @file     idmap_csmap_interaction.proto
+* @details  众包与用户交互
+* @date     2023-7-18
+* @version  2.3
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+**********************************************************************************
+*/
+
+syntax = "proto3";
+import "idmap_sd_path.proto";
+package sdmap;
+
+
+/**
+ * @brief 众包路线交互
+ * @details  新建、编辑、删除及确认众包路线建图进度
+ */
+message CSMapPathInfo
+{
+  ///<众包路线ID:[/],(/,/,/),[/],(/,/),用于区分不同路线
+  uint64 csmap_path_id = 1;
+
+  ///<路线名称:[/],(/,/,/),[/],(/,/),起止点拼音
+  string path_name = 2;
+
+  ///<用户动作:[/],(0,0,4),[/],(/,/),编辑时继承原有路线ID但内容变更
+  ///<0:invalid
+  ///<1:新建路线
+  ///<2:编辑路线，内容变更，实际为删除原路线后新建路线
+  ///<3:删除路线，众包对应标注为可删除
+  ///<4:建图进度请求
+  uint32 user_edit_path = 3;
+
+  ///<输入路线信息:[/],(/,/,/),[/],(/,/),删除路线及进度确认时不赋值
+  repeated PathInfo cs_path_info = 4;
+}

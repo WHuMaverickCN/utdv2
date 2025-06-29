@@ -1,0 +1,38 @@
+/**
+* @file     multipose.proto
+* @author   changweili
+* @details  定位输出接口定义
+* @date     2024-02-02
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2024.2.2          <th>1.0                 <th>changweili
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3";
+package localization;
+import "header.proto";
+import "odometry.proto";
+
+
+/**
+* @brief 定位多位置姿态输出信息
+* @detail 用于存储多个位置姿态信息（目前用于粒子滤波初始化多粒子位姿表征）
+*/
+message Multipose {
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 存储多个位置姿态信息:[/],(/,/,/),[/],(/,/),标识位置姿态信息
+  repeated Pose pose = 2;
+}

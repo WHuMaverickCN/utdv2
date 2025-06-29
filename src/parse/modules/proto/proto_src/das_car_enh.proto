@@ -1,0 +1,45 @@
+/**
+* @file     das_car_enh.proto
+* @author   liuhang
+* @details  数据服务整车增强服务
+* @date     2023-8-24
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.8.24       <th>1.0                 <th>liuhang 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	DasCarEnhanceProto;
+
+/**
+* @brief DasCarEnhance 100ms
+* @detail 车辆增强服务信息
+*/
+message DasCarEnhance{
+    ///< 数据服务模块收到本数据包时的系统时间戳 ：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 1;
+
+    ///<车辆增强服务状态信息 ：[/],(/,/,/),[/],(/,/),/
+    CarEnhanceSts car_enhance_sts = 2;
+}
+
+/**
+* @brief CarEnhanceSts
+* @detail 车辆增强服务状态信息
+*/
+message CarEnhanceSts{
+    ///<设防状态 ：[/],(0,/,/),[/],(1,0),Disarm 0x00  Prearm 0x01 Arm 0x02 Activate 0x03
+    uint32 arm_sts = 1;
+}

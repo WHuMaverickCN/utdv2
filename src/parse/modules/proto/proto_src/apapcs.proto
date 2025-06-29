@@ -1,0 +1,1335 @@
+/**
+
+* @file     parking_planning.proto
+* @author   冯荣
+* @details  SDA泊车规划接口定义
+* @date     2023-02-20
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.20         <th>1.0                  <th>冯荣
+* <table>
+* @par      修改日志：debugmsg新增目标点
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.27         <th>1.1                  <th>冯荣
+* <table>
+* @par      修改日志：新增仲裁定位和case type和step type
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.7.15         <th>1.2                  <th>冯荣
+* <table>
+* @par      修改日志：PlanningState新增PathInfo
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.10.12         <th>1.5                  <th>冯荣
+* <table>
+* @par      修改日志：LongPlan/LatPlan/DecisionResult/RecommendedInfo中分别加入帧数seq和时间戳timestamp
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.10.20         <th>1.6                  <th>蒋彪
+* <table>
+* @par      修改日志：加入一些中间信号到AddtionalDebugMsg里面;加入HZP一些相关信号HzpNavInfo,HzpDecisionInfo
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.10.24         <th>1.7                  <th>冯荣
+* <table>
+* @par      修改日志：LongPlan/LatPlan/DecisionResult/RecommendedInfo修改时间戳的类型
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.1         <th>1.8                  <th>蒋彪
+* <table>
+* @par      修改日志：ApaDiagnosis中增加对每个bit的注释
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.2         <th>1.9                  <th>蒋彪
+* <table>
+* <table>
+* @par      修改日志：对repeated量增加最大值注释
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.7         <th>1.10                  <th>蒋彪
+* <table>
+* @par      修改日志：message ApaDiagnosis中增加heart_beat
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.17         <th>1.11                  <th>蒋彪
+* <table>
+* @par      修改日志：message AddtionalDebugMsg 中增加 look_ahead_pnt
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.18         <th>1.12                  <th>冯荣
+* <table>
+* @par      修改日志：时延方案调整，使用DelayHeader;message LatPlan 新增 steer_angle_req 角度请求;PathInfo parking_in_slot_id uint32 to int32
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.21         <th>1.13                  <th>薛奇
+* <table>
+* @par      修改日志：增加目标信息，增加 PathPoint 的左右边界和坡度
+* <table>
+* <tr><th>2023.11.21         <th>1.10                  <th>姚刚
+* <table>
+* @par      修改日志：按架构要求，message ApaDiagnosis中增加整车信号和资源占用诊断
+* <table>
+* <tr><th>date               <th>version              <th>author
+* <tr><th>2023.11.23         <th>1.14                  <th>薛奇
+* @par      修改日志：新增纵向规划debug接口
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.12.27         <th>1.15                  <th>刘亚龙
+* <table>
+* @par      修改日志：新增部分debug信号
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.12.28         <th>1.16                  <th>薛奇
+* <table>
+* @par      修改日志：新增部分决策信号,文件写入状态和后视镜折叠
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023.2.05         <th>1.17                  <th>薛奇
+* <table>
+*********************************************************************************
+*/
+syntax = "proto3";
+package apapcs;
+import "ca_apa_slot_sector.proto";
+import "seq_header.proto";
+import "fusion_common.proto";
+/**
+ * @brief PathPoint
+ * @detail 路径点
+ */
+message PathPoint {
+  ///< 横坐标: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  double x = 1;
+  ///< 纵坐标: [m]，(/，/，/)，[/]，(1，0), 纵坐标
+  double y = 2;
+  ///< 航向: [m]，(/，/，/)，[/]，(1，0)，航向
+  double heading = 3;
+  ///< 曲率: [m]，(/，/，/)，[/]，(1，0)，曲率
+  double curvature = 4;
+  ///< 累计距离: [m]，(/，/，/)，[/]，(1，0)，累计距离
+  double s = 5;
+  ///< left_boundary ：[/],(0, -100, 0),[/],(1, 0), 左边界
+  float left_boundary = 6;
+  ///< right_boundary ：[/],(0, 0, 100),[/],(1, 0), 右边界
+  float right_boundary = 7;
+  ///< slope ：[/],(0, -100, 100),[/],(1, 0), 坡度
+  float slope = 8;
+}
+
+/**
+ * @brief PlanningStatus
+ * @detail  规划状态
+ */
+enum PlanningStatus {
+  ///< 规划状态未知: [/]，(/，/，/)，[/]，(1，0)，规划状态未知
+  PLANNNING_STATUS_UNKNOWN = 0;
+  ///< 规划成功: [/]，(/，/，/)，[/]，(1，0)，规划成功
+  PLANNING_SUCCESS = 1;
+  ///< 规划失败: [/]，(/，/，/)，[/]，(1，0)，规划失败
+  PLANNING_FAILED = 2;
+}
+
+/**
+ * @brief ManeuverSrc
+ * @detail  单向路径来源
+ */
+enum ManeuverSrc {
+  ///< 单向路径来源未知: [/]，(/，/，/)，[/]，(1，0)，单向路径来源未知
+  MANEUVER_SRC_UNKNOWN = 0;
+  ///< 搜索: [/]，(/，/，/)，[/]，(1，0)，单向路径来源为搜索
+  MANEUVER_SRC_SEARCH = 1;
+  ///< RS: [/]，(/，/，/)，[/]，(1，0)，单向路径来源为RS path
+  MANEUVER_SRC_ANALYTICAL_RS = 2;
+  ///< 几何: [/]，(/，/，/)，[/]，(1，0)，单向路径来源为几何规划
+  MANEUVER_SRC_ANALYTICAL_GEOMETRY = 3;
+  ///< 连接: [/]，(/，/，/)，[/]，(1，0)，单向路径来源为连接规划
+  MANEUVER_SRC_ANALYTICAL_CONNECTION = 4;
+}
+
+/**
+ * @brief Maneuver
+ * @detail  单向路径，所有的点要么前进要么后退
+ */
+message Maneuver {
+  ///< 路径点: [/]，(/，/，/)，[100]，(/，/)，路径点
+  repeated PathPoint points = 1;
+  ///< 目标档位: [/]，(/，/，/)，[/]，(/，/)，目标档位
+  uint32 target_gear = 2;
+  ///< 路径来源: [/]，(/，/，/)，[/]，(1，0)，路径来源
+  ManeuverSrc source = 3;
+  ///< maneuver长度: [/]，(/，/，/)，[/]，(1，0)，maneuver长度
+  double length = 4;
+  ///< maneuver_index: [/]，(/，/，/)，[/]，(1，0)，maneuver_index
+  uint32 maneuver_index = 5;
+}
+
+/**
+ * @brief SamplingPoint
+ * @detail  采样点
+ */
+message SamplingPoint {
+  ///< 采样点：[/]，(/，/，/)，[/]，(/，/)，采样点
+  PathPoint points = 1;
+  ///< 代价大小 : [/]，(/，/，/)，[/]，(/，/)，代价大小
+  uint64 cost = 2;
+  ///< 行号 : [/]，(/，/，/)，[/]，(/，/)，行号
+  uint32 row = 3;
+  ///< 列号 : [/]，(/，/，/)，[/]，(/，/)，列号
+  uint32 col = 4;
+}
+
+/**
+ * @brief SamplingMap
+ * @detail  采样地图
+ */
+message SamplingMap {
+  ///< 采样点：[/]，(/，/，/)，[861]，(/，/)，路径点
+  repeated SamplingPoint points = 1;
+}
+
+/**
+ * @brief ParkingPath
+ * @detail  整个规划的路径
+ */
+message ParkingPath {
+  ///< 规划状态: [/]，(0，0，/)，[/]，(1，0)，规划状态
+  PlanningStatus planning_status = 1;
+  ///< 所有单向路径集合: [/]，(0，0，/)，[20]，(1，0)，所有单向路径集合
+  repeated Maneuver maneuvers = 2;
+}
+
+/**
+ * @brief Pose2D
+ * @detail  二维点
+ */
+message Pose2D {
+  ///< 横坐标: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  double x = 1;
+  ///< 纵坐标: [m]，(/，/，/)，[/]，(1，0)，纵坐标
+  double y = 2;
+}
+
+/**
+ * @brief GridCell
+ * @detail  栅格地图单元
+ */
+message GridCell {
+  ///< 中心点: [m]，(/，/，/)，[/]，(/，/)，中心点
+  Pose2D center_pnt = 1;
+  ///< 是否被占用:[/]，(0，0，/)，[/]，(1，0)，是否被占用
+  bool is_occupied = 2;
+}
+
+/**
+ * @brief GridMapProperty
+ * @detail  栅格地图特征参数
+ */
+message GridMapProperty {
+  ///< 坐标分辨率: [m]，(/，/，/)，[/]，(1，0)，坐标分辨率
+  double coord_res = 1;
+  ///< 行数: [/]，(/，/，/)，[/]，(/，/)，行数
+  double col_num = 2;
+  ///< 列数: [/]，(/，/，/)，[/]，(/，/)，行数
+  double row_num = 3;
+}
+
+/**
+ * @brief GridMap
+ * @detail  栅格地图
+ */
+message GridMap {
+  ///< 栅格: [/]，(/，/，/)，[60000]，(/，/)，栅格
+  repeated GridCell grid_cells = 1;
+  ///< 栅格地图特征参数: [/]，(/，/，/)，[/]，(/，/)，栅格地图特征参数
+  GridMapProperty property = 2;
+}
+
+/**
+ * @brief ParkingSlot
+ * @detail  车位
+ */
+message ParkingSlot {
+  ///< 车位角点: [m]，(/，/，/)，[4]，(/，/)，车位角点
+  repeated Pose2D vertices = 1;
+  ///< 车位角点: [m]，(/，/，/)，[4]，(/，/)，限位器
+  repeated Pose2D limiter = 2;
+  ///< parking_space: [m]，(/，/，/)，[4]，(/，/)，parking_space
+  repeated Pose2D parking_space = 3;
+}
+
+/**
+ * @brief DebugCluster
+ * @detail  Cluster 信息
+ */
+message DebugCluster {
+  ///< start_pnt: [/]，(/，/，/)，[/]，(/，/)，起点
+  Pose2D start_pnt = 1;
+  ///< end_pnt: [/]，(/，/，/)，[/]，(/，/)，终点
+  Pose2D end_pnt = 2;
+  ///< height: [m]，(/，/，/)，[/]，(1，0)，高度
+  double height = 3;
+  ///< type: [/]，(/，/，/)，[/]，(1，0)，类型
+  int32 type = 4;
+}
+
+/**
+ * @brief DebugMsg
+ * @detail  debug 信息
+ */
+message DebugMsg {
+  ///< 栅格地图: [/]，(/，/，/)，[/]，(/，/)，栅格地图
+  GridMap grid_map = 1;
+  ///< freespace: [/]，(/，/，/)，[1000]，(/，/)，freespace
+  repeated Pose2D freespace = 2;
+  ///< 定位坐标: [/]，(/，/，/)，[/]，(/，/)，定位坐标
+  PathPoint ego_pose = 3;
+  ///< 车位: [/]，(/，/，/)，[100]，(/，/)，车位
+  repeated ParkingSlot slots = 4;
+  ///< 目标车位: [/]，(/，/，/)，[/]，(/，/)，目标车位
+  ParkingSlot target_slot = 5;
+  ///< 规划路径: [/]，(/，/，/)，[/]，(/，/)，规划路径
+  ParkingPath parking_path = 6;
+  ///< 目标点: [/]，(/，/，/)，[/]，(/，/)，目标点
+  PathPoint target_pnt = 7;
+  ///< cluster: [/]，(/，/，/)，[100]，(/，/)，cluster
+  repeated DebugCluster cluster = 8;
+  ///< 错误：[/],(/,/,/),[100],(/，/)，标识错误码
+  repeated ErrorType error_type = 9;
+  ///< 警告：[/],(/,/,/),[100],(/，/)，标识警告码
+  repeated WarningType warning_type = 10;
+  ///< 诊断：[/],(/,/,/),[/],(/，/)，诊断码
+  uint64 apa_diagnosis = 11;
+  ///< 版本号：[/],(/,/,/),[/],(/，/)，版本号
+  string apa_version = 12;
+}
+
+/**
+ * @brief DiySlot
+ * @detail  自定义车位
+ */
+message DiySlot {
+  ///< diy_slot_available: [/]，(/，/，/)，[/]，(/，/)，自定义车位是否可用
+  uint32 diy_slot_available = 1;
+}
+
+/**
+ * @brief LatPlannerType
+ * @detail  规划器类型
+ */
+enum LatPlannerType {
+  ///< 规划器类型未知: [/]，(/，/，/)，[/]，(1，0)，规划器类型未知
+  PARKING_PLANNER_UNKNOWN = 0;
+  ///< 规划器类型为hybrid a star: [/]，(/，/，/)，[/]，(1，0)，规划器类型为hybrid a star
+  HYBRID_ASTAR = 1;
+  ///< 规划器类型为rs: [/]，(/，/，/)，[/]，(1，0)，规划器类型为rs
+  RS_PLANNER = 2;
+  ///< 规划器类型为几何: [/]，(/，/，/)，[/]，(1，0)，规划器类型为几何
+  GEOMETRY = 3;
+  CONNECTION = 4;
+  ACR_GEOMETRY = 5;
+  ESCAPE = 6;
+  MIXTURE = 7; //
+  ADJUST = 8;
+  PARK_IN = 9;
+  ADJUST_BASE = 10;
+  PARALLEL_OUT_ADJUST = 11; // 平行泊出库内揉库规划
+  REVERSE_ASSIST = 12;      // 倒车寻迹的planner
+  STRAIGHT_IN_OUT_PLANNER = 13;
+  HZP_CRUISE_PLANNER = 14;
+  HYBRID_ASTAR_CRUISE = 15;
+  DWA = 16;
+  REVERSE_ARC = 17; // 反圆弧
+  STATE_LATTICE = 18;
+}
+
+/**
+ * @brief PlanningState
+ * @detail  规划状态信息
+ */
+message PlanningState {
+  ///< 搜索次数: [/]，(/，/，/)，[/]，(1，0)，搜索次数
+  uint32 search_num = 1;
+  ///< 试探路径类型: [/]，(/，/，/)，[/]，(1，0)，试探路径类型
+  LatPlannerType analytical_path = 2;
+  ///< 规划状态: [/]，(/，/，/)，[/]，(1，0)，规划状态
+  PlanningStatus planning_status = 3;
+  ///< 当前定位点到当前路径距离: [m]，(/，/，/)，[/]，(1，0)，当前定位点到当前路径距离
+  double dist_frm_crnt_manuever = 4;
+  ///< 车位目标点的误差: [m]，(/，/，/)，[/]，(1，0)，车位目标点的误差，当前想对于规划起始时刻
+  double dest_pnt_error = 5;
+  ///< 当前路径序号: [/]，(/，/，/)，[/]，(1，0)，属于整个路径上的第几段
+  uint32 current_manuever = 6;
+  ///< 当前路径匹配的点序号: [/]，(/，/，/)，[/]，(1，0)，定位匹配到当前路径上的点的序号
+  uint32 current_manuever_match_idx = 7;
+  ///< 心跳信号: [/]，(/，/，/)，[/]，(1，0)，心跳信号
+  uint32 apapcs_heart_beat = 8;
+  ///< 规划次数: [/]，(/，/，/)，[/]，(1，0)，规划次数
+  uint32 plan_num = 9;
+  ///< path_info: [/]，(/，/，/)，[/]，(/，/)，路径状态信息
+  PathInfo path_info = 10;
+}
+
+/**
+ * @brief LatPlan
+ * @detail  横向规划输出
+ */
+message LatPlan {
+  ///< 航向偏差: [deg]，(/，/，/)，[/]，(0.1，0)，航向偏差
+  int32 eyaw = 1;
+  ///< 横向偏差: [cm]，(/，/，/)，[/]，(1，0)，横向偏差
+  int32 epos = 2;
+  ///< 目标曲率: [1/m]，(/，/，/)，[/]，(0.001，0)，目标曲率
+  int32 tarc = 3;
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/), 标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 4;
+  ///< 角度请求: [deg]，(/，/，/)，[/]，(0.1，0), 角度请求
+  double steer_angle_req = 5;
+}
+
+/**
+ * @brief LonPlannerType
+ * @detail  纵向规划器类型
+ */
+enum LonPlannerType {
+  ///< 规划器类型未知: [/]，(/，/，/)，[/]，(1，0)，规划器类型未知
+  LON_PLANNER_UNKNOWN = 0;
+  ///< 规划器类型为模型生成: [/]，(/，/，/)，[/]，(1，0)，规划器类型为模型生成
+  LON_PLANNER_OLD = 1;
+  ///< 规划器类型为新建(未使用): [/]，(/，/，/)，[/]，(1，0)，规划器类型为新建(未使用)
+  LON_PLANNER_NEW = 2;
+  ///< 规划器类型为简约纵向规划: [/]，(/，/，/)，[/]，(1，0)，规划器类型为简约纵向规划
+  LON_PLANNER_PROTECTION = 3;
+  ///< 规划器类型为APA纵向规划: [/]，(/，/，/)，[/]，(1，0)，规划器类型为APA纵向规划
+  LON_PLANNER_PREDICTION = 4;
+  ///< 规划器类型为HZP纵向规划: [/]，(/，/，/)，[/]，(1，0)，规划器类型为HZP纵向规划
+  LON_PLANNER_HZP = 5;
+}
+
+/**
+ * @brief SpeedType
+ * @detail  速度模式
+ */
+enum SpeedType {
+  ///< 速度模式未知: [/]，(/，/，/)，[/]，(1，0)，速度模式未知
+  SPEED_TYPE_INACTIVE = 0;
+  ///< 低速模式: [/]，(/，/，/)，[/]，(1，0)，低速模式
+  SPEED_TYPE_SLOW = 1;
+  ///< 中速模式: [/]，(/，/，/)，[/]，(1，0)，中速模式
+  SPEED_TYPE_NORMAL = 2;
+  ///< 高速模式: [/]，(/，/，/)，[/]，(1，0)，高速模式
+  SPEED_TYPE_FAST = 3;
+}
+
+/**
+ * @brief LongPlan
+ * @detail  纵向规划输出
+ */
+message LongPlan {
+  ///< 目标距离: [cm]，(/，/，/)，[/]，(1，0)，目标距离
+  int32 target_dist = 1;
+  ///< 目标速度: [kph]，(/，/，/)，[/]，(0.1，0)，目标速度
+  uint32 target_speed = 2;
+  ///< 轨迹状态: [/]，(/，/，/)，[/]，(1，0)，轨迹状态
+  ///< 0: 默认
+  ///< 1: 跟踪
+  ///< 2: 切下一个
+  uint32 pt_status = 3;
+  ///< 危险距离: [cm]，(/，/，/)，[/]，(1，0)，当前位置到超声波障碍物危险距离
+  int32 dtc = 4;
+  ///< 路径距离: [cm]，(/，/，/)，[/]，(1，0)，当前位置到路径终点的长度
+  int32 dth = 5;
+  ///< 移动方向: [/]，(/，/，/)，[/]，(1，0)，移动方向
+  ///< 0: 默认
+  ///< 1: 前进
+  ///< 2: 后退
+  int32 moving_dir = 6;
+  ///< 目标档位: [/]，(/，/，/)，[/]，(1，0)，目标档位
+  uint32 target_gear = 7;
+  ///< pitch: [%]，(/，/，/)，[/]，(1，0)，pitch
+  double pitch = 8;
+  ///< lon planner type: [/]，(/，/，/)，[/]，(1，0)，lon planner type
+  LonPlannerType lon_planner_type = 9;
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/), 标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 10;
+  ///< 速度选择模式：[/],(/,/,/),[/],(/,/), 速度选择模式
+  SpeedType speed_type = 11;
+  ///< dtc安全距离：[/],(/,/,/),[/],(/,/), dtc安全距离
+  uint32 dtc_safe_dist = 12;
+}
+
+/**
+ * @brief FunctionType
+ * @detail 功能
+ */
+enum FunctionType {
+  ///< 未知功能: [/]，(/，/，/)，[/]，(1，0)，未知功能
+  FUNCTION_UNKNOWN = 0;
+  ///< 泊入: [/]，(/，/，/)，[/]，(1，0)，泊入
+  FUNCTION_PARK_IN_INSIDE = 1;
+  ///< 泊出: [/]，(/，/，/)，[/]，(1，0)，遥控泊入
+  FUNCTION_PARK_IN_OUTSIDE = 2;
+  ///< 泊出: [/]，(/，/，/)，[/]，(1，0)，泊出
+  FUNCTION_PARK_OUT = 3;
+  ///< 泊出: [/]，(/，/，/)，[/]，(1，0)，直进直出
+  FUNCTION_STRAIGHT_IN_OUT = 4;
+  ///< 倒车循迹: [/]，(/，/，/)，[/]，(1，0)，倒车循迹
+  FUNCTION_RA = 5;
+  ///< HZP泊入: [/]，(/，/，/)，[/]，(1，0)，HZP泊入
+  FUNCTION_HZP_PARK_IN = 6;
+  ///< HZP_SUMMON: [/]，(/，/，/)，[/]，(1，0)，HZP_SUMMON
+  FUNCTION_HZP_SUMMON = 7;
+  ///< AVP: [/]，(/，/，/)，[/]，(1，0)，AVP
+  FUNCTION_AVP = 8;
+  ///< 远程挪车: [/]，(/，/，/)，[/]，(1，0)，远程挪车
+  FUNCTION_REMOTE_PARK = 9;
+}
+
+/**
+ * @brief RecommendedFunction
+ * @detail 推荐和释放的功能
+ */
+message RecommendedFunction {
+  ///< function_released: [/]，(/，/，/)，[50]，(/，/)，功能释放
+  repeated FunctionType function_released = 1;
+  ///< function_released: [/]，(/，/，/)，[/]，(/，/)，功能推荐
+  FunctionType function_recommended = 2;
+}
+
+/**
+ * @brief ApaScenarioType
+ * @detail 泊车场景类型
+ */
+enum ApaScenarioType {
+  ///< PARK_SENARIO_UNKNOWN: [/]，(/，/，/)，[/]，(1，0)，未知场景
+  APA_SENARIO_UNKNOWN = 0;
+  ///< PARK_SENARIO_WARNING: [/]，(/，/，/)，[/]，(1，0)，警示场景
+  APA_SENARIO_WARNING = 1;
+  ///< PARK_SENARIO_TEMPORARY_STOP: [/]，(/，/，/)，[/]，(1，0)，临停场景
+  APA_SENARIO_TEMPORARY_STOP = 2;
+  ///< PARK_SENARIO_NORMAL: [/]，(/，/，/)，[/]，(1，0)，正常可泊场景
+  APA_SENARIO_NORMAL = 3;
+}
+
+/**
+ * @brief ParkingDir
+ * @detail  泊入/泊出方向
+ */
+enum ParkingDir {
+  ///< PARKING_DIR_UNKNOWN: [/]，(/，/，/)，[/]，(1，0)，未知方向
+  PARKING_DIR_UNKNOWN = 0;
+  ///< PARKING_DIR_LEFT: [/]，(/，/，/)，[/]，(1，0)，往左
+  PARKING_DIR_LEFT = 1;
+  ///< PARKING_DIR_RIGHT: [/]，(/，/，/)，[/]，(1，0)，往右
+  PARKING_DIR_RIGHT = 2;
+  ///< PARKING_DIR_STRAIGHT_FOREWARD: [/]，(/，/，/)，[/]，(1，0)，往前
+  PARKING_DIR_STRAIGHT_FOREWARD = 3;
+  ///< PARKING_DIR_STRAIGHT_BACKWARD: [/]，(/，/，/)，[/]，(1，0)，往前
+  PARKING_DIR_STRAIGHT_BACKWARD = 4;
+  ///< PARKING_DIR_LEFT_REAR: [/]，(/，/，/)，[/]，(1，0)，往左后
+  PARKING_DIR_LEFT_REAR = 5;
+  ///< PARKING_DIR_RIGHT_REAR: [/]，(/，/，/)，[/]，(1，0)，往右后
+  PARKING_DIR_RIGHT_REAR = 6;
+  ///< PARKING_DIR_UNAVAILABLE: [/]，(/，/，/)，[/]，(1，0)，泊出方向不可用
+  PARKING_DIR_UNAVAILABLE = 7;
+}
+
+/**
+ * @brief CourtesyObstaclesType
+ * @detail 礼让障碍物
+ */
+enum CourtesyObstaclesType {
+  ///< PARKING_DIR_UNAVAILABLE: [/]，(/，/，/)，[/]，(1，0)，礼让类型未知
+  COURTESY_OBSTACLES_UNKNOWN = 0;
+  ///< PARKING_DIR_UNAVAILABLE: [/]，(/，/，/)，[/]，(1，0)，礼让行人
+  COURTESY_OBSTACLES_PEOPLE = 1;
+  ///< PARKING_DIR_UNAVAILABLE: [/]，(/，/，/)，[/]，(1，0)，礼让车辆
+  COURTESY_OBSTACLES_VEHICLE = 2;
+}
+
+/**
+ * @brief StraightInOutSafeDistance
+ * @detail 直进直出安全距离
+ */
+enum StraightInOutSafeDistance {
+  ///< STRAIGHT_IN_OUT_SAFE_DISTANCE_UNKNOWN: [/]，(/，/，/)，[/]，(1，0)，安全距离未知
+  REACHING_SAFE_DISTANCE_UNKNOWN = 0;
+  ///< STRAIGHT_IN_OUT_SAFE_DISTANCE_FORWARD: [/]，(/，/，/)，[/]，(1，0)，到达前向安全距离
+  REACHING_SAFE_DISTANCE_FORWARD = 1;
+  ///< STRAIGHT_IN_OUT_SAFE_DISTANCE_BACKWARD: [/]，(/，/，/)，[/]，(1，0)，到达后向安全距离
+  REACHING_SAFE_DISTANCE_BACKWARD = 2;
+  ///< REACHING_SAFE_DISTANCE_SIDE: [/]，(/，/，/)，[/]，(1，0)，到达侧向安全距离
+  REACHING_SAFE_DISTANCE_SIDE = 3;
+}
+
+/**
+ * @brief ParkInRecommendation
+ * @detail  泊入推荐
+ */
+message ParkInRecommendation {
+  ///< released_slots_id: [/]，(/，/，/)，[100]，(1，0)，释放车位id
+  repeated int32 released_slots_id = 1;
+  ///< recommended_slot_id: [/]，(/，/，/)，[/]，(1，0)，推荐车位id
+  int32 recommended_slot_id = 2;
+}
+
+/**
+ * @brief ParkOutRecommendation
+ * @detail  泊入推荐
+ */
+message ParkOutRecommendation {
+  ///< dir: [/]，(/，/，/)，[10]，(/，/)，泊出释放方向
+  repeated ParkingDir released_dir = 1;
+  ///< dir: [/]，(/，/，/)，[/]，(/，/)，泊出推荐方向
+  ParkingDir recommended_dir = 2;
+}
+
+/**
+ * @brief ParkRecommendation
+ * @detail  泊车推荐信息
+ */
+message ParkRecommendation {
+  ///< function_released: [/]，(/，/，/)，[/]，(/，/)，功能推荐
+  FunctionType function_type = 1;
+  ///< park_recommendation: [/]，(/，/，/)，[/]，(/，/)，泊入泊出推荐
+  oneof park_recommendation {
+    ///< park_in_recommendation: [/]，(/，/，/)，[/]，(/，/)，泊入推荐
+    ParkInRecommendation park_in_recommendation = 2;
+    ///< park_out_recommendation: [/]，(/，/，/)，[/]，(/，/)，泊出推荐
+    ParkOutRecommendation park_out_recommendation = 3;
+  }
+}
+
+/**
+ * @brief PcsNoticeType
+ * @detail  环境相关的因素不满足时的提示
+ */
+enum PcsNoticeType {
+  ///< PCS_NOTICE_UNKOWN: [/]，(/，/，/)，[/]，(1，0)，未知提示
+  PCS_NOTICE_UNKOWN = 0;
+  ///< PCS_NOTICE_UNKOWN: [/]，(/，/，/)，[/]，(1，0)，无可用车位
+  SLOT_UNAVAILABLE = 1;
+  ///< PARK_OUT_SPACE_NARROW: [/]，(/，/，/)，[/]，(1，0)，泊出空间太窄
+  PARK_OUT_SPACE_NARROW = 2;
+  ///< PARK_IN_SPACE_NARROW: [/]，(/，/，/)，[/]，(1，0)，泊入空间太窄
+  PARK_IN_SPACE_NARROW = 3;
+}
+
+/**
+ * @brief RecommendedInfo
+ * @detail  规划状态,泊入/泊出方向，推荐车位id，释放车位id
+ */
+message RecommendedInfo {
+  ///< recommended_function: [/]，(/，/，/)，[/]，(/，/)，推荐和释放的功能
+  RecommendedFunction recommended_function = 1;
+  ///< park_recommendation: [/]，(/，/，/)，[/]，(/，/)，具体某个功能的内部推荐,如泊入的车位释放和推荐
+  ParkRecommendation park_recommendation = 2;
+  ///< pcs_notice: [/]，(/，/，/)，[100]，(/，/)，环境相关的因素不满足时的提示
+  repeated PcsNoticeType pcs_notice = 3;
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/), 标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 4;
+}
+
+/**
+ * @brief DecisionState
+ * @detail  决策所处状态
+ */
+enum DecisionState {
+  ///< 初始状态: [/]，(/，/，/)，[/]，(1，0)，决策初始状态
+  DECISION_INIT = 0;
+  ///< 规划状态: [/]，(/，/，/)，[/]，(1，0)，决策规划状态
+  DECISION_PLANNING = 1;
+  ///< 规划成功状态: [/]，(/，/，/)，[/]，(1，0)，决策规划成功状态
+  DECISION_PLANNING_SUCCESS = 2;
+  ///< 规划失败状态: [/]，(/，/，/)，[/]，(1，0)，决策规划失败状态
+  DECISION_PLANNING_FAILED = 3;
+  ///< 泊车状态: [/]，(/，/，/)，[/]，(1，0)，泊车状态
+  DECISION_PARKING = 4;
+  ///< 泊车结束状态: [/]，(/，/，/)，[/]，(1，0)，泊车结束状态
+  DECISION_PARKING_OVER = 5;
+}
+
+/**
+ * @brief DrivingCondition
+ * @detail  自车运动状态
+ */
+enum DrivingCondition {
+  ///< 初始状态: [/]，(/，/，/)，[/]，(1，0)，决策初始状态
+  DRIVING_UNKNOWN = 0;
+  ///< 左前转弯状态: [/]，(/，/，/)，[/]，(1，0)，左前转弯状态
+  DRIVING_LEFT_FORWARD = 1;
+  ///< 前进直行状态: [/]，(/，/，/)，[/]，(1，0)，前进直行状态
+  DRIVING_STRAIGHT_FORWARD = 2;
+  ///< 右前转弯状态: [/]，(/，/，/)，[/]，(1，0)，右前转弯状态
+  DRIVING_RIGHT_FORWARD = 3;
+  ///< 左后转弯状态: [/]，(/，/，/)，[/]，(1，0)，左后转弯状态
+  DRIVING_LEFT_BACKWARD = 4;
+  ///< 后退直行状态: [/]，(/，/，/)，[/]，(1，0)，后退直行状态
+  DRIVING_STRAIGHT_BACKWARD = 5;
+  ///< 右后转弯状态: [/]，(/，/，/)，[/]，(1，0)，右后转弯状态
+  DRIVING_RIGHT_BACKWARD = 6;
+  ///< 静止状态: [/]，(/，/，/)，[/]，(1，0)，静止状态
+  DRIVING_STANDSTILL = 7;
+}
+
+/**
+ * @brief SpacingPileStatus
+ * @detail  限位器状态
+ */
+enum SpacingPileStatus {
+  ///< 初始状态: [/]，(/，/，/)，[/]，(1，0)，决策初始状态
+  PILE_UNKNOWN = 0;
+  ///< 需要重规划状态: [/]，(/，/，/)，[/]，(1，0)，需要重规划状态
+  PILE_NEED_REPLAN = 1;
+  ///< 需要重规划状态: [/]，(/，/，/)，[/]，(1，0)，平行车位泊入需要重规划状态
+  PILE_NEED_REPLAN_PARALLEL_SPECIAL_PARK_IN = 2;
+  ///< 需要报完成状态: [/]，(/，/，/)，[/]，(1，0)，需要报完成状态
+  PILE_FINISH = 3;
+  ///< 需要重规划状态: [/]，(/，/，/)，[/]，(1，0)，平行车位泊出需要重规划状态
+  PILE_NEED_REPLAN_PARALLEL_SPECIAL_PARK_OUT = 4;
+}
+
+/**
+ * @brief ParkInDcsn
+ * @detail  决策状态,目标点，目标车位信息
+ */
+message ParkInDcsn {
+  ///< decision_state: [/]，(/，/，/)，[/]，(/，/)，决策状态
+  DecisionState decision_state = 1;
+  ///< target_point: [/]，(/，/，/)，[/]，(/，/)，目标点dr坐标系
+  PathPoint target_point = 2;
+  ///< selected_slot: [/]，(/，/，/)，[/]，(/，/)，目标车位信息
+  CaApaSlotSectorProto.SlotInfo target_slot = 3;
+  ///< target_point_base: [/]，(/，/，/)，[/]，(/，/)，目标点本车坐标系
+  PathPoint target_point_base = 4;
+}
+
+/**
+ * @brief ParkOutDcsn
+ * @detail  决策状态,目标点，泊入/泊出目标方向
+ */
+message ParkOutDcsn {
+  ///< decision_state: [/]，(/，/，/)，[/]，(/，/)，决策状态
+  DecisionState decision_state = 1;
+  ///< target_point: [/]，(/，/，/)，[/]，(/，/)，目标点dr坐标系
+  PathPoint target_point = 2;
+  ///< target_parking_dir: [/]，(/，/，/)，[/]，(1，0)，泊入/泊出目标方向
+  ParkingDir target_parking_dir = 3;
+  ///< target_slot: [/]，(/，/，/)，[/]，(/，/)，目标车位信息
+  CaApaSlotSectorProto.SlotInfo target_slot = 4;
+  ///< target_point_base: [/]，(/，/，/)，[/]，(/，/)，目标点本车坐标系
+  PathPoint target_point_base = 5;
+}
+
+/**
+ * @brief DecisionResult
+ * @detail  决策结果
+ */
+message DecisionResult {
+  ///< function_type: [/]，(/，/，/)，[/]，(/，/)，功能类型
+  FunctionType function_type = 1;
+  ///< dcsn_res: [/]，(/，/，/)，[/]，(/，/)，泊入泊出决策结果
+  oneof dcsn_res {
+    ///< park_in_dcsn: [/]，(/，/，/)，[/]，(/，/)，泊入决策结果
+    ParkInDcsn park_in_dcsn = 2;
+    ///< park_out_dcsn: [/]，(/，/，/)，[/]，(/，/)，泊出决策结果
+    ParkOutDcsn park_out_dcsn = 3;
+  };
+  ///< planning_trigger: [/]，(/，/，/)，[/]，(/，/)，规划触发
+  bool planning_trigger = 4;
+  ///< decision_state: [/]，(/，/，/)，[/]，(/，/)，决策状态
+  DecisionState decision_state = 5;
+  ///< target_point: [/]，(/，/，/)，[/]，(/，/)，目标点
+  PathPoint target_point = 6;
+  ///< dynamic_takeover: [/]，(/，/，/)，[/]，(/，/)，泊出动态接管决策结果
+  bool park_out_takeover_dcsn = 7;
+  ///< ParkCaseType: [/]，(/，/，/)，[/]，(/，/)，决策结果
+  ParkCaseType case_type = 8;
+  ///< StepType: [/]，(/，/，/)，[/]，(/，/)，决策结果
+  StepType step_type = 9;
+  ///< arbitrate_loc_point: [/]，(/，/，/)，[/]，(/，/), 仲裁定位坐标
+  PathPoint arbitrate_loc_point = 10;
+  ///< apa_scenario_type: [/]，(/，/，/)，[/]，(/，/), 泊车场景类型
+  ApaScenarioType apa_scenario_type = 11;
+  ///< courtesy_obstacles_type: [/]，(/，/，/)，[/]，(/，/), 礼让障碍物类型
+  CourtesyObstaclesType courtesy_obstacles_type = 12;
+  ///< diy_slot: [/]，(/，/，/)，[/]，(/，/), 直进直出安全距离决策结果
+  StraightInOutSafeDistance straight_in_out_safe_distance = 13;
+  ///< diy_slot: [/]，(/，/，/)，[/]，(/，/), 自定义车位决策结果
+  DiySlot diy_slot_dcsn = 14;
+  ///< 延时统计消息头：[/],(/,/,/),[/],(/,/), 标识延时统计消息头
+  SeqHeaderProto.DelayHeader seq_header = 15;
+  ///< data_to_file_sts: [/]，(/，/，/)，[/]，(/，/), 文件写入状态
+  ///< 0x0: 默认
+  ///< 0x1: 写入中
+  ///< 0x2: 写入完成
+  uint32 data_to_file_sts = 16;
+  ///< data_to_file_sts: [/]，(/，/，/)，[/]，(/，/), 后视镜折叠触发信号
+  ///< 0x0: 默认
+  ///< 0x1: 需要折叠
+  uint32 rearview_mirror_flod_sts = 17;
+}
+
+/**
+ * @brief AddtionalDebugMsg
+ * @detail  给可视化或者其他模块的debug信号
+ */
+message AddtionalDebugMsg {
+  ///< parking_space: [/]，(/，/，/)，[4]，(/，/)，parking_space
+  repeated Pose2D parking_space = 1;
+  ///< ParallelKneadSlotInfo: [/]，(/，/，/)，[4]，(/，/)，ParallelKneadSlotInfo
+  ParallelKneadSlotInfo parallel_knead_slot_info = 2;
+  ///< plan_start_pnt_latest: [/]，(/，/，/)，[/]，(/，/), 最近规划起点
+  PathPoint plan_start_pnt_latest = 3;
+  ///< plan_end_pnt_latest: [/]，(/，/，/)，[/]，(/，/), 最近规划终点
+  PathPoint plan_end_pnt_latest = 4;
+  ///< escape_start_pnt_latest: [/]，(/，/，/)，[/]，(/，/), 最近揉库起点
+  PathPoint escape_start_pnt_latest = 5;
+  ///< escape_end_pnt_latest: [/]，(/，/，/)，[/]，(/，/), 最近揉库终点
+  PathPoint escape_end_pnt_latest = 6;
+  ///< track_error: [/]，(/，/，/)，[/]，(/，/), 跟踪误差
+  PathPoint track_error = 7;
+  ///< target_pnt_error: [/]，(/，/，/)，[/]，(/，/), 目标点跳动误差
+  PathPoint target_pnt_error = 8;
+  ///< target_slot_length: [m]，(/，/，/)，[/]，(/，/)，目标车位长度
+  double target_slot_length = 9;
+  ///< target_slot_width: [m]，(/，/，/)，[/]，(/，/)，目标车位宽度
+  double target_slot_width = 10;
+  ///< target_slot_side: [/]，(/，/，/)，[/]，(/，/)，目标车位哪一侧
+  int32 target_slot_side = 11;
+  ///< plan_enable: [/]，(/，/，/)，[/]，(/，/)，plan_enable
+  bool plan_enable = 12;
+  ///< replan_enable: [/]，(/，/，/)，[/]，(/，/),replan_enable
+  bool replan_enable = 13;
+  ///< dynamic_plan_enable: [/]，(/，/，/)，[/]，(/，/)，dynamic_plan_enable
+  bool dynamic_plan_enable = 14;
+  ///< failed_task: [/]，(/，/，/)，[300]，(/，/), failed_task
+  repeated uint32 failed_task = 15;
+  ///< apa_active: [/]，(/，/，/)，[/]，(/，/), apa_active
+  bool apa_active = 16;
+  ///< goal_collision: [/]，(/，/，/)，[/]，(/，/), 终点是否碰撞
+  bool goal_collision = 17;
+  ///< distance_reached: [/]，(/，/，/)，[/]，(/，/), distance_reached
+  bool distance_reached = 18;
+  ///< heading_reached: [/]，(/，/，/)，[/]，(/，/), heading_reached
+  bool heading_reached = 19;
+  ///< no_replan_reason: [/]，(/，/，/)，[/]，(/，/), 没有重规划原因
+  ///< 0x0: 无
+  ///< 0x1: isCloseFromLastReplan
+  ///< 0x2: isVelolcityTooLarge
+  ///< 0x3: isCloseFromLastManueverShift
+  uint32 no_replan_reason = 20;
+  ///< replan_reason: [/]，(/，/，/)，[/]，(/，/), 重规划原因
+  ///< 0x0: 无
+  ///< 0x1: distErrorNotMeet
+  ///< 0x2: blockedByObstacle
+  ///< 0x3: lastPathEgoTargetPointErrorNotMeet
+  uint32 replan_reason = 21;
+  ///< special_parking_property: [/]，(/，/，/)，[/]，(/，/), 特殊泊车场景类型
+  uint32 special_parking_property = 22;
+  ///< special_target_pnt: [/]，(/，/，/)，[/]，(/，/), 特殊泊车场景目标点
+  uint32 special_target_pnt = 23;
+  ///< path_length: [m]，(/，/，/)，[/]，(/，/), 路径总长度
+  double path_length = 24;
+  ///< min_dth_index: [/]，(/，/，/)，[/]，(/，/), 最小dtc扇区编号
+  uint32 min_dtc_index = 25;
+  ///< dynamic_obst_type: [/]，(/，/，/)，[/]，(/，/), 动态障碍物类型
+  uint32 dynamic_obst_type = 26;
+  ///< rs_seg_type: [/]，(/，/，/)，[2000]，(/，/), RS路径的模式
+  repeated uint32 rs_seg_type = 27;
+  ///< rs_seg_length: [/]，(/，/，/)，[1000]，(/，/), RS路径长度
+  repeated double rs_seg_length = 28;
+  ///< park_space_length: [m]，(/，/，/)，[/]，(/，/)，park space长度
+  double park_space_length = 29;
+  ///< park_space_width: [m]，(/，/，/)，[/]，(/，/)，park space宽度
+  double park_space_width = 30;
+  ///< tp_left_ref_pnt: [/]，(/，/，/)，[/]，(/，/)，TP左侧参考障碍物点
+  PathPoint tp_left_ref_pnt = 31;
+  ///< tp_right_ref_pnt: [/]，(/，/，/)，[/]，(/，/)，TP右侧参考障碍物点
+  PathPoint tp_right_ref_pnt = 32;
+  ///< tp_bottom_ref_pnt: [/]，(/，/，/)，[/]，(/，/)，TP底部参考障碍物点
+  PathPoint tp_bottom_ref_pnt = 33;
+  ///< tp_failure_reason: [/]，(/，/，/)，[/]，(/，/)，TP计算失败原因
+  uint32 tp_failure_reason = 34;
+  ///< path_plan_failure_reason: [/]，(/，/，/)，[/]，(/，/)，路径规划失败原因
+  uint32 path_plan_failure_reason = 35;
+  ///< look_ahead_pnt: [/]，(/，/，/)，[/]，(/，/)，横向预瞄点
+  PathPoint look_ahead_pnt = 36;
+  ///< is_ego_in_slot: [/]，(/，/，/)，[/]，(/，/)，是否处于车位内
+  bool is_ego_in_slot = 37;
+  ///< dtc_safe_distance: [/]，(/，/，/)，[/]，(/，/)，dtc安全距离
+  uint32 dtc_safe_distance = 38;
+  ///< is_ego_on_ramp: [/]，(/，/，/)，[/]，(/，/)，是否处于坡道
+  bool is_ego_on_ramp = 39;
+  ///< driving_condition: [/]，(/，/，/)，[/]，(/，/)，自车运动状态
+  DrivingCondition driving_condition = 40;
+  ///< sector_warning_limit: [/]，(/，/，/)，[/]，(/，/)，各扇区预警范围
+  repeated double sector_warning_limit = 41;
+  ///< velocity_restriction_by_path: [/]，(/，/，/)，[/]，(/，/)，根据dth规划的车速
+  double velocity_restriction_by_path = 42;
+  ///< velocity_restriction_by_colli: [/]，(/，/，/)，[/]，(/，/)，根据障碍物规划的车速
+  double velocity_restriction_by_colli = 43;
+  ///< velocity_restriction_in_advance: [/]，(/，/，/)，[/]，(/，/)，预先减速规划的车速
+  double velocity_restriction_in_advance = 44;
+  ///< min_dist_for_plan_in_advance: [/]，(/，/，/)，[/]，(/，/)，预先减速规划的距离
+  double min_dist_for_plan_in_advance = 45;
+  ///< pedestrian_distance_to_vehicle: [/]，(/，/，/)，[/]，(/，/)，行人到车辆的距离
+  double pedestrian_distance_to_vehicle = 46;
+  ///< spacing_pile_status: [/]，(/，/，/)，[/]，(/，/)，限位器状态
+  SpacingPileStatus spacing_pile_status = 47;
+  ///< ramp_slope: [/]，(/，/，/)，[/]，(/，/)，坡度
+  double ramp_slope = 48;
+  ///< planning_trigger_type: [/]，(/，/，/)，[/]，(/，/)，规划触发的类型
+  ///< 0x0: 无
+  ///< 0x1: 跟踪误差过大
+  ///< 0x2: TP点偏差过大
+  ///< 0x3: pt为3
+  ///< 0x4: 动态连接
+  ///< 0x5: 重规划
+  ///< 0x6: 第一次规划
+  ///< 0x7: maneuver end
+  uint32 plan_trigger_type = 49;
+  ///< plan_failed_reason: [/]，(/，/，/)，[/]，(/，/)，规划失败原因
+  ///< 0x0: 无
+  ///< 0x1: 路径搜索失败
+  ///< 0x2: 终点碰撞
+  uint32 plan_failed_reason = 50;
+  ///< dynamic_connection_failed_reason: [/]，(/，/，/)，[/]，(/，/)，动态链接失败原因
+  ///< 0x0: 无
+  ///< 0x1: 路径搜索失败
+  uint32 dynamic_connection_failed_reason = 51;
+  ///< non_parking_over_reason: [/]，(/，/，/)，[/]，(/，/)，未报完成原因
+  ///< 0x0: 无
+  ///< 0x1: 车辆未active
+  ///< 0x2: 车辆未standstill
+  ///< 0x3: 车身未在车位中
+  uint32 non_parking_over_reason = 52;
+  ///< velocity_restricton_by_dist_map: [/]，(/，/，/)，[/]，(/，/)，根据距离地图规划的车速
+  double velocity_restricton_by_dist_map = 53;
+  ///< min_dist_in_dist_map: [/]，(/，/，/)，[/]，(/，/)，距离地图中的最小距离
+  double min_dist_in_dist_map = 54;
+  ///< velocity_restricton_by_curvature: [/]，(/，/，/)，[/]，(/，/)，根据曲率规划的车速
+  double velocity_restricton_by_curvature = 55;
+  ///< preview_mean_curvature: [/]，(/，/，/)，[/]，(/，/)，预瞄平均曲率
+  double preview_mean_curvature = 56;
+  ///< current_mean_curvature: [/]，(/，/，/)，[/]，(/，/)，当前平均曲率
+  double current_mean_curvature = 57;
+}
+
+/**
+ * @brief 诊断信息
+ * @detail ApaDiagnosis，包含时间戳，故障类型等信息
+ */
+message ApaDiagnosis {
+  ///< 时间戳: [s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+  ///< 诊断编码：[/],(/,/,/),[/],(/,/),通过查找标志位识别具体错误信息
+  ///< 0x0: 默认值，无故障
+  ///< bit 0: 预留
+  ///< bit 1: 定位信息错误 error
+  ///< bit 2: 车位输入错误 error
+  ///< bit 3: 目标车位和方向错误 error
+  ///< bit 4: 功能推荐失败 error
+  ///< bit 5: 状态机输入不满足条件 error
+  ///< bit 6: 释放车位失败 error
+  ///< bit 7: 目标点计算失败（包括parking space） error
+  ///< bit 8: 路径初始规划失败 error
+  ///< bit 9: 路径规划超时 warn
+  ///< bit 10: 路径重规划失败 warn
+  ///< bit 11: 揉库失败 error
+  ///< bit 12: 被障碍物卡死超时 error
+  ///< bit 13: 目标点附近超时报完成 warn
+  ///< bit 14: 速度规划失败 error
+  ///< bit 15: hzp地图不可用 error
+  ///< bit 16: hzp参考线匹配失败 error
+  ///< bit 17: RA记忆路径不可用 error
+  ///< bit 18: 自定义车位不可用 error
+  ///< bit 19: 目标车位不可用 error
+  ///< bit 20: 泊车过程中目标车位变为不可用 error
+  ///< bit 21: 整车信号输入超时故障
+  ///< bit 22: FF检查整车信号无效
+  ///< bit 23: 整车信号合理性故障
+  ///< bit 24: CPU占用异常error
+  ///< bit 25: 内存占用异常error
+
+  uint32 diagnosis_code = 2;
+  ///< 诊断信息：[/],(/,/,/),[/],(/,/),传递额外的诊断信息
+  string diagnosis_info = 3;
+  ///< 心跳信号(UINT8)：[/],(0,0,255),[/],(/,/),传递心跳信号
+  uint32 heart_beat = 4;
+}
+
+/**
+ * @brief apa diagnose
+ * @detail receive信息
+ */
+enum ErrorType {
+  ERROR_NOT_HAPPEN = 0;                 // 没有错误
+  ERROR_NOT_UNKOWN = 1;                 //位置错误
+  ERROR_NO_FREESPACE = 2;               //没有freespace
+  ERROR_NO_PARKING_SLOT = 3;            //没有车位输入
+  ERROR_LOCALIZATION_INVALID = 4;       //定位无效
+  ERROR_HZP_MAP_UNAVAILABLE = 5;        // hzp地图不可用
+  ERROR_REFERENCE_LINE_UNAVAILABLE = 6; // 参考线不可用
+  ERROR_SEARCH_FAILED = 7;              // 搜索失败
+  ERROR_LAT_PLAN_FAILED = 8;            // 横向规划失败
+  ERROR_NO_LAT_PLANNER = 9;             //没有横向规划器
+  ERROR_NO_LON_PLANNER = 10;            //没有纵向规划器
+  ERROR_TARGET_SLOT_UNAVAILABLE = 11;   //目标车位不可用
+  ERROR_RELEASED_SLOT_EMPTY = 12;       //没有释放车位
+  ERROR_RELEASED_SLOT_UNAVAILABLE = 13; //释放车位不可用
+  ERROR_ADJUST_FAILED = 14;             //揉库失败
+  ERROR_LON_PLAN_FAILED = 15;           // 纵向规划失败
+}
+
+/**
+ * @brief apa diagnose
+ * @detail warning信息
+ */
+enum WarningType {
+  WARNING_NOT_HAPPEN = 0;            //没有警告
+  WARNING_LAT_PLANNING_TIMEOUT = 1;  //横向规划超时
+  WARNING_LON_PLANNING_TIMEOUT = 2;  //纵向规划超时
+  WARNING_TARGET_COLLISION = 3;      //终点碰撞
+  WARNING_NO_TARGET = 4;             // 没有终点输入
+  WARNING_SMOOTH_FAILED = 5;         // 平滑失败
+  WARNING_PARKING_SPACE_FAILED = 14; //计算parking space 失败
+}
+
+/**
+ * @brief ParkCaseType
+ * @detail ParkCaseType
+ */
+enum ParkCaseType {
+  CASE_UNKNOWN = 0;                      // 未知case
+  CASE_PARK_IN_PARALLEL_NORMAL = 1;      // 正常平行泊入case
+  CASE_PARK_IN_PARALLEL_INSIDE_SLOT = 2; // 在车位里面平行泊入case
+  CASE_PARK_IN_VERTICAL_NORMAL = 3;      // 正常垂直泊入case
+  CASE_PARK_IN_VERTICAL_INSIDE_SLOT = 4; // 在车位里面垂直泊入case
+  CASE_PARK_OUT_PARALLEL = 5;            // 平行泊出case
+  CASE_PARK_OUT_VERTICAL = 6;            // 垂直泊出case
+  CASE_DYNAMIC_CONNECTION = 7;           // 动态连接case
+  CASE_PARK_IN_ANGULAR = 8;              // 斜列泊入case
+  CASE_REVERSE = 9;                      //倒车循迹case
+  CASE_CRUISE_NORMAL = 10;               // 正常巡航case
+  CASE_PARK_OUT_ANGULAR = 11;            // 斜列泊出case
+  CASE_PARK_IN_SELF_DEFINED = 12;        // 自定义车位泊入
+  CASE_STRAIGHT_IN_OUT = 13;             // 直进直出case
+}
+
+/**
+ * @brief StepType
+ * @detail StepType
+ */
+enum StepType {
+  STEP_UNKNOWN = 0;            // 未知阶段
+  STEP_PARK_IN_NORMAL = 1;     // 正常泊入阶段
+  STEP_PARK_IN_CONNECTION = 2; // 连接阶段
+  STEP_PARK_IN_ADJUST = 3;     // 揉库阶段
+  STEP_PARK_OUT_NORMAL = 4;    // 泊出阶段
+  STEP_REVERSE_ASSIST = 5;     // 倒车循迹阶段
+  STEP_STRAIGHT_IN_OUT = 6;    // 直进直出阶段
+  STEP_CRUISE_NORMAL = 7;      // 正常巡航阶段
+}
+
+/**
+ * @brief ParallelKneadSlotInfo
+ * @detail  平行揉库状态信息
+ */
+message ParallelKneadSlotInfo {
+  ///< 是否有揉库过程: [/],(/,/,/),[/],(1，0), 是否有揉库过程
+  bool flag_knead_slot_run = 1;
+  ///< 规划状态: [/]，(/，/，/)，[/]，(1，0)，规划状态
+  bool flag_sucess = 2;
+  ///< 是否有原始路径: [/]，(/，/，/)，[/]，(1，0)，是否有原始路径
+  bool flag_has_raw_path = 3;
+  ///< 是否有筛选路径 : [/]，(/，/，/)，[/]，(1，0)，是否有筛选路径
+  bool flag_has_filter_path = 4;
+  ///< 揉库次数: [/]，(/，/，/)，[/]，(1，0)，揉库次数
+  uint32 knead_slot_count = 5;
+  ///< dr特征点泊入是入库点，出库是出库点: [/]，(/，/，/)，[/]，(1，0)，特征点泊入是入库点，出库是出库点
+  PathPoint dr_feature_point = 6;
+  ///< 库位坐标系特征点泊入是入库点，出库是出库点: [/]，(/，/，/)，[/]，(1，0)，特征点泊入是入库点，出库是出库点
+  PathPoint slot_feature_point = 7;
+}
+
+/**
+ * @brief apapcs状态反馈
+ * @detail  apapcs状态反馈
+ */
+message ApapcsStateSwitchRsp {
+  ///< apapcs_sts_feedback: [/]，(/，/，/)，[/]，(1，0)，apapcs_sts_feedback
+  uint32 apapcs_sts_feedback = 1;
+}
+
+/**
+ * @brief PathInfo
+ * @detail  PathInfo
+ */
+message PathInfo {
+  ///< decision_state: [/]，(/，/，/)，[/]，(/，/)，路径是否有效
+  ///< 0x0:默认
+  ///< 0x1:无效
+  ///< 0x2:有效
+  uint32 path_status = 1;
+  ///< pd_status: [/],(0x0,0,28),[/],(1,0),路径对应的产品形态
+  ///< 0x0:OFF
+  ///< 0x1:ACC
+  ///< 0x2:IACC
+  ///< 0x3:NDA
+  ///< 0x4:TJP
+  ///< 0x5:DDSA
+  ///< 0x6:APA On;
+  ///< 0x7:RPA On ByCAR;
+  ///< 0x8:RPA On ByAPP;
+  ///< 0x9:RPA On ByKey;
+  ///< 0xA:RMA On;
+  ///< 0xB:RADS On;
+  ///< 0xC:HZP On;
+  uint32 pd_status = 2;
+  ///< pd_sub_apa_status:[/],(0,0,22),[/],(1,0),路径对应的泊车产品子形态
+  ///< 0x0:OFF;
+  ///< 0x1:自定义泊车;
+  ///< 0x2:无感泊车;
+  ///< 0x3:预留;
+  ///< 0x4:预留;
+  ///< 0x5:预留;
+  ///< 0x6:车内泊入;
+  ///< 0x7:车内泊出;
+  ///< 0x8:倒车循迹;
+  ///< 0x9:车外泊入模式选择;
+  ///< 0xA:钥匙泊入;
+  ///< 0xB:钥匙直进直出;
+  ///< 0xC:蓝牙泊入;
+  ///< 0xD:蓝牙启动(reserve);
+  ///< 0xE:蓝牙泊出;
+  ///< 0xF:蓝牙直进直出;
+  ///< 0x10:4G泊入;
+  ///< 0x11:4G归位;
+  ///< 0x12:4G泊出;
+  ///< 0x13:4G直进直出;
+  ///< 0x14:4G泊出结束(reserve);
+  ///< 0x15:HZP学图;
+  ///< 0x16:HZP学图完成;
+  ///< 0x17:车内HZP;
+  ///< 0x18:APPHZP;
+  ///< 0x19:HZP召唤;
+  ///< 0x1A:车内AVP;
+  ///< 0x1B:APPAVP;
+  ///< 0x1C:AVP召唤;
+  uint32 pd_sub_apa_status = 3;
+  ///< parking_out_dir:[/],(/，/，/),[/],(1,0),路径对应的泊出方向
+  ParkingDir parking_out_dir = 4;
+  ///< parking_in_slot_id:[/],(/，/，/),[/],(1,0),路径对应的泊入车位id
+  int32 parking_in_slot_id = 5;
+}
+
+/**
+ * @brief HzpNavInfo
+ * @detail  hzp导航信息
+ */
+message HzpNavInfo {
+  ///< cruise_road: [/],(0x0,0,0xA),[/],(1,0),巡航所处路段
+  ///< 0x0:默认
+  ///< 0x1:直道
+  ///< 0x2:弯道
+  ///< 0x3:道闸
+  ///< 0x4:上坡
+  ///< 0x5:下坡
+  ///< 0x6:直行路口
+  ///< 0x7:左转
+  ///< 0x8:右转
+  ///< 0x9:减速带
+  ///< 0xA:其他
+  uint32 cruise_road = 1;
+  ///< dist_to_barrier_gate: [m]，(0，/，/)，[/]，(1，0), 本车到道闸距离
+  double dist_to_barrier_gate = 2;
+  ///< dist_to_slop: [m]，(0，/，/)，[/]，(1，0), 本车到坡道距离
+  double dist_to_slop = 3;
+  ///< dist_to_intersection: [m]，(0，/，/)，[/]，(1，0), 本车到路口距离
+  double dist_to_intersection = 4;
+  ///< dist_to_left_turn: [m]，(0，/，/)，[/]，(1，0), 本车到下次左转距离
+  double dist_to_left_turn = 5;
+  ///< dist_to_right_turn: [m]，(0，/，/)，[/]，(1，0), 本车到下次右转距离
+  double dist_to_right_turn = 6;
+  ///< dist_to_ref_line: [m]，(0，/，/)，[/]，(1，0), 本车到路径距离
+  double dist_to_ref_line = 7;
+  ///< refline_remain_dist: [m]，(0，/，/)，[/]，(1，0), 路径剩余距离
+  double refline_remain_dist = 8;
+}
+
+/**
+ * @brief HzpBehaviourDecisionInfo
+ * @detail  hzp行为决策信息
+ */
+message HzpBehaviourDecisionInfo {
+  ///< is_in_path_avoidance_scenario: [/]，(/，/，/)，[/]，(1，0), 是否处于绕障场景
+  bool is_in_path_avoidance_scenario = 1;
+  ///< front_static_obstacle_id: [/]，(/，/，/)，[/]，(1，0), 绕障目标ID
+  uint32 front_static_obstacle_id = 2;
+  ///< voidance_over_counter: [/]，(/，/，/)，[/]，(1，0), 绕障结束计数器
+  uint32 voidance_over_counter = 3;
+  ///< decided_avoidance_direction: [/]，(/，/，/)，[/]，(1，0), 绕障方向
+  bool decided_avoidance_direction = 4;
+  ///< is_in_path_following_scenario: [/]，(/，/，/)，[/]，(1，0), 是否处于跟车场景
+  bool is_in_path_following_scenario = 5;
+  ///< following_object_id: [/]，(/，/，/)，[/]，(1，0), 跟车目标ID
+  uint32 following_object_id = 6;
+  ///< is_in_path_meeting_scenario: [/]，(/，/，/)，[/]，(1，0), 是否处于会车场景
+  bool is_in_path_meeting_scenario = 7;
+  ///< meeting_object_id: [/]，(/，/，/)，[/]，(1，0), 会车目标ID
+  uint32 meeting_object_id = 8;
+  ///< reserve_1: [/]，(/，/，/)，[/]，(1，0), 预留接口1
+  double reserve_1 = 9;
+  ///< reserve_2: [/]，(/，/，/)，[/]，(1，0), 预留接口2
+  double reserve_2 = 10;
+  ///< reserve_3: [/]，(/，/，/)，[/]，(1，0), 预留接口3
+  double reserve_3 = 11;
+  ///< reserve_4: [/]，(/，/，/)，[/]，(1，0), 预留接口4
+  double reserve_4 = 12;
+  ///< reserve_5: [/]，(/，/，/)，[/]，(1，0), 预留接口5
+  double reserve_5 = 13;
+  ///< reserve_6: [/]，(/，/，/)，[/]，(1，0), 预留接口6
+  double reserve_6 = 14;
+}
+
+/**
+ * @brief HzpDecisionInfo
+ * @detail  hzp决策信息
+ */
+message HzpDecisionInfo {
+  ///< activation_status: [/],(0x0,0,2),[/],(1,0),hzp满足开启条件状态
+  ///< 0x0:默认
+  ///< 0x1:满足
+  ///< 0x2:不满足
+  uint32 hzp_status = 1;
+  ///< hzp_mode: [/],(0x0,0,3),[/],(1,0),hzp模式
+  ///< 0x0:默认
+  ///< 0x1:巡航模式
+  ///< 0x2:巡航切泊入
+  ///< 0x3:泊入模式
+  uint32 hzp_mode = 2;
+  ///< target_slot_status: [/],(0x0,0,4),[/],(1,0),目标车位状态
+  ///< 0x0:默认
+  ///< 0x1:目标车位可用
+  ///< 0x2:目标车位不可用,其他指定车位可用
+  ///< 0x3:指定车位不可用,实时搜索到车位
+  ///< 0x4:无可用车位
+  uint32 target_slot_status = 3;
+  ///< cruise_scene: [/],(0x0,0,7),[/],(1,0),巡航状态
+  ///< 0x0:默认
+  ///< 0x1:巡航
+  ///< 0x2:跟车
+  ///< 0x3:会车
+  ///< 0x4:绕障
+  ///< 0x5:停车等待
+  ///< 0x6:脱困
+  ///< 0x7:其他
+  uint32 cruise_scene = 4;
+};
+
+/**
+ * @brief PredictedTrajPoint
+ * @detail 预测路径点
+ */
+message PredictedTrajPoint {
+  ///< 横坐标: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  double x = 1;
+  ///< 纵坐标: [m]，(/，/，/)，[/]，(1，0), 纵坐标
+  double y = 2;
+  ///< 航向角: [m]，(/，/，/)，[/]，(1，0)，航向
+  double heading = 3;
+}
+
+/**
+ * @brief PredictedTraj
+ * @detail 预测轨迹
+ */
+message PredictedTraj {
+  ///< 概率: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  float confidence = 1;
+  ///< 路径: [m]，(/，/，/)，[10000]，(1，0), 纵坐标
+  repeated PredictedTrajPoint points = 2;
+  ///< 路径连续间隔点时间步长: [m]，(/，/，/)，[/]，(1，0), 连续两个预测路径点之间的时间步长
+  float time_step = 3;
+}
+
+/**
+ * @brief PredictedObject
+ * @detail 加了预测信息的目标
+ */
+message PredictedObject {
+  ///< 目标跟踪ID: [/],(0，0,255),[/],(1,0),目标跟踪ID
+  int32 track_id = 1;
+  ///< 目标长度: [m],(0，0,30),[/],(1,0),目标长度
+  float length = 2;
+  ///< 目标宽度: [m],(0，0,5),[/],(1,0),目标宽度
+  float width = 3;
+  ///< 航向角: [rad],(0，-4,4),[/],(1,0),航向角
+  float heading_angle = 4;
+  ///< 目标类别: [/],(0，0,8),[/],(1,0),目标类别
+  FusionCommonProto.ObjectClass classification = 5;
+  ///< 传感器类型: [/],(0，0,127),[详见fusion_common.proto中的DetectionSensor],(1,0),传感器类型
+  uint32 detect_sensor = 6;
+  ///< 置信度: [/],(0，0,100),[/],(1,0),置信度
+  int32 confidence = 7;
+  ///< 存在帧数: [/],(0，0,2000),[/],(1,0),存在帧数
+  int32 age = 8;
+  ///< 目标跨线标志位: [/],(0，0,1),[/],(1,0),目标跨线标志位
+  bool cross_line_flag = 9;
+  ///< 目标跨线距离: [m],(0，-5,5),[/],(1,0),目标跨线距离
+  float cross_line_value = 10;
+  ///< 目标运动状态: [/],(0，0,4),[/],(1,0),目标运动状态
+  FusionCommonProto.ObjectMotionState status = 11;
+  ///< 纵向距离: [m],(0，-90,200),[/],(1,0),纵向距离
+  float longitudinal_distance = 12;
+  ///< 横向距离: [m],(,,30),[/],(1,0),横向距离
+  float lateral_distance = 13;
+  ///< 纵向绝对速度: [m/s],(0，-50,50),[/],(1,0),纵向绝对速度
+  float longitudinal_absolute_velocity = 14;
+  ///< 横向绝对速度: [m/s],(0，-50,50),[/],(1,0),横向绝对速度
+  float lateral_absolute_velocity = 15;
+  ///< 纵向相对速度: [m/s],(0，-100,100),[/],(1,0),纵向相对速度
+  float longitudinal_relative_velocity = 16;
+  ///< 横向相对速度: [m/s],(0，-50,50),[/],(1,0),横向相对速度
+  float lateral_relative_velocity = 17;
+  ///< 目标测量参考点: [/],(/，/,/),[8],(1,0),目标测量参考点
+  repeated FusionCommonProto.Point2DPosition obj_refer_points = 18;
+  ///< 转向灯: [/],(0，0,4),[/],(1,0),转向灯
+  FusionCommonProto.TurnSignal turn_signal = 19;
+  ///< 刹车灯: [/],(0，0,1),[/],(1,0),刹车灯
+  FusionCommonProto.BrakeSignal brake_light = 20;
+  ///< 车辆目标遮挡属性: [/],(/,/,/),[/],(1,0),具体含义参照 vp.common.proto中的cover_level
+  int32 cover_level = 21;
+  ///< 目标车运动类别: [/],(0,/,/),[/],(1,0), 目标车运动类别
+  int32 moving_status = 22;
+  ///< 目标运动方向: [/],(0,/,/),[/],(1,0), 目标运动方向
+  int32 moving_dir = 23;
+  ///< 预测器类型: [/],(0,/,/),[/],(1,0), 预测器类型
+  int32 predictor_type = 24;
+  ///< 目标预测轨迹: [/]，(/，/，/)，[100]，(/，/)，路径点
+  repeated PredictedTraj trajs = 25;
+}
+
+/**
+ * @brief HzpPredictedObjects
+ * @detail  hzp目标预测信息
+ */
+message HzpPredictedObjects {
+  ///< 发送帧数:[帧],(0,/,/),[/],(/,/),标识 HzpPredictedObjects 的帧数
+  uint32 frame_id = 1;
+  ///< 目标集: [/],(/，/,/),[32],(1,0),目标集
+  repeated PredictedObject objs = 2;
+}

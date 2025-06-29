@@ -1,0 +1,121 @@
+/**
+* @file     ems.proto
+* @author   shenjj
+* @details  ems.proto
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>shenjj
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	EmsProto;
+
+/**
+* @brief BusEms
+* @detail BusEms
+*/
+message BusEms{ 
+	///<BusEmsMotionInfo：[/],(/,/,/),[32],(1,0),
+    BusEmsMotionInfo ems_motion_info = 1;
+	
+	///< BusEmsSts：[/],(/,/,/),[32],(1,0),
+    BusEmsSts ems_sts = 2;
+} 
+/**
+* @brief BusEmsMotionInfo
+* @detail BusEmsMotionInfo
+*/ 
+message BusEmsMotionInfo{ 
+	///< 发动机转速：[/],(/,/,/),[/],(1,0),
+    double ems_engine_speed = 1;
+	///< 摩擦扭矩：[/],(/,/,/),[/],(1,0),
+    double ems_frictional_torq = 2;
+	///< 驾驶员期望燃烧扭矩：[/],(/,/,/),[/],(1,0),
+    double ems_indicated_driver_req_torq = 3;
+    ///< 发动机真实扭矩：[/],(/,/,/),[/],(1,0),
+    double ems_indicated_real_eng_torq = 4;
+	///< 最大指示扭矩：[/],(/,/,/),[/],(1,0),
+    double ems_max_indicated_torq = 5;
+	///< 最小指示扭矩：[/],(/,/,/),[/],(1,0),
+    double ems_min_indicated_torq = 6;
+	///< 扭矩基准值：[/],(/,/,/),[/],(1,0),
+	uint32 ems_torque_constant = 7;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 8;
+    	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 9;
+
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 10;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 11;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 12;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 13;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 14;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 15;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 16;	
+}
+/**
+* @brief BusEmsSts
+* @detail BusEmsSts
+*/ 
+message BusEmsSts{
+	///< 加速踏板故障：[/],(/,/,/),[/],(1,0),0x0:Valid; 0xff:invalid
+    uint32 ems_accpedel_error = 1;
+	///< 发动机当前可以响应ACC的扭矩请求：[/],(/,/,/),[/],(1,0),
+    uint32 ems_acc_req_possible = 2;
+	///< 加速踏板位置：[/],(/,/,/),[/],(0.1,0),0xff:invalid
+    double ems_acc_pedal = 3;
+	///< 发动机当前可以响应APA的扭矩请求：[/],(/,/,/),[/],(1,0),
+    uint32 ems_apa_torq_request_available = 4;
+	///< 发动机检测到驾驶员油门请求超过ACC油门请求：[/],(/,/,/),[/],(1,0),
+    uint32 ems_ecgp_ovrd = 5;
+	///< 发动机转速故障：[/],(/,/,/),[/],(1,0),
+    uint32 ems_engine_speed_error = 6;
+	///< 发动机运行状态：[/],(/,/,/),[/],(1,0),
+    uint32 ems_engine_status = 7;
+	///< 发动机怠速起停状态：[/],(/,/,/),[/],(1,0),
+    uint32 ems_engine_status_with_stt = 8;
+	///< EMS检测到ACC发出的信息有错误：[/],(/,/,/),[/],(1,0),
+    uint32 ems_qecacc = 9;
+	///< 真实加速踏板位置：[/],(/,/,/),[/],(0.1,0),0xff:invalid
+    double ems_real_acc_pedal = 10;
+	///< 发动机扭矩失效：[/],(/,/,/),[/],(1,0),
+    uint32 ems_torq_failure = 11;
+	///< 制动踏板状态：[/],(/,/,/),[/],(1,0),0x0:NotPressed；0x1:Pressed；0x2:Reserved；0x3:Error 0xff:invalid
+	uint32 ems_brake_pedal_status = 12;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 13;
+    	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 14;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 15;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 16;	
+	
+} 

@@ -1,0 +1,27 @@
+/**
+* @file     idmap_emulation.proto
+* @details  仿真获取导航
+* @date     2023-5-23
+* @version  1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+**********************************************************************************
+*/
+
+syntax = "proto3";
+
+package idmap;
+
+
+/**
+ * @brief 导航数据获取
+ * @details  仿真输入导航文件名，获取导航路线数据
+ */
+message SDPathName
+{
+  ///<导航文件名:[/],(/,/,/),[/],(/,/),用于获取对应的导航数据
+  bytes sd_path_name = 1;
+}

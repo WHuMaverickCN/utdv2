@@ -1,0 +1,39 @@
+/**
+* @file     loc_trigger.proto
+* @author   yangzhao
+* @details  定位ADR触发接口定义
+* @date     2022-03-2
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+
+
+syntax = "proto3";
+package localization;
+
+/**
+* @brief 定位事件触发和诊断消息
+* @detail xxxxxxxx
+*/
+message LocTrigger {
+  ///< ADR触发标识:[/],(/,/,/),[/],(/,/),标识ADR触发标识
+  bool is_trigger_adr = 1;
+
+  ///< ADR诊断码:[/],(/,/,/),[/],(/,/),标识ADR诊断码
+  ///< 0:无故障
+  ///< 非0:记录loc_log.proto中logs(非0)
+  uint32 diagnostic_code = 2;
+}

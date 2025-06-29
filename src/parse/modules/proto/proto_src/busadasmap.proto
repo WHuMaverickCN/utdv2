@@ -1,0 +1,736 @@
+/**
+* @file     busadasmap.proto
+* @author   zhangfeilong
+* @details  busadasmap
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>zhangfeilong 
+* <tr><th>2023.2.03          <th>1.1                 <th>liuhang 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	BusadasmapProto;
+
+/**
+* @brief FromBusAdasMap
+* @detail FromBusAdasMap
+*/
+message BusAdasMap{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+
+    ///< ADAS地图位置曲率信息：[/],(/,/,/),[/],(/,/),/
+    BusAdasMapCurInfo bus_adas_map_cur_info = 2;
+
+    ///< ADAS地图道路信息：[/],(/,/,/),[/],(/,/),/
+    BusAdasMapRoadInfo bus_adas_map_road_info = 3;
+
+    ///< ADAS地图坡道信息：[/],(/,/,/),[/],(/,/),/
+    BusAdasMapSlopeInfo bus_adas_map_slope_info = 4;
+
+    ///< ADAS地图交通标志信息：[/],(/,/,/),[/],(/,/),/
+    BusAdasMapTrafficSign bus_adas_map_traffic_sign = 5;
+
+    ///< ADAS地图状态信息：[/],(/,/,/),[/],(/,/),/
+    BusAdasMapSts bus_adas_map_sts = 6;
+
+    ///< HeadUnit状态信息：[/],(/,/,/),[/],(/,/),/
+    BusHuStsInfo bus_hu_sts_info = 7;
+}
+
+/**
+* @brief busadasmap
+* @detail BusAdasMapCurInfo
+*/
+message BusAdasMapCurInfo{ 
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+
+    ///< 前方20m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature = 2;
+
+    ///< 前方100m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_100m = 3;
+
+    ///< 前方10m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_10m = 4;
+
+    ///< 前方20m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_20m = 5;
+
+    ///< 前方300m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_300m = 6;
+
+    ///< 前方30m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_30m = 7;
+
+    ///< 前方400m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_400m = 8;
+
+    ///< 前方40m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_40m = 9;
+
+    ///< 前方50m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_50m = 10;
+
+     ///< 前方600m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_600m = 11;
+
+    ///< 前方60m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_60m = 12;
+
+    ///< 前方70m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_70m = 13;
+
+    ///< 前方80m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_80m = 14;
+
+    ///< 前方90m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_90m = 15;
+
+    ///< 前方200m位置曲率：[1/m],(0x1FF,0,1023),[/],(0.00001,-0.16192),"0x0~0x1FE = -0.16192 ~ -0.00001，负数代表向左的弯道曲率；0x1FFF = 0，代表曲率为0的直道；0x200~0x3FE = 0.00001 ~ 0.16192，正数代表向右的弯道曲率；0x3FF = unknown;"
+    double hu_road_curvature_far = 16;
+    
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 17;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 18;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 19;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 20;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 21;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 22;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 23;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 24;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 25;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 26;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 27;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 28;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 29;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 30;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 31;	
+	
+	///< 预留信号15：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved14 = 32;	
+} 
+
+/**
+* @brief busadasmap
+* @detail BusAdasMapRoadInfo
+*/
+message BusAdasMapRoadInfo{ 
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+
+    ///< 到事故多发地的距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_accident_prone = 2;
+
+    ///< 到事故多发地的距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_accident_prone_distance = 3;
+
+    ///< 岔道信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:有岔道，但本车不通过岔道 0x2:有岔道，本车通过岔道 0x3:预留
+    uint32 hu_branch_info = 4;
+
+    ///< 到桥梁标识的距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_bridge_dis = 5;
+
+    ///< 桥梁信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:窄桥 0x2:驼峰桥 0x3:invalid
+    uint32 hu_bridge_info = 6;
+
+    ///< 车辆与隧道间岔路信号：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:有岔路 0x2:无岔路 0x3:reserved
+    uint32 hu_byroad = 7;
+
+    ///< 施工区域信息：[/],(0x3,0,3),[/],(1,0),0x0:路径无施工区 0x1:路径有施工区 0x2:预留 0x3:invalid
+    uint32 hu_construction_info = 8;
+
+    ///< 当前位置与弯道距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_curve_distance = 9;
+    
+    ///< 弯道信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:弯道进口 0x2:弯道中 0x3:弯道出口
+    uint32 hu_enter_curve_info = 10;
+
+    ///< 进出匝道：[/],(0x0,0,3),[/],(1,0),0x0:Unknown 0x1:匝道进口 0x2:匝道中 0x3:匝道出口
+    uint32 hu_enter_ramp_info = 11;
+
+    ///< 隧道信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:隧道入口 0x2:隧道中 0x3:隧道出口
+    uint32 hu_enter_tunnel_info = 12;
+
+    ///< 当前位置与落石距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_falling_rock_dis = 13;
+
+    ///< 前方落石信息：[/],(0x3,0,3),[/],(1,0),0x0:路径无落石 0x1:路径有落石 0x2:预留 0x3:invalid
+    uint32 hu_falling_rock_info = 14;
+
+    ///< 前方600m道路类型：[/],(0x0,0,7),[/],(1,0),
+    uint32 hu_forward_road_type = 15;
+
+    ///< 当前位置与区间测速起始点/结束点距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_interval_velocity_dis = 16;
+
+    ///< 区间测速信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:区间测速起始点 0x2:区间测速结束点 0x3:reserved
+    uint32 hu_interval_velocity_info = 17;
+
+    ///< 车道变化类型：[/],(0x3,0,3),[/],(1,0),0x0:NO change，0x1:Merge 0x2:Separate， 0x3:invalid
+    uint32 hu_lane_changtype = 18;
+
+    ///< 车道数量：[/],(0x0,0,7),[/],(1,0),0x0:unknown 0x1-0x5:当前道路车道数量 0x6:大于等于6 0x7:当前道路单项行驶且车辆逆行
+    uint32 hu_lane_cnt = 19;
+
+    ///< 车道合流信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:前方左侧合流 0x2:前方右侧合流 0x3:invalid
+    uint32 hu_lane_confluence = 20;
+
+    ///< 到合流的距离：[m],(0x3F,0,600),[/],(1,0),0x0~0x258 = 0~600m；0x259=Out of Range；0x25A~0x25E=reserved；0x25F=unknown；
+    uint32 hu_lane_confluence_dis = 21;
+
+    ///< 最右侧车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d1 = 22;
+
+    ///< 第2车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d2 = 23;
+
+    ///< 第3车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d3 = 24;
+
+    ///< 第4车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d4 = 25;
+
+    ///< 第5车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d5 = 26;
+
+    ///< 第6车道类型：[/],(0x0,0,15),[/],(1,0),
+    uint32 hu_lane_type_i_d6 = 27;
+
+    ///< 道路类型：[/],(0x0,0,7),[/],(1,0),0x0:未知；
+    ///< 0x1：City_Main_Road//城市主要道路；
+    ///< 0x2：City_ expressway//城市快速路；
+    ///< 0x3：province&county_Road//省道，县道；
+    ///< 0x4：country_road//国道；
+    ///< 0x5：Highway//高速路；
+    ///< 0x6：normal_road//次要道路，普通道路，乡公路，县乡内部路；
+    ///< 0x7：invalid//无效；
+    uint32 hu_nav_current_road_type = 28;
+
+    ///< 限速值：[/],(0xFE,0,255),[/],(5,0),0x0:Unlimited 0x1:SL 5 0x2:SL 10 0x20:SL 160 0xFE:Unknown 0xFF:Invalid
+    uint32 hu_nav_speed_limit = 29;
+
+    ///< 限速状态：[/],(0x0,0,3),[/],(1,0),0x3:reserved 0x2:reserved 0x1:invalid 0x0:valid
+    uint32 hu_nav_speed_limit_status = 30;
+
+    ///< 限速类型：[/],(0x0,0,3),[/],(1,0),0x0:Unknown 0x1:Speed-Limit Sign 0x2:Road Camera 0x3:Interval Velocity
+    uint32 hu_nav_speed_limit_type = 31;
+
+    ///< 当前位置与匝道距离：[m],(0x3FF,0,3000),[/],(1,0),0x0~0x7D0 = 0~2000m；0x7D1-0x7DD=reserved；0x7DE=Out of Range；0x7DF=unknown
+    uint32 hu_ramp_distance = 32;
+
+    ///< 匝道信息：[/],(0x0,0,3),[/],(1,0),0x0:Unknown 0x1:有匝道，但本车不出高速 0x2:本车通过匝道进入高速 0x3:本车通过匝道出高速
+    uint32 hu_ramp_info = 33;
+
+    ///< 匝道位置：[/],(0x0,0,3),[/],(1,0),0x0:Unknown 0x1:道路左边 0x2:道路右边 0x3:无效
+    uint32 hu_ramp_side = 34;
+
+    ///< 当前道路交通流信息：[/],(0x0,0,7),[/],(1,0),0x0:unknown 0x1:畅通 0x2:缓行 0x3:拥堵 0x4:严重拥堵 0x5:无交通流 0x6:reserved 0x7:invalid
+    uint32 hu_road_traffic_flow = 35;
+
+    ///< 服务区引路信息：[m],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:进入服务区引路 0x2:reserve 0x3:invalid
+    uint32 hu_service_road = 36;
+
+    ///< 到服务区引路的距离：[m],(0x3F,0,600),[/],(1,0),0x0~0x258 = 0~600m；0x259=Out of Range；0x25A~0x25E=reserved；0x25F=unknown；
+    uint32 hu_service_road_dis = 37;
+
+    ///< 当前位置与限速点距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_speed_limit_distance = 38;
+
+    ///< 到岔道的距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_to_branch_dis = 39;
+
+    ///< 施工区距离：[m],(0x3F,0,600),[/],(1,0),0x0~0x258 = 0~600m；0x259=Out of Range；0x25A~0x25E=reserved；0x25F=unknown；
+    uint32 hu_to_construction_dis = 40;
+
+    ///< 车道数量变化的距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_to_numchange_of_lanes_dist = 41;
+
+    ///< 交通事故区距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_to_traffic_accident_dis = 42;
+
+    ///< 当前位置与收费站距离：[m],(0x3F,0,600),[/],(1,0),0x0~0x258 = 0~600m；0x259=Out of Range；0x25A~0x25E=reserved；0x25F=unknown；
+    uint32 hu_toll_dis = 43;
+
+    ///< 收费站信息：[/],(0x3,0,3),[/],(1,0),0x0:路径无收费站 0x1:路径有收费站 0x2:预留 0x3:invalid
+    uint32 hu_toll_info = 44;
+
+    ///< 交通事故信息：[/],(0x3,0,3),[/],(1,0),0x0:无交通事故 0x1:有交通事故 0x2:预留 0x3:invalid
+    uint32 hu_traffic_accident_info = 45;
+
+    ///< 当前位置与隧道距离：[m],(0x3F,0,600),[/],(1,0),0x0~0x258 = 0~600m；0x259=Out of Range；0x25A~0x25E=reserved；0x25F=unknown；
+    uint32 hu_tunnel_distance = 46;
+    
+    ///< 隧道长度：[m],(0x3F,0,63),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_tunnel_length = 47;
+
+    ///< 天气信息：[/],(0x3F,0,63),[/],(1,0),
+    uint32 hu_weather_type = 48;
+
+    ///< 导航路口距离：[m],(0x0,0,131070),[/],(1,0),距离下一个路口距离
+    uint32 hu_navi_distance = 49;
+
+    ///< 当前Path索引号：[/],(0x0,0,63),[/],(1,0),当前Path的索引号：如果这个值与前一个索引为0的POSITION消息中的值有变化，车辆已经离开了当前path； 0-7的标记有特殊含义：详细见sheet<ADAS_Posn_Pathldx>
+    uint32 hu_adas_posn_pathldx = 50;
+
+    ///< 车辆距路径起点位置：[m],(0x0,0,8191),[/],(1,0),Offset of current position from the current path’s start point modulo 8191. Value 8191 is invalid.
+    uint32 hu_adas_posn_offset = 51;
+
+    ///< HU_EHR下发监控：[/],(0x0,0,1),[/],(1,0),"0x0:normal//正常;0x1:abnormal//异常"
+    uint32 hu_ehr_heart_flag = 52;
+
+    ///< HU_EHP心跳监控：[/],(0x0,0,1),[/],(1,0),"0x0:normal//正常;0x1:abnormal//异常"
+    uint32 hu_ehp_heart_flag = 53;
+
+    ///< HU_远距离匝道距离：[/],(0xFF,0,255),[/],(1,0),"(0x0~C8)*10=0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；"
+    uint32 hu_long_ramp_dis = 54;
+
+    ///< HU_远距离匝道方向：[/],(0x0,0,3),[/],(1,0),"0x0:Unknown;0x1:Left_side_of_the_road//道路左边;0x2:Right_side_of_the_road//道路右边;0x3:无效"
+    uint32 hu_long_ramp_side = 55;
+
+    ///< HU_隧道长度：[/],(0xFF,0,255),[/],(1,0),"(0x0~C8)*10=0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；"
+    uint32 hu_llong_tunnel_len = 56;
+    
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 57;
+	
+	///< 地图限速值：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0:Unlimited
+    ///< 0x1:SL 5
+    ///< 0x2:SL 10
+    ///< 0x20:SL 160
+    ///< 0xFE:Unknown
+    ///< 0xFF:Invalid
+    uint32 hu_nav_speed_limit_gd = 58;	
+	
+	///< 地图限速单位：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0:unknown
+    ///< 0x1:unit kph
+    ///< 0x2:unit mph
+    uint32 hu_nav_speed_limit_units_gd = 59;	
+	
+	///< 当前位置与限速点距离：[/],(0x0,0,/),[/],(/,/),/
+    ///< :(0x0~0x3C)*10 = 0~600m；
+    ///< 0x3D:Out of Range
+    ///< 0x3E:reserved
+    uint32 hu_speed_limit_distance_gd = 60;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 61;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 62;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 63;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 64;	
+} 
+
+/**
+* @brief busadasmap
+* @detail BusAdasMapSlopeInfo
+*/
+message BusAdasMapSlopeInfo{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+ 
+    ///< 坡道信息：[/],(0x0,0,3),[/],(1,0),0x0:unknown 0x1:坡道入口 0x2:坡道中 0x3:坡道出口
+    uint32 hu_enter_slope_info = 2;
+
+    ///< 当前位置与坡道距离：[m],(0x3F,0,600),[/],(1,0),0x3D:Out of Range 0x3E:reserved 0x3F:unknown
+    uint32 hu_slope_distance = 3;
+
+    ///< 当前位置坡度：[%],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),0x0:No Obstacle Detected； 0x1:distance of RRC is less than 40cm； 0x2:distance range of RRC is from40cm to60cm； 0x3-0xF:invalid
+    double hu_slope_gradient = 4;
+
+    ///< 前方100m坡度：[m],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),（-51.1）+（0.1*X）;0x3FF = unknown；
+    double hu_slope_gradient_100m = 5;
+
+    ///< 前方10m坡度：[/],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),
+    double hu_slope_gradient_10m = 6;
+
+    ///< 前方20m坡度：[/],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),
+    double hu_slope_gradient_20m = 7;
+
+    ///< 前方300m坡度：[%],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),（-51.1）+（0.1*X）;0x3FF = unknown；
+    double hu_slope_gradient_300m = 8;
+
+    ///< 前方30m坡度：[/],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),
+    double hu_slope_gradient_30m = 9;
+
+    ///< 前方40m坡度：[m],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),
+    double hu_slope_gradient_40m = 10;
+
+    ///< 前方50m坡度：[/],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),（-51.1）+（0.1*X）;0x3FF = unknown；
+    double hu_slope_gradient_50m = 11;
+    
+    ///< 前方200m（暂定）坡度：[%],(0x3FF,-51.1,51.1),[/],(0.1,-51.1),（-51.1）+（0.1*X）;0x3FF = unknown；
+    double hu_slope_gradient_far = 12;
+    
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 13;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 14;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 15;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 16;	
+} 
+
+/**
+* @brief busadasmap
+* @detail BusAdasMapTrafficSign
+*/
+message BusAdasMapTrafficSign{
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+
+    ///< HU_警告标志_反向弯路：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_reverse_curve = 2;
+
+    ///< HU_警告标志_连续弯路：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_continuous_detours = 3;
+
+    ///< HU_警告标志_注意行人：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_pedestrian = 4;
+
+    ///< HU_警告标志_易滑：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_slip = 5;
+
+    ///< HU_警告标志_隧道：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_tunnel = 6;
+
+    ///< HU_警告标志_慢行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_slow = 7;
+
+    ///< HU_警告标志_施工：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_warning_road_works = 8;
+
+    ///< HU_禁令标志_禁止驶入：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_drive_into = 9;
+
+    ///< HU_禁令标志_禁止机动车通行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_motor_vehicles = 10;
+
+    ///< HU_禁令标志_禁止向右转弯：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_turn_right = 11;
+
+    ///< HU_禁令标志_禁止直行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_straight = 12;
+
+    ///< HU_禁令标志_禁止掉头：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_uturn = 13;
+
+    ///< HU_禁令标志_禁止超车：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_overtake = 14;
+
+    ///< HU_禁令标志_禁止车辆临时或长时停放：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_vehicle_parking = 15;
+
+    ///< HU_禁令标志_禁止车辆长时停放：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_veh_park_long_time = 16;
+
+    ///< HU_禁令标志_限制速度：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_speed_limit = 17;
+
+    ///< HU_禁令标志_停车让行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_stop_to_give_way = 18;
+
+    ///< HU_禁令标志_禁止通行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_enter = 19;
+
+    ///< HU_禁令标志_禁止鸣喇叭：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_honking = 20;
+
+    ///< HU_禁令标志_会车让行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_prohibitory_give_way_to_oncoming = 21;
+
+    ///< HU_指示标志_单行路(直行)：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_indication_one_way = 22;
+
+    ///< HU_指示标志_步行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_indication_walk = 23;
+
+    ///< HU_指示标志_干路先行：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_indication_main_road_priority = 24;
+
+    ///< HU_指示标志_人行横道：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_indication_pedestrian_crossing = 25;
+
+    ///< HU_指示标志_公交线路专用车道：[/],(0x1,0,1),[/],(1,0),"0x0:Valid//存在标志 0x1:invalid//不存在标志" 
+    uint32 hu_indication_bus_lane = 26;
+
+    ///< HU_警告标志_反向弯路的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_reverse_curve_dis = 27;
+
+    ///< HU_警告标志_连续弯路的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_continuous_detours_dis = 28;
+
+    ///< HU_警告标志_注意行人的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_pedestrian_dis = 29;
+
+    ///< HU_警告标志_易滑的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_slip_dis = 30;
+
+    ///< HU_警告标志_隧道的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_tunnel_dis = 31;
+
+    ///< HU_警告标志_慢行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_slow_dis = 32;
+
+    ///< HU_警告标志_施工的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_warning_road_works_dis = 33;
+
+    ///< HU_禁令标志_禁止驶入的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_drive_into_dis = 34;
+
+    ///< HU_禁令标志_禁止机动车通行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_motor_vehicles_dis = 35;
+
+    ///< HU_禁令标志_禁止向右转弯的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_turn_right_dis = 36;
+
+    ///< HU_禁令标志_禁止直行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_straight_dis = 37;
+
+    ///< HU_禁令标志_禁止掉头的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_uturn_dis = 38;
+
+    ///< HU_禁令标志_禁止超车的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_overtake_dis = 39;
+
+    ///< HU_禁令标志_禁止车辆临时或长时停放的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_veh_park_dis = 40;
+
+    ///< HU_禁令标志_禁止车辆长时停放的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_veh_park_long_t_dis = 41;
+
+    ///< HU_禁令标志_限制速度的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_speed_limit_dis = 42;
+
+    ///< HU_禁令标志_停车让行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_stop_to_give_way_dis = 43;
+
+    ///< HU_禁令标志_禁止通行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_enter_dis = 44;
+
+    ///< HU_禁令标志_禁止鸣喇叭的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_honking_dis = 45;
+
+    ///< HU_禁令标志_会车让行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_prohibitory_give_way_oncom_dis = 46;
+
+    ///< HU_指示标志_单行路(直行)的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_indication_one_way_dis = 47;
+
+    ///< HU_指示标志_步行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_indication_walk_dis = 48;
+
+    ///< HU_指示标志_干路先行的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_indication_main_road_pri_dis = 49;
+
+    ///< HU_指示标志_人行横道的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_indication_pedestrian_cro_dis = 50;
+
+    ///< HU_指示标志_公交线路专用车道的距离：[/],(0xFF,0,0xFF),[/],(1,0),"(0x0~C8)*10 = 0~2000m；0xC9=Out of Range；0xCA~0xFE=reserved；0xFF=unknown；" 
+    uint32 hu_indication_bus_lane_dis = 51;
+    
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 52;
+
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 53;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 54;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 55;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 56;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 57;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 58;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 59;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 60;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 61;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 62;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 63;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 64;	
+}
+
+/**
+* @brief busadasmap
+* @detail BusAdasMapSts
+*/
+message BusAdasMapSts{ 
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 1;
+
+    ///< HU_地图数据更新状态：[/],(0x0,0,7),[/],(1,0),"0x0:no_update//未更新；0x1:update_in_one_month//1个月内更新；0x2:update_in_three_month//3个月内更新； 0x3:update_in_six_month//6个月内更新;0x4:update_in_one_year//1年内更新;0x5-0x6: reserved;0x7:Invalid"
+    uint32 hu_map_data_update_status = 2;
+
+    ///< HU_地图定位状态（地图匹配结果）：[/],(0x3,0,3),[/],(1,0),"0x0:Successl;0x1:Fail;0x2:reserve//保留；0x3:invalid//无效"
+    uint32 hu_map_match_status = 3;
+
+    ///< HU_导航路径引导状态：[/],(0x0,0,3),[/],(1,0),"0x0:no_NavGuigance//没有导航引导路径；0x1:have_NavGuigance//有导航引导路径；0x2:reserve//保留；0x3:invalid//无效"
+    uint32 hu_nav_guigance_status = 4;
+
+    ///< HU_导航状态：[/],(0x0,0,1),[/],(1,0),"0x0:Normal； 0x1:Error"
+    uint32 hu_nav_status = 5;
+
+    ///< HU_国家代码：[/],(0x0,0,255),[/],(1,0),"8bit(0-255)"
+    uint32 hu_nav_country_code = 6;
+
+    ///< HU_限速单位：[/],(0x0,0,3),[/],(1,0),"0x0:no display；0x1:unit kph；0x2:unit mph；0x3:reserved;"
+    uint32 hu_nav_speed_limit_units = 7;
+    
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 8;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 9;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 10;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 11;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 12;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 13;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 14;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 15;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 16;	
+} 
+
+/**
+* @brief BusHuStsInfo
+* @detail BusHuStsInfo
+*/
+message BusHuStsInfo{
+	///< 哨兵模式启用/退出事件通知：[/],(0x0,0,/),[/],(/,/),
+    ///<0x00： exit	退出
+    ///<0x01： enable	启用
+    uint32 act_sen_fun_en_typ = 1;
+
+	///< 通知营地守护开关状态：[/],(0x0,0,/),[/],(/,/),0x00 –off-state关闭状态 0x01 – on-state开启状态
+    uint32 act_camp_swit_st = 2;
+	
+	///< 导航状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< -1：其它状态 
+    ///< 0: 真实导航状态 
+    ///< 1：模拟导航状态 
+    ///< 2：巡航模式
+    int32 sd_map_navi_st = 3;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 4;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 5;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 6;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 7;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 8;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 9;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 10;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 11;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 12;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 13;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 14;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 15;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 16;	
+}

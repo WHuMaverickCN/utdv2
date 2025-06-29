@@ -1,0 +1,73 @@
+/**
+
+* @file     map_bev_v2.proto
+* @author   zhanghongjie
+* @details  BEV相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+syntax = "proto3";
+package VpNdmProtoV2;
+import "vp_ndm_base_v2.proto";
+import "physical_layer.proto";
+import "logical_layer.proto";
+import "topological_layer.proto";
+import "dynamic_layer.proto";
+import "freespace_v2.proto";
+import "seq_header.proto";
+
+
+
+/**
+* @brief BEV信息
+* @detail BEV最外层接口
+*/
+message MapEnvMsg {
+    ///< header信息：[/],(0,0,1),[/],(1,0),header信息
+    SeqHeaderProto.SeqHeader seq_header = 1;  
+    ///< 物理层信息：[/],(0,0,1),[/],(1,0),物理层信息
+    PhysicalLayer physical_layer = 2;        
+    ///< 逻辑层信息：[/],(0,0,1),[/],(1,0),逻辑层信息
+    LogicalLayer logical_layer = 3;           
+    ///< 拓扑层信息：[/],(0,0,1),[/],(1,0),拓扑层信息
+    TopologicalLayer topological_layer = 4;   
+    ///< 动态层信息：[/],(0,0,1),[/],(1,0),动态层信息
+    DynamicLayer dynamic_layer = 5;          
+}
+
+
+/**
+* @brief 融合freespace信息
+* @detail 无
+*/
+message BevFusionFresspace{
+    ///< 融合freespace信息：[/],(0,0,1),[/],(1,0),融合freespace
+    VpPerceptionBaseProto.FreespacePointsMsg  freespace = 1;
+}
+

@@ -1,0 +1,79 @@
+/**
+
+* @file     hmi_basic_parkobjfusion.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义 
+* @date     2023-11-21
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ////<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ////<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ////<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ////<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface; 
+
+/**
+* @brief 二维坐标值
+* @details 二维坐标值
+*/
+message EXPos2D { 
+  ///<x轴坐标值:[/],(/,/,/),[/],(/,/),x轴坐标值
+  int32 x = 1;
+
+  ///<y轴坐标值:[/],(/,/,/),[/],(/,/),y轴坐标值
+  int32 y = 2;
+}
+
+
+/**
+* @brief Objfusion信号
+* @detail 目标信号
+*/
+message ExObjfusion
+{
+	///< 目标ID:[/],(0,0,/),[/],(1,0) :[/],(0,0,/),[/],(1,0), 目标ID
+	uint32 ex_objx_trackid = 1; 
+
+	///< 目标类型:[/],(0,0,/),[/],(1,0) :[/],(0,0,/),[/],(1,0),目标类型
+	uint32 ex_objx_type = 2; 
+
+	///< 目标纵向相对位置:[m],(0,0,/),[/],(1,0) :[/],(0,0,/),[/],(1,0),目标纵向相对位置
+	float ex_objx_long_rel = 3; 
+
+	///< 目标横向相对位置 :[m],(0,0,/),[/],(1,0),目标横向相对位置 
+	float ex_objx_lat_rel = 4; 
+
+	///< 目标航向角 :[/],(0,0,/),[/],(1,0) :[/],(0,0,/),[/],(1,0),目标航向角
+	float ex_objx_headingangle = 5;
+  
+	///< 目标角点 :[/],(0,0,/),[4],(1,0) :[/],(0,0,/),[/],(1,0),目标角点
+	repeated EXPos2D ex_points = 6;
+}
+
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装所有信号
+*/
+message ExObjfusion16
+{
+	///<目标融合：[/],(0,0,/),[16],(1,0),周期触发，70ms，融合目标
+	repeated ExObjfusion ad_exobjfusion = 1; 
+}
+

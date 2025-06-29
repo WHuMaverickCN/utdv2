@@ -1,0 +1,28 @@
+vector_data:
+  target_path:
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B2_0322/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B6_0412/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_C9_0508/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_E7_0501/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_F9_0508/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A1_0319/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A5_0327/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B3_0325/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_C6_0412/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_D7_0501/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_E8_0507/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A2_0322/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A6_0412/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B4_0326/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_C7_0501/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_D8_0507/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_E9_0508/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A3_0325/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B1_0319/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_B5_0327/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_C8_0507/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_D9_0508/features
+    - /data/gyx/cqc_p2_cd701_raw/datasets_F8_0507/features
+
+dataset_path: /data/gyx/cqc_p2_cd701_raw/datasets_AA1_0319

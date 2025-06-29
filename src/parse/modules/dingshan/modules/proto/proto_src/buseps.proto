@@ -1,0 +1,331 @@
+/**
+* @file     buseps.proto
+* @author   zhangzhirui
+* @details  
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>zhangzhirui 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	BusepsProto;
+
+/**
+* @brief BusEps
+* @detail BusEps
+*/
+message BusEps{ 
+	///<BusEpsMotionInfo：[/],(/,/,/),[32],(1,0),/
+    BusEpsMotionInfo eps_motion_info = 1;
+	
+	///< BusEpsSts：[/],(/,/,/),[32],(1,0),/
+    BusEpsSts eps_sts = 2;
+	
+	///< BusSAS：[/],(/,/,/),[32],(1,0),/
+    BusSAS sas = 3;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 4;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 5;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 6;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 7;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 8;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 9;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 10;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 11;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 12;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 13;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 14;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 15;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 16;	
+} 
+
+/**
+* @brief BusEpsMotionInfo
+* @detail BusEpsMotionInfo 10ms
+*/
+message BusEpsMotionInfo{ 
+    ///< EPS小齿轮端转角（实测）：[degree],(0x1C20,-720,720),[/],(1,0),
+    double eps_pinionang = 1;
+
+    ///< EPS方向盘相对角度（电机换算）：[degree],(0x2A30,-1080,1080),[/],(1,0),
+    double eps_handwheel_relang = 2;//EPS方向盘相对角度（电机换算）,
+
+    ///< EPS实际扭杆扭矩：[Nm],(0x400,-20.48,20.44),[/],(1,0),
+    double eps_actual_torsion_bar_torq = 3;
+
+    ///< 助力转向电流消耗：[A],(0x0,0,127),[/],(1,0),    
+    double eps_elect_power_consumption = 4;
+    
+    ///< EPS功能安全限定的最大扭杆扭矩：[Nm],(0x400,-20.48,20.44),[/],(1,0),
+    double eps_max_safety_torsion_bar_torq = 5;
+    
+    ///< 驾驶员手力矩：[Nm],(0x800,-20.48,20.46),[/],(0.01,-20.48), 0xff:invalid
+    double eps_measured_torsion_bar_torque = 6;
+    
+    ///< 驾驶员手力矩验证位：[/],(0x0,0,1),[/],(1,0),0x0：valid 0x1：invalid 0xff:invalid
+    uint32 eps_measured_torsion_bar_torq_valid = 7;
+
+    ///< EPS功能安全限定的最小扭杆扭矩：[Nm],(0x400,-20.48,20.44),[/],(1,0),
+    double eps_min_safety_torsion_bar_torq = 8;
+    
+    ///< 转向力矩：[Nm],(0x7F,-22.78,22.78),[/],(1,0),
+    double eps_steering_torque = 9;
+    
+    ///< EPS实际执行电机扭矩：[Nm],(0x800,-20.5,20.46),[/],(1,0),    
+    double eps_actual_motor_torq = 10;
+    
+    ///< EPS方向盘相对角度有效（电机换算）：[/],(0x0,0,1),[/],(1,0),0x0：valid 0x1：invalid
+    uint32 eps_handwheel_relang_valid = 11;
+
+    ///< EPS小齿轮端转角有效（实测）：[/],(0x0,0,1),[/],(1,0),0x0:valid 0x1:invalid
+    uint32 eps_pinionang_valid = 12;
+    
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 13;
+	
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 14;
+
+    ///< 目标执行电机扭矩：[/],(0x0,0,/),[/],(0.01,-20.48),/
+    double eps_target_motor_torq = 15;	
+
+    ///< 目标执行电机扭矩有效：[/],(0x0,0,1),[/],(1,0),Valid 0x0 Valid; Invalid 0x1 Invalid
+    ///< 0x0: Valid
+    ///< 0x1: Invalid
+    uint32 eps_target_motor_torq_valid = 16;	
+
+} 
+
+/**
+* @brief BusEpsSts
+* @detail BusEpsSts 10ms
+*/
+message BusEpsSts{ 
+    ///< APA控制中断反馈：[/],(0x0,0,7),[/],(1,0),0x0:NO_DRIVING_INTERUPTION 0x1:DRIVER_RECOVERY 0x2:TOO_HIGH_VEHICLE_SPEED 0x3:TOO_IMPORTANT_ANGULAR_ERROR 0x4:TOO_IMPORTANT_ANGULAR_SPEED_ERROR 0x5:DAE_THERMAL_SECURITY 0x6:DAE_LIMIT_SECURITY 0x7:OTHER_DEFAULT
+    uint32 eps_apa_abortfeedback = 1;
+    
+    ///< APA请求转向控制反馈：[/],(0x0,0,1),[/],(1,0),0x0:Control disable 0x1:Control enabled
+    uint32 eps_apa_control_feedback = 2;
+    
+    ///< EPS临时故障：[/],(0x0,0,1),[/],(1,0),
+    uint32 eps_apa_epas_failed = 3;
+    
+    ///< 方向盘震动状态：[/],(0x0,0,3),[/],(1,0),0x0:Concuss Availability震动可用但是未震动 0x1:Concuss Active震动激活中 0x2:EPS Concuss failureEPS震动故障不可用 0x3:reserved
+    uint32 eps_concuss_availability_status = 4;
+    
+    ///< IACC控制中断反馈：[/],(0x0,0,7),[/],(1,0),0x0:NO_DRIVING_INTERUPTION  0x1:DRIVER_RECOVERY(Over ride) 0x2:VEHICLE_SPEED ERROR 0x3:REQUEST ERROR 0x4:DAE_THERMAL_SECURITY 0x5:OTHER_DEFAULT 0x6:MESSAGE FAULT 0x7:RESERVED
+    uint32 eps_iacc_abortreason = 5;
+    
+    ///< EPS横向控制激活：[/],(0x0,0,1),[/],(1,0),0x0:Not Actived 0x1:Actived 0x2:Failure 0x3:Reserved 0xff:invalid
+    uint32 eps_lat_ctrl_active = 6;
+    
+    ///< EPS横向控制可用状态：[/],(0x0,0,3),[/],(1,0),0x0:not Availability 0x1:Availability 0x2:failure 0x3:reserved 0xff:invalid
+    uint32 eps_lat_ctrl_availability_status = 7;
+    
+    ///< EPS助力模式切换状态：[/],(0x0,0,1),[/],(1,0),0x0:No judgment 0x1:In judgmentEPS功能安全限定的最小扭杆扭矩
+    uint32 eps_mode_switch_st = 8;
+    
+    ///< 力矩传感器状态：[/],(0x0,0,1),[/],(1,0),0x0:Normal 0x1:Abnormal
+    uint32 eps_torq_sensor_status = 9;  
+
+    ///< EPS故障状态：[/],(/,0,15),[/],(1,0),
+    ///< 0x0:No Fault 
+    ///< 0x1:Thermal Protection Fault 
+    ///< 0x2:Power Limit Fault 
+    ///< 0x3:IMC Result error 
+    ///< 0x4:Torque Sensor Fault(recoverable with assist) 
+    ///< 0x5:Angle Sensor Fault(recoverable with assist) 
+    ///< 0X6:Sensorless Angle Fault(Non recoverable without assist) 
+    ///< 0x7:Power Supply Fault(Non recoverable) 
+    ///< 0x8:Motor Sensor Fault(Non recoverable) 
+    ///< 0x9:Flash/RAM/NVM Fault(Non recoverable) 
+    ///< 0xA:Battery Voltage Fault(Recoverable) 
+    ///< 0xB:ECU ID Fault(Non recoverable) 
+    ///< 0xC:Other Fault(Non recoverable) 0xff:invalid
+    uint32 eps_fault_state = 10;
+    
+    ///< LDW震动强度状态：[/],(0x0,0,3),[/],(1,0),0x0:reserved 0x1:low 0x2:normal 0x3:high
+    uint32 eps_ldw_shake_lev_status = 11;
+    
+    ///< EPS系统状态：[/],(0x0,0,15),[/],(1,0),0x0:disable 0x1:off 0x2:enable 0x3:warm int 0x4~0xF : Reserved
+    uint32 eps_system_st = 12;
+    
+    ///< EPS响应的上位机类别：[/],(0x0,0,7),[/],(1,0),0x0:none 0x1:APALat 0x2:MainLat 0x3:SubLat 0x4-0x7预留
+    uint32 eps_adas_active_mode = 13;
+    
+    ///< 助力转向故障位：[/],(0x0,0,7),[/],(1,0),0x0:No failure 0x1:Slight failure 0x2:Critical failure 0x3:Fatal failure 0x4-0x7:Reserved 0xff:invalid
+    uint32 eps_faild = 14;
+    
+    ///< EPS助力模式反馈：[/],(0x3,0,3),[/],(1,0),0x0:Normal 0x1:light 0x2:heavy  0x3:unknow
+    uint32 eps_steer_mod_fb = 15;
+
+    ///< EPS控制中断反馈：[/],(0x0,0,15),[/],(1,0),
+    ///< 0x0:No Fault 
+    ///< 0x1:Adas Speed Invalid 
+    ///< 0x2:Adas Signal Invalid 
+    ///< 0x3:State Mismatch 
+    ///< 0x4:APA Interrupt 
+    ///< 0x5:BUS Off 
+    ///< 0x6:Both Channels CAN down 
+    ///< 0x7:Adas Chassis CAN Down 
+    ///< 0x8:ADAS Internal Error 
+    ///< 0x9:Speed out of range 
+    ///< 0xA:AgAmpErr 
+    ///< 0xB:AgGrdtFlt 
+    ///< 0xC:Driver Interrupt 
+    ///< 0xD:ADAS Req Mode Invld 
+    ///< 0xE:UnavailableTargetAngle 
+    ///< 0XF:AdasRdntCANDown 
+    ///< 0xff:invalid
+    uint32 eps_ads_abortfeedback = 16;
+    
+    ///< ADS请求转向控制反馈：[/],(0x0,0,7),[/],(1,0),
+    ///< 0x0:Standby 
+    ///< 0x1:Parking Running 
+    ///< 0x2:AutoDriving 
+    ///< 0x3:ESS Runing 
+    ///< 0x4-0x6:Reserved 
+    ///< 0x7:Error 
+    ///< 0xff:invalid
+    uint32 eps_ads_control_feedback = 17;
+    
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 18;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 19;
+	
+	///< Lok按压状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x00: SinglePress 短按
+    ///< 0x01: LongPress 长按
+    ///< 0x02: DoublePress 双击
+    uint32 lok_swt_info = 20;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 21;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 22;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 23;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 24;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 25;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 26;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 27;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 28;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 29;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 30;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 31;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 32;	
+} 
+
+/**
+* @brief BusSAS
+* @detail BusSAS 10ms
+*/
+message BusSAS{ 
+    ///< SAS标定状态：[/],(0x0,0,1),[/],(1,0),0x0:Calibrated 0x1:Not Calibrated
+    uint32 eps_sas_cal_sts = 1;
+    
+    ///< 方向盘转向角度：[degree],(0x0,-780,780),[/],(0.1,0),0xff:invalid
+    double eps_sas_steer_ag = 2;
+    
+    ///< 方向盘转角有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 eps_sas_steer_ag_vld = 3;
+    
+    ///< 方向盘转角速率：[deg/s],(0x0,0,1016),[/],(4,0),0xff:invalid
+    uint32 eps_steer_ag_rate = 4;
+
+    ///< 转角传感器失效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 eps_steer_ag_sens_filr = 5;
+
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 6;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+		
+} 

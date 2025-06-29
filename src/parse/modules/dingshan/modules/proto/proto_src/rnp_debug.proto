@@ -1,0 +1,42 @@
+syntax = "proto3";
+package rnp;
+import "rnp_common.proto";
+import "seq_header.proto";
+
+
+/**
+* @brief 
+* @details 输出用于软件debug的信号，包括：1. 环境模型、预测的可视化；2. AI预测的影子模式数据采集，AI预测在线评测所需要的数据（历史轨迹、预测轨迹、环境信息等）；
+*/
+message RNPDebugOut
+{
+    ///< 延时统计信息:[/],(/,/,/),[/],(/,/),/,输出
+    SeqHeaderProto.SeqHeader seq_header = 1;
+	///< 时间戳 :[/],(/,/,/),[/],(/,/), 时间戳
+	double timestamp = 2;
+	///< 运行时信息:[/],(/,/,/),[/],(/,/), 子模块时耗等
+    RuntimeStatistics runtime_statistics = 3;
+    ///< 采集的数据 :[/],(/,/,/),[/],(/,/),采集的数据，含历史轨迹和车道线，含历史轨迹和车道线
+    ShadowModeCollectedData shadow_mode_collected_data = 4;
+    ///< 目标预测结果及目标属性（所有目标）:[/],(0,0,/),[200],(1,0),所有目标信息，包含预测算法输出的轨迹、意图、上游透传的属性、经过预测模块处理后新增的属性等
+    repeated ObjectDebug objects_debug = 5;
+	///< AI预测算法所激活的场景，one-hot编码:[/],(0,0,/),[200],(1,0),所有目标信息，包含预测算法输出的轨迹、意图、上游透传的属性、经过预测模块处理后新增的属性等
+	uint32 ai_activated_scenario = 6;
+	// ///< 自车所在场景:[/],(0,0,/),[/],(1,0),自车所在场景
+	// ScenarioType ego_scenario_type = 5;
+}
+
+
+/**
+ * @brief rnp_debug
+ * @detail RuntimeStatistics 运行时信息 子模块时耗等
+ */
+message RuntimeStatistics
+{
+	///<附加信息:[/],(0,0,/),[/],(1,0),d
+	string str_info = 1;
+	///<附加信息:[/],(0,0,/),[/],(1,0),d
+	repeated string keys = 2;
+	///<数据值:[/],(0,0,/),[100],(1,0),description 数组内容自定协议
+	repeated double values = 3;
+}

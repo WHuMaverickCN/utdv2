@@ -1,0 +1,317 @@
+/**
+* @file     lidar_calibration.proto
+* @author   wujie
+* @details  lidar_calibration输出接口定义
+* @date     2023-07-11
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.7.11         <th>1.0                 <th>wujie
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package LidarCalibrationProto;
+
+/**
+* @brief  激光雷达下线标定状态信息
+* @detail 激光雷达下线标定状态信息
+*/
+enum OfflineCalibrationState
+{
+  ///< 无错误
+  CALIBRATION_SUCCESS = 0;
+
+  ///< 意外错误
+  RECEIVED_UNEXPECTED_ERROR = 1;
+
+  ///< JSON配置文件读取失败
+  READING_JSON_CONFIG_FILE_FAILED = 2;
+
+  ///< 雷达进入标定模式失败
+  LIDAR_FAILED_ENTERING_EOL_MODE = 3;
+
+  ///< 输入的用于粗匹配的模板点云为空
+  TEMPLATE_POINTCLOUD_IS_EMPTY = 4;
+
+  ///< 工厂标定模式下,能用于最终标定结果平均的标定结果数量太少
+  VALID_CALIBRATION_RESULTS_ARE_TOO_FEW_TO_CALCULATE_FINAL_AVERAGE_RESULT = 5;
+
+  ///< 工厂标定模式下,标定临时文件失效
+  MISSING_TEMPORARY_FILE_FOR_FACTORY_CALIBRATION = 6;
+
+  ///< 雷达退出标定模式失败
+  LIDAR_FAILED_QUITTING_EOL_MODE = 7;
+
+  ///< 输入点云数量过少
+  INPUT_POINTS_ARE_TOO_FEW = 11;
+
+  ///< 粗标定失败
+  INTTIAL_NDT_FAILED = 12;
+
+  ///< 粗标定失败
+  GROUND_DETECTION_FAILED = 13;
+
+  ///< 没有足够的标定板被识别
+  BOARDS_EXTRACTION_FAILED = 14;
+
+  ///< 输入点云数量为0, LidarDriver存在丢包的可能
+  INPUT_POINTS_ARE_ZERO = 15;
+
+  ///< 点云配准用到的源点数量不等于目标点数量，或者目标点数量小于3
+  REGISTER_INPUT_POINTS_COUNT_IS_SMALL_THAN_THREE_OR_NOT_MATCH = 51;
+
+  ///< 点云配准输入值存在nan
+  REGISTER_INPUT_IS_NAN = 52;
+
+  ///< 标定有效配对过少
+  CORRESPONDING_PAIRS_ARE_FEW = 53;
+
+  ///< 平均损失值过高
+  AVERAGE_CORRESPONDING_LOSS_IS_BAG = 54;
+
+  ///< 标定板[id]的配对误差过大，标定板编号id = error_code - 60
+  BOARD_ID_SIXTY_HAS_BIG_CORRESPONDING_LOSS = 60;
+
+  ///< 标定结果与设计值角度误差较大
+  RESULT_ROTATION_DELTA_IS_TOO_BIG = 91;
+
+  ///< 标定结果与设计值位置误差较大
+  RESULT_ROTATION_DELTA_IS_TOO_SMALL = 92;
+
+  ///< 标定板[id]提取失败，标定板编号id = error_code - 202
+  BOARD_ID_CODE_HAS_BIG_CORRESPONDING_LOSS = 202;
+}
+
+/**
+* @brief  激光雷达下线标定信息
+* @detail 激光雷达下线标定信息
+*/
+message OfflineCalibration
+{
+  ///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+  double timestamp = 1;
+
+  ///< 左雷达标定状态：[/],(/,/,/),[/],(1,0),左雷达标定状态
+  OfflineCalibrationState left_lidar_calibration_state = 2;
+
+  ///< 右雷达标定状态：[/],(/,/,/),[/],(1,0),右雷达标定状态
+  OfflineCalibrationState right_lidar_calibration_state = 3;
+
+  ///< 激光雷标定状态：[/],(/,/,/),[/],(1,0),激光雷标定状态,0x0:默认值；0x1：标定中；0x2：标定成功；3-22表示左雷达标定过程的故障，与OfflineCalibrationState的枚举对应；23-42表示右边雷达标定过程的故障，与OfflineCalibrationState的枚举对应
+  uint32 lidar_calibration_status = 4;
+}
+
+/**
+* @brief  激光雷达在线标定状态信息
+* @detail 激光雷达在线标定状态信息
+*/
+enum OnlineCalibrationState
+{
+
+  ///< 无错误
+  NO_ERRORS = 0;
+
+  ///< 意外错误
+  RECEIVED_SOME_UNEXPECTED_ERRORS = 1;
+
+  ///< 配置文件读取失败
+  FAIL_TO_LOAD_CONFIG_FILE = 2;
+
+  ///< 点云数据格式异常
+  THE_NUMBER_OF_POINT_CLOUDS_IS_NOT_NORMAL = 3;
+
+  ///< 找不到GPS数据来源
+  COULD_NOT_FIND_THE_SOURCE_OF_GPS = 4;
+
+  ///< 找不到点云数据来源
+  COULD_NOT_FIND_THE_SOURCE_OF_POINT_CLOUD = 5;
+
+  ///< 找不到IMU数据来源
+  COULD_NOT_FIND_THE_SOURCE_OF_IMU = 6;
+
+  ///< 找不到INS数据来源
+  COULD_NOT_FIND_THE_SOURCE_OF_INS = 7;
+
+  ///< 创建文件失败
+  HAVE_NOT_RECEIVED_PC_WITHIN_THE_SPECIFIED_TIME = 8;
+
+  ///< 未在规定时间内接收到点云
+  FAILED_TO_CREATE_FILE = 9;
+
+  ///< 未在规定时间内收到INS数据
+  HAVE_NOT_RECEIVED_INS_DATA_WITHIN_THE_SPECIFIED_TIME = 10;
+
+  ///< 未在规定时间内收到IMU数据
+  HAVE_NOT_RECEIVED_IMU_DATA_WITHIN_THE_SPECIFIED_TIME = 11;
+
+  ///< 内置流程线出现逻辑错误
+  THERE_ARE_SOME_LOGICAL_ERRORS_IN_INNER_PIPELINE = 12;
+
+  ///< 点云数据格式异常
+  POINT_CLOUD_HAS_A_BAD_HEADER = 13;
+
+  ///< INS数据异常(数值过大，或者无意义)
+  RECEIVED_BAD_INS_DATA = 14;
+
+  ///< 成功运行标定程序
+  RUN_CALIB_PROCESS_SUCCESSFULLY = 15;
+
+  ///< 正在运行标定程序
+  CALIB_PROCESS_IS_RUNNING = 16;
+
+  ///< 标定程序冷却中
+  CALIB_PROCESS_IS_COOLING_DOWN = 17;
+
+  ///< 点云时间戳存在跳变
+  THERE_IS_JUMP_IN_THE_PC_TIMESTAMP = 20;
+
+  ///< 有效点云数目太少
+  TOO_FEW_VALID_POINT_CLOUDS = 21;
+
+  ///< 点云点时间戳异常
+  POINT_CLOUD_HAS_BAD_POINTS_TIMESTAMP = 22;
+
+  ///< 未检测到地面
+  FAILED_TO_DETECT_GROUND = 30;
+
+  ///< 场景中能被检测到的地面太少
+  TOO_LITTLE_GROUND_IN_THE_SCENE_TO_BE_DETECTED = 31;
+
+  ///< 场景中能被检测到的立柱太少
+  TOO_FEW_PILLARS_TO_BE_DETECTED_IN_THE_SCENE = 32;
+
+  ///< 场景中能被检测到的立面太少
+  TOO_FEW_FACADES_TO_BE_DETECTED_IN_THE_SCENE = 33;
+
+  ///< 场景中能被检测到的横杆太少
+  TOO_FEW_BEAMS_TO_BE_DETECTED_IN_THE_SCENE = 34;
+
+  ///< 地面矫正失败
+  FAILED_TO_REFINE_THE_GROUND = 35;
+
+  ///< 数据时序不正确
+  THE_TIME_SEQUENCE_IS_NOT_GOOD = 36;
+
+  ///< 使用默认标定参数
+  COUNLD_NOT_FIND_DEFAULT_CALIBRATION_PARAMETERS = 37;
+
+  ///< 因缺少足够特征而跳过当前帧
+  SKIPPED_SCANNING_FOR_LACKING_ENOUGH_FEATURES = 50;
+
+  ///< 局部点云地图过期
+  LOCAL_MAP_HAS_BEEN_OUT_OF_DATE = 51;
+
+  ///< 未创建局部点云地图
+  LOCAL_MAP_HAS_NOT_BEEN_BUILT = 52;
+
+  ///< 局部点云地图没有边界
+  LOCAL_MAP_HAS_NO_BOUND = 53;
+
+  ///< 里程计优化结果缺少足够的约束/匹配
+  LMOPT_LACK_ENOUGH_CONSTRAINTS = 60;
+
+  ///< 里程计优化结果的残差过大
+  THE_RESIDUAL_OF_LMOPT_IS_TOO_LARGE = 61;
+
+  ///< 里程计优化结果的平移过大
+  THE_TRANSLATION_OF_LMOPT_IS_TOO_LARGE = 62;
+
+  ///< 里程计优化结果的旋转过大
+  THE_ROTATION_OF_LMOPT_IS_TOO_LARGE = 63;
+
+  ///< 里程计优化结果无法收敛
+  LMOPT_FAILED_TO_CONVERGE = 64;
+
+  ///< 里程计优化的lamda过大
+  LMOPT_HAS_TOO_BIG_LAMDA = 65;
+
+  ///< 车辆无运动
+  NO_MOVEMENTS_HAVE_BEEN_DETECTED = 80;
+
+  ///< 车辆速度太慢
+  THE_SPEED_OF_THE_VEHICLE_IS_TOO_SLOW = 81;
+
+  ///< 车辆正在进行大转弯，无法正常标定
+  THE_VEHICLE_IS_MAKING_A_BIG_TURN_AND_CANNOT_BE_CALIBRATED_NORMALLY = 82;
+
+  ///< 车辆线速度信息有跳变
+  THERE_IS_A_BIG_JUMP_IN_LINEAR_VELOCITY = 83;
+
+  ///< 车辆角速度信息有跳变
+  THERE_IS_A_BIG_CHANGE_IN_ANGULAR_VELOCITY = 84;
+
+  ///< 车辆平移运动信息不连续
+  TRANSLATION_IS_DISCONTINUOUS = 85;
+
+  ///< 车辆旋转运动信息不连续
+  RATOTION_IS_DISCONTINUOUS = 86 ;
+
+  ///< 环境条件不适合标定
+  ENVIRONMENTAL_CONDITIONS_ARE_NOT_SUITABLE_FOR = 87;
+
+  ///< 内部里程计重置
+  RESET_LO = 88;
+
+  ///< 车辆速度太快
+  THE_SPEED_OF_THE_VEHICLE_IS_TOO_FAST = 89;
+
+  ///< 点云里程计与INS轨迹之间差异过大
+  THE_DIFFERENCE_BETWEEN_LO_AND_INS_MOTION_TRAJECTORIES_IS_TOO_EXCESSIVE = 100;
+
+  ///< 用于标定的有效数据不足
+  LACK_ENOUGH_VALID_DATA_FOR_CALIBRATION = 101;
+
+  ///< 标定结果的标准差过大
+  THE_STANDARD_DEVIATION_OF_THE_CALIBRATION_RESULT_IS_TOO_LARGE = 102;
+
+  ///< 标定结果与设计值差异过大
+  THE_RANGE_DIFF_OF_THE_CALIBRATION_RESULT_IS_TOO_LARGE = 103;
+
+  ///< 输出标定结果失败
+  FAILED_TO_OUTPUT_CALIBRATION_RESULT = 104;
+
+  ///< 标定程序运行超时
+  CALIBRATION_RUNNING_TIMEOUT = 105;
+
+  ///< 统计模块无法读取历史文件
+  SUMMARY_STORAGE_FILE_MISSED = 120;
+
+  ///< 统计模块历史文件保存失败
+  SAVING_STORAGE_FILE_FAILED = 121;
+
+  ///< 标定成功时，标定结果保存文件失败
+  RESULT_SAVE_FAILED = 125;
+
+  ///< 雷达内参文件失效
+  LIDAR_HAS_A_BAD_INSTRINSIC_DATA = 126;
+}
+
+/**
+* @brief  激光雷达在线标定信息
+* @detail 激光雷达标在线定信息
+*/
+message OnlineCalibration
+{
+  ///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+  double timestamp = 1;
+
+  ///< 左雷达标定状态：[/],(/,/,/),[/],(1,0),左雷达标定状态
+  OfflineCalibrationState left_lidar_calibration_state = 2;
+
+  ///< 右雷达标定状态：[/],(/,/,/),[/],(1,0),右雷达标定状态
+  OfflineCalibrationState right_lidar_calibration_state = 3;
+
+  ///< 激光雷标定状态：[/],(/,/,/),[/],(1,0),激光雷标定状态,0x0:默认值；0x1：标定中；0x2：标定成功；大于3：标定失败
+  uint32 lidar_calibration_status = 4;
+}

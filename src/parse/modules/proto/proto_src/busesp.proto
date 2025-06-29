@@ -1,0 +1,689 @@
+/**
+* @file     busesp.proto
+* @author   zhangzhirui
+* @details  
+* @date     2022-03-18
+* @version  V1.1
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18         <th>1.0                 <th>zhangzhirui 
+* <tr><th>2022.12.05        <th>1.1                 <th>liuhang
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	BusespProto;
+import "seq_header.proto";
+
+/**
+* @brief BusEsp
+* @detail BusEsp
+*/
+message BusEsp{ 
+	///<BusEspMotionInfo：[/],(/,/,/),[32],(1,0),/
+    BusEspMotionInfo esp_motion_info = 1;
+	
+	///< BusEspFbSts：[/],(/,/,/),[32],(1,0),/
+    BusEspFbSts esp_fb_sts = 2;
+	
+	///< BusBrkPressure：[/],(/,/,/),[32],(1,0),/
+    BusBrkPressure brk_pressure = 3;
+		
+	///< BusEspWhlSpd：[/],(/,/,/),[32],(1,0),/
+    BusEspWhlSpd esp_whl_spd = 4;
+	
+	///< BusEpbFunInfo：[/],(/,/,/),[32],(1,0),/
+	BusEpbFunInfo epb_fun_info = 5;
+
+    ///< BusEspFuncSts：[/],(/,/,/),[32],(1,0),/
+    BusEspFuncSts esp_func_sts = 6;
+	
+	///< BusEspMbr：[/],(/,/,/),[32],(1,0),/
+	BusEspMbr esp_mbr = 7;
+
+    ///< BusEspFbStsforAPA：[/],(/,/,/),[32],(1,0),/
+    BusEspFbStsforAPA esp_fb_sts_forapa = 8;
+	
+	
+} 
+
+
+/**
+* @brief BusBrkPressure
+* @detail BusBrkPressure 10ms
+*/
+message BusBrkPressure{ 
+	///< 踏板模拟器制动压力：[bar],(0x0,0,250),[/],(0.1,0),
+    double ibcu_pfs_brake_pressure = 1;
+	
+	///< 踏板模拟器制动压力有效：[/],(0x0,0,1),[/],(1,0),0x0:Invalid0x1:Valid
+    uint32 ibcu_pfs_brake_pressure_valid = 2;
+	
+	///< 助力缸制动压力：[bar],(0x0,0,250),[/],(0.1,0),0xff:invalid
+    double ibcu_plunger_brake_pressure = 3;
+	
+	///< 助力缸制动压力有效：[/],(0x0,0,1),[/],(1,0),0x0:Invalid0x1:Valid
+    uint32 ibcu_plunger_brake_pressure_valid = 4;
+	
+	///< 制动主缸压力信号：[Bar],(0,0,250),[/],(1,0),
+    double esp_mas_cyl_brake_pressure = 5;
+	
+	///< 制动主缸压力信号有效：[/],(0,0,1),[/],(1,0),
+    uint32 esp_mas_cyl_brake_pressure_valid = 6;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 7;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 8;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 9;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 10;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 11;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 12;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 13;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 14;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 15;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 16;	
+	
+} 
+
+/**
+* @brief BusEpbFunInfo
+* @detail BusEpbFunInfo 10ms
+*/
+message BusEpbFunInfo{ 
+	///< CDC电子手刹开关设置：[/],(0x0,0,3),[/],(1,0),0x0:no request 0x1:apply 0x2:Reserved 0x3:Reserved
+    uint32 cdc_epb_swt_set = 1;
+	
+	///< EPB夹紧力：[KN],(0x0,0,31),[/],(1,0),0x0-0x1D:ClampForce 0x1E:Reserved 0x1F:Error
+    uint32 epb_achieved_clamp_force = 2;
+	
+	///< EPB夹紧力_Primary：[KN],(0x0,0,31),[/],(1,0),0x0-0x1D:ClampForce 0x1E:Reserved 0x1F:Error
+    uint32 epb_achieved_clamp_force_primary = 3;
+	
+	///< APA请求拉EPB可用：[/],(0,0,1),[/],(/,/),
+    uint32 epb_apa_request_available = 4;
+	
+	///< EPB故障状态_Primary：[/],(0x0,0,3),[/],(1,0),0x0:no error in EPB  0x1:not defined   0x2:not defined 0x3:error in EPB 
+    uint32 epb_fail_statuss_primary = 5;
+	
+	///< EPB故障状态：[/],(0x0,0,3),[/],(1,0),
+	///< 0x0:No error 
+	///< 0x1:Not defined 
+	///< 0x2:Not defined 
+	///< 0x3:error 0xff:invalid
+    uint32 epb_failr_sts = 6;
+	
+	///< EPB状态：[/],(0x0,0,7),[/],(1,0),
+	///< 0x0:both brakes released 
+	///< 0x1:both brakes applied 
+	///< 0x2:both brakes Releasing 
+	///< 0x3:both brakes Locking 
+	///< 0x4:unknown 
+	///< 0xff:invalid
+    uint32 epb_sts = 7;
+	
+	///< EPB状态_Primary：[/],(0x0,0,7),[/],(1,0),0x0:released 0x1: ParkedApplied 0x2:releasing 0x3:Locking 0x4:unknown 0x5:HoldApplied 0x6: CompletelyReleased 0x7:HapPrepared
+    uint32 epb_sts_primary = 8;
+	
+	///< EPB外部请求可用：[/],(0x0,0,1),[/],(1,0),0x0:Not available 0x1:available 0xff:invalid
+    uint32 esp_epb_req_avl = 9;
+	
+	///< EPB开关位置：[/],(0,0,3),[/],(1,0),0x00 BothReleased,0x01 BothApplied,0x02 BothReleasing,0x03 BothLocking,0x04 Unknown
+    uint32 epb_switch_position = 10;
+	
+	///< EPB开关位置有效：[/],(0,0,1),[/],(1,0),
+    uint32 epb_switch_position_valid = 11;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 12;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 13;
+    
+	///< EPB功能指示灯：[秒],(0x0,0,/),[/],(/,/),标识3C2,0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:invalid 0xFF:invalid(E2E/signalvalid)
+	uint32 epbfctlamp = 14;
+	
+	///< EPB1功能指示灯：[秒],(0x0,0,/),[/],(/,/),标识3C2,0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:invalid 0xFF:invalid(E2E/signalvalid)
+	uint32 epb1fctlamp = 15;
+	
+	///< EPB错误指示灯：[/],(0x0,0,/),[/],(/,/),标识3C2,0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:invalid0xFF:invalid(E2E/signalvalid)
+	uint32 epbfailrlamp = 16;
+	
+	///< EPB1功能指示灯：[/],(0x0,0,/),[/],(/,/),标识3C2,0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:invalid 0xFF:invalid(E2E/signalvalid)
+	uint32 epb1failrlamp = 17;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 18;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 19;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 20;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 21;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 22;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 23;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 24;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 25;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 26;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 27;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 28;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 29;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 30;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 31;	
+	
+	///< 预留信号15：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved14 = 32;	
+	
+} 
+
+/**
+* @brief BusEspFbSts
+* @detail BusEspFbSts 10ms
+*/
+message BusEspFbSts{ 
+	///< 制动系统压力：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:nobrakeforce 
+	///< 0x1:havebrakeforce 
+	///< 0xff:invalid
+    uint32 esp_brake_force = 1;
+	
+	///< CDD(减速度控制)激活：[/],(0x0,0,1),[/],(1,0),0x0:notactive 0x1:ActiveL2 0x2 ActiveL3 0xff:invalid
+    uint32 esp_cdd_active = 2;
+	
+	///< CDD(减速度控制)可用：[/],(0x0,0,1),[/],(1,0),0x0:NotActive 0x1:ActiveL2 0x2:ActiveL3 0x3：reserved 0xff:invalid
+    uint32 esp_cdd_available = 3;
+	
+	///< 预制动激活：[/],(0x0,0,1),[/],(1,0),0x0:notactive 0x1:active 0xff:invalid
+    uint32 esp_prefill_active = 4;
+	
+	///< 预制动有效：[/],(0x0,0,1),[/],(1,0),0x0:notavailable 0x1:available 0xff:invalid
+    uint32 esp_prefill_available = 5;
+	
+	///< ESP检测到ACC发出的信息有错误（例如checksum, alivecouner,timeout…)：[/],(0x0,0,3),[/],(1,0),0x0:noerror 0x1:error 0x2:reserved 0x3:reserved 0xff:invalid
+    uint32 esp_qdcacc = 6;
+	
+	///< Esp制动灯点亮请求：[/],(0x0,0,3),[/],(1,0),0x0:Not request(brakelightOFF) 0x1:brake light ON 0x2:Not used 0x3:signal Not available
+    uint32 esp_brk_li_on_req = 7;
+	
+	///< IBCU激活状态：[/],(0x0,0,3),[/],(1,0),0x0:ADC_NotActive 0x1:ADC_ActiveReduce 0x2:ADC_ActiveFull 0x3:reserved
+    uint32 ibcu_adc_active_state = 8;
+	
+	///< ADC功能退出抑制状态：[/],(0x0,0,3),[/],(1,0),0x0 ADC_Normal； 0x1 ADC_SuspendByOtherBrake； 0x2 ADC_SuspendByDriverPropulsion；0x3 ADC_RampOffByDriverBrake；
+    uint32 ibcu_adc_ramp_off_suspend_state = 9;
+	
+	///< IBCU与ADC在主CAN通讯异常：[/],(0x0,0,3),[/],(1,0),0x0:noerror 0x1:error 0x2:reserved 0x3:reserved
+    uint32 ibcu_communication_invalid = 10;
+	
+	///< IBCU全功能可用状态：[/],(0x0,0,3),[/],(1,0),0x0：not Available 0x1：Available 0x2：SafeControl Avail 0x3：reserved
+    uint32 ibcu_full_func_avail = 11;
+	
+	///< IBCU降级功能可用状态：[/],(0x0,0,3),[/],(1,0),0x0：not Available 0x1：Available 0x2：reserved 0x3：reserved
+    uint32 ibcu_reduce_func_avail = 12;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 13;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 14;
+    
+    	///< 制动盘温过高报警：[秒],(0x0,0,/),[/],(/,/),0xFF:invalid(E2E/signalvalid)
+	double esp_brakedischightempwarning = 15;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 16;	
+	
+} 
+
+/**
+* @brief BusEspFbStsforAPA
+* @detail BusEspFbStsforAPA 10ms
+*/
+message BusEspFbStsforAPA{ 
+	///< 纵向执行器全功能可用：[/],(0x0,0,3),[/],(1,0),0x0:notavailable 0x1:available 0x2:testpending
+    uint32 apa_available_full_function = 1;
+	
+	///< 纵向执行器降级功能可用：[/],(0x0,0,1),[/],(1,0),0x0:notavailable 0x1:available
+    uint32 apa_available_reduced_function = 2;
+	
+	///< 驾驶员超越：[/],(0x0,0,1),[/],(1,0),0x0:Flase 0x1:True
+    uint32 esp_apa_driver_override = 3;
+	
+	///< ESP减速度激活：[/],(0x0,0,3),[/],(1,0),0x0: Deactive 0x1: ReducedFunction Active 0x2: FullFunction Active 0x3: Reserved
+    uint32 esp_apa_status = 4;
+	
+	///< CDD(减速度控制)激活：[/],(0,0,1),[/],(1,0),0x0:NotActive 0x1:ActiveL2 0x2:ActiveL3 0x3：reserved
+    uint32 esp_cdd_active_apa = 5;
+	
+	///< CDD(减速度控制)可用：[/],(0,0,1),[/],(1,0),
+    uint32 esp_cdd_available_apa = 6;
+	
+	///< ESP液压保压：[/],(0x0,0,1),[/],(1,0),0x0:Flase 0x1:True
+	uint32 esp_apa_cddap_vehicle_hold = 7;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 8;
+	
+	    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 9;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 10;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 11;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 12;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 13;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 14;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 15;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 16;	
+} 
+
+/**
+* @brief BusEspFuncSts
+* @detail BusEspFuncSts 10ms
+*/
+message BusEspFuncSts{ 
+	///< ABA(自动制动辅助)激活：[/],(0x0,0,1),[/],(1,0),0x0:notactive 0x1:active 0xff:invalid
+    uint32 esp_aba_active = 1;
+	
+	///< ABA(自动制动辅助)可用：[/],(0x0,0,1),[/],(1,0),0x0:notavailable 0x1:available 0xff:invalid
+    uint32 esp_aba_available = 2;
+	
+	///< AEB(自动紧急制动)可用：[/],(0x0,0,1),[/],(1,0),0x0:notavailable 0x1:available 0xff:invalid
+    uint32 esp_aeb_available = 3;
+	
+	///< AEB(自动紧急制动)激活：[/],(0x0,0,1),[/],(1,0),0x0:notactive 0x1:active 0xff:invalid
+    uint32 esp_aeb_dec_active = 4;
+	
+	///< AWB(自动警告制动)激活：[/],(0x0,0,1),[/],(1,0),0x0:notactive 0x1:active 0xff:invalid
+    uint32 esp_awb_active = 5;
+	
+	///< AWB(自动警告制动)有效：[/],(0x0,0,1),[/],(1,0),0x0:notavailable 0x1:available 0xff:invalid
+    uint32 esp_awb_available = 6;
+	
+	///< 制动盘过热：[/],(0x0,0,1),[/],(1,0),0x0:nothigh 0x1:temptoohigh 0xff:invalid
+    uint32 esp_brake_over_heat_brake_disc_temp = 7;
+	
+	///< 惯性信号标定状态：[/],(0x0,0,1),[/],(1,0),0x0:Calibrated  0x1: Not Calibrated 0xff:invalid
+    uint32 esp_imu_calibrated = 8;
+	
+	///< ABS激活：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:Not active 
+	///< 0x1:active 
+	///< 0x1C2： EspAbsFailr 
+	///< 0xff:invalid
+    uint32 esp_abs_actv = 9;
+	
+	///< ABS故障：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:No error 来源：0x1C2 EspAbsFailr
+	///< 0x1:Error 
+	///< 0xff:invalid
+    uint32 esp_abs_failr = 10;
+	
+	///< ESP激活状态：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:Not active 来源：0x1C2 EspActvSts
+	///< 0x1:active 
+	///< 0xff:invalid
+    uint32 esp_actv_sts = 11;
+	
+	///< AutoHold功能状态：[/],(0x0,0,3),[/],(1,0),0x0:Not active 0x1:active 0xff:invalid
+    uint32 esp_auto_hold_actv_sts = 12;
+	
+	///< ESP功能开启状态：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:Off 
+	///< 0x1:ON 
+    uint32 esp_fct_open_sts = 13;
+
+	///< 后轴降扭轮端扭矩：[Nm],(0x0,-32768,32767),[/],(1,0),
+    int32 esp_re_whl_dec_tar_tq = 14;
+	
+	///< 后轴降扭激活标志位：[/],(0x0,0,1),[/],(1,0),0x0:Not active 0x1:active
+    uint32 esp_re_whl_dec_tar_tq_actv = 15;
+	
+	///< 后轴增扭轮端扭矩：[Nm],(0x0,-32768,32767),[/],(1,0),
+    int32 esp_re_whl_inc_tar_tq = 16;
+	
+	///< 后轴增扭激活标志位：[/],(0x0,0,1),[/],(1,0),0x0:Not active 0x1:active
+    uint32 esp_re_whl_inc_tar_tq_actv = 17;
+	
+	///< TCS激活状态：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:Not active 来源：0x1C2 EspTcsActvSts
+	///< 0x1:active 
+	///< 0xff:invalid
+    uint32 esp_tcs_actv_sts = 18;
+	
+	///< TCS/ESP故障：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:No error  来源：0x1C2 EspTcsFailr
+	///< 0x1:Error 0xff:
+    uint32 esp_tcs_failr = 19;
+	
+	///< VDC激活状态：[/],(0x0,0,1),[/],(1,0),0x0:Not active 0x1:active 0xff:invalid
+    uint32 esp_vdc_actv_sts = 20;
+	
+	///< 车辆静止：[/],(0x0,0,1),[/],(1,0),0x0:Not standstill 0x1:standstill 0xff:invalid
+    uint32 esp_veh_standstill = 21;
+	
+	///< CDP制动激活：[/],(0,0,1),[/],(1,0),
+    uint32 esp_cdp_parking_active_for_acc = 22;
+	
+	///< CDP制动可用：[/],(0,0,1),[/],(1,0),
+    uint32 esp_cdp_parking_avail_for_acc = 23;
+	
+	///< HDC工作状态：[/],(0,0,3),[/],(1,0),
+	///< 0x0: Off
+	///< 0x1: Standby
+	///< 0x2: Active
+	///< 0x3: Error
+	///< 0xff:invalid
+    uint32 esp_hdc_status = 24;
+	
+	///< HHC激活状态：[/],(0,0,1),[/],(1,0),
+    uint32 esp_hhc_active = 25;
+	
+	///< RWU制动激活：[/],(0,0,1),[/],(1,0),
+    uint32 esp_rwu_parking_active_for_acc = 26;
+	
+	///< RWU制动可用：[/],(0,0,1),[/],(1,0),
+    uint32 esp_rwu_parking_avail_for_acc = 27;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 28;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 29;
+	
+	///< EBD故障：[/],(0x0,0,/),[/],(/,/),
+	///< 0x0:OFF 来源：0x1C2 EspEbdFailr,
+	///< 0x01:ON
+	///< 0xff:invalid
+    uint32 esp_ebd_failr = 30;	
+	
+	///< Auto功能可用：[/],(0x0,0,/),[/],(/,/),/
+	///< 0x0： NotActive
+	///< 0x1：Available
+    uint32 esp_auto_hold_avl = 31;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 32;	
+	
+} 
+
+/**
+* @brief BusEspMbr
+* @detail BusEspMbr 10ms
+*/
+message BusEspMbr{ 
+	///< 制动能量回收轮端目标扭矩：[Nm],(0x8000,-32768,32766),[/],(1,0),
+    int32 mb_rgn_tar_whl = 1;
+	
+	///< 制动能量回收轮端目标扭矩有效状态：[/],(0x0,0,3),[/],(1,0),0x0:NotIntialized 0x1:Normal 0x2:Faulty
+    uint32 mb_rgn_tar_whl_qlfr = 2;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 3;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 4;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 5;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 6;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 7;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 8;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 9;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 10;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 11;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 12;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 13;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 14;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 15;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 16;	
+} 
+
+/**
+* @brief BusEspMotionInfo
+* @detail BusEspMotionInfo 10ms
+*/
+message BusEspMotionInfo{ 
+	///< 横向加速度：[m/s2],(0x0,-12.7,12.7),[/],(0.1,-12.7),0xff:invalid
+    double esp_lat_accel = 1;
+	
+	///< 横向加速度有效位：[/],(0x0,0,3),[/],(1,0),0x0:Initializing 0x1:Valid 0x2:Invalid 0x3:Reserved 0xff:invalid
+    uint32 esp_lat_accel_valid = 2;
+	
+	///< 纵向加速度：[m/s2],(0x0,-16,15.90625),[/],(0.03125,-16),0xff:invalid
+    double esp_long_accel = 3;
+	
+	///< 纵向加速度有效位：[/],(0x0,0,3),[/],(1,0),0x0:Initializing 0x1:Valid 0x2:Invalid 0x3:Reserved 0xff:invalid
+    uint32 esp_long_accel_valid = 4;
+	
+	///< 偏航率：[degree/s],(0x0,-81.91,81.92),[/],(0.01,-81.91),0xff:invalid
+    double esp_yaw_rate = 5;
+	
+	///< 偏航率有效位：[/],(0x0,0,3),[/],(1,0),0x0:Initializing 0x1:Valid 0x2:Invalid 0x3:Reserved 0xff:invalid
+    uint32 esp_yaw_rate_valid = 6;
+	
+	///< 车速信号：[km/h],(0x0,0,460.744),[/],(0.05625,0),0xff:invalid
+    double esp_veh_spd = 7;
+	
+	///< 车速有效：[/],(0x0,0,1),[/],(1,0),
+	///< 0x0:Valid  来源：0x1C2  EspVehSpdVld
+	///< 0x1:Invalid 
+	///< 0xff:invalid
+    uint32 esp_veh_spd_vld = 8;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 9;
+
+    ///< 统计数据帧与时间戳信息：[/],(0x0,0,/),[/],(/,/),
+    SeqHeaderProto.SeqHeader seqheader = 10;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 11;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 12;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 13;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 14;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 15;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 16;	
+} 
+
+/**
+* @brief BusEspWhlSpd
+* @detail BusEspWhlSpd 10ms
+*/
+message BusEspWhlSpd{ 
+	///< 左前轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff:invalid
+    uint32 whl_spd_frnt_le_pls = 1;
+	
+	///< 右前轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff:invalid
+    uint32 whl_spd_frnt_ri_pls = 2;
+	
+	///< 左前轮速信号：[km/h],(0x0,0,360),[/],(0.05626,0),0xff:invalid
+    double whl_spd_le_frnt_data = 3;
+	
+	///< 左前轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid  0xff:invalid
+    uint32 whl_spd_le_frnt_data_vld = 4;
+	
+	///< 左前轮方向信号：[/],(0x0,0,3),[/],(1,0),
+	///< 0x0:Forward 
+	///< 0x1:backward 
+	///< 0x2:Standstill 
+	///< 0x3:Invalid 
+	///< 0xff:invalid 
+	///< 0xff:invalid
+    uint32 whl_spd_le_frnt_dir = 5;
+	
+	///< 左后轮速信号：[km/h],(0x0,0,360),[/],(0.0526,0),0xff:invalid
+    double whl_spd_le_re_data = 6;
+	
+	///< 左后轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 whl_spd_le_re_data_vld = 7;
+	
+	///< 左后轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff:invalid
+    uint32 whl_spd_le_re_dir = 8;
+	
+	///< 左后轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff:invalid
+    uint32 whl_spd_re_le_pls = 9;
+	
+	///< 右后轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff:invalid
+    uint32 whl_spd_re_ri_pls = 10;
+	
+	///< 右前轮速信号：[km/h],(0x0,0,360),[/],(0.0526,0),0xff:invalid
+    double whl_spd_ri_frnt_data = 11;
+	
+	///< 右前轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid  0xff:invalid
+    uint32 whl_spd_ri_frnt_data_vld = 12;
+	
+	///< 右前轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff:invalid
+    uint32 whl_spd_ri_frnt_dir = 13;
+	
+	///< 右后轮速信号：[km/h],(0,0,360),[/],(0.0526,0),0xff:invalid
+    double whl_spd_ri_re_data = 14;
+	
+	///< 右后轮速数据有效：[/],(0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff:invalid
+    uint32 whl_spd_ri_re_data_vld = 15;
+	
+	///< 右后轮方向信号：[/],(0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff:invalid
+    uint32 whl_spd_ri_re_dir = 16;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 17;
+
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 18;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 19;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 20;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 21;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 22;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 23;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 24;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 25;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 26;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 27;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 28;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 29;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 30;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 31;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 32;	
+	
+} 

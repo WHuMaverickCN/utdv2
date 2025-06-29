@@ -1,0 +1,239 @@
+/**
+* @file     busrbm.proto
+* @author   shenjj
+* @details  busrbm.proto
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>shenjj
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	BusrbmProto;
+
+
+/**
+* @brief Busrbm
+* @detail Busrbm
+*/
+message Busrbm{ 
+	///<BusRbmFunSts：[/],(/,/,/),[32],(1,0),
+    BusRbmFunSts rbm_fun_sts = 1;
+	
+	///< BusRbmFbSts：[/],(/,/,/),[32],(1,0),
+    BusRbmFbSts rbm_fb_sts = 2;
+	
+	///< BusRbmMotionInfo：[/],(/,/,/),[32],(1,0),
+    BusRbmMotionInfo rbm_motion_info = 3;
+} 
+
+/**
+* @brief BusRbmFbSts
+* @detail BusRbmFbSts 10ms
+*/
+message BusRbmFbSts{
+	///< RBM的ESP检测到ACC发出的信息有错误（例如checksum, alivecouner,timeout…)：[/],(0x0,0,3),[/],(1,0),0x0:noerror 0x1:error 0x2:reserved 0x3:reserved 0xff:invalid
+    uint32 rbm_esp_qdcacc = 1;
+	///< RBM制动灯点亮请求：[/],(0x0,0,3),[/],(1,0),0x0:brakelightOFF 0x1:brakelightON 0x2:notused 0x3:signalnotavailable
+    uint32 rbm_esp_brake_light_on_request = 2;
+	///< RBM全功能可用状态：[/],(0x0,0,3),[/],(1,0),0x0：not Available 0x1：Available 0x2：SafeControl Avail 0x3：reserved
+    uint32 rbm_full_func_avail = 3;
+	///< RBM与ADC在主CAN通讯异常：[/],(0x0,0,3),[/],(1,0),0x0:noerror 0x1:error 0x2:reserved 0x3:reserved
+    uint32 rbm_communication_invalid = 4;
+	///< RBM激活状态：[/],(0x0,0,3),[/],(1,0),0x0:ADC_NotActive 0x1:ADC_Active_Full 0x2:reserved 0x3:reserved
+    uint32 rbm_adc_active_state = 5;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 6;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+	///< RBM的CDD(减速度控制)可用置为“不可用”：[/],(0x0,0,3),[/],(1,0),
+    ///< 0x0： NotActive
+    ///< 0x1： AvailableL2
+    ///< 0x2： AvailableL3
+    ///< 0x3： Reserve
+    ///< 0xff： invalid
+    uint32 rbm_cdd_available = 8;	
+	
+	///< RBM_制动盘过热：[/],(0x0,0,1),[/],(1,0),
+    ///<0x0： NotHigh
+    ///<0x1： TempTooHigh
+    ///<0xff： invalid
+    uint32 rbm_brake_disc_over_heat = 9;	
+
+	///< 冗余CDD(减速度控制)激活：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    ///< 0x0: NotActive
+    ///< 0x1: ActiveL2
+    ///< 0x2: ActiveL3
+    ///< 0x3: Reserve
+    uint32 rbm_cdd_active = 10;	
+
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 11;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 12;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 13;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 14;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 15;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 16;	
+	
+}
+/**
+* @brief BusRbmFunSts
+* @detail BusRbmFunSts 10ms
+*/ 
+message BusRbmFunSts{
+	///< RBM的EPB错误指示灯_Secondary：[/],(0x0,0,3),[/],(1,0),0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:Invalid
+    uint32 rbm_epb_failr_lamp_secondary = 1;
+	///< RBM的EPB功能指示灯——Secondary：[/],(0x0,0,3),[/],(1,0),0x0:Lamp Off 0x1:Lamp ON 0x2:Lamp Flashing 0x3:Invalid
+    uint32 rbm_epb_fct_lamp_secondary = 2;
+	///< RBM的EPB故障状态_Secondary：[/],(0x0,0,3),[/],(1,0),0x0:no error in EPB  0x1:not defined   0x2:not defined 0x3:error in EPB 
+    uint32 rbm_epb_fail_statuss_secondary = 3;
+	///< RBM的EPB状态_Secondary：[/],(0x0,0,7),[/],(1,0),0x0:released 0x1: ParkedApplied 0x2:releasing 0x3: Locking 0x4:unknown 0x5:HoldApplied 0x6: CompletelyReleased 0x7:HapPrepared
+    uint32 rbm_epb_sts_secondary = 4;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 5;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 6;
+	
+	///< RBM_ABS激活：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x0： NotActive
+    ///< 0x1： Active
+    uint32 rbm_abs_actv_info = 7;	
+	
+	///< ABS故障：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x0： NoError
+    ///< 0x1： Error
+    uint32 rbm_abs_failr_info = 8;	
+	
+	///< 冗余EPB状态：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    ///< 0x0： BrakesReleased
+    ///< 0x1： BrakesApplied
+    ///< 0x2： BrakesReleasing
+    ///< 0x3： BrakesLocking
+    ///< 0x4： unknown
+    uint32 rbm_epb_sts = 9;	
+	
+	///< 冗余EPB外部请求可用：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    ///< 0x0: NotAvailable
+    ///< 0x1: Available
+    uint32 rbm_epb_req_avl = 10;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 11;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 12;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 13;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 14;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 15;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 16;	
+}
+/**
+* @brief BusRbmMotionInfo
+* @detail BusRbmMotionInfo 10ms
+*/ 
+message BusRbmMotionInfo{
+	///< RBM的车速信号：[km/h],(0x0,0,460.744),[/],(1,0),0x0000-0x1FFE:Speed 0x1FFF:Invalid 0xff:invalid 0x1C2: EspVehSpd
+    double rbm_rbm_esp_veh_spd = 1;
+	///< RBM的车速有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid
+    uint32 rbm_esp_veh_spd_vld = 2; 
+	///< RBM左前轮速信号：[km/h],(0x0,0,360),[/],(0.05625,0),0xff: invalid
+    double rbm_wheel_speed_fl_data = 3;
+	///< RBM左前轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_fl_valid_data = 4;
+	///< RBM右前轮速信号：[km/h],(0x0,0,360),[/],(0.05625,0), 0xff: invalid
+    double rbm_wheel_speed_fr_data = 5;
+	///< RBM右前轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_fr_direction = 6;
+	///< RBM右前轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff: invalid
+    uint32 rbm_wheel_speed_fr_pulse = 7;
+	///< RBM右前轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid  0xff: invalid
+    uint32 rbm_wheel_speed_fr_valid_data = 8;
+	///< RBM左后轮速信号：[km/h],(0x0,0,360),[/],(1,0),0xff: invalid
+    double rbm_wheel_speed_rl_data = 9;
+	///< RBM左后轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_rl_direction = 10;
+	///< RBM左后轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff: invalid
+    uint32 rbm_wheel_speed_rl_pulse = 11;
+	///< RBM左后轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_rl_valid_data = 12; 
+	///< RBM右后轮速信号：[km/h],(0x0,0,360),[/],(0.05625,0),0xff: invalid
+    double rbm_wheel_speed_rr_data = 13;
+	///< RBM右后轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_rr_direction = 14;
+	///< RBM右后轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff: invalid
+    uint32 rbm_wheel_speed_rr_pulse = 15;
+	///< RBM右后轮速数据有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_rr_valid_data = 16;
+	///< RBM左前轮速脉冲：[/],(0x0,0,254),[/],(1,0),0xff: invalid
+    uint32 rbm_wheel_speed_fl_pulse = 17;
+	///< RBM左前轮方向信号：[/],(0x0,0,3),[/],(1,0),0x0:Forward 0x1:backward 0x2:Standstill 0x3:Invalid 0xff: invalid
+    uint32 rbm_wheel_speed_fl_direction = 18;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+    double time_stamp = 19;
+    ///< RBM车辆静止:[/],(0x0,0,/),[/],(1,0),0x0:Not standstill 0x1:standstill 0xFF:invalid(E2E/signalvalid) else:Reserved
+    uint32 rbm_veh_standstill = 20;
+    ///< 横向加速度:[m/s2],(0x0,-32,49.91),[/],(0.01,-32),横向加速度
+    double esp_lat_accel = 21;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 22;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 23;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 24;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 25;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 26;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 27;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 28;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 29;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 30;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 31;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 32;	
+} 

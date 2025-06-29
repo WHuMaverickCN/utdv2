@@ -1,0 +1,100 @@
+/**
+* @file     fusion_ex_object.proto
+* @author   chenjianbing
+* @details  fusionExobj相关信号的输出接口定义
+* @date     2022-03-05
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.5          <th>1.0                 <th>chenjianbing 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package FusionProto;
+import "fusion_object.proto";
+import "fusion_common.proto";
+
+/**
+* @brief fusionExobj信息
+* @detail xxxxxxxx
+*/
+
+
+message SingleAssoInfo
+{
+    ///< 关联的传感目标ID: [/],(0，0,10000),[/],(1,0),关联的传感目标的id
+    int32 asso_obj_track_id = 1; 
+    ///< 关联的年龄: [/],(0，0,255),[/],(1,0),关联的年龄	
+    int32 asso_age = 2;
+    ///< 关联的权重: [/],(0，0,100),[/],(1,0),关联的权重
+    int32 asso_weight = 3;
+    ///< 关联丢失帧数: [/],(0，0,100),[/],(1,0),关联丢失帧数
+    int32 asso_loss_frames = 4;
+    ///< 关联的传感观测: [/],(/，/,/),[/],(1,0),关联的传感观测
+    FusionProto.FusObject sensor_object = 5; 
+}
+
+/**
+* @brief fusionExobj信息
+* @detail xxxxxxxx
+*/
+message SingleSensorAssoInfo
+{
+    ///< 传感器类型: [/],(0,0,14),[/],(1,0),传感器类型
+    FusionCommonProto.SensorFlag flag = 1; 
+    ///< 关联的传感的目标信息: [/],(/，/,/),[/],(1,0),关联的传感的目标信息
+    SingleAssoInfo asso_obj = 2; 
+    ///< 关联的传感观测: [/],(0，0,128),[128],(1,0),关联的传感的点云索引
+    repeated int32 asso_points_index = 3;
+    ///< 需要合并的目标的id: [/],(0,0,255),[/],(1,0),需要合并的目标的id
+    int32 sure_merged_track_id = 4;
+    ///< 传感的关联丢失帧数: [/],(0,0,255),[/],(1,0),传感的关联丢失帧数
+    int32 sensor_asso_loss_frames = 5;
+    ///< 关联的传感的所有目标id: [/],(0，0,255),[16],(1,0),关联的传感的所有目标id
+    repeated int32 asso_all_objs_track_id = 6;
+}
+
+/**
+* @brief fusionExobj信息
+* @detail xxxxxxxx
+*/
+message FusExObject
+{
+    ///< 目标信息: [/],(/，/,/),[/],(1,0),目标信息
+    FusionProto.FusObject self_obj = 1; 
+    ///< 目标关联的所有传感的信息: [/],(/，/,/),[16],(/,/),目标关联的所有传感的信息
+    repeated SingleSensorAssoInfo asso_sensors_info = 2; 
+    ///< 目标融合标志位: [/],(0,0,1024),[/],(1,0),目标融合标志位
+    int32 fus_flag = 3;
+    ///< 航迹推算纵向位置: [/],(/，/,/),[/],(/,/),航迹推算纵向位置
+    double ego_posx = 4;
+    ///< 航迹推算横向位置: [/],(/，/,/),[/],(/,/),航迹推算横向位置
+    double ego_posy = 5;
+    ///< 航迹推算夹角: [/],(/，/,/),[/],(/,/),航迹推算夹角
+    float yaw_angle = 6;
+    ///< 本车速度: [/],(/，/,/),[/],(/,/),本车速度
+    float hv_speed = 7;
+}
+
+/**
+* @brief fusionExobj信息
+* @detail xxxxxxxx
+*/
+message FusExObjects
+{
+    ///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+    double time_stamp = 1; 
+    ///< 融合扩展目标集: [/],(/，/,/),[128],(/,/),融合扩展目标集
+    repeated FusExObject objs = 2;
+}

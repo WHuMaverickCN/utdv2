@@ -1,0 +1,978 @@
+/**
+* @file     vp_ndm_base_v2.proto
+* @author   panyiqun、huangshan
+* @details  前视感知NDM基本数据结构信息，定义了NDMHeader及Header具体的数据结构
+* @date     2022-07-26
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.26          <th>1.0                 <th>panyiqun、huangshan
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto2";
+package VpNdmProtoV2;
+
+/**
+*@brief   NDM消息数据头
+*@detail  数据头主要包含版本，日期，时间戳，投影方式等
+*/
+message NDMHeader {
+  ///< 版本信息：[/],(/,/,/),[/],(1,0),NDM格式版本信息
+  optional string version = 1;
+
+  ///< 日期：[/],(/,/,/),[/],(1,0),日期
+  optional string date = 2;
+
+  ///< 时间戳 ：[/],(/,/,/),[/],(1,0),时间戳
+  optional uint64 stamp = 3;
+
+  ///< 消息序列id：[/],(/,/,/),[/],(1,0),消息序列id
+  optional uint64 seq_id = 4;
+
+  ///< 投影方式：[/],(/,/,/),[/],(1,0),地图要素坐标形式，如WGS-84，UTM   
+  optional string projection = 6;
+
+  ///< utm zone编号：[/],(/,/,/),[/],(1,0),ZoneNumber and ZoneDesignator, 例如"50S"
+  optional string utm_zone = 7;  
+
+  ///< 坐标点offset：[/],(/,/,/),[/],(1,0),地图、定位坐标offset
+  optional Point base_offset = 8;
+
+  ///< 系统概述信息：[/],(/,/,/),[/],(1,0),系统概述信息
+  optional GlobalData global_data = 9;
+}
+
+
+/**
+*@brief  系统概述消息
+*@detail  消息主要包含编码，车速，版本，时区等
+*/
+message GlobalData {
+  ///< 国家编码：[/],(/,/,/),[/],(1,0),国家编码, 如:CHN:156
+  optional uint32 country_code      = 1;
+
+  ///< 地区编码：[/],(/,/,/),[/],(1,0),地区编码
+  optional uint32 region_code       = 2;
+
+  ///< 驾驶方向：[/],(/,/,/),[/],(1,0),驾驶方向, 左侧驾驶或右侧驾驶
+  optional DrivingSide driving_side = 3;
+
+  ///< 速度：[单位：km/h],(/,/,/),[/],(1,0),速度单位, km/h或mph
+  optional UnitOfSystem unit        = 4;
+
+  ///< 地图格式版本号：[/],(/,/,/),[/],(1,0),地图格式版本号 major.minor.sub, uint32表示方法: 2的24次方 * major + 2的16次方 * minor + sub
+  optional uint32 protocol_version  = 5;
+
+  ///< 硬件版本：[/],(/,/,/),[/],(1,0), 硬件版本
+  optional uint32 hardware_version  = 6;
+
+  ///< 地图版本：[/],(/,/,/),[/],(1,0),地图数据版本号
+  optional uint32 map_version       = 7;
+
+  ///< 地图更新时间：[/],(/,/,/),[/],(1,0),地图更新时间
+  optional uint32 map_age           = 8;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),地图供应商
+  optional MapProvider map_provider = 9;
+
+  ///< 地图状态：[/],(/,/,/),[/],(1,0),状态如：地图加载中，地图可获得
+  optional MapStatus map_status     = 10;
+
+  ///< 时区：[/],(/,/,/),[/],(1,0),时区
+  optional int32 time_zone_offset   = 11;
+
+  ///< 建图软件版本：[/],(/,/,/),[/],(1,0),mapping软件版本: 3.2.0 (如果来自于自建地图, 即map_provider = MapProvider_provider_HORIZON)
+  optional uint32 mapping_version   = 12;
+
+  ///< 聚合软件版本：[/],(/,/,/),[/],(1,0),aggregation软件版本: 3.2.0 (如果来自自建地图, 即map_provider = MapProvider_provider_HORIZON)
+  optional uint32 aggregation_version = 13;
+
+  ///< OTA 状态：[/],(/,/,/),[/],(1,0),OTA 状态
+  optional uint32 ota_status        = 14;
+}
+
+
+/**
+*@brief   定义驾驶方向
+*@detail  分为两个方向：左侧驾驶和右侧驾驶
+*/
+enum DrivingSide {
+  ///< 左侧驾驶：[/],(/,/,/),[/],(1,0),左侧驾驶
+  DrivingSide_RightHandDriving = 0;
+
+  ///< 右侧驾驶：[/],(/,/,/),[/],(1,0),右侧驾驶
+  DrivingSide_LeftHandDriving = 1;
+}
+
+
+/**
+*@brief   描述车速的两种方式
+*@detail  分为两种方式：mph和km/h
+*/
+enum UnitOfSystem {
+  ///< 速度单位：[单位：mph],(/,/,/),[/],(1,0),英制mph
+  UnitOfSystem_Imperial = 0;
+
+  ///< 速度单位：[单位：km/h],(/,/,/),[/],(1,0),千米/h
+  UnitOfSystem_Metric   = 1;
+}
+
+
+/**
+*@brief   定义地图供应商
+*@detail  共9家供应商
+*/
+enum MapProvider {
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),未知地图
+  MapProvider_provider_Unknown = 0;
+
+   ///< 地图供应商：[/],(/,/,/),[/],(1,0),AND地图
+  MapProvider_provider_AND = 1;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),高德地图
+  MapProvider_provider_AutoNavi = 2;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),HERE地图
+  MapProvider_provider_HERE = 3;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),现代地图
+  MapProvider_provider_Hyundai = 4;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),四维图新地图
+  MapProvider_provider_Navinfo = 5;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),TomTom地图
+  MapProvider_provider_TomTom = 6;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),Zenrin地图
+  MapProvider_provider_Zenrin = 7;
+
+  ///< 地图供应商：[/],(/,/,/),[/],(1,0),地平线地图
+  MapProvider_provider_HORIZON = 8;
+}
+
+
+/**
+*@brief   定义地图状态
+*@detail  共3种状态：未获得，加载中，已获得
+*/
+enum MapStatus {
+  ///< 地图状态：[/],(/,/,/),[/],(1,0),未获得
+  MapStatus_mapNotAvailable = 0;
+
+  ///< 地图状态：[/],(/,/,/),[/],(1,0),加载中
+  MapStatus_mapLoading = 1;
+
+  ///< 地图状态：[/],(/,/,/),[/],(1,0),已获得
+  MapStatus_mapAvailable = 2;
+}
+
+
+/**
+*@brief   描述消息的id号
+*@detail  主要描述id号，和name
+*/
+message Id {
+  ///< 消息id：[/],(/,/,/),[/],(1,0),id号
+  optional uint64 id = 1;
+
+  ///< 消息name：[/],(/,/,/),[/],(1,0),name
+  optional string name = 2;
+}
+
+
+/**
+*@brief   描述消息的索引
+*@detail  主要描述x,y,z三个方向的索引
+*/
+message Index {
+  ///< 消息索引：[/],(/,/,/),[/],(1,0),x方向索引
+  optional uint64 x = 1;
+
+  ///< 消息索引：[/],(/,/,/),[/],(1,0),y方向索引
+  optional uint64 y = 2;
+
+  ///< 消息索引：[/],(/,/,/),[/],(1,0),z方向索引
+  optional uint64 z = 3;
+}
+
+
+/**
+*@brief   描述消息的相关关联
+*@detail  主要描述关联要素编号，起始偏移量，终止偏移量
+*/
+message Link {
+  ///< 关联要素编号：[/],(/,/,/),[/],(1,0),关联要素编号
+  optional string id = 1;
+
+  ///< 起始偏移量：[单位：m],(/,/,/),[/],(1,0),关联要素相对于上层要素的起始偏移量，⽐如路⾯箭头被关联的⻋道，记录路⾯箭头相对于⻋道的起始偏移量
+  optional float offset = 2;
+
+  ///< 终止偏移量：[单位：m],(/,/,/),[/],(1,0),关联要素相对于上层要素的终⽌偏移量，单位：m
+  optional float end_offset = 3;
+}
+
+/**
+*@brief   描述消息的Number属性
+*@detail  主要描述点的属性，如值和协方差
+*/
+message Number {
+  ///<值：[/],(/,/,/),[/],(1,0),值
+  optional float value = 1;
+  
+  ///<协方差：[/],(/,/,/),[/],(1,0),协方差
+  optional float cov = 2;
+}
+
+/**
+*@brief   描述消息的String属性
+*@detail  主要描述点的属性，如字符串和协方差
+*/
+message String {
+  ///<字符串：[/],(/,/,/),[/],(1,0),字符串
+  optional string str = 1;
+  
+  ///<协方差：[/],(/,/,/),[/],(1,0),协方差
+  optional float cov = 2;
+}
+
+
+/**
+*@brief   描述消息的Point属性
+*@detail  主要描述点的属性，如x,y,z坐标和协方差
+*/
+message Point {
+  ///< x轴坐标：[/],(/,/,/),[/],(1,0),3D点的X轴坐标 
+  optional double x = 1;
+
+  ///< y轴坐标：[/],(/,/,/),[/],(1,0),3D点的Y轴坐标 
+  optional double y = 2;
+
+  ///< z轴坐标：[/],(/,/,/),[/],(1,0),3D点的Z轴坐标 
+  optional double z = 3;
+
+  ///< 协方差：[/],(/,/,/),[/],(1,0),3D点的坐标协方差
+  repeated double cov = 4;
+}
+
+
+/**
+*@brief   描述消息的四元数属性
+*@detail  主要描述四元数属性，如x,y,z分量和协方差
+*/
+message Quaternion4d {
+  ///< x：[/],(/,/,/),[/],(1,0),四元数x分量  
+  optional double x = 1;
+
+  ///< y：[/],(/,/,/),[/],(1,0),四元数y分量  
+  optional double y = 2;
+
+  ///< z：[/],(/,/,/),[/],(1,0),四元数z分量  
+  optional double z = 3;
+
+  ///< w：[/],(/,/,/),[/],(1,0),四元数w分量  
+  optional double w = 4;
+
+  ///< 协方差：[/],(/,/,/),[/],(1,0),四元数的协方差
+  repeated double cov = 5;
+}
+
+
+/**
+*@brief   描述消息的里程计信息
+*@detail  主要描述里程计信息，如时间戳，当前坐标系，序列id，速度，角速度，坐标系等
+*/
+message Odometry {
+  ///< 时间戳：[单位：ms],(/,/,/),[/],(1,0),时间戳
+  optional uint64 stamp = 1;	// ms
+
+  ///< 当前坐标系：[/],(/,/,/),[/],(1,0),当前坐标系
+  optional string frame_id = 2;  // the pose in this message is specified in the coordinate frame given by frame_id
+
+  ///< 子坐标系：[/],(/,/,/),[/],(1,0),子坐标系
+  optional string child_frame_id = 3;  // the twist(速度) in this message is specified in the coordinate frame given by child_frame_id
+
+  ///< 序列ID：[/],(/,/,/),[/],(1,0),消息序列ID
+  optional uint32 seq_id = 4;
+
+  ///< 四元数：[/],(/,/,/),[/],(1,0),四元数 x,y,z,w分量
+  optional Quaternion4d quaternion = 5;   // quaternion: x, y, z, w
+
+  ///< 位置xyz：[/],(/,/,/),[/],(1,0),若坐标系是WGS84，则填经纬⾼。若是UTM坐标系，则填xyz
+  optional Point position = 6;    // position: Point.x, Point.y, Point.z
+
+  ///< 位置协方差：[/],(/,/,/),[/],(1,0),位置协方差
+  repeated double pose_cov = 7;
+
+  ///< 速度：[单位：m/s],(/,/,/),[/],(1,0),x,y,z方向速度
+  optional Point linear_velocity = 8;	// x, y, z, in m/s
+
+  ///< 角速度：[单位：rad/s],(/,/,/),[/],(1,0),x,y,z方向角速度
+  optional Point angular_velocity = 9;	// rotx*roty*rotz, in rad/s 
+
+  ///< 速度协方差：[/],(/,/,/),[/],(1,0),速度协方差
+  repeated double twist_cov = 10;
+
+  ///< 投影方式：[/],(/,/,/),[/],(1,0),若是UTM坐标系，需填写对应的zone分区
+  optional string utm_zone = 11;
+
+  ///< 地图偏移量 ：[/],(/,/,/),[/],(1,0),若是UTM坐标系，需填写对应地图⽚段在UTM坐标系下的偏移量
+  optional Point map_offset = 12;
+
+  ///< 局部协方差：[/],(/,/,/),[/],(1,0),局部x,y,yaw的协方差
+  repeated double local_cov = 13; // local covariance x, y, yaw
+}
+
+
+/**
+*@brief   描述消息的WGS84坐标格式
+*@detail  主要描述WGS84坐标格式，如时间戳，经纬度，高度，偏航角
+*/
+message WGS84 {
+  ///< 时间戳：[单位：ms],(/,/,/),[/],(1,0),时间戳
+  optional uint64 stamp = 1;	// ms
+
+  ///<纬度：[单位：degree],(/,/,/),[/],(1,0),纬度
+  optional double lat = 2;	// degree
+
+  ///<经度：[单位：degree],(/,/,/),[/],(1,0),经度
+  optional double lon = 3;	// degree
+
+  ///<高度：[单位：degree],(/,/,/),[/],(1,0),高度
+  optional uint64 height = 4;	// meter
+
+  ///<偏航角：[单位：rad],(/,/,/),[/],(1,0),偏航角
+  optional double yaw = 5;	// rad
+}
+
+
+/**
+*@brief   描述消息的轨迹信息
+*@detail  主要描述轨迹信息，如时间戳，序列id，odom序列，道路编号序列，车道编号序列
+*/
+message Trajectory {
+  ///< 时间戳：[单位：ms],(/,/,/),[/],(1,0),时间戳
+  optional uint64 stamp = 1;
+
+  ///< 序列ID：[/],(/,/,/),[/],(1,0),消息序列ID
+  optional uint32 seq_id = 2;
+
+  ///< odom序列：[/],(/,/,/),[/],(1,0),轨迹对应的odom序列
+  repeated Odometry odoms = 3;  // 轨迹对应的odom序列
+
+  ///< 道路编号序列：[/],(/,/,/),[/],(1,0),轨迹关联的道路编号序列, road_ids.size = odoms.size, odoms[i] 对应的位置在road_ids[i] 对应的道路中
+  repeated string road_ids = 4;  
+
+  ///< 车道编号序列：[/],(/,/,/),[/],(1,0),轨迹关联的车道编号序列, lane_ids.size = odoms.size, odoms[i] 对应的位置在lane_idss[i] 对应的车道中
+  repeated string lane_ids = 5;  // 轨迹关联的车道编号序列, lane_ids.size = odoms.size, odoms[i] 对应的位置在lane_idss[i] 对应的车道中
+}
+
+
+/**
+*@brief   描述消息的圆柱形状信息
+*@detail  主要描述圆柱形状信息，如采样点，控制点，半径
+*/
+message Cylinder {
+  ///< 采样点：[/],(/,/,/),[/],(1,0),曲线对于的采样点(vcs坐标系)
+  repeated Point points = 1;
+
+  ///< 控制点1：[/],(/,/,/),[/],(1,0),⻉塞尔曲线对应的Pred 控制点
+  repeated Point pred_points = 2;
+
+  ///< 控制点2：[/],(/,/,/),[/],(1,0),⻉塞尔曲线对应的succ 控制点
+  repeated Point succ_points = 3;
+
+  ///< 半径：[/],(/,/,/),[/],(1,0),半径
+  optional Number radius = 4;
+}
+
+
+/**
+*@brief   描述消息的圆形状信息
+*@detail  主要描述圆形状信息，如圆点，半径，平面法向量，边的宽度
+*/
+message Circle {
+  ///< 圆点坐标：[/],(/,/,/),[/],(1,0), 圆点坐标
+  optional Point center = 1;
+
+  ///< 圆平面法向量：[/],(/,/,/),[/],(1,0),平面法向量
+  optional Point normal = 2;
+
+  ///< 半径：[/],(/,/,/),[/],(1,0),半径
+  optional Number radius = 3;
+
+  ///< 边的宽度：[/],(/,/,/),[/],(1,0),边的宽度
+  optional float edgeline_width = 5;
+}
+
+
+/**
+*@brief   描述消息的多边形形状信息
+*@detail  主要描述多边形状信息，如端点，平面法向量，边的宽度，主方向
+*/
+message Polygon {
+  ///< 多边形端点数组：[/],(/,/,/),[/],(1,0),多边形框的顶点，从左上⻆开始，逆时针存储
+  repeated Point points = 1;
+
+  ///< 多边形平⾯法向量：[/],(/,/,/),[/],(1,0),多边形平⾯法向量
+  optional Point normal = 2;
+
+  ///< 多边形边的宽度：[/],(/,/,/),[/],(1,0),多边形的边宽
+  optional float edgeline_width = 3;
+
+  ///< 多边形的主⽅向：[/],(/,/,/),[/],(1,0),多边形的主⽅向
+  optional Point orientation = 4;
+}
+
+
+/**
+*@brief   描述消息的车辆类型信息
+*@detail  主要描述车辆类型信息，如卡车，摩托车，自行车以及类型置信度等
+*/
+message VehicleType {
+
+  /**
+  *@brief   描述消息的车辆类型信息
+  *@detail  主要描述车辆类型信息，如卡车，摩托车，自行车
+  */
+  enum Type {
+    ///< 未知类型：[/],(/,/,/),[/],(1,0),未知车辆
+    VEHICLE_TYPE_UNKNOWN = 0;
+
+    ///< 轿车：[/],(/,/,/),[/],(1,0),轿车
+    CAR = 1;
+
+    ///< 摩托车：[/],(/,/,/),[/],(1,0),摩托车
+    MOTORCYCLE = 2;
+
+    ///< 自行车：[/],(/,/,/),[/],(1,0),自行车
+    BICYCLE = 3;
+
+    ///< 卡车：[/],(/,/,/),[/],(1,0),卡车
+    TRUCK = 4;
+
+    ///< 出租车：[/],(/,/,/),[/],(1,0),出租车
+    TAXI = 5;
+
+    ///< 公交车：[/],(/,/,/),[/],(1,0),公交车
+    BUS = 6;
+
+    ///< 行人 ：[/],(/,/,/),[/],(1,0),行人
+    PEDESTRAIN = 7;
+
+    ///< 缆车：[/],(/,/,/),[/],(1,0),缆车
+    CABLE_CAR = 8;
+  }
+
+  ///< 车辆类型：[/],(/,/,/),[/],(1,0),车辆类型
+  optional Type type = 1;
+
+  ///< 置信度：[/],(/,/,/),[/],(1,0),类型的置信度
+  optional float conf = 2;
+}
+
+
+/**
+*@brief   定义限速来源信息
+*@detail  主要描述限速来源，如未知，计算导出结果，标记结果
+*/
+enum SpeedLimitSource {
+  ///< 限速来源未知 ：[/],(/,/,/),[/],(1,0),限速来源未知
+  SpeedLimitSource_Unknown = 0;
+
+  ///<  限速来源为计算导出：[/],(/,/,/),[/],(1,0),计算导出结果
+  SpeedLimitSource_Implicit = 2;  // derived results
+
+  ///<  限速来源为标记结果：[/],(/,/,/),[/],(1,0),标记结果
+  SpeedLimitSource_Explicit = 4;  // clearly marked
+}
+
+
+/**
+*@brief   定义限速类型信息
+*@detail  主要描述限速类型，如未知，最低限速，最高限速
+*/
+enum SpeedLimitType {
+  ///< 限速类型未知 ：[/],(/,/,/),[/],(1,0),限速类型未知
+  SpeedLimitType_Unknown = 0;
+
+  ///< 限速类型最低限速 ：[/],(/,/,/),[/],(1,0),最低限速
+  SpeedLimitType_Min = 2;  // minimum speed limit
+
+  ///< 限速类型最高限速 ：[/],(/,/,/),[/],(1,0),最高限速
+  SpeedLimitType_Max = 4;  // maximum speed limit
+}
+
+
+/**
+*@brief   定义每种车辆的限速信息
+*@detail  主要描述每种车辆的限速信息，如限速类型，限速值，限速来源，起始作用范围，终止作用范围
+*/
+message SpeedLimit {
+  ///< 限速类型 ：[/],(/,/,/),[/],(1,0),限速类型
+  optional SpeedLimitType limit_type = 1;  // see SpeedLimitType
+
+  ///< 限速值：[单位：km/h],(/,/,/),[/],(1,0),限速值
+  optional float speed_value = 2;           // value of speed limit (km/h)
+
+  ///< 限速来源：[/],(/,/,/),[/],(1,0),限速来源
+  optional SpeedLimitSource source = 3;     // source of speed limit
+
+  ///< 起始作用范围 ：[单位：m],(/,/,/),[/],(1,0),限速起始作⽤范围，如相对于⻋道起点的偏移量，单位m
+  optional float offset = 4;                // starting range of speed limit (offset from the start of lane, unit: m)
+
+  ///< 终止作用范围 ：[单位：m],(/,/,/),[/],(1,0),限速终⽌作⽤范围 
+  optional float end_offset = 5;            // end range of speed limit (offset from the start of lane, unit: m)
+}
+
+
+/**
+*@brief   定义时间限制信息
+*@detail  主要描述开始时间，结束时间
+*/
+message TimeLimit {
+  ///< 开始时间：[/],(/,/,/),[/],(1,0),开始时间
+  optional float time_begin = 1;
+
+  ///< 终止时间：[/],(/,/,/),[/],(1,0),终止时间
+  optional float time_end = 2;
+}
+
+
+/**
+*@brief   定义停车位限制信息
+*@detail  主要描述车辆数量限制，停车时间限制，车型限制
+*/
+message ParkingSpaceRestriction {
+  ///<车位数量限制：[/],(/,/,/),[/],(1,0),停⻋区域中⻋位的数量限制
+  optional Number number_limit = 1;
+
+  ///< 停车时间限制：[/],(/,/,/),[/],(1,0),停车时间限制
+  repeated TimeLimit time_limits = 2;
+
+  ///< 车型限制：[/],(/,/,/),[/],(1,0),允许停⻋的⻋型 
+  repeated VehicleType vehicle_types = 3;
+}
+
+
+/**
+*@brief   定义特殊场景类型信息
+*@detail  主要描述特殊场景类型信息，如收费站，检查站，减速带，断头路等
+*/
+enum SpecialSituationType {
+  ///< 断头路：[/],(/,/,/),[/],(1,0),断头路
+  SpecialSituationType_DeadEnd = 248;
+
+  ///< 码头：[/],(/,/,/),[/],(1,0),码头
+  SpecialSituationType_FerryTerminal = 249;
+
+  ///<  收费站：[/],(/,/,/),[/],(1,0), 收费站
+  SpecialSituationType_TollBooth = 250; 
+
+  ///< 铁道路口：[/],(/,/,/),[/],(1,0),铁道路口
+  SpecialSituationType_RailroadCrossing = 251;
+
+  ///< 行人路口：[/],(/,/,/),[/],(1,0),行人路口
+  SpecialSituationType_PedestrianCrossing = 252;
+
+  ///< 减速带：[/],(/,/,/),[/],(1,0),减速带
+  SpecialSituationType_SpeedBump = 253;
+
+  ///< 检查站：[/],(/,/,/),[/],(1,0),检查站
+  SpecialSituationType_CertifiedRoad = 254;
+
+  ///< 收费站和检查站：[/],(/,/,/),[/],(1,0),收费站和检查站
+  SpecialSituationType_TollBooth_CertifiedRoad = 255;
+}
+
+
+/**
+*@brief   交通事件类型
+*@detail  交通事件类型，包括事故类、施工类、管制类、天气类、路面类、活动类、灾害类、警察等
+*/
+
+enum TrafficEventType {
+  ///<未知：[/],(/,/,/),[/],(1,0),未知
+  TrafficEventType_Unknown = 0;
+
+  ///<一般交通事故：[/],(/,/,/),[/],(1,0),一般交通事故
+  TrafficEventType_GeneralTrafficAccident = 7;
+  
+  ///<严重交通事故：[/],(/,/,/),[/],(1,0),严重交通事故
+  TrafficEventType_SeriousTrafficAccident = 8;
+  
+  ///<故障车：[/],(/,/,/),[/],(1,0),故障车
+  TrafficEventType_FaultyCar = 9;
+  
+  ///<疑似事故：[/],(/,/,/),[/],(1,0),疑似事故
+  TrafficEventType_SuspectedAccident = 10;
+  
+  ///<道路施工：[/],(/,/,/),[/],(1,0),道路施工
+  TrafficEventType_RoadConstruction = 11;
+  
+  ///<施工影响出行：[/],(/,/,/),[/],(1,0),施工影响出行
+  TrafficEventType_ConstructionImpactTravel = 12;
+  
+  ///<施工不建议穿行：[/],(/,/,/),[/],(1,0),施工不建议穿行
+  TrafficEventType_ConstructionAndPassThroughNotRecommended = 13;
+  
+  ///<交通管制：[/],(/,/,/),[/],(1,0),交通管制
+  TrafficEventType_TrafficControl = 14;
+  
+  ///<道路关闭：[/],(/,/,/),[/],(1,0),道路关闭
+  TrafficEventType_RoadClosed = 15;
+  
+  ///<出口匝道关闭：[/],(/,/,/),[/],(1,0),出口匝道关闭
+  TrafficEventType_ExitRampClosed = 16;
+  
+  ///<入口匝道关闭：[/],(/,/,/),[/],(1,0),入口匝道关闭
+  TrafficEventType_EntranceRampClosed = 17;
+  
+  ///<1条车道关闭：[/],(/,/,/),[/],(1,0),1条车道关闭
+  TrafficEventType_OneLaneClosed = 18;
+  
+  ///<2条车道关闭：[/],(/,/,/),[/],(1,0),2条车道关闭
+  TrafficEventType_TwoLanesClosed = 19;
+  
+  ///<3条车道关闭：[/],(/,/,/),[/],(1,0),3条车道关闭
+  TrafficEventType_ThreeLanesClosed = 20;
+  
+  ///<4条车道关闭：[/],(/,/,/),[/],(1,0),4条车道关闭
+  TrafficEventType_FourLanesClosed = 21;
+  
+  ///<禁止左转：[/],(/,/,/),[/],(1,0),禁止左转
+  TrafficEventType_ProhibitLeftTurn = 22;
+  
+  ///<禁止右转：[/],(/,/,/),[/],(1,0),禁止右转
+  TrafficEventType_ProhibitRightTurn = 24;
+  
+  ///<禁止左右转：[/],(/,/,/),[/],(1,0),禁止左右转
+  TrafficEventType_ProhibitLeftAndRightTurn = 26;
+  
+  ///<禁止直行：[/],(/,/,/),[/],(1,0),禁止直行
+  TrafficEventType_ProhibitStraight = 28;
+  
+  ///<禁止掉头：[/],(/,/,/),[/],(1,0),禁止掉头
+  TrafficEventType_ProhibitUTurn = 30;
+  
+  ///<道路限制：[/],(/,/,/),[/],(1,0),道路限高|限重|限宽
+  TrafficEventType_RoadHeightOrWeightOrWidthLimited = 32;
+  
+  ///<其他车辆限行：[/],(/,/,/),[/],(1,0),其他车辆限行
+  TrafficEventType_OtherVehicleRestrictions = 33;
+  
+  ///<禁止停车：[/],(/,/,/),[/],(1,0),禁止停车
+  TrafficEventType_NoParking = 34;
+  
+  ///<大风：[/],(/,/,/),[/],(1,0),大风
+  TrafficEventType_Gale = 35;
+  
+  ///<飓风：[/],(/,/,/),[/],(1,0),飓风
+  TrafficEventType_Hurricane = 36;
+  
+  ///<雾：[/],(/,/,/),[/],(1,0),雾
+  TrafficEventType_Fog = 37;
+  
+  ///<大雾：[/],(/,/,/),[/],(1,0),大雾
+  TrafficEventType_HeavyFog = 38;
+  
+  ///<雨：[/],(/,/,/),[/],(1,0),雨
+  TrafficEventType_Rain = 39;
+  
+  ///<大雨：[/],(/,/,/),[/],(1,0),大雨
+  TrafficEventType_HeavyRain = 40;
+  
+  ///<雨夹雪：[/],(/,/,/),[/],(1,0),雨夹雪
+  TrafficEventType_Sleet = 41;
+  
+  ///<雪：[/],(/,/,/),[/],(1,0),雪
+  TrafficEventType_Snow = 42;
+  
+  ///<大雪：[/],(/,/,/),[/],(1,0),大雪
+  TrafficEventType_HeavySnow = 43;
+  
+  ///<冰雹：[/],(/,/,/),[/],(1,0),冰雹
+  TrafficEventType_Hail = 44;
+  
+  ///<破坏性冰雹：[/],(/,/,/),[/],(1,0),破坏性冰雹
+  TrafficEventType_DestructiveHail = 45;
+  
+  ///<寒潮：[/],(/,/,/),[/],(1,0),寒潮
+  TrafficEventType_ColdWave = 46;
+  
+  ///<沙尘暴：[/],(/,/,/),[/],(1,0),沙尘暴
+  TrafficEventType_Sandstorm = 47;
+  
+  ///<高温：[/],(/,/,/),[/],(1,0),高温
+  TrafficEventType_HighTemperature = 48;
+  
+  ///<干旱：[/],(/,/,/),[/],(1,0),干旱
+  TrafficEventType_Drought = 49;
+  
+  ///<雷电：[/],(/,/,/),[/],(1,0),雷电
+  TrafficEventType_Thunder = 50;
+  
+  ///<霜冻：[/],(/,/,/),[/],(1,0),霜冻
+  TrafficEventType_Frost = 51;
+  
+  ///<霾：[/],(/,/,/),[/],(1,0),霾
+  TrafficEventType_Haze = 52;
+  
+  ///<台风：[/],(/,/,/),[/],(1,0),台风
+  TrafficEventType_Typhoon = 53;
+  
+  ///<雷雨大风：[/],(/,/,/),[/],(1,0),雷雨大风
+  TrafficEventType_Thunderstorm = 54;
+  
+  ///<森林火灾：[/],(/,/,/),[/],(1,0),森林火灾
+  TrafficEventType_ForestFire = 55;
+  
+  ///<路面积水：[/],(/,/,/),[/],(1,0),路面积水
+  TrafficEventType_RoadSurfaceWater = 56;
+  
+  ///<路面积雪：[/],(/,/,/),[/],(1,0),路面积雪
+  TrafficEventType_RoadSurfaceSnow = 57;
+  
+  ///<路面薄冰：[/],(/,/,/),[/],(1,0),路面薄冰
+  TrafficEventType_RoadSurfaceThinIce = 58;
+  
+  ///<路面沉陷：[/],(/,/,/),[/],(1,0),路面沉陷
+  TrafficEventType_RoadSurfaceSubsidence = 59;
+  
+  ///<路面有障碍物：[/],(/,/,/),[/],(1,0),路面有障碍物
+  TrafficEventType_RoadSurfaceObstacle = 60;
+  
+  ///<路面火灾：[/],(/,/,/),[/],(1,0),路面火灾
+  TrafficEventType_RoadSurfaceFire = 61;
+  
+  ///<路滑：[/],(/,/,/),[/],(1,0),路滑
+  TrafficEventType_RoadSurfaceSlip = 62;
+  
+  ///<路面有油：[/],(/,/,/),[/],(1,0),路面有油
+  TrafficEventType_RoadSurfaceOil = 63;
+  
+  ///<路面有汽油：[/],(/,/,/),[/],(1,0),路面有汽油
+  TrafficEventType_RoadSurfaceGasoline = 64;
+  
+  ///<路面状况较差：[/],(/,/,/),[/],(1,0),路面状况较差
+  TrafficEventType_PoorRoadConditions = 65;
+  
+  ///<危险的行驶条件：[/],(/,/,/),[/],(1,0),危险的行驶条件
+  TrafficEventType_DangerousDrivingConditions = 66;
+  
+  ///<极端危险的行驶条件：[/],(/,/,/),[/],(1,0),极端危险的行驶条件
+  TrafficEventType_ExtremelyDangerousDrivingConditions = 67;
+  
+  ///<博览会：[/],(/,/,/),[/],(1,0),博览会
+  TrafficEventType_Expo = 68;
+  
+  ///<国家重大活动：[/],(/,/,/),[/],(1,0),国家重大活动
+  TrafficEventType_MajorNationalEvents = 69;
+  
+  ///<集会：[/],(/,/,/),[/],(1,0),集会
+  TrafficEventType_Assembly = 70;
+  
+  ///<大型会议：[/],(/,/,/),[/],(1,0),大型会议
+  TrafficEventType_LargeConference = 71;
+  
+  ///<体育活动：[/],(/,/,/),[/],(1,0),体育活动
+  TrafficEventType_SportsActivity = 72;
+  
+  ///<文艺活动：[/],(/,/,/),[/],(1,0),文艺活动
+  TrafficEventType_CulturalActivity = 73;
+  
+  ///<节假日：[/],(/,/,/),[/],(1,0),节假日
+  TrafficEventType_Holiday = 74;
+  
+  ///<洪水：[/],(/,/,/),[/],(1,0),洪水
+  TrafficEventType_Flood = 75;
+  
+  ///<地震：[/],(/,/,/),[/],(1,0),地震
+  TrafficEventType_Earthquake = 76;
+  
+  ///<岩崩：[/],(/,/,/),[/],(1,0),岩崩
+  TrafficEventType_RockFall = 77;
+  
+  ///<坍坡：[/],(/,/,/),[/],(1,0),坍坡
+  TrafficEventType_Collapse = 78;
+  
+  ///<泥石流：[/],(/,/,/),[/],(1,0),泥石流
+  TrafficEventType_DebrisFlow = 79;
+  
+  ///<抓违章：[/],(/,/,/),[/],(1,0),抓违章
+  TrafficEventType_GraspTheViolation = 80;
+  
+  ///<查酒驾：[/],(/,/,/),[/],(1,0),查酒驾
+  TrafficEventType_CheckDrunkDriving = 81;
+  
+  ///<警察执法：[/],(/,/,/),[/],(1,0),警察执法
+  TrafficEventType_PoliceEnforcement = 82;
+  
+  ///<公告：[/],(/,/,/),[/],(1,0),公告
+  TrafficEventType_Announcement = 83;
+  
+  ///<通车：[/],(/,/,/),[/],(1,0),通车
+  TrafficEventType_OpenToTraffic = 84;
+  
+  ///<完成改建：[/],(/,/,/),[/],(1,0),完成改建
+  TrafficEventType_CompleteTheReconstruction = 85;
+  
+  ///<实景路况：[/],(/,/,/),[/],(1,0),实景路况
+  TrafficEventType_RealRoadCondition = 86;
+  
+  ///<紧急事件：[/],(/,/,/),[/],(1,0),紧急事件
+  TrafficEventType_Emergency = 87;
+  
+  ///<地铁事件：[/],(/,/,/),[/],(1,0),地铁事件
+  TrafficEventType_SubwayEvent = 88;
+  
+  ///<定制播报：[/],(/,/,/),[/],(1,0),定制播报
+  TrafficEventType_CustomBroadcast = 89;
+  
+  ///<一般交通事故&道路关闭：[/],(/,/,/),[/],(1,0),一般交通事故&道路关闭
+  TrafficEventType_GeneralTrafficAccidentAndRoadClosed = 90;
+  
+  ///<严重交通事故&道路关闭：[/],(/,/,/),[/],(1,0),严重交通事故&道路关闭
+  TrafficEventType_SeriousTrafficAccidentAndRoadClosed = 91;
+  
+  ///<道路施工&道路关闭：[/],(/,/,/),[/],(1,0),道路施工&道路关闭
+  TrafficEventType_RoadConstructionAndRoadClosed = 92;
+  
+  ///<大雾&道路关闭：[/],(/,/,/),[/],(1,0),大雾&道路关闭
+  TrafficEventType_HeavyFogAndRoadClosed = 93;
+  
+  ///<大雨&道路关闭：[/],(/,/,/),[/],(1,0),大雨&道路关闭
+  TrafficEventType_HeavyRainAndRoadClosed = 94;
+  
+  ///<大雪&道路关闭：[/],(/,/,/),[/],(1,0),大雪&道路关闭
+  TrafficEventType_HeavySnowAndRoadClosed = 95;
+  
+  ///<冰雹&道路关闭：[/],(/,/,/),[/],(1,0),冰雹&道路关闭
+  TrafficEventType_HailAndRoadClosed = 96;
+  
+  ///<路面积水&道路关闭：[/],(/,/,/),[/],(1,0),路面积水&道路关闭
+  TrafficEventType_RoadSurfaceWaterAndRoadClosed = 97;
+  
+  ///<路面积雪&道路关闭：[/],(/,/,/),[/],(1,0),路面积雪&道路关闭
+  TrafficEventType_RoadSurfaceSnowAndRoadClosed = 98;
+  
+  ///<路面薄冰&道路关闭：[/],(/,/,/),[/],(1,0),路面薄冰&道路关闭
+  TrafficEventType_RoadSurfaceThinIceAndRoadClosed = 99;
+  
+  ///<路面沉陷&道路关闭：[/],(/,/,/),[/],(1,0),路面沉陷&道路关闭
+  TrafficEventType_RoadSurfaceSubsidenceAndRoadClosed = 100;
+  
+  ///<路面有障碍物&道路关闭：[/],(/,/,/),[/],(1,0),路面有障碍物&道路关闭
+  TrafficEventType_RoadSurfaceObstacleAndRoadClosed = 101;
+  
+  ///<严重火灾&道路关闭：[/],(/,/,/),[/],(1,0),严重火灾&道路关闭
+  TrafficEventType_SeriousFireAndRoadClosed = 102;
+  
+  ///<博览会&道路关闭：[/],(/,/,/),[/],(1,0),博览会&道路关闭
+  TrafficEventType_ExpoAndRoadClosed = 103;
+  
+  ///<国家重大活动&道路关闭：[/],(/,/,/),[/],(1,0),国家重大活动&道路关闭
+  TrafficEventType_MajorNationalEventsAndRoadClosed = 104;
+  
+  ///<集会&道路关闭：[/],(/,/,/),[/],(1,0),集会&道路关闭
+  TrafficEventType_AssemblyAndRoadClosed = 105;
+  
+  ///<大型会议&道路关闭：[/],(/,/,/),[/],(1,0),大型会议&道路关闭
+  TrafficEventType_LargeConferenceAndRoadClosed = 106;
+  
+  ///<体育活动&道路关闭：[/],(/,/,/),[/],(1,0),体育活动&道路关闭
+  TrafficEventType_SportsActivityAndRoadClosed = 107;
+  
+  ///<文艺活动&道路关闭：[/],(/,/,/),[/],(1,0),文艺活动&道路关闭
+  TrafficEventType_CulturalActivityAndRoadClosed = 108;
+  
+  ///<节假日&道路关闭：[/],(/,/,/),[/],(1,0),节假日&道路关闭
+  TrafficEventType_HolidayAndRoadClosed = 109;
+  
+  ///<洪水&道路关闭：[/],(/,/,/),[/],(1,0),洪水&道路关闭
+  TrafficEventType_FloodAndRoadClosed = 110;
+  
+  ///<地震&道路关闭：[/],(/,/,/),[/],(1,0),地震&道路关闭
+  TrafficEventType_EarthquakeAndRoadClosed = 111;
+  
+  ///<岩崩&道路关闭：[/],(/,/,/),[/],(1,0),岩崩&道路关闭
+  TrafficEventType_RockFallAndRoadClosed = 112;
+  
+  ///<坍坡&道路关闭：[/],(/,/,/),[/],(1,0),坍坡&道路关闭
+  TrafficEventType_CollapseAndRoadClosed = 113;
+  
+  ///<泥石流&道路关闭：[/],(/,/,/),[/],(1,0),泥石流&道路关闭
+  TrafficEventType_DebrisFlowAndRoadClosed = 114;
+  
+  ///<其他：[/],(/,/,/),[/],(1,0),其他
+  TrafficEventType_Other = 999;
+}
+
+
+/**
+*@brief   交通流状态
+*@detail  主要描述交通流的状态
+*/
+enum TrafficFlowStatus {
+  ///<未知：[/],(/,/,/),[/],(1,0),未知
+  TrafficFlowStatus_Unknown = 0;
+  
+  ///<畅通：[/],(/,/,/),[/],(1,0),畅通
+  TrafficFlowStatus_Smooth = 1;
+  
+  ///<缓行：[/],(/,/,/),[/],(1,0),缓行
+  TrafficFlowStatus_Amble = 2;
+  
+  ///<拥堵：[/],(/,/,/),[/],(1,0),拥堵
+  TrafficFlowStatus_Congestion = 3;
+  
+  ///<堵塞：[/],(/,/,/),[/],(1,0),堵塞
+  TrafficFlowStatus_Blockage = 4;
+  
+  ///<无交通流：[/],(/,/,/),[/],(1,0),无交通流
+  TrafficFlowStatus_NoTrafficFlow = 5;
+  
+  ///<其他：[/],(/,/,/),[/],(1,0),其他
+  TrafficFlowStatus_Other = 99;
+}
+
+/**
+*@brief   道路类型
+*@detail  主要描述道路的类型
+*/
+enum RoadClassType {
+  ///<未知：[/],(/,/,/),[/],(1,0),未知
+  ROAD_CLASS_TYPE_UNSPECIFIED = 0;
+  
+  ///<高速：[/],(/,/,/),[/],(1,0),高速
+  ROAD_CLASS_TYPE_HIGHWAY = 1;
+  
+  ///<城市快速路：[/],(/,/,/),[/],(1,0),城市快速路
+  ROAD_CLASS_TYPE_CITY_EXPRESS = 2;
+  
+  ///<国道：[/],(/,/,/),[/],(1,0),国道
+  ROAD_CLASS_TYPE_NATIONAL_ROAD = 3;
+  
+  ///<省道：[/],(/,/,/),[/],(1,0),省道
+  ROAD_CLASS_TYPE_PROVINCE_ROAD = 4;
+  
+  ///<县道：[/],(/,/,/),[/],(1,0),县道
+  ROAD_CLASS_TYPE_COUNTRY_ROAD = 5;
+  
+  ///<乡道：[/],(/,/,/),[/],(1,0),乡道
+  ROAD_CLASS_TYPE_TOWN_ROAD = 6;
+  
+  ///<其他：[/],(/,/,/),[/],(1,0),其他
+  ROAD_CLASS_TYPE_OTHERS = 7;
+}

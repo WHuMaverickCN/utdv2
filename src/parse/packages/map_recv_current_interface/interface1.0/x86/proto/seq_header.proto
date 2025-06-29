@@ -1,0 +1,185 @@
+/**
+* @file     seq_header.proto
+* @author   caozhengxiong
+* @details  用于延时统计需要添加的头文件
+* @date     2022-12-19
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.12.19        <th>1.0                 <th>caozhengxiong
+* <tr><th>2023.03.30        <th>1.0                 <th>zhouyongjiang
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package	SeqHeaderProto;
+/**
+ * @brief 头文件信息
+ * @detail 记录各模块输出的关键topic的帧数和时间戳信息
+ */
+
+message SeqHeader {
+  ///< sab_vehicle时间戳:[s],(0,/,/),[/],(/,/),标识sab模块输出sab_vehicle信号的时间戳
+  double timestamp_sab_vehicle = 1;
+  ///< sab_radar时间戳:[s],(0,/,/),[/],(/,/),标识sab模块输出sab_radar信号的时间戳
+  double timestamp_sab_radar = 2;
+  ///< sab_lidar时间戳:[s],(0,/,/),[/],(/,/),标识sab模块输出sab_lidar信号的时间戳
+  double timestamp_sab_lidar = 3;
+
+  ///< fc_sensor时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_sensor信号的时间戳
+  double timestamp_fc_sensor = 4;
+  ///< fc_freespace时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_freespace信号的时间戳
+  double timestamp_fc_freespace = 5;
+  ///< fc_lines时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_lines信号的时间戳
+  double timestamp_fc_lines = 6;
+  ///< fc_objects时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_objects信号的时间戳
+  double timestamp_fc_objects = 7;
+  ///< fc_tsr时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_tsr信号的时间戳
+  double timestamp_fc_tsr = 8;
+  ///< fc_parsing时间戳:[s],(0,/,/),[/],(/,/),标识front camera模块输出fc_parsing信号的时间戳
+  double timestamp_fc_parsing = 9;
+  
+  ///< ac_sensor时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_sensor信号的时间戳
+  double timestamp_ac_sensor = 10;
+  ///< ac_objects时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_objects信号的时间戳
+  double timestamp_ac_objects = 11;
+  ///< ac_freespace时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_freespace信号的时间戳
+  double timestamp_ac_freespace = 12;
+  ///< ac_lines时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_lines信号的时间戳
+  double timestamp_ac_lines = 13;
+  ///< ac_tsr时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_tsr信号的时间戳
+  double timestamp_ac_tsr = 14;
+  ///< ac_parsing时间戳:[s],(0,/,/),[/],(/,/),标识around cameras模块输出ac_parsing信号的时间戳
+  double timestamp_ac_parsing = 15;
+  
+  ///< lidar_sensor时间戳:[s],(0,/,/),[/],(/,/),标识lidar模块输出lidar_sensor信号的时间戳
+  double timestamp_lidar_sensor = 16;
+  ///< lidar_objects时间戳:[s],(0,/,/),[/],(/,/),标识lidar模块输出lidar_objects信号的时间戳
+  double timestamp_lidar_objects = 17;
+  ///< lidar_freespace时间戳:[s],(0,/,/),[/],(/,/),标识lidar模块输出lidar_freespace信号的时间戳
+  double timestamp_lidar_freespace = 18;
+
+  ///< fus_objects时间戳:[s],(0,/,/),[/],(/,/),标识fusion模块输出fus_objects信号的时间戳
+  double timestamp_fus_objects = 19; 
+  ///< fus_freespace时间戳:[s],(0,/,/),[/],(/,/),标识fusion模块输出fus_freespace信号的时间戳
+  double timestamp_fus_freespace = 20;
+
+  ///< map_staticinfo时间戳:[s],(0,/,/),[/],(/,/),标识map模块输出map_staticinfo信号的时间戳
+  double timestamp_map_staticinfo = 21;
+
+  ///< insparser_insdata时间戳:[s],(0,/,/),[/],(/,/),标识loc模块输出insparser_insdata信号的时间戳
+  double timestamp_insparser_insdata = 22;
+  ///< du_insdata时间戳:[s],(0,/,/),[/],(/,/),标识loc模块输出du_insdata信号的时间戳
+  double timestamp_du_insdata = 23;
+  ///< kalmanfilter_odometry时间戳:[s],(0,/,/),[/],(/,/),标识loc模块输出kalmanfilter_odometry信号的时间戳
+  double timestamp_kalmanfilter_odometry = 24;
+
+  ///< sts_statemachine时间戳:[s],(0,/,/),[/],(/,/),标识sts模块输出sts_statemachine信号的时间戳
+  double timestamp_sts_statemachine = 25;
+  
+  ///< rnp_objects时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_UTMLocalization信号的时间戳
+  double timestamp_rnp_utmlocalization = 26;
+  ///< rnp_traffic时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_DrivingEnvInfo信号的时间戳
+  double timestamp_rnp_drivingenvinfo = 27;
+  ///< rnp_env时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_IACCNIDSwitch信号的时间戳
+  double timestamp_rnp_iaccnidswitch = 28;
+  ///< rnp_ego时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_EdcRendering信号的时间戳
+  double timestamp_rnp_edcrendering = 29;
+  ///< rnp_ego时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_ReferenceLineWithConstraints信号的时间戳
+  double timestamp_rnp_referencelinewithconstraints = 30;
+  ///< rnp_ego时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_PredictedObjects信号的时间戳
+  double timestamp_rnp_predictedobjects = 31;
+  ///< rnp_ego时间戳:[s],(0,/,/),[/],(/,/),标识rnp模块输出rnp_LocalLaneTopology信号的时间戳
+  double timestamp_rnp_locallanetopology = 32;
+
+  ///< dnp_dnp时间戳:[s],(0,/,/),[/],(/,/),标识dnp模块输出dnp_dnp信号的时间戳
+  double timestamp_dnp_dnp = 33;
+  ///< dnp_latcontrolpre时间戳:[s],(0,/,/),[/],(/,/),标识dnp模块输出dnp_latcontrolpre信号的时间戳
+  double timestamp_dnp_latcontrolpre = 34;
+  ///< dnp_loncontrolpre时间戳:[s],(0,/,/),[/],(/,/),标识dnp模块输出dnp_loncontrolpre信号的时间戳
+  double timestamp_dnp_loncontrolpre = 35;
+  ///< sab_vehicle帧数:[帧],(0,/,/),[/],(/,/),标识sab模块输出sab_vehicle信号的帧数
+  uint32 seq_sab_vehicle = 36;
+  ///< sab_radar帧数:[帧],(0,/,/),[/],(/,/),标识sab模块输出sab_radar信号的帧数
+  uint32 seq_sab_radar = 37;
+  ///< sab_lidar帧数:[帧],(0,/,/),[/],(/,/),标识sab模块输出sab_lidar信号的帧数
+  uint32 seq_sab_lidar = 38;
+
+  ///< fc_sensor帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_sensor信号的帧数
+  uint32 seq_fc_sensor = 39;
+  ///< fc_freespace帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_freespace信号的帧数
+  uint32 seq_fc_freespace = 40;
+  ///< fc_lines帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_lines信号的帧数
+  uint32 seq_fc_lines = 41;
+  ///< fc_objects帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_objects信号的帧数
+  uint32 seq_fc_objects = 42;
+  ///< fc_tsr帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_tsr信号的帧数
+  uint32 seq_fc_tsr = 43;
+  ///< fc_parsing帧数:[帧],(0,/,/),[/],(/,/),标识front camera模块输出fc_parsing信号的帧数
+  uint32 seq_fc_parsing = 44;
+
+  ///< ac_sensor帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出ac_sensor信号的帧数
+  uint32 seq_ac_sensor = 45;
+  ///< ac_objects帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出ac_objects信号的帧数
+  uint32 seq_ac_objects = 46;
+  ///< ac_freespace帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出ac_freespace信号的帧数
+  uint32 seq_ac_freespace = 47;
+  ///< ac_lines帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出ac_lines信号的帧数
+  uint32 seq_ac_lines = 48;
+  ///< ac_tsr帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出ac_tsr信号的帧数
+  uint32 seq_ac_tsr = 49;
+  ///< fc_parsing帧数:[帧],(0,/,/),[/],(/,/),标识around cameras模块输出fc_parsing信号的帧数
+  uint32 seq_ac_parsing = 50;
+ 
+  ///< lidar_sensor帧数:[帧],(0,/,/),[/],(/,/),标识lidar模块输出lidar_sensor信号的帧数
+  uint32 seq_lidar_sensor = 51;
+  ///< lidar_objects帧数:[帧],(0,/,/),[/],(/,/),标识lidar模块输出lidar_objects信号的帧数
+  uint32 seq_lidar_objects = 52;
+  ///< lidar_freespace帧数:[帧],(0,/,/),[/],(/,/),标识lidar模块输出lidar_freespace信号的帧数
+  uint32 seq_lidar_freespace = 53;
+
+  ///< fus_objects帧数:[帧],(0,/,/),[/],(/,/),标识fus模块输出fus_objects信号的帧数
+  uint32 seq_fus_objects = 54;
+  ///< fus_freespace帧数:[帧],(0,/,/),[/],(/,/),标识fus模块输出fus_freespace信号的帧数  
+  uint32 seq_fus_freespace = 55;
+
+  ///< fus_freespace帧数:[帧],(0,/,/),[/],(/,/),标识fus模块输出fus_freespace信号的帧数  
+  uint32 seq_map_staticinfo = 56;
+
+  ///< insparser_insdata帧数:[帧],(0,/,/),[/],(/,/),标识loc模块输出insparser_insdata信号的帧数  
+  uint32 seq_insparser_insdata = 57;
+  ///< du_insdata帧数:[帧],(0,/,/),[/],(/,/),标识loc模块输出du_insdata信号的帧数  
+  uint32 seq_du_insdata = 58;
+  ///< kalmanfilter_odometry帧数:[帧],(0,/,/),[/],(/,/),标识loc模块输出kalmanfilter_odometry信号的帧数  
+  uint32 seq_kalmanfilter_odometry = 59;
+
+  ///< sts_statemachine帧数:[帧],(0,/,/),[/],(/,/),标识sts模块输出sts_statemachine信号的帧数
+  uint32 seq_sts_statemachine = 60;
+  
+  ///< rnp_objects帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_UTMLocalization信号的帧数
+  uint32 seq_rnp_utmlocalization = 61;
+  ///< rnp_traffic帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_DrivingEnvInfo信号的帧数
+  uint32 seq_rnp_drivingenvinfo = 62;
+  ///< rnp_env帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_IACCNIDSwitch信号的帧数
+  uint32 seq_rnp_iaccnidswitch = 63;
+  ///< rnp_ego帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_EdcRendering信号的帧数
+  uint32 seq_rnp_edcrendering = 64;
+  ///< rnp_ego帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_ReferenceLineWithConstraints信号的帧数
+  uint32 seq_rnp_referencelinewithconstraints = 65;
+  ///< rnp_ego帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_PredictedObjects信号的帧数
+  uint32 seq_rnp_predictedobjects = 66;
+  ///< rnp_ego帧数:[帧],(0,/,/),[/],(/,/),标识rnp模块输出rnp_LocalLaneTopology信号的帧数
+  uint32 seq_rnp_locallanetopology = 67;
+
+  ///< dnp_dnp帧数:[帧],(0,/,/),[/],(/,/),标识dnp模块输出dnp_dnp信号的帧数
+  uint32 seq_dnp_dnp = 68;
+  ///< dnp_latcontrolpre帧数:[帧],(0,/,/),[/],(/,/),标识dnp模块输出dnp_latcontrolpre信号的帧数
+  uint32 seq_dnp_latcontrolpre = 69;
+  ///< dnp_loncontrolpre帧数:[帧],(0,/,/),[/],(/,/),标识dnp模块输出dnp_loncontrolpre信号的帧数
+  uint32 seq_dnp_loncontrolpre = 70;
+}

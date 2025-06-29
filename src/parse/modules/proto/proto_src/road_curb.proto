@@ -1,0 +1,164 @@
+/**
+* @file     road_curb.proto
+* @author   yangkai
+* @details  激光雷达路沿输出数据结构信息
+* @date     2023-05-11
+* @version  V1.0
+* @copyright(C),CA,2023
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.5.11         <th>1.0                 <th>yangkai
+* <tr><th>2023.11.21        <th>1.1                 <th>huanghong
+* <table>
+
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package RoadCurbProto;
+import "seq_header.proto";
+
+/**
+*@brief   三维点
+*@detail  包含路沿点的x、y和z坐标
+*/
+message CaVector3f {
+    ///< x: [m], (0,-1e6,1e3), [/], (/,/), x坐标, x=-1e6时，该点为无效点
+    float x = 1;
+    ///< y: [m], (0,-1e3,1e3), [/], (/,/), y坐标
+    float y = 2;
+    ///< z: [m], (0,-1e3,1e3), [/], (/,/), z坐标
+    float z = 3;
+}
+
+/**
+*@brief   四维点
+*@detail  包含路沿点的x、y、z坐标和置信度
+*/
+message CaVector4f {
+    ///< x: [m], (0,-1e6,1e3), [/], (/,/), x坐标, x=-1e6时，该点为无效点
+    float x = 1;
+    ///< y: [m], (0,-1e3,1e3), [/], (/,/), y坐标
+    float y = 2;
+    ///< z: [m], (0,-1e3,1e3), [/], (/,/), z坐标
+    float z = 3;
+    ///< confidence: [/], (0,0,1), [/], (/,/), 置信度
+    float confidence = 4;
+}
+
+/**
+*@brief   polyline属性信息
+*@detail  路沿polyline的附加属性信息，包括长度，覆盖角度，起始点和终止点，拟合曲线参数
+*/
+message CurbPolylineSupplementInfos  {
+    ///< length: [m], (0,0,1e3), [], (/,/), polyline长度
+    double length = 1;
+    ///< x_min: [m], (0,-1e6,1e3), [], (/,/), polyline中所有点沿x轴最小坐标
+    double x_min = 2;
+    ///< x_max: [m], (0,-1e6,1e3), [], (/,/), polyline中所有点沿x轴最大坐标
+    double x_max = 3;
+    ///< y_min: [m], (0,-1e3,1e3), [], (/,/), polyline中所有点沿y轴最小坐标
+    double y_min = 4;
+    ///< y_max: [m], (0,-1e3,1e3), [], (/,/), polyline中所有点沿y轴最大坐标
+    double y_max = 5;
+    ///< polar_min: [rad], (0,-pi/2,pi/2), [], (/,/), polyline中点-原点连线与坐标轴形成的最小角
+    double polar_min = 6;
+    ///< polar_max: [rad], (0,-pi/2,pi/2), [], (/,/), polyline中点-原点连线与坐标轴形成的最大角
+    double polar_max = 7;
+    ///< extend_direction: [rad], (0,-pi/2,pi/2), [], (/,/), polyline总体延伸的方向，以与x轴正向为0
+    double extend_direction = 8;
+    ///< start: [/], (/,/,/), [], (/,/), polyline起始点
+    CaVector4f start = 9;
+    ///< end: [/], (/,/,/), [], (/,/), polyline结束点
+    CaVector4f end = 10;
+    ///< curve_coeff: [/], (/,/,/), [1800], (/,/), 拟合曲线系数
+    repeated double curve_coeff = 11;
+}
+
+/**
+*@brief   polyline
+*@detail  包含polyline的序号，类别和对应的控制点点集
+*/
+message CurbPolyLine {
+    ///< num: [m], (0,-1,1800), [/], (/,/), polyline的序号,num=-1时为无效点
+    int32 num = 1;
+
+    ///< label: [m], (/,/,/), [/], (/,/), polyline的类型，即是否连续
+    int32 label = 2;
+
+    ///< points: [/], (/,/,/), [1800], (/,/), 输出的路沿点集合
+    repeated CaVector4f points = 3;
+
+    ///< sup_infos: [/], (/,/,/), [], (/,/), polyline的附加属性信息
+    CurbPolylineSupplementInfos sup_infos = 4;
+}
+
+/**
+*@brief   pose
+*@detail  激光雷达位姿输出,x,y,z,roll,pitch,yaw
+*/
+message LidarPose {
+    ///< x: [m], (/,/,/), [/], (/,/), x坐标
+    float x = 1;
+
+    ///< y: [m], (/,/,/), [/], (/,/), y坐标
+    float y = 2;
+
+    ///< z: [m], (/,/,/), [/], (/,/), z坐标
+    float z = 3;
+
+    ///< roll: [rad], (/,/,/), [/], (/,/), 翻滚角
+    float roll = 4;
+
+    ///< pitch: [rad], (/,/,/), [/], (/,/), 俯仰角
+    float pitch = 5;
+
+    ///< yaw: [rad], (/,/,/), [/], (/,/), 偏转角
+    float yaw = 6;
+}
+
+
+/**
+*@brief   failsafe state
+*@detail  路沿状态信息，包括失效，不稳定及场景信息
+*/
+message CurbFailsafeState {
+    ///< valid_state:[],  (/,/,/), [/], (/,/), 路沿失效状态位
+    int32 valid_state = 1;
+    ///< stable_state:[],  (/,/,/), [/], (/,/), 路沿稳定状态位
+    int32 stable_state = 2;
+    ///< scenario:[],  (/,/,/), [/], (/,/), 路沿场景状态位
+    int32 scenario = 3;
+}
+
+/**
+*@brief   路沿
+*@detail  包括路沿点集合，以及路沿的整体属性信息
+*/
+message CurbPointSet {
+    ///< control_point: [/], (/,/,/), [1800], (/,/), 输出的路沿点集合
+    repeated CaVector3f control_point = 1;
+
+    ///< timestamp: [s], (/,/,/), [/], (/,/), 当前路沿点集合对应的时间戳
+    double timestamp = 2;
+
+    ///< 延时统计：[/],(/,/,/),[/],(1,0),标识输出时间戳
+    SeqHeaderProto.SeqHeader seq_header = 3;
+
+    ///< polyline: [/], (/,/,/), [1800], (/,/), 当前帧的polyline集合
+    repeated CurbPolyLine polyline = 4;
+
+    ///< lidar_pose: [s], (/,/,/), [/], (/,/), 激光雷达位姿信息
+    LidarPose lidar_pose = 5;
+
+    ///< state:[],  (/,/,/), [/], (/,/), 路沿状态信息
+    CurbFailsafeState state = 6;
+}

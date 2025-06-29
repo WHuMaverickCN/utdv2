@@ -1,0 +1,344 @@
+/**
+
+* @file     hmi_basic_convoyfun.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义 Basic_ConvoyFun - NTF_ConvoyFun
+* @date     2023-12-20
+* @version  V1.3
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <tr><th>2023.12.28         <th>R13v1新增安全辅助故障相关信号    <th>HMITEAM
+* <tr><th>2024.1.23         <th>完善注释信息   <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装推送护航相关的功能信息
+*/
+message LDWLKAELK
+{
+	///<ldwstatus:[/],(0,0,5),[/],(1,0),LDW状态
+	///<0x0: off关闭
+	///<0x1: Passive抑制
+	///<0x2: Standby待机
+	///<0x3: Active激活
+	///<0x4: Failure故障
+	///<0x5: reserved
+	uint32 ad_ldwstatus = 1;
+	
+	///<lkastatus:[/],(0,0,5),[/],(1,0),LKA状态
+	///<0x0: off关闭
+	///<0x1: Passive抑制
+	///<0x2: Standby待机
+	///<0x3: Active激活
+	///<0x4: Failure故障
+	///<0x5: reserved
+	uint32 ad_lkastatus = 2;
+	
+	///<voiceinfo:[/],(0,0,0x1F),[/],(1,0),驾驶辅助声音信息
+	///<0x0: NoVoice无声音
+	///<0x1: LatentWarningVoive潜在危险报警音
+	///<0x2: FCWAEBVoiceFCW/AEB报警音
+	///<0x3: ACCObjDetectVoiceACC跟车报警音
+	///<0x4: ACCObjDisappearedVoiceACC跟车丢失报警音
+	///<0x5: ACCIACCTakeoverVoice接管报警音
+	///<0x6: LDWLeftVoice左偏移音
+	///<0x7: LDWRightVoice右偏移音
+	///<0x9: IACCActiveVoiceIACC激活音
+	///<0xA: IACCExitVoiceIACC退出音
+	///<0xD: CruiseUnintendedExit巡航意外退出
+	///<0xE: TrafficWarning交通预警
+	///<0xF~0x1F：reserved
+	uint32 ad_voiceinfo = 3;
+	
+	///<elkmode:[/],(0,0,7),[/],(1,0),紧急车道保持系统状态
+	///<0x0: off
+	///<0x1: passive
+	///<0x2: active
+	///<0x3: fault
+	///<0x4: standby
+	///<0x5-0x7: reserved
+	uint32 ad_elkmode = 4;
+	
+	///<elkleftinterventionmode:[/],(0,0,3),[/],(1,0),紧急车道保持辅助_左侧干预模式
+	///<0x0: NoActive不显示
+	///<0x1: RoadEdge路沿
+	///<0x2: OverTaking后向来车
+	///<0x3: OnComing对向来车
+	uint32 ad_elkleftinterventionmode = 5;
+	
+	///<elkrightinterventionmode:[/],(0,0,3),[/],(1,0),紧急车道保持辅助_右侧干预模式
+	///<0x0: NoActive不显示
+	///<0x1: RoadEdge路沿
+	///<0x2: OverTaking后向来车
+	///<0x3: OnComing对向来车	
+	uint32 ad_elkrightinterventionmode = 6;
+	
+	///<dwinhaitwarning:[/],(0,0,1),[/],(1,0),车道偏离预警惩罚模式警告
+	///<0x0: NoWarning
+	///<0x1: LDWSuspendWarning
+	uint32 ad_ldwinhaitwarning = 7;
+	
+	///<lkainhaitwarning:[/],(0,0,1),[/],(1,0),LKA惩罚模式警告
+	///<0x0：no warning 
+	///<0x1：LKA warning
+	uint32 ad_lkainhaitwarning = 8;
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装推送护航相关的功能信息
+*/
+
+message FCWAEBEDS
+{
+    ///<ad_aebstatus:[/],(0,0,5),[/],(1,0),AEB系统状态
+	///<0x0: off关闭
+	///<0x1: passive抑制的
+	///<0x2: failure故障
+	///<0x3: standby待机
+	///<0x4: active激活
+	///<0x5: reserved
+	uint32 ad_aebstatus = 1;
+	
+	///<ad_rebstatus:[/],(0,0,5),[/],(1,0),REB系统状态		
+	///<0x0: off关闭;
+	///<0x1: passive抑制的
+	///<0x2: failure故障
+	///<0x3: standby待机
+	///<0x4: active激活
+	///<0x5: reserved		
+	uint32 ad_rebstatus = 2;
+	
+	///<ad_aesstatus:[/],(0,0,5),[/],(1,0),AES系统状态	
+	///<0x0: off关闭;
+	///<0x1: passive抑制的
+	///<0x2: failure故障
+	///<0x3: standby待机
+	///<0x4: active激活
+	///<0x5: reserved
+	uint32 ad_aesstatus = 3;
+	
+	///<ad_fcwlatentwarning:[/],(0,0,1),[/],(1,0),安全距离提醒报警
+	///<0x0: no warning
+	///<0x1: warning
+	uint32 ad_fcwlatentwarning = 4;
+	
+	///<ad_fcwactive:[/],(0,0,1),[/],(1,0),前碰撞预警激活
+	///<0x0: notActive
+	///<0x1: Active
+	uint32 ad_fcwactive = 5;
+	
+	///<ad_rewalert:[/],(0,0,1),[/],(1,0),倒挡后追尾预警信号
+	///<0x0: NoREWwarning
+	///<0x1: REWwarning
+	uint32 ad_rewalert = 6;
+	
+	///<ad_fctbactive:[/],(0,0,2),[/],(1,0),FCTB激活
+	///<0x0: NotActive
+	///<0x1: LeftActive
+	///<0x2: RightActive
+	uint32 ad_fctbactive = 7;
+	
+	///<ad_rctbactive:[/],(0,0,2),[/],(1,0),RCTB激活
+	///<0x0: NotActive
+	///<0x1: LeftActive
+	///<0x2: RightActive
+	uint32 ad_rctbactive = 8;
+	
+	///<ad_rebactive:[/],(0,0,1),[/],(1,0),REB激活
+	///<0x0: NotActive
+	///<0x1: Active
+	uint32 ad_rebactive = 9;
+	
+	///<ad_fctaleftalert:[/],(0,0,3),[/],(1,0),前向左侧横向预警报警信号
+	///<0x0: NoFCTAwarning
+	///<0x1: FCTAwarningLevel1
+	///<0x2: FCTAwarningLevel2
+	///<0x3: FCTAwarningLevel3
+	uint32 ad_fctaleftalert = 10;
+	
+	///<ad_fctarightalert:[/],(0,0,3),[/],(1,0),前向右侧横向预警报警信号
+	///<0x0: NoFCTAwarning
+	///<0x1: FCTAwarningLevel1
+	///<0x2: FCTAwarningLevel2
+	///<0x3: FCTAwarningLevel3
+	uint32 ad_fctarightalert = 11;
+	
+	///<ad_aebactive:[/],(0,0,1),[/],(1,0),AEB减速激活
+	///<0x0: NotActive
+	///<0x1: Active
+	uint32 ad_aebactive = 12;
+	
+	///<ad_runredlightwarning:[/],(0,0,1),[/],(1,0),闯红灯提醒
+	///<0x0: No Warning
+	///<0x1: Runing a red light warning
+	uint32 ad_runredlightwarning = 13;
+	
+	///<ad_aesactive:[/],(0,0,6),[/],(1,0),AES触发信号
+	///<0x0: notActive
+	///<0x1: DES_Left_Active
+	///<0x2: DES_Right_Active
+	///<0x3: CES_Left_Active
+	///<0x4: CES_Right_Active
+	///<0x5: AES_Left_Active
+	///<0x6: AES_Right_Active
+	uint32 ad_aesactive = 14;
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装推送护航相关的功能信息
+*/
+message LCDAFUN
+{
+	///<ad_bsdlca_leftalert:[/],(0,0,3),[/],(1,0),左侧盲点检测_换道辅助报警信号
+	///<0x0: NoLCAwarning
+	///<0x1: LCAwarninglevel1
+	///<0x2: LCAwarninglevel2
+	///<0x3: Reserved
+	uint32 ad_bsdlca_leftalert = 1;
+	
+	///<ad_rctaleftalert:[/],(0,0,3),[/],(1,0),后向左侧倒车横向预警报警信号
+	///<0x0: NoRCTAwarning
+	///<0x1: RCTAwarningLevel1
+	///<0x2: RCTAwarningLevel2
+	///<0x3: RCTAwarningLevel3
+	uint32 ad_rctaleftalert = 2;
+	
+	///<ad_sealeftalert:[/],(0,0,3),[/],(1,0),左侧开门预警信号
+	///<0x0: NoSEAwarning
+	///<0x1: SEAwarninglevel1
+	///<0x2: SEAwarninglevel2
+	///<0x3: SEAwarninglevel3
+	uint32 ad_sealeftalert = 3;
+	
+	///<ad_dowleftalert:[/],(0,0,3),[/],(1,0),左侧后门开门预警信号
+	///<0x0: nowarning
+	///<0x1: level1
+	///<0x2: level2
+	///<0x3: level3
+	uint32 ad_dowleftalert = 4;
+	
+	///<ad_rcwalert:[/],(0,0,3),[/],(1,0),后追尾预警信号
+	///<0x0: NoRCWwarning
+	///<0x1: RCWwarninglevel1
+	///<0x2: RCWwarninglevel2
+	///<0x3: RCWwarninglevel3
+	uint32 ad_rcwalert = 5;
+	
+	///<ad_bsdlca_rightalert:[/],(0,0,3),[/],(1,0),右侧盲点检测_换道辅助报警信号
+	///<0x0: NoLCAwarning
+	///<0x1: LCAwarninglevel1
+	///<0x2: LCAwarninglevel2
+	///<0x3: Reserved
+	uint32 ad_bsdlca_rightalert = 6;
+	
+	///<ad_rctarightalert:[/],(0,0,3),[/],(1,0),后向右侧倒车横向预警信号
+	///<0x0: NoRCTAwarning
+	///<0x1: RCTAwarningLevel1
+	///<0x2: RCTAwarningLevel2
+	///<0x3: RCTAwarningLevel3
+	uint32 ad_rctarightalert = 7;
+	
+	///<ad_searightalert:[/],(0,0,3),[/],(1,0),右侧开门预警信号
+	///<0x0: NoSEAwarning
+	///<0x1: SEAwarninglevel1
+	///<0x2: SEAwarninglevel2
+	///<0x3: SEAwarninglevel3
+	uint32 ad_searightalert = 8;
+	
+	///<ad_dowrightalert:[/],(0,0,3),[/],(1,0),右侧后门开门预警信号
+	///<0x0: nowarning
+	///<0x1: level1
+	///<0x2: level2
+	///<0x3: level3
+	uint32 ad_dowrightalert = 9;
+}
+
+/**
+* @brief 安全辅助故障相关信号
+* @details 安全辅助故障相关信号
+*/
+message FaultData
+{
+	///<ads_aebfault:[/],(0,0,1),[/],(1,0),AEB故障
+	///<0x0: no display
+	///<0x1: AEB fault
+	uint32 ads_aebfault = 1;
+	
+	///<ads_elkfault:[/],(0,0,1),[/],(1,0),ELK故障
+	///<0x0: no display
+	///<0x1: ELK fault
+	uint32 ads_elkfault = 2;
+	
+	///<ads_ldwlkafault:[/],(0,0,1),[/],(1,0),LDWLKA故障
+	///<0x0: no display
+	///<0x1: LDW/LKA fault
+	uint32 ads_ldwlkafault = 3;
+	
+	///<ads_sensorblocked:[/],(0,0,0xB),[/],(1,0),传感器遮挡提示
+	///<0x0: no display;
+	///<0x1: front view camera blocked
+	///<0x2: rear view camera blocked
+	///<0x3: peripheral view camera blocked
+	///<0x4：surround view camera blocked
+	///<0x5: front radar blocked
+	///<0x6: front corner radar blocked
+	///<0x7: rear corner radar blocked
+	///<0x8: lidar blocked
+	///<0x9：UItrasonic probe blocked
+	///<0xA: DMS camera blocked
+	///<0xB: multiple sensors blocked
+	uint32 ads_sensorblocked = 4;
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装推送护航相关的功能信息
+*/
+message ConvoyFunInfo
+{
+	///<lcdafun:[/],(0,0,/),[/],(1,0),lcdafun
+	LCDAFUN lcdafun = 1;
+	///<fcwaebeds:[/],(0,0,/),[/],(1,0),fcwaebeds
+	FCWAEBEDS fcwaebeds = 2;
+	///<ldwlkaelk:[/],(0,0,/),[/],(1,0),ldwlkaelk							
+	LDWLKAELK ldwlkaelk = 3;
+	///<faultdata:[/],(0,0,/),[/],(1,0),faultdata							
+	FaultData faultdata = 4;
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装推送护航相关的功能信息
+*/
+message BasicConvoyFunInfo
+{
+	///<推送护航相关的功能信息:[/],(0,0,/),[/],(1,0),周期触发	10	推送护航相关的功能信息
+	ConvoyFunInfo convoy_fun_info = 1;
+	
+}
+
+
+
+

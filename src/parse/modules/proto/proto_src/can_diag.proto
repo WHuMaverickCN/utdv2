@@ -1,0 +1,157 @@
+/**
+ * @file     can_diag.proto
+ * @author
+ * @details  CAN通信状态
+ * @date     2023-12-27
+ * @version  V1.0
+ * @copyright(C),changan,2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+ * ///<车辆坐标系 原点：车辆后轴 右手法则
+ *
+ * @par      修改日志：
+ * <table>
+ * <tr><th>date              <th>version             <th>author
+ * <tr><th>2023.12.27         <th>1.0                 <th>
+ * <table>
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package CanDiagProto;
+
+/**
+ * @brief ComFltService
+ * @detail soa服务can通信故障状态
+ */
+message ComFltService {
+    ///< AVH功能状态服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts avh_func_sts = 1;
+
+    ///< 车身稳定系统状态服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts body_staby_sys_sts = 2;
+
+    ///< 电子驻车功能服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts epb_fuc = 3;
+
+    ///< VDC状态服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts esp_vdc_sts = 4;
+
+    ///< 冗余车速信息服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts rbm_veh_spd = 5;
+
+    ///< 车速信息服务can通信故障状态：[/],(/,/,/),[/],(/,/),/
+    ComFltSts veh_spd = 6;
+
+     ///< 进入售后标定流程状态：[/],(/,/,/),[/],(/,/),/
+    SCcalibration sc_calibraction = 7;
+    
+    ///< 光线传感器故障状态：[/],(/,/,/),[/],(/,/),/
+    LiSnsrInfoState li_sn_err_st = 8; 
+
+    ///< 通知HOD相关状态：[/],(/,/,/),[/],(/,/),/
+    HODDetectInfo hod_detect_info = 9;
+
+    ///< 信息错误状态（检测到巡航系统信号错误）：[/],(/,/,/),[/],(/,/),/
+    ///< 0: no error
+    ///< 1: reversible error 
+    ///< 2: irreversible error
+    ///< 3: not defined
+    uint32 dmd_prm_info = 10;
+
+}
+
+/**
+ * @brief ComFltSts
+ * @detail can通信故障状态
+ */
+message ComFltSts {
+  ///< 丢失通信故障状态：[/],(/,/,/),[/],(1,0),/
+  ///< 0x0: 正常,无故障 Normal
+  ///< 0x1: 故障 Error
+  ///< 0x2: Not_Supported Not_Supported
+  uint32 lost_com_flt_sts = 1;
+
+  ///< CRC校验状态 ：[/],(/,/,/),[/],(/,/),/
+  ///< 0x0: 正常,无错误 Normal
+  ///< 0x1: 错误 Error
+  ///< 0x2: Not_SupportedNot_Supported
+  uint32 crc_check_sts = 2;
+
+  ///< RollingCounter校验状态 ：[/],(/,/,/),[/],(/,/),/
+  ///< 0x0: 正常,无错误 Normal
+  ///< 0x1: 错误 Error
+  ///< 0x2: Not_SupportedNot_Supported
+  uint32 rolling_counter_sts = 3;
+}
+
+/**
+* @brief 通知HOD相关状态
+* @detail xxxxxxxx
+*/
+message HODDetectInfo
+{
+    ///< HOD 系统状态: [/],(/,/,/),[/],(/,/),/
+    ///< 0x0 : 无故障 Nofault
+    ///< 0x1:  故障 Fault 
+    ///< 0x2:  预留 Reserved
+    ///< 0x3:  预留 Reserved
+    ///< 0x4:  预留 Reserved
+    ///< 0x5:  预留 Reserved
+    ///< 0x6:  预留 Reserved
+    ///< 0x7:  预留 Reserved
+    uint32 system_status = 1;
+
+    ///< HOD:  传感器状态: [/],(/,/,/),[/],(/,/),/
+    ///< 0x0:  无故障 Nofault
+    ///< 0x1:  故障 Fault
+    uint32 senser_status = 2;
+
+    ///< HOD:  软件或硬件状态: [/],(/,/,/),[/],(/,/),/
+    ///< 0x0:  无故障 Nofault
+    ///< 0x1:  故障 Fault
+    uint32 app_status = 3;
+
+    ///< HOD:  LIN通信状态: [/],(/,/,/),[/],(/,/),/
+    ///< 0x0:  无故障 Nofault
+    ///< 0x1:  故障 Fault
+    uint32 lin_status = 4;
+
+    ///< HOD标定状态: [/],(/,/,/),[/],(/,/),/
+    ///< 0x0:  未标定 NotCalibrated
+    ///< 0x1:  标定 Calibrated
+    uint32 calibraction_status = 5;
+    
+    ///< HOD系统Rolling Counter: [/],(/,/,/),[/],(/,/),/
+    uint32 rolling_counter = 6;
+    
+    ///< HOD系统CRC校验: [/],(/,/,/),[1],(/,/),/
+    uint32 check_sum = 7;
+}
+
+/**
+* @brief 通知智驾进入售后标定流程
+* @detail xxxxxxxx
+*/
+message SCcalibration
+{
+    ///< 进入售后标定流程状态：[/],(0,1,0),[1],(/,/),/
+    ///< 0: 未进入标定
+    ///< 1: 进入标定
+    uint32 state = 1;
+}
+
+/**
+* @brief 通知光线传感器故障状态
+* @detail xxxxxxxx
+*/
+message LiSnsrInfoState
+{
+    ///< 光线传感器故障状态：[/],(0,1,0),[1],(/,/),/
+    ///< 0x0: NoError 无故障 
+    ///< 0x1: Error 故障
+    uint32 li_sn_err_st = 1;
+}

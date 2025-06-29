@@ -1,0 +1,299 @@
+/**
+* @file     eol.proto
+* @author   刘洪成
+* @details  下线电检
+* @date     2023-11-16
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.11.16          <th>1.0                 <th>刘洪成 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	Eol;
+
+/**
+* @brief EolStatus
+* @detail EolStatus EOL状态
+*/
+message EolStatus{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+  
+///< 产线模式：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+uint32 production_line_model = 2;
+
+///< 路试自驾功能检查测试：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+uint32 roadtest_autodrive_func_check = 3;
+
+///< 摄像头标定启动标志：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF
+///<0x0: 关闭
+///<0x1: 环视摄像头工厂标定
+///<0x2: 前视摄像头工厂标定
+///<0x4: 周视摄像头工厂标定
+///<0x10: 环视摄像头售后标定
+///<0x20: 前视摄像头售后标定
+///<0x40: 周视摄像头售后标定
+uint32 camra_calibration_status = 4;
+
+///< 激光标定启动标志：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+///<0x0: 关闭
+///<0x1: 工厂标定
+///<0x2: 售后标定
+uint32 lidar_dcalibration_status = 5;
+
+///< 激光雷达IP配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+///<0x0: 关闭
+///<0x1: 工厂配置
+///<0x2: 售后配置
+uint32 lidar_ip_config_status = 6;
+
+///< 激光雷达读取校准文件：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为OFF	 
+uint32 lidar_read_cali_files = 7;
+} 
+
+/**
+* @brief HardwareConfig
+* @detail HardwareConfig 自驾硬件配置
+*/
+message HardwareConfig{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 车辆是否配置IMS传感器：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool ims_config = 2;
+///< 车辆是否配置HOD：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool hod_config = 3;
+///< 车辆是否配置制动冗余：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool brake_config = 4;
+///< 车辆是否配置转向冗余：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool steering_config = 5;
+///< 车辆是否配置安全功能冗余：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool safety_config = 6;
+} 
+
+/**
+* @brief FunctionConfig
+* @detail FunctionConfig 自驾功能配置
+*/
+message FunctionConfig{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< ACC产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_acc_config = 2;
+///< IACC产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_iacc_config = 3;
+///< 领航功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_pilot_config = 4;
+///< NDA产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_nda_config = 5;
+///< TJP产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_tjp_config = 6;
+///< FIDA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fida_config = 7;
+///< ALC功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_alc_config = 8;
+///< UDLC功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_udlc_config = 9;
+///< 智慧偏移功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_shift_config = 10;
+///< 失能辅助产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_disability_config = 11;
+///< SEA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_sea_config = 12;
+///< BSD/LCA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_bsd_config = 13;
+///< REW功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rew_config = 14;
+///< TSR功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_tsr_config = 15;
+///< TMR功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_tmr_config = 16;
+///< TLR功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_tlr_config = 17;
+///< CNA产品功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_cna_config = 18;
+///< APA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_apa_config = 19;
+///< AVP功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_avp_config = 20;
+///< HZP功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_hzp_config = 21;
+///< Summon功能配置 ：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_summon_config = 22;
+///< RMA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rma_config = 23;
+///< RADS功能配置 ：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rads_config = 24;
+///< RPA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rpa_config = 25;
+///< RIO功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rio_config = 26;
+///< SPA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_spa_config = 27;
+///< IDA路口辅助功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_ida_config = 28;
+///< OA智能绕障功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_oa_config = 29;
+///< REB后向自动紧急制动辅助功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_reb_config = 30;
+///< DES驾驶员触发紧急转向功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_des_config = 31;
+///< CES车道内紧急转向功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_ces_config = 32;
+///< AES自动紧急转向功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aes_config = 33;
+///< AEB功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_config = 34;
+///< LAEB功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_laeb_config = 35;
+///< DIY Parking自定义车位功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_diy_park_config = 36;
+///< Self-learning Park自学习泊车功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_self_learning_park_config = 37;
+///< ELK路沿功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_elk_road_config = 38;
+///< ELK对向来车功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_elk_vehicle_config = 39;
+///< ELK变道辅助功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_elk_assist_config = 40;
+///< AEB车辆功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_vehicle_config = 41;
+///< AEB行人功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_pedestrian_config = 42;
+///< AEB二轮车功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_bicycle_config = 43;
+///< AEB特殊车辆功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_special_vehicle_config = 44;
+///< AEB其它目标功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_other_config = 45;
+///< FCW车辆功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_vehicle_config = 46;
+///< FCW行人功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_pedestrian_config = 47;
+///< FCW二轮车功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_bicycle_config = 48;
+///< FCW特殊车辆功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_special_vehicle_config = 49;
+///< FCW其它目标功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_other_config = 50;
+///< AEB横穿低速功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_traverse_slow_config = 51;
+///< AEB横穿高速功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_traverse_fast_config = 52;
+///< FCW横穿低速功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_traverse_slow_config = 53;
+///< FCW横穿高速功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_traverse_fast_config = 54;
+///< AEB左转功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_turnleft_config = 55;
+///< AEB右转功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_turnright_config = 56;
+///< AEB转弯对向车辆功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_wheel_vehicle_config = 57;
+///< AEB转弯对向行人功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_wheel_pedestrian_config = 58;
+///< AEB转弯对向二轮车功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_aeb_wheel_bicycle_config = 59;
+///< LAEB前向目标功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_laeb_front_target_config = 60;
+///< LAEB前向障碍物功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_laeb_front_barrier_config = 61;
+///< LAEB后向目标功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_laeb_rear_target_config = 62;
+///< LAEB后向障碍物功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_laeb_rear_barrier_config = 63;
+///< IRLC功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_irlc_config = 64;
+///< 自学习领航功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_self_learning_pilot_config = 65;
+///< LDW功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_ldw_config = 66;
+///< LKA功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_lka_config = 67;
+///< ELK功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_elk_config = 68;
+///< RCW功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rcw_config = 69;
+///< RRLW功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_rrlw_config = 70;
+///< FCW功能配置：[/],(/,/,/),[/],(1,0),0x0=OFF,0x1=ON 默认为ON	 
+bool fun_fcw_config = 71;
+} 
+
+/**
+* @brief BasicCharacteisticConfig
+* @detail BasicCharacteisticConfig 自驾基础特性配置
+*/
+message BasicCharacteisticConfig{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+
+///< 本车长度：[/],(/,/,/),[/],(1,0),Phy=Hex	 
+double basic_length = 2;
+///< 本车宽度：[/],(/,/,/),[/],(1,0),Phy=Hex	 
+double basic_width = 3;
+///< 本车高度：[/],(/,/,/),[/],(1,0),Phy=Hex	 
+double basic_height = 4;
+///< 轴距：[/],(/,/,/),[/],(1,0),Phy=Hex	 
+double basic_wheel_base = 5;
+///< 转向比：[/],(/,/,/),[/],(1,0),Phy=Hex*0.1	 
+double basic_steering_ratio = 6;
+///< 转弯半径：[/],(/,/,/),[/],(1,0),Phy=Hex*0.1	 
+double basic_adius = 7;
+///< 轮胎型号：[/],(/,/,/),[/],(1,0),0：无效1：245/50 R192：245/45 R203：255/50 R204：265/45 R21	 
+uint32 basic_tyre_type = 8;
+///< 后轴到车尾距离：[/],(/,/,/),[/],(1,0),Phy=Hex
+double basic_dis_axle_rear = 9;
+///< 外后视镜中心到后轴距离：[/],(/,/,/),[/],(1,0),Phy=Hex	 
+double basic_dis_rearview_axle = 10;
+///< IMU至定位天线的杆臂X值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_imu_antnna_x = 11;
+///< IMU至定位天线的杆臂Y值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_imu_antnna_y = 12;
+///< IMU至定位天线的杆臂Z值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_imu_antnna_z = 13;
+///< 投影点的杆臂X值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_subpoint_x = 14;
+///< 投影点的杆臂Y值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_subpoint_y = 15;
+///< 投影点的杆臂Z值：[/],(/,/,/),[/],(1,0),Phy=Hex*0.00001-10	 
+double basic_subpoint_z = 16;
+///< SDA-S平台车型：[/],(/,/,/),[/],(1,0),0：无效1：CD570（E0二车）2：CD701 3：CD985 4：C857 5：D587 6: C518 7: P866	 
+uint32 basic_veh_model = 17;
+///< 自动驾驶等级：[/],(/,/,/),[/],(1,0),0:C2L 1:C2M 2:C2M+ 3:C2H	 
+uint32 basic_autodrive_level = 18;
+///< 悬架类型：[/],(/,/,/),[/],(1,0),0：普通悬架1：VIU集成空气悬架	 
+uint32 basic_suspension_type = 19;
+///< 语言：[/],(/,/,/),[/],(1,0),0：中文 1：英文	 
+uint32 basic_language = 20;
+///< 销售区域：[/],(/,/,/),[/],(1,0),0：中国大陆1：日本2：海湾地区3：东南亚4：西欧5：东欧6：北美7：南美8：非洲9：澳洲	 
+uint32 basic_sale_area = 21;
+///< 动力系统类型：[/],(/,/,/),[/],(1,0),
+uint32 power_system_type = 22;
+///< 驱动形式：[/],(/,/,/),[/],(1,0),
+uint32 driving_form = 23;
+}
+
+/**
+* @brief VIN
+* @detail VIN 车架号
+*/
+message VinConfig{ 
+///< 目标时间戳：[s],(/,/,/),[/],(1,0),目标时间戳
+double timestamp = 1;
+  
+///< vin码：[/],(/,/,/),[/],(1,0),
+bytes vin_data = 2;
+}

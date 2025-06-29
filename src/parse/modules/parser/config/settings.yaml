@@ -1,0 +1,32 @@
+Pasers:
+  # - PaserName: Video_701
+  #   Sigleton: true
+  #   TopicNames:
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM0
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM1
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM2
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM3
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM8
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM9
+  #      - sda-encode_srv-EncodeSrv.EncodeH265-CAM10
+  #   OutDic:
+  #      - CAM0
+  #      - CAM1
+  #      - CAM2
+  #      - CAM3
+  #      - CAM8
+  #      - CAM9
+  #      - CAM10
+
+  # - PaserName: WheelSpeedPaser
+  #   Sigleton: true
+  #   TopicNames:
+  #      - INS-WS-GI7683
+  #      - INS-WS2-GI7683
+
+  - PaserName: Ins_701
+    Sigleton: true
+    TopicNames:
+      - sda-ins_parser-localization.InsData
+    OutDic:
+      - insdata

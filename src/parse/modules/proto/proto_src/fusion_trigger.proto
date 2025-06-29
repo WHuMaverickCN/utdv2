@@ -1,0 +1,37 @@
+/**
+* @file     fusion_trigger.proto
+* @author   chenjianbing
+* @details  fusion trigger相关信号的输出接口定义
+* @date     2022-03-05
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.5          <th>1.0                 <th>chenjianbing 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package FusionProto;
+
+/**
+* @brief fusion trigger信息
+* @detail xxxxxxxx
+*/
+
+message FusTriggerAndDiagnostic  
+{
+	///< 是否触发: [/],(0，0,1),[/],(1,0),是否触发
+	bool is_trigger_adr = 1;
+	///< 触发场景集: [/],(/，/,/),[16],(1,0),触发场景集
+	repeated uint32 diagnostic_code = 2; 
+}

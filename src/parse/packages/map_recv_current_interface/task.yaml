@@ -1,0 +1,209 @@
+coms:
+  -
+    name: map_recv
+    timer_sche_policy: 0
+    timer_priority: 20
+    timer_nice: 0
+    cm_sche_policy: 1
+    cm_priority: 40
+    cm_nice: 0
+    affinity: []
+    submit_thread_pool_max_num: 1
+    timer_thread_pool_max_num: 3
+    memory_max: -1
+    lib: ./libmap_recv.so.1.0
+    config: ./map_recv.yaml
+    
+tasks:
+  -
+    name: sda
+    default_activity: true
+    interface_libs: [./interface1.0/x86/lib/libdrive_interface.so.1.0]
+    packages:
+      - [map_recv]
+
+    lazy_coms: []
+    borrows: [] # <task_name>-<node_name>
+
+    #对组件分组,通过capilot_sche进行分组调度
+    groups:
+      -
+        name: sample #组名
+        coms: [] #组件名列表 node_name
+    #设置组件环境变量
+    envs: []
+      # -
+      #   com: send #组件名
+      #   env:
+      #    -
+      #     key: sample_key #环境变量key
+      #     val: sample_val #环境变量val
+
+#将指定的主题发布到片间
+cross_device_pub:
+  -
+    #任务名
+    task: default
+    #片间发布地址(TCP)
+    url: 127.0.0.1:6543
+    #需要片间发布的主题列表
+    topics: []
+
+#订阅来自片间的主题
+cross_device_sub:
+  -
+    #任务名
+    task: default
+    #片间订阅地址(TCP)
+    url: 127.0.0.1:6544
+    #需要片间订阅的主题列表
+    topics: []
+
+
+#数据回放主题列表,填写需要回放的主题,这里的topic需要添加task前缀 <task_name>-<topic_name>
+replay_topics: [
+  sda-map_static_info-idmap.StaticIDMapInfo,
+  sda-ins_parser-localization.InsData-RawDu
+]
+
+#数据录制主题列表
+#若不指定主题，记录全量数据，若指定节点，则只记录指定的节点发布的数据
+#这里需要注意的是节点名称需要加上task前缀: <task_name>-<node_name>
+#例如 apa-fusion,只记录fusion模块的输出数据,所有统计信息也不会被记录
+record_nodes: []
+
+#capilot主框架服务地址(TCP),系统级配置
+uniform_url: 127.0.0.1:7766
+
+#zmq临时目录,系统级配置
+zmq_temp_folder: /tmp
+
+#请勿设置该选项,即将废弃
+use_share_memory: false
+run_share_memory_daemon: false
+
+#日志选项
+#off=0 debug=1 info=2 warn=3 err=4 critical=5 (在组件里请勿乱使用日志等级,请参考日志等级使用说明)
+log_file_level: 0 #输出到文件
+log_stdout_level: 1 #输出到终端
+log_path: ./log #日志配置目录
+
+enable_fd_diag: false
+diag_folder_path: ./diag
+
+#是否开启线程池,开启此选项后,coms->timer_thread_pool_max_num参数才会生效,默认关闭
+enable_thread_pool: false
+
+#capilot可执行文件目录,若部署在控制器中,这里需修改为capilot在控制器中的路径
+bin_path: /opt/capilot/bin
+
+#仅在kmsg模式下使用,指定接口库路径
+lib_path: ./
+
+#启用进程池,若出现与三方框架或库冲突等异常问题,可置为false
+enable_process_pool: true
+#进程池数量
+process_pool_num: 3
+
+#数据回注选项,默认关闭
+enable_data_injection: false
+#数据回注地址(TCP)
+data_injection_url: 127.0.0.1:9765
+#数据回注主题列表,<task>-<topic>
+injection_topics: []
+
+#旧版共享内存,弃用
+use_share_memory_config_default: true
+#[size,count]
+share_memory_config: [
+  [128,10000],
+  [1204,5000],
+  [16384,1000],
+  [131072,200],
+  [52488,50],
+  [1048576,30],
+  [4194304,10]
+]
+
+#是否启用优先级,开启后,coms->timer_*优先级参数生效,默认关闭
+enable_priority: false
+#是否启用cpu亲和性设置,开启后,coms->affinity参数生效,默认关闭
+enable_affinity: false
+
+#系统监控信息,监控各个模块CPU/内存等系统占用情况
+#在ctrl-c中止程序后,会在当前路径下生成包含框架中运行所有组件的内存和cpu相关统计信息
+system_monitor:
+  #是否开启系统监控功能,默认关闭
+  enable: false
+  #每次采集系统信息的时间间隔,单位毫秒(ms)
+  interval: 2000
+  #被监控模块异常处理策略: 0:只打印错误信息到终端; 1:将错误信息记录到文件; 2:将错误信息记录到文件并重启模块
+  exception_policy: 0
+  #是否开启内存使用监控,当组件使用内存超过coms设置的memory_max最大值时,自动KILL组件
+  memory_monitor: false
+
+#向外发布数据选项
+pub_out:
+  #是否开启向外发布功能,默认开启
+  enable: true
+  #向外发布地址(tcp通信)
+  address: 127.0.0.1:7890
+  #是否向外发送系统监控信息,默认关闭
+  pub_system_monitor: false
+  #topic信息统计功能开关,可提供topic收发周期、延时等统计信息,会额外消耗一定的cpu资源,默认关闭
+  pub_call_monitor: false
+  #是否向外发送诊断日志信息,默认关闭
+  pub_diagnose_info: false
+  #是否向外发送内部主题内容,默认开启
+  pub_topic_content: true  
+
+#共享内存配置选项
+cashm:
+  #默认使用共享内存通信,关闭此选项使用zmq通信,默认开启
+  enable: true
+  #启动框架时是否重置ipc资源,默认关闭
+  memory_ipcs_reset: false
+  #内存池配置，根据实际情况进行配置，[size(KB), count]
+  memory_pool_config: [
+    [1,32],
+    [2,32],
+    [4,16],
+    [8,16],
+    [16,16],
+    [64,16],
+    [128,16],
+    [1024,16],
+    [2048,8],
+    [8192,8],
+    [32768,8],
+    [65536,8]
+  ]
+ 
+exec_app:
+  -
+   #可执行程序名称，唯一
+   app_name: capilot_proxy  #框架级默认代理
+   #可执行程序启动路径
+   app_path: /opt/capilot/bin
+   #可选,app的配置文件路径,需要时开启
+   config_path: ./config.yaml
+   #是否启用
+   enable: true
+   #调度策略,0-OTHER 1-FIFO 2-RR
+   cm_sche_policy: 1
+   #调度优先级,在FIFO和RR策略下生效
+   cm_priority: 40
+   #nice值,在OTHER策略下生效
+   cm_nice: 0
+   #CPU亲和性设置,根据实际情况配置
+   affinity: []
+   #需要订阅的'框架外'主题列表,共享内存通信模式下需要，否则无法订阅数据
+   sub_topics: []
+   #capilot默认代理选项,唯一
+   default: true
+   #启动时打开gdb调试,由框架启动时生效
+   gdb_enable: false
+   #是否由capilot框架启动,默认开启
+   capilot_launch: true
+
+

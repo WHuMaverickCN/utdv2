@@ -1,0 +1,75 @@
+Pasers:
+   - PaserName: CD701VideoParserSingle
+     Sigleton: true
+     TopicNames:
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM0
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM1
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM2
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM3
+        - sda-encode_srv-EncodeSrv.EncodeH265-CAM8
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM9
+      #   - sda-encode_srv-EncodeSrv.EncodeH265-CAM10
+     OutDic:
+        - CAM0
+        - CAM1
+        - CAM2
+        - CAM3
+        - CAM8
+        - CAM9
+        - CAM10
+   - PaserName: InsParser
+     Sigleton: true
+     TopicNames:
+       - sda-ins_parser-localization.InsData
+     OutDic:
+       - insdata
+   - PaserName: S7VideoPaser
+     Sigleton: false
+     TopicNames:
+        - Camera-left-bc
+        - Camera-left-fc
+        - Camera-right-bc
+        - Camera-right-fc
+        - Camera-tail-bc
+        - Camera-wide-fc
+        - Camera-narrow-fc
+     OutDic:
+        - cam_rear_left
+        - cam_front_left
+        - cam_rear_right
+        - cam_front_right
+        - cam_rear
+        - cam_front
+        - cam_front_30fov # 7.5新增摄像头
+   - PaserName: PosImuPaser
+     Sigleton: true
+     TopicNames:
+        - INS-INS-GI7683
+        - INS-IMU-GI7683
+     OutDic: pos_imu_data
+   - PaserName: WheelSpeedPaser
+     Sigleton: true
+     TopicNames:
+        - INS-WS-GI7683
+        - INS-WS2-GI7683
+     OutDic: wheel_speed_data
+   - PaserName: S7RTKrtcmPaser # 腾讯使用
+     Sigleton: true
+     TopicNames:
+        - INS-RTCM-GI7683
+     OutDic: rtk_data
+   - PaserName: S7GNSSRTCMPaser # 腾讯使用
+     Sigleton: true
+     TopicNames:
+        - GNSS-RAW
+     OutDic: gnss_data
+   - PaserName: S7ImuPaser #腾讯使用
+     Sigleton: true
+     TopicNames:
+        - INS-IMU-GI7683
+     OutDic: imu_data
+   - PaserName: S7GnssDataPaser
+     Sigleton: true
+     TopicNames:
+        - INS-GNSS-GI7683
+     OutDic: gnss_info

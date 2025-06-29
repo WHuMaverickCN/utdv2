@@ -1,0 +1,81 @@
+/**
+
+* @file     hmi_basic_trafficsign.proto
+* @author   HMI TEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义  Basic_TrafficSign - Ntf_TrafficSign
+* @date     2023-06-12
+* @version  V1.6
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+
+/**
+* @brief TrafficSign
+* @detail TrafficSigndata
+*/
+message LaneArrowArray
+{
+	///<车道X引导箭头类型:[/],(0,0,/),[/],(1,0),车道X引导箭头类型
+	///<备注：R8需求删除
+	uint32 lane1garrowtype = 1;  
+}
+/**
+* @brief TrafficSign
+* @detail TrafficSign交通标志信息
+*/
+message TrafficSign
+{
+	///<警告标志:[/],(0,0,/),[/],(1,0),警告标志
+	///<0x3:注意行人
+	///<0xF:施工
+	///<0x19:注意儿童
+	uint32 warningsign = 1;
+
+	///<禁令标志:[/],(0,0,/),[/],(1,0),禁令标志
+	///<0xD:停车让行
+	///<0xE:减速让行
+	uint32 prohibitionsign = 2;
+
+	///<指示标志:[/],(0,0,/),[/],(1,0),指示标志
+	uint32 mandatorysign = 3;
+
+	///<车道X引导箭头类型:[/],(0,0,/),[6],(1,0),R7车道X引导箭头类型
+	repeated LaneArrowArray lanearrowdata = 4;  
+}
+
+
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装所有信号，包括目标、车道线、交通灯等
+*/
+message BasicTrafficSign
+{
+	///<推送三个类型的交通标志:[/],(0,0,/),[/],(1,0),事件触发		
+	TrafficSign trafficsign = 1; 	
+}
+
+
+
+

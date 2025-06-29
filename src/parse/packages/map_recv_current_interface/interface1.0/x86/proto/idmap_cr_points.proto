@@ -1,0 +1,94 @@
+/**
+
+* @file     idmap_cr_points.proto
+* @author   jianghongyue
+* @details  异源匹配路段上的起止点序列，cr为cross reference缩写
+* @date     2023-07-18
+* @version  2.3
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  GCJ02
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.03.20        <th>2.0                 <th>jianghongyue
+* <tr><th>2023.07.18        <th>2.3                 <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax="proto3";
+package idmap;
+
+
+/**
+* @brief 反馈匹配请求信息
+* @details  反馈数据路线信息，收到sd_path就返回
+*/
+message RespRequest
+{
+    ///<返回请求异源匹配ID:[/],(/,/,/),[/],(/,/),用于区分不同路线
+    uint64 resp_request_id = 1;
+
+    ///<异源匹配反馈:[/],(/,/,/),[/],(/,/),跟sd_path一一对应
+    repeated CRInfo cr_info = 2;
+}
+
+/**
+* @brief 反馈众包建图进度
+* @details  收到请求后，或者周期性反馈用户路线上众包覆盖情况
+*/
+message RespRequestCSMapProgress
+{
+    ///<返回建图路线ID:[/],(/,/,/),[/],(/,/),用于区分不同路线
+    uint64 resp_csmap_path_id = 1;
+
+    ///<建图情况反馈:[/],(/,/,/),[/],(/,/),跟sd_path一一对应
+    repeated CRInfo csmap_progress_cr = 2;
+}
+
+/**
+* @brief 异源匹配反馈信息
+* @details  提供异源匹配起止点，及对应的pathid，每次收到sdpath后完成计算播发
+*/
+message CRInfo
+{
+    ///<导航路线ID:[/],(/,/,/),[/],(/,/),提供导航pathid
+    uint64 sd_path_id = 2;
+
+    ///<重叠匹配起止点:[/],(/,/,/),[/],(/,/),路线对应的所有起止点序列
+	repeated CRPoints cr_points = 3;
+}
+
+/**
+* @brief 异源匹配起止点坐标
+* @details  提供导航路线和智驾地图匹配路线上，对应的导航路线坐标起止点
+*/
+message CRPoints
+{
+    ///<重叠匹配起点:[/],(/,/,/),[/],(/,/),计算取图范围内单次匹配的重叠路段起点坐标
+	CRGnss cr_start_points = 1;
+
+    ///<重叠匹配终点:[/],(/,/,/),[/],(/,/),计算取图范围内单次匹配的重叠路段终点坐标
+	CRGnss cr_end_points = 2;
+}
+
+/**
+* @brief 坐标
+* @details  匹配坐标的经纬度
+*/
+message CRGnss
+{
+    ///<经度:[°],(0,-180,180),[/],(0.000001,0),东经为正
+    double cr_lng = 1;
+
+    ///<纬度:[°],(0,-90,90),[/],(0.000001,0),北纬为正
+    double cr_lat = 2;
+}

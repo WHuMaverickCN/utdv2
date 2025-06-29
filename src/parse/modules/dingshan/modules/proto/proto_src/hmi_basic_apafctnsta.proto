@@ -1,0 +1,115 @@
+/**
+
+* @file     hmi_basic_apafctnsta.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-通知泊车状态
+* @date     2023-08-24
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2023-08-24         <th>1.0                 <th>HMITEAM
+* <table>
+* @par      修改日志： 修改proto格式
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2024-01-22         <th>1.1                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+/**
+* @brief hmi泊车状态机
+* @details hmi泊车状态机
+*/
+message ADAPAFctnStaData
+{
+	///<泊车系统功能开启状态:[/],(/,/,/),[/],(/,/),泊车系统功能开启状态
+	///<0x0: Off
+	///<0x1: APAOn
+  ///<0x2: RPAOnbyCAR	
+  ///<0x3: RPAOnbyAPP
+  ///<0x4: RPAOnbyKEY
+  ///<0x5: RMAOn
+  ///<0x6: RADSOn
+  ///<0x7: HZPOn
+	uint32 ad_apasysenasta = 1;		
+
+  ///<车内泊车sta:[/],(/,/,/),[/],(/,/),车内泊车sta
+	///<0x0: Off
+	///<0x1: Passive
+  ///<0x2: Standby	
+  ///<0x3: SearchingIn
+  ///<0x4: SearchingOut
+  ///<0x5: APAParkInActive
+  ///<0x6: APAParkOutActive
+  ///<0x7: CustomSlot
+  ///<0x8: Pause
+  ///<0x9: Pending
+  ///<0xA: Finish
+  ///<0xB: Terminate
+  ///<0xC: Takeover
+  ///<0xD: Failure
+	uint32 ad_apasta = 2;	
+  
+  ///<遥控泊车sta:[/],(/,/,/),[/],(/,/),遥控泊车sta
+	///<0x0: Off
+	///<0x1: RPAParkInStandby
+  ///<0x2: RPAInOutPreActive	
+  ///<0x3: RPAParkOutPreActive
+  ///<0x4: RPAParkInPreActive
+  ///<0x5: RPAParkInActive
+  ///<0x6: RPAParkOutActive
+  ///<0x7: RPAInOutActive
+  ///<0x8: EPAParkInActive
+  ///<0x9: Pause
+  ///<0xA: Pending
+  ///<0xB: Finish
+  ///<0xC: Terminate
+  ///<0xD: Failure
+	uint32 ad_rpasta = 3;
+  
+  ///<RMA泊车sta:[/],(/,/,/),[/],(/,/),RMA泊车sta
+	///<0x0: Off
+  ///<0x1: RMAMovePreActive
+  ///<0x2: RMAParkOutPreActive
+  ///<0x3: RMAParkHomePreActive
+  ///<0x4: RMAParkOutActive
+  ///<0x5: RMAParkInActive
+  ///<0x6: RMAMoveActive
+  ///<0x7: RMAHomeActive
+  ///<0x8: Pause
+  ///<0x9: Pending
+  ///<0xA: Finish
+  ///<0xB: Terminate
+  ///<0xC: Failure
+	uint32 ad_rmasta = 4;
+
+  ///<RADS泊车sta:[/],(/,/,/),[/],(/,/),RADS泊车sta
+	///<0x0: Off
+  ///<0x1: Passive
+  ///<0x2: Standby
+  ///<0x3: PathFollowing
+  ///<0x4: Pause
+  ///<0x5: Pending
+  ///<0x6: Finish
+  ///<0x7: Terminate
+  ///<0x8: Failure
+	uint32 ad_radssta = 5;
+}

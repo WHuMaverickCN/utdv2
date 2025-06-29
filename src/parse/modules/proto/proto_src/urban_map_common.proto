@@ -1,0 +1,163 @@
+/**
+* @file     urban_map_common.proto
+* @author   langshibing
+* @details  urban地图枚举、补充信息
+* @date     2024-01-23
+* @version  1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.10.19        <th>1.0                 <th>langshibing
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+
+/**
+* @brief urban地图类型
+* @details  标志urabn的地图类型
+*/
+enum UrbanMapType{
+   ///< 0:未知类型
+   kUnknowType = 0;
+   ///< 1:停车场地图
+   kParkUrban = 1;
+   ///< 2:高速地图
+   kHighwayUrban = 2;
+   ///< 3:其他类型
+   kOtherUrban = 3;
+}
+
+/**
+* @brief urban地图类型
+* @details  标志urabn的地图类型
+*/
+enum ParkUrbanMapType{
+  ///< 0:无类型
+  kNullType = 0;
+  ///< 1:入库地图
+  kParkIn = 1;
+  ///< 2:出库地图
+  kParkOut = 2;
+  ///< 3:入库&出库地图
+  kParkInOut = 3;
+}
+
+/**
+* @brief  状态
+* @details  标志地图学习状态
+*/
+enum UrbanMapStudyStatus {
+  ///< 0:空闲
+  kFreeTask = 0;
+  ///< 1:用户主动学习地图
+  kUsrStartStudyReq = 1;
+  ///< 2:车机导航触发学习地图
+  kSdStartStudyReq = 2;
+  ///< 3:地图不存在，首次学习
+  kFirstStudying = 3;
+  ///< 4:地图已存在，删除重学
+  kOverrideStudy = 4;
+  ///< 5:地图已存在，更新合并
+  kUpdateStudy = 5;
+  ///< 6:地图学习中
+  kStudyingMap = 6;
+  ///< 7:地图学习结束请求
+  kFinishStudyReq = 7;
+  ///< 8:建图后处理中
+  kMapProcessing = 8;
+  ///< 9:地图学习成功
+  kStudyMapSucc = 9;
+  ///< 10:地图学习失败
+  kStudyMapFail = 10;
+  ///< 11:用户主动退出学图
+  kUserActiveQuit = 11;
+  ///< 12:违规退出学图
+  kBreakRulesQuit = 12;
+  ///< 13:中途退出学图
+  kHalfWayQuit = 13;
+  ///< 50:未知状态
+  kUnknowStatus = 50;
+}
+
+/**
+* @brief  诊断输出
+* @details  标志详细的故障时的状态参数
+*/
+enum ErrorType {
+  ///<0:正常
+  kNormal = 0;
+  ///<1:文件不存在
+  kFileNotExist = 1;
+  ///<2:超时
+  kTimeOut = 2;
+  ///<3:时间不同步
+  kTimeSyncErr = 3;
+  ///<4:INS数据存在错误
+  kInsDataErr = 4;
+  ///<5:磁盘空间不足
+  kLowDiskSpace = 5;
+  ///<6:地图列表异常
+  kUrbanListsErr = 6;
+  ///<7:前视数据异常
+  kFcDataErr = 7;
+  ///<8:环视数据异常
+  kScDataErr = 8;
+  ///<9:软件异常
+  kSoftwareErr = 9;
+  ///<50:未知问题
+  kUnknowErr = 50;
+}
+
+/**
+* @brief  消息类型
+* @details  标志该条消息的类型和发送目标
+*/
+enum InfoType{
+  ///<0:无效
+  kInvalidType = 0;
+  ///<1:发送给实时建图模块
+  kToRealMapping = 1;
+  ///<2:发送给地图引擎用于定位
+  kToMapEngineForLoc = 2;
+  ///<3:发送给地图引擎用于车机渲染
+  kToMapEngineForRender = 3;
+}
+
+/**
+* @brief  地图学习请求
+* @details  标志地图学习请求信号
+*/
+enum LearnReq{
+  ///<0:无效
+  kFree = 0;
+  ///<1:发送给实时建图模块
+  kStart = 1;
+  ///<2:发送给地图引擎用于定位
+  kQuit = 2;
+  ///<3:发送给地图引擎用于车机渲染
+  kFinish = 3;
+}
+
+/**
+* @brief  地图管理状态
+* @details  标志地图管理组件是否可以
+*/
+enum UmmStatus{
+  ///<0:空闲
+  kIdle = 0;
+  ///<1:不可用
+  kUnusable = 1;
+  ///<2:可用
+  kUsable = 2;
+}
+
+

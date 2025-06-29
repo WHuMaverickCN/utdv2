@@ -1,0 +1,50 @@
+/**
+
+* @file     hmi_basc_autoturnview.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义  NTF_AutoTurnView
+* @date     2023-10-23
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：R12v1
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+/**
+* @brief 自适应视角
+* @details 推送当前需要切换的视角
+*/
+message AutoTurnViewData
+{
+	///<自适应视角（推送当前需要切换的视角:[/],(0,0,6),[/],(1,0),周期触发	100	状态信息
+	///<0x0:nodisplay
+	///<0x1:normal(angle)
+	///<0x2:normal(top view)
+	///<0x3:low(angle)
+	///<0x4:low(top view)
+	///<0x5:high(angle)
+	///<0x6:high(top view)
+	uint32 c2_autoturnview = 1;
+}
+
+
+
+

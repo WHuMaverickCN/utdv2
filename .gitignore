@@ -1,0 +1,18 @@
+# 忽略 src/parse/ 下的配置文件目录
+src/parse/.vscode/
+src/parse/insdata/
+
+# 忽略 src/parse/ 下的日志文件目录
+src/parse/packages/map_recv_current_interface/log/*
+
+# 忽略 src/parse/ 下的归档包和构建文件
+src/parse/*.tar.gz
+src/parse/*.zip
+src/parse/Dockerfile
+
+# 忽略 src/parse/ 下的 Python 缓存文件
+src/parse/__pycache__/
+src/parse/*.py[cod]
+
+# 忽略 src/parse/ 下的 common 模块目录
+src/parse/common/

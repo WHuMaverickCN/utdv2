@@ -1,0 +1,344 @@
+/**
+
+* @file     idmap_static.proto
+* @author   jianghongyue
+* @details  智能驾驶地图静态模块相关信号的输出接口定义，静态模块主要提供车道、车道连接关系、车道线、地面标志等不会自身发生变化的信息
+* @date     2023-07-18
+* @version  2.3
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  GCJ02
+* ///<G表示Guojia国家，C表示Cehui测绘，J表示Ju局,表示国测局基于WGS84坐标系制订的坐标系统
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version          <th>author
+* <tr><th>2022.12.30         <th>1.8             <th>jianghongyue
+* <tr><th>2023.03.06         <th>1.9             <th>jianghongyue
+* <tr><th>2023.03.29         <th>2.0             <th>jianghongyue
+* <tr><th>2023.04.21         <th>2.1             <th>jianghongyue
+* <tr><th>2023.07.18         <th>2.3             <th>jianghongyue
+* <table>
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+import "idmap_common.proto";
+import "idmap_parking.proto";
+import "seq_header.proto";
+package idmap;
+
+
+
+/**
+* @brief 静态信息集合
+* @details  提供自车半径范围内方2000米的所有车道，及各类车道关联信息
+*/
+message StaticIDMapInfo
+{
+    ///<取图点坐标:[/],(/,/,/),[/],(/,/),请求地图的坐标点
+	Gnss anchor_pos = 1;
+
+    ///<请求半径:[m],(2000,10,2000),[/],(/,/),请求范围为半径2km的圆形
+    int32 circle_radius = 2;
+
+    ///<智驾地图状态信息:[/],(/,/,/),[/],(/,/),/
+	IDMapStatus idmap_status = 3;
+
+    ///<车道相关的信息:[/],(/,/,/),[200],(/,/),/
+	repeated Lane lanes = 4;
+
+    ///<车道线集合:[/],(/,/,/),[300],(/,/),/
+    repeated Line lines = 5;
+
+    ///<道路边界集合:[/],(/,/,/),[100],(/,/),/
+    repeated RoadBoundary boundaries = 6;
+
+    ///<地面标识:[/],(/,/,/),[100],(/,/),人行横道、地面箭头、停止线、文字等
+    repeated GroundMarking ground_markings = 7;
+
+    ///<交通灯信息:[/],(/,/,/),[8],(/,/),众包暂不输出
+    repeated MapTrafficLight traffic_light = 8;
+
+    ///<交通标志牌信息:[/],(/,/,/),[16],(/,/),/
+    repeated MapTrafficSign traffic_info = 9;
+
+    ///<停车场补充状态信息:[/],(/,/,/),[/],(/,/),暂不输出
+    PakingIDMapInfo parking_info = 10;
+
+    ///<数据源切换计时:[/],(0XFF,0,5),[/],(/,/),数据源切换计数
+    uint32 data_change_countdown = 11;
+
+    ///<延时统计信息:[/],(/,/,/),[/],(/,/),标识上下游信号
+    SeqHeaderProto.SeqHeader map_seq_msg = 12;
+
+    ///<收费站信息:[/],(/,/,/),[/],(/,/),关联收费站
+    repeated Toll toll_info = 13;
+
+    ///<车道对应众包红绿灯状态:[/],(/,/,/),[/],(/,/),众包demo，图商不具备
+    repeated CSMapTrafficLight lane_connect_lights = 14;
+}
+
+
+/**
+* @brief 车道信息
+* @details  车道体现在车道中心线上
+*/
+message Lane
+{
+    ///<车道id:[/],(0,0,/),[/],(1,0),车道中心线id具有唯一性
+    uint64 lane_id = 1;
+
+    ///<车道长度:[m],(0,0,2000),[/],(0.01,0),体现为车道中心线长度
+    double lane_length = 2;
+
+    ///<车道类型:[/],(0,0,3),[/],(1,0),/
+    ///<0：未知
+    ///<1：普通车道
+    ///<2：虚拟车道，多表示连接关系
+    ///<3：众包连通车道，仅众包具备,除犬牙交错外的点点连通由此替代
+    uint32 lane_type = 3;
+
+    ///<车道通行方向:[/],(0,0,3),[/],(1,0),可找回南西原则下形状点串顺序
+    ///<0：未知
+    ///<1：双向通行
+    ///<2：顺方向
+    ///<3：逆方向
+    uint32 lane_direction = 4;
+
+    ///<车道不可通行时间:[ms],(/,/,/),[/],(/,/),起止时间，Unix时间，众包车端不输出
+    string lane_impassability_time = 5;
+
+    ///<车道曲率:[/],(0,0,/),[/],(1,0),不输出
+    repeated LaneAttribute lane_curvature_list = 6;
+
+    ///<车道纵坡:[/],(0,0,/),[/],(1,0),/
+    repeated LaneAttribute lane_slope_list = 7;
+
+    ///<推荐最高速度:[kph],(0,0,/),[/],(1,0),不表示实际限速
+    uint32 lane_speed_max = 8;
+
+    ///<推荐最低速度:[kph],(0,0,/),[/],(1,0),不表示实际限速，众包默认0
+    uint32 lane_speed_min = 9;
+
+    ///<前序车道id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 front_lane_id = 10;
+
+    ///<后继车道id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 successor_lane_id = 11;
+
+    ///<关联车道节点:[/],(/,/,/),[4],(/,/),/,部分不输出
+    repeated LaneNode lane_node = 12;
+
+    ///<车道中心线形状点:[/],(/,/,/),[50],(/,/),230719修改为按照异源匹配方向播发
+    repeated Gnss lane_points = 13;
+
+    ///<车道层级:[/],(/,/,/),[50],(/,/),当前车道对应关联层级点与层级组
+    repeated Zlevel lane_level = 14;
+
+    ///<车道楼层:[/],(0,0,10),[/],(1,0),当前车道对应的楼层，停车场具备，不输出
+    int32 floor_num = 15;
+
+    ///<对应不推荐ODD信息：[/],(/,/,/),[/],(/,/),20230329修改
+    ///<标注：todo 修改给下游的ODD信息，为NOT ODD范围&&NOT ODD原因
+    NotODD not_odd = 16;
+
+    ///<是否匹配导航路线：[/],(0,0,1),[/],(1,0),/
+    ///<说明：默认不匹配，输出0；如果重复的情况在原有的基础上增加1bit
+    uint32 in_navigation_route = 17;
+
+    ///<车道来源图商：[/],(/,/,/),[/],(/,/),该信号标志地图数据源切换
+    MapDataSource data_source = 18;
+
+    ///<车道置信度：[/],(1,0,1),[/],(0.01,0),众包未实现
+    double lane_confidence = 19;
+
+    ///<关联的车道id：[/],(0,0,/),[/],(1,0),一定范围内的车道
+    repeated uint64 associated_lane_id = 20;
+
+    ///<关联的车道线id：[/],(0,0,/),[/],(1,0),一定范围内的车道线
+    repeated uint64 associated_line_id = 21;
+
+    ///<关联的道路边界id：[/],(0,0,/),[/],(1,0),一定范围内的道路边界线
+    repeated uint64 associated_boundary_id = 22;
+
+    ///<中心线生成逻辑：[/],(0,0,15),[/],(1,0),数据来源存储采用bit位存储
+    ///<注释：第1bit 左右分界线，道路边界推导;第2bit 用户轨迹挖掘;第3bit  图商来源；第4bit 前后分界线，道路边界推导
+    uint64 center_lane_sources = 23;
+
+    ///<众包采集次数：[/],(0,0,/),[/],(1,0),仅众包数据具备
+    uint32 crowd_source_collect_times = 24;
+
+    ///<众包颠簸反馈：[/],(/,/,/),[/],(/,/),仅众包数据具备，单车道存在多个颠簸可能
+    repeated BumpStatus bump_status = 25;
+}
+
+/**
+* @brief 车道线相关信息
+* @details  包括车道线索引、属性、轨迹点等
+*/
+message Line
+{
+    ///<车道线id:[/],(0,0,/),[/],(1,0),无索引顺序
+    uint64 line_id = 1;
+
+    ///<车道线轨迹点集合:[/],(/,/,/),[400],(/,/),/
+    repeated Gnss line_points = 2;
+
+    ///<车道线类型:[/],(0,0,99),[/],(1,0),/
+    repeated LineType line_type = 3;
+
+    ///<车道线线形:[/],(0,0,99),[/],(1,0),/
+    LineMarkingType linemarking_type = 4;
+
+    ///<车道线颜色:[/],(0,0,8),[/],(1,0),/
+    Color color = 5;
+
+    ///<车道线置信度：[/],(1,0,1),[/],(0.01,0),待数据实现
+    double line_confidence = 6;
+
+    ///<车道线点对应的二维曲率：[/],(0,-100,100),[/],(1,0),20230718定位增加
+    ///<注释：负值代表此点不可信,正值代表可信；此信号不赋值，用于融合定位兼容
+    repeated double point_curvature = 7;
+}
+
+
+/**
+* @brief 道路边界线相关信息
+* @details  主要描述道路边界线的类型
+*/
+message RoadBoundary
+{
+    ///<道路边界线id:[/],(/,0,/),[/],(1,0),具有唯一性
+    uint64 road_boundary_id = 1;
+
+    ///<道路边界轨迹点集合:[/],(/,/,/),[100],(/,/),/
+    repeated Gnss boundary_points = 2;
+
+    ///<道路边界线类型:[/],(0,0,99),[/],(1,0),/,部分不输出
+    RoadBoundaryType boundary_type = 3;
+
+    ///<道路边界置信度：[/],(1,0,1),[/],(0.01,0),待数据实现
+    double boundary_confidence = 4;
+}
+
+
+/**
+* @brief 地面标识
+* @details  包括人行横道、停止线、减速带等信息
+*/
+message GroundMarking
+{
+    ///<地面标识id:[/],(/,/,/),[/],(1,0),/
+    uint64 groundmarking_id = 1;
+
+    ///<外框坐标:[/],(/,/,/),[8],(/,/),地面箭头给几何角点，输出不一致
+	repeated Gnss points = 2;
+
+    ///<地面标识类型:[/],(0,0,99),[/],(1,0),/,部分不输出
+    GroundMarkType gdm_type = 3;
+
+    ///<地面标志的值:[/],(/,/,/),[/],(1,0),/,部分不输出
+    string sign_value = 4;
+
+    ///<颜色:[/],(/,/,/),[4],(/,/),/
+	Color color = 5;
+
+    ///<地面标识样式:[/],(0,0,99),[/],(1,0),地面箭头方向或限速,部分不输出
+    GroundMarkPattern gdp_type = 6;
+
+    ///<关联车道id:[/],(0,0,/),[/],(1,0),/
+    repeated uint64 lane_id_groundmarking = 7;
+}
+
+
+/**
+* @brief 交通灯相关信息
+* @details  信号灯,众包暂不提供
+*/
+message MapTrafficLight
+{
+    ///<交通灯几何中心坐标:[/],(/,/,/),[1],(/,/),提供交通灯投射坐标
+    Gnss gnss_position = 1;
+
+    ///<关联作用车道id:[/],(0,0,/),[/],(1,0),/
+    ///<说明:感知目前无法提供，需要后续实现方案
+    repeated uint64 lane_id_tfc_light = 2;
+
+    ///<交通灯id:[/],(/,/,/),[/],(1,0),20230329新增
+    uint64 traffic_light_id = 3;
+}
+
+
+/**
+* @brief 交通标志牌
+* @details  提供交通标志牌类型、内容等信息
+*/
+message MapTrafficSign
+{
+    ///<交通标志牌类型:[/],(0,0,256),[/],(1,0),/
+    SignType sign_type = 1;
+
+    ///<标志牌中心点坐标:[/],(/,/,/),[1],(/,/),提供标志牌中心点
+    Gnss center_position = 2;
+
+    ///<交通标志牌上面的值:[/],(/,/,/),[/],(1,0),限速和具体文字等，部分不输出
+    string sign_value = 3;
+
+    ///<关联车道id:[/],(0,0,/),[/],(1,0),关联到最近的车道
+    uint64 lane_id_tfc_sign = 4;
+
+    ///<交通标志牌id:[/],(/,/,/),[/],(1,0),20230329新增
+    uint64 traffic_sign_id = 5;
+}
+
+
+/**
+* @brief 收费站
+* @details  提供收费站信息，众包不具备
+*/
+message Toll
+{
+    ///<收费站id:[/],(/,/,/),[/],(1,0),/
+    uint64 toll_id = 1;
+
+    ///<收费站面坐标:[/],(/,/,/),[/],(/,/),提供收费站范围坐标
+    repeated Gnss gnss_toll = 2;
+}
+
+/**
+* @brief 众包红绿灯状态
+* @details  试验版本，用于提供众包单帧多趟红绿灯状态信息
+*/
+message CSMapTrafficLight
+{
+    ///<对应车道id:[/],(/,/,/),[/],(1,0),/
+    uint64 csmap_lane_id = 1;
+
+    ///<红绿灯灯箱数量:[/],(/,/,/),[/],(/,/),可以看到的灯箱总数，且不一定为实际数量
+    uint32 lights_num = 2;
+
+    ///<红绿灯灯箱顺序:[/],(/,/,/),[/],(/,/),从左到右递增1
+    repeated uint32 lights_order = 3;
+
+    ///<灯箱内红绿灯颜色:[/],(/,/,/),[/],(/,/),默认一个灯箱只有一种颜色，有绿色是默认为绿色
+    ///<0:红色
+    ///<1:绿色
+    ///<2:黄色，感知不支持
+    repeated uint32 lights_color = 4;
+
+    ///<灯箱内红绿灯类型:[/],(/,/,/),[/],(/,/),默认一个灯箱只有一种类型，有多个则为未知类型
+    ///<0:未知
+    ///<1:圆形
+    ///<2:箭头-左
+    ///<3:箭头-右
+    ///<4:箭头-直
+    ///<5:箭头-掉头
+    repeated uint32 lights_type = 5;
+}

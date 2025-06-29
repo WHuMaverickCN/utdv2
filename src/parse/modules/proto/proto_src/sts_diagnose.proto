@@ -1,0 +1,670 @@
+/**
+* @file     sts_diagnose.proto
+* @author   wangqing
+* @details  STS debug信号的输出接口定义
+* @date     2023-1-4
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<12oordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原  点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>    
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.1.79         <th>1.0                 <th>wangqing 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	Sts;
+
+/**
+* @brief sts debug信息
+* @detail sts debug信息
+*/
+message StsDiagnose{
+  ///<STM 中间变量:[/],(/,/,/),[/],(/,/),STM 中间变量
+  DebugSTM debug_stm = 1; 
+  ///<STM 输入诊断:[/],(/,/,/),[/],(/,/),STM 输入诊断
+  StsInputDiagnose sts_input_diagnose = 2;
+  ///<odc抑制退出条件:[/],(/,/,/),[/],(/,/),odc抑制退出条件
+  OdcInOutConds odc_in_out_conds = 3;
+  ///<PARK STM 中间变量:[/],(/,/,/),[/],(/,/),PARK STM 中间变量
+  DebugParkSTM debug_park_stm = 4;
+}
+
+/**
+* @brief odc debug信号
+* @detail odc debug信号
+*/
+message OdcInOutConds{ 
+    ///<ODC_ACC功能抑制条件提示信息:[/],(0,0,123),[/],(1,0),ODC_ACC功能抑制条件提示信息
+    ///<定义同ACC功能抑制条件提示信息定义:
+    uint32 odc_acc_rescond_text = 1;
+
+    ///<ODC_IACC功能抑制条件提示信息:[/],(0,0,123),[/],(1,0),ODC_IACC功能抑制条件提示信息
+    ///<定义同ACC功能抑制条件提示信息定义:
+    uint32 odc_iacc_rescond_text = 2;
+
+    ///<ODC_NDA功能抑制条件提示信息:[/],(0,0,123),[/],(1,0),ODC_NDA功能抑制条件提示信息
+    ///<定义同ACC功能抑制条件提示信息定义:
+    uint32 odc_nda_rescond_text = 3;
+    
+    ///<ODC_满足退出nda条件:[/],(0,0,65535),[/],(1,0),ODC_满足退出nda条件
+    ///<0:默认值，无nda退出条件
+    ///<bit0:viu_fr_eth故障
+    ///<bit1:Rnp诊断领航不可用
+    ///<bit2:kalmanfilter无心跳
+    ///<bit3:车机导航状态异常
+    ///<bit4:即将到达地图重点
+    ///<bit5:ins故障
+    ///<bit6:行车冗余系统故障
+    ///<bit7:领航传感器故障
+    ///<bit8:驾驶偏好不为领航
+    ///<bit9:转向灯故障
+    uint32 odc_nda_quit_reason = 4;
+
+    ///<抑制领航自动激活的原因:[/],(0x0,0,255),[/],(1,0),,抑制领航自动激活的原因
+    ///<bit 0 :领航不可用或导航路径引导状态异常，
+    ///<bit 1 :控制器硬件故障等原因
+    ///<bit 2 :满足bit1时，15秒内或者行驶100米，保持抑制
+    ///<bit 3 :1分钟内，触发3次bit1
+    ///<bit 4 :10分钟内，触发5次bit1
+    uint32 nda_rescond_auto_active_reason = 5;
+} 
+
+/**
+* @brief 行车安全策略中间变量
+* @detail 行车安全策略中间变量
+*/
+message DebugSTM{  
+
+    ///<stm状态机模型版本号: [/],(0,0,4294967295),[/],(1,0),stm状态机模型版本号
+   uint32 stm_versionnumber = 1;
+
+    ///<道路预警信息: [/],(0,0,4294967295),[/],(1,0),道路预警信息
+    ///<bit0:超出坡度范围
+    ///<bit1:超出曲率范围
+    ///<bit2:前方路面颠簸
+    ///<bit3:前方骑行者
+    ///<bit4:前方道路变化
+    ///<bit5:前方施工区
+    ///<bit6:前方匝道
+    ///<bit7:前方障碍物
+   uint32 prewarn_roadword = 2;
+
+    ///<脱手提示报一级提示的具体原因: [/],(0,0,255),[/],(1,0),脱手提示报一级提示的具体原因
+    ///<bit0 :HandsoffL1_Handsoff
+    ///<bit1 :HandsoffL1_JamLev_2_3
+    ///<bit2 :HandsoffL1_Handsoff_Nofence
+    ///<bit3 :HandsoffL1_RoadPrewarn
+    ///<bit4 :HandsoffL1_MapInvalid
+    ///<bit5 :HandsoffL1_Weather
+    ///<bit6 :HandsoffL1_FIDA
+    ///<bit7 :HandsoffL1_Ramp
+    ///<bit8 :HandsoffL1_HighWay
+    ///<bit9 :HandsoffL1_MainRoad
+    ///<bit10 :HandsoffL1_ConeTank
+    ///<bit11 :HandsoffL1_UDLC
+    ///<bit12 :HandsoffL1_DMS_status
+   uint32 handsoff_warn1_reason = 3;
+
+    ///<抑制加速横向条件: [/],(0,0,255),[/],(1,0),抑制加速横向条件
+    ///<bit0 :Warn_L3_Upgrade_LAT
+    ///<bit1 :LatErr_1_COND (LatPlanErr_TDP_1 + 状态条件）
+    ///<bit2 :VehSensorErr_COND（VehBodyWord 10）、FarNearLightErr_COND（0）、DataRecodErr_COND（12）、TurnLightErr_COND（2）、WiperErr_COND（15）
+    ///<bit3 :TurnSysErr_1_COND（TurnSysErr 0 ）
+    ///<bit4 :Lat_DriverUnlockSafeBelt
+    ///<bit5 :Lat_NoDetectHead
+    ///<bit6 :Lat_NoLocation
+    ///<bit7 :OpenlightRequest
+   uint32 tor_ihbacclat_reason = 4;
+
+    ///<纵向抑制加速原因: [/],(0,0,255),[/],(1,0),纵向抑制加速原因
+    ///<bit0:车身状态等条件
+    ///<bit1:Warn_L3_Upgrade_LNG
+    ///<bit2:EnvirErr_COND
+    ///<bit3:PowerSysErr_COND
+    ///<bit4:CorrFunErr_COND
+    ///<bit5:InterSysErr_COND
+    ///<bit6:DriverErrSta
+    ///<bit7:MultiFunSteerErr、FunSwitchErr
+   uint32 tor_ihbacclng_reason = 5;
+
+    ///<脱眼提示一级条件: [/],(0,0,255),[/],(1,0),脱眼提示一级条件
+    ///<bit 0:电子围栏内注意力分散
+    ///<bit 1:电子围栏外注意力分散
+    ///<bit 2:电子围栏内轻度疲劳
+    ///<bit 3:电子围栏外轻度疲劳
+   uint32 eyesoff_warn1_reason = 6;
+
+    ///<脱眼提示二级条件: [/],(0,0,255),[/],(1,0),脱眼提示二级条件
+    ///<bit 0:闭眼、未平视前方
+    ///<bit 1:一级脱眼提示升级
+    ///<bit 2:电子围栏内疲劳
+    ///<bit 3:电子围栏外疲劳
+    ///<bit 4:电子围栏内微睡眠
+    ///<bit 5:电子围栏外微睡眠
+   uint32 eyesoff_warn2_reason = 7;
+
+    ///<制动系统异常: [/],(0,0,255),[/],(1,0),制动系统异常
+    ///<bit0 :MainBrkErr
+    ///<bit1 :Main_2nd_BrkErr
+    ///<bit2 :BrkDiskOverheat
+    ///<bit3 :MainSpdSensorErr
+    ///<bit4 :TurnAngelSensorErr
+    ///<bit5 :SpdSensorErr
+    ///<bit6 :SafeStopDisabl
+   uint32 brk_sys_err = 8;
+
+    ///<纵向减速纵向条件: [/],(0,0,65535),[/],(1,0),纵向减速纵向条件
+    ///<bit0:LngTorUpgrade
+    ///<bit1:SensorSysErr_6_Handsoff_COND、SensorSysErr_4_COND、SensorSysErr_6_Handson_COND
+    ///<bit2:HandsTorqueErr_COND
+    ///<bit3:MainBrkErr_COND
+    ///<bit4:MainSpeedSensorErr_COND
+    ///<bit5:ParkSysErr_COND
+    ///<bit6:TurnAngelSensorErr_COND
+    ///<bit7:TurnAssistErr_COND
+    ///<bit8:SelfErr_commu_COND
+    ///<bit9:LngBrkInsuffic_COND
+    ///<bit10:SelfErr_821_COND
+    ///<bit11:LNG_FusModelErr
+    ///<bit12:LNG_NoOverrideSpdOverHigh
+    ///<bit13:LNG_NoStartVeh
+    ///<bit14:LngQuit_AirBagErr、BrkDiskOverheat
+    ///<bit15:Lng_DecSpd、LNG_SteerTurnSpdErr
+    
+   uint32 tor_declng_reason = 9;
+
+    ///<纵向减速横向条件: [/],(0,0,255),[/],(1,0),纵向减速横向条件
+    ///<bit0:LatErr_2_3_COND(LatErr bit1,2)
+    ///<bit1:LatTorUpgrade
+    ///<bit2:SensorSysErr_2_COND(SensorSysErr bit2)
+    ///<bit3:TurnSysErr_2_COND（TurnSysErr bit1）、TurnSysErr_3_COND（TurnSysErr bit2）
+    ///<bit4:LatCtrErr_COND(LatErr bit4,5)
+    ///<bit5:LngNoActive_COND(LatErr bit6)
+    ///<bit6:SelfErr_8155_COND(LatErr bit3）
+    ///<bit7:LAT_AccelOverBig、LAT_SteerAngelOverBig、LAT_SteerSpdOverBig
+   uint32 tor_declat_reason = 10;
+
+    ///<横向退出条件: [/],(0,0,65535),[/],(1,0),横向退出条件
+    ///<bit0:WarnQuit_COND
+    ///<bit1:SensorSysErr_2_COND
+    ///<bit2:TurnSysErr_2_COND、TurnSysErr_3_COND
+    ///<bit3:LatCtrErr_COND
+    ///<bit4:LngNoActive_COND
+    ///<bit5:TurnAngelSensorErr_COND
+    ///<bit6:LngQuit_COND
+    ///<bit7:SelfErr_821_397_COND、DoorOpen_COND
+    ///<bit8:reserved
+    ///<bit9:LngQuit_unstability
+    ///<bit10:LAT_SelfErr_HeartBeatErr
+    ///<bit11:TurnSysErr_LatActive
+   uint32 quit_lat_reason = 11;
+
+    ///<纵向退出条件: [/],(0,0,65535),[/],(1,0),纵向退出条件
+    ///<bit0:LngPlanErr_COND
+    ///<bit1:LngCtrlErr_COND
+    ///<bit2:reserved
+    ///<bit3:Main_2nd_BrkErr_COND
+    ///<bit4:SpeedSensorErr_COND
+    ///<bit5:SelfErr_397_COND
+    ///<bit6:LngQuit_COND
+    ///<bit7:DoorOpen_COND、SensorSysErr_6_Handson_COND
+    ///<bit8:reserved
+    ///<bit9:DLngQuit_unstability
+    ///<bit10:SafeStopDisable
+    ///<bit11:SteerTurnAngelErr
+    
+   uint32 quit_lng_reason = 12;
+
+    ///<脱手提示为二级提示状态位: [/],(0,0,255),[/],(1,0),脱手提示为二级提示状态位
+    ///<bit0:HandsoffL2_Overcurve_100
+    ///<bit1:HandsoffL2_Overcurve
+    ///<bit2:HandsoffL2_FIDA
+    ///<bit3:HandsoffL2_L1Upgrade
+    ///<bit4:HandsoffL2_LaneTarget_error
+    ///<bit5:HandsoffL2_Req_eye
+   uint32 handsoff_warn2_reason = 13;
+
+    ///<驾驶员横向接管: [/],(0,0,255),[/],(1,0),驾驶员横向接管
+    ///<0:驾驶员接管方向盘
+    ///<1:驾驶员晃动方向盘
+    ///<2:驾驶员拉动方向盘
+    ///<3:巡航/取消按键
+    ///<4:转向灯相关
+   uint32 handover_lat = 14;
+
+    ///<驾驶员纵向接管: [/],(0,0,255),[/],(1,0),驾驶员纵向接管
+    ///<0:保留，暂无意义
+    ///<1:踩刹车
+    ///<2:巡航/取消按键
+    ///<3:FC/FR失效
+    ///<4:未处于前进挡
+   uint32 handover_lng = 15;
+
+    ///<横向错误的条件: [/],(0,0,255),[/],(1,0),横向错误的条件
+    ///<bit0 :LatPlanErr_TDP_1
+    ///<bit1 :LatPlanErr_TDP_2
+    ///<bit2 :LatPlanErr_TDP_invalid
+    ///<bit3 :SelfErr_8155
+    ///<bit4 :LatCtrErr_TCM_Ctr_invalid
+    ///<bit5 :LatCtrErr_TCM_Funsts_fail
+    ///<bit6 :LngNoActive
+    ///<bit7 :Lat_NoLocation
+   uint32 lat_err = 16;
+
+    ///<横向一级报警的具体原因: [/],(0,0,255),[/],(1,0),横向一级报警的具体原因
+    ///<bit0 :LAT_Warn_L3_Upgrade
+    ///<bit1 :LAT_PlanErr_TDP_Warn
+    ///<bit2 :LAT_NearfarlightErr
+    ///<bit3 :LAT_WiperErr
+    ///<bit4 :LAT_RainLightErr
+    ///<bit5 :LAT_SteeringSys_ErrL1
+    ///<bit6 :LAT_Toll_Ahead
+    ///<bit7 :LAT_OverCurve
+    ///<bit7 :LAT_HeartBeat_Adr
+   uint32 lat_alarm1_reason = 17;
+
+    ///<横向二级报警的具体原因: [/],(0,0,255),[/],(1,0),横向二级报警的具体原因
+    ///<bit0 :LAT_AccelOverBig
+    ///<bit1 :LAT_PlanErr_TDP_invalid
+    ///<bit2 :LAT_SelfErr_Quit
+    ///<bit3 :LAT_TorUpgrade
+    ///<bit4 :LAT_SteeringSys_ErrL2
+    ///<bit5 :LAT_LaneSensorDecFar
+    ///<bit6 :LAT_Lat_Control_Err
+    ///<bit7 :LAT_LngNoactive
+    ///<bit8 :LAT_heartbeat_Err
+    ///<bit9 :LAT_SelfErr_Dquit
+    ///<bit10 :LAT_SelfErr_LngDec
+    ///<bit11 :LAT_Eps_LatCtrlActive
+    ///<bit12 :LAT_Unsafe_State
+   uint32 lat_alarm2_reason = 18;
+
+    ///<纵向一级报警的具体原因: [/],(0,0,255),[/],(1,0),纵向一级报警的具体原因
+    ///<bit0 :LNG_Warn_L3_Upgrade
+    ///<bit1 :LNG_DriverErrSta
+    ///<bit2 :LNG_BumRoad
+    ///<bit3 :LNG_ALARM_WTHR
+    ///<bit4 :LNG_PowerSysErr
+    ///<bit5 :LNG_VehUnstable
+    ///<bit6 :LNG_Display_Err
+    ///<bit7 :LNG_Button_Err
+    ///<bit8 :LNG_Door_Uncertain
+    ///<bit9 :LNG_People_Ahead
+    ///<bit10 :LNG_TyrePressure_Err
+    ///<bit11 :LNG_ModeUnfit
+    ///<bit12 :LNG_BrakeLamp_Err
+    ///<bit13 :LNG_Door_open
+    ///<bit14 :LNG_Unsafe_State
+    ///<bit15 :LNG_Odo_Unenough
+   uint32 lng_alarm1_reason = 19;
+
+    ///<纵向二级报警的具体原因: [/],(0,0,65535),[/],(1,0),纵向二级报警的具体原因
+    ///<bit0 :LNG_Core_Err
+    ///<bit1 :LNG_TorUpgrade
+    ///<bit2 :LNG_HandsOff
+    ///<bit3 :LNG_MainBrakeSys_Err
+    ///<bit4 :LNG_BrakeSysDec_Err
+    ///<bit5 :LNG_MainVehSpdSensor_Err
+    ///<bit6 :LNG_RbmVehSpdSensor_Err
+    ///<bit7 :LNG_VehSpdOver
+    ///<bit8 :LNG_EpbSys_Err
+    ///<bit9 :LNG_SasSys_Err
+    ///<bit10 :LNG_Diagnosis
+    ///<bit11 :LNG_FusFun_Err
+    ///<bit12 :LNG_RnpFun_Err
+    ///<bit13 :LNG_BrkOverTemp
+    ///<bit14 :LNG_BrakeSys_Err
+    ///<bit15 :LNG_VehSpdSensor_Err
+    ///<bit16 :LNG_SafeStop_Disable
+    ///<bit17 :LNG_Quit_Unstable
+    ///<bit18 :LNG_DecSpd
+    ///<bit19 :LNG_Airbag_Err
+    ///<bit20 :LNG_Crash_Quit
+    ///<bit21 :LNG_Mcu_Err
+    ///<bit22 :LNG_SelfError
+    ///<bit23 :LNG_Veh_Unable
+    ///<bit24 :LNG_TargetSensorDecFar
+    ///<bit25 :LNG_TargetSensorFailFar
+    ///<bit26 :LNG_Control_Err
+    ///<bit27 :LNG_SrsUnbuck
+   uint32 lng_alarm2_reason = 20;
+
+    ///<纵向错误的条件: [/],(0,0,65535),[/],(1,0),纵向错误的条件
+    ///<bit0 :CorrFunErr
+    ///<bit1 :HandsTorqueErr
+    ///<bit2 :TurnAssistErr
+    ///<bit3 :LngBrkInsuffic
+    ///<bit4 :LngPlanErr
+    ///<bit5 :LngCtrlErr
+    ///<bit6 :SelfErr_821
+    ///<bit7 :SelfErr_397
+    ///<bit8 :SelfErr_commu
+    ///<bit9 :LngQuit_crash                            
+    ///<bit10:LngQuit_unstability
+    ///<bit11:LngQuit_AirBagErr
+    ///<bit12:Lng_DecSpd
+    ///<bit13:LngOrLatHeartSigErr
+    ///<bit14:Lng_LostAbility
+   uint32 lng_err = 21;
+
+    ///<车身状态异常的条件: [/],(0,0,65535),[/],(1,0),车身状态异常的条件
+    ///<bit0：远近光灯异常 
+    ///<bit1：请求打开远近光灯
+    ///<bit2：转向灯异常
+    ///<bit3：制动刹车灯异常
+    ///<bit4：胎压异常
+    ///<bit5：胎温异常 
+    ///<bit6：门盖打开
+    ///<bit7：高速下前盖打开
+    ///<bit8：门盖信号异常
+    ///<bit9：电量过低或电量信号异常
+    ///<bit10：车身传感器异常
+    ///<bit11：安全带异常
+    ///<bit12：数据记录异常
+    ///<bit13：驾驶员监控异常
+    ///<bit14：车身碰撞异常
+    ///<bit15：雨刷异常
+   uint32 veh_body_word = 22;
+
+    ///<道路紧急信息、天气紧急信息状态字: [/],(0,0,255),[/],(1,0),道路紧急信息、天气紧急信息状态字
+    ///<bit0：道路湿滑
+    ///<bit1：道路颠簸
+    ///<bit2：前方存在行人
+    ///<bit3：超出坡度范围
+    ///<bit4：前方道路施工
+    ///<bit5：危险目标
+    ///<bit6：道路天气环境较差
+    ///<bit7：超出曲率范围
+   uint32 envir_degard_word = 23;
+
+    ///<提示退出: [/],(0,0,255),[/],(1,0),提示退出
+    ///<bit0：当前档位错误
+    ///<bit1：主驾未系安全带
+    ///<bit2：门盖打开
+    ///<bit3：ESP功能错误关闭
+    ///<bit4：巡航驻车超时
+    ///<bit5：整车不可行驶
+    ///<bit6：系统纵向退出
+    ///<bit7：车辆前溜
+    ///<bit8：模式不匹配
+   uint32 warn_quit = 24;
+
+    ///<驾驶员非安全驾驶: [/],(0,0,255),[/],(1,0),驾驶员非安全驾驶
+    ///<bit0:主驾未系安全带
+    ///<bit1:当前档位错误
+    ///<bit2:ESP功能错误关闭
+    ///<bit3:车速过高
+   uint32 req_driver_err_sta_reason = 25;
+
+    ///<转向系统故障状态字: [/],(0,0,255),[/],(1,0),转向系统故障状态字
+    ///<bit0:TurnSysErr_SteerBrakCond
+    ///<bit1:TurnSysErr_SteerCond
+    ///<bit2:TurnSysErr_LatActive
+   uint32 turn_sys_err_word = 26;
+
+    ///<横向接管请求其他条件: [/],(0,0,255),[/],(1,0),横向接管请求其他条件
+    ///<bit0:Warn_L3_Upgrade_LAT
+    ///<bit1:LAT_DriverUnlockSafebelt
+    ///<bit2:LAT_NoDetectHead
+    ///<bit3:LatTorUpgrade
+    ///<bit4:FrontLaneSensorErr
+    ///<bit5:LAT_HandsoffOver
+    ///<bit6:LAT_AccelOverBig
+    ///<bit7:LAT_SteerAngelOverBig、LAT_SteerSpdOverBig
+   uint32 lat_othercond_word = 27;
+
+    ///<纵向接管请求其他条件: [/],(0,0,65535),[/],(1,0),纵向接管请求其他条件
+    ///<bit0:Warn_L3_Upgrade_LNG
+    ///<bit1:LNG_DriverErrSta
+    ///<bit2:MultiFunSteerErr
+    ///<bit3:FunSwitchErr_OtherSta
+    ///<bit4:FunSwitchErr_ACC
+    ///<bit5:LngTorUpgrade
+    ///<bit6:FrontTargetSensorErr_Handsoff
+    ///<bit7:FrontTargetSensorDegard
+    ///<bit8:FrontTargetSensorErr_HandsOn
+    ///<bit9:LNG_HANDSOFF_OVER
+    ///<bit10:LNG_NoOverrideSpdOverHigh
+    ///<bit11:LNG_SteerTurnAngelErr
+    ///<bit12:LNG_SteerTurnSpdErr
+    ///<bit13:LNG_NoStartVeh
+    ///<bit14:LNG_FusModelErr
+   uint32 lng_othercond_word = 28;
+   
+   ///<手不在: [/],(0,0,1),[/],(1,0),手不在
+   ///<false:手不在
+   ///<true:手在
+   bool handoverability = 29;
+
+  ///<雨天状态: [/],(0,0,4),[/],(1,0),雨天状态
+  ///<0:未下雨；
+  ///<1:小雨；
+  ///<2:中雨；
+  ///<3:大雨;
+  ///<4:无效;
+  uint32 grd_rain_sts = 30;
+  ///<驾驶员拉方向盘: [/],(0,0,2),[/],(1,0),驾驶员拉方向盘
+  ///<0:未拉
+  ///<1:慢拉
+  ///<2:快拉
+  uint32 grd_driver_pull_ster_wheel_sts = 31;
+  ///<驾驶员横向超越: [/],(0,0,2),[/],(1,0),驾驶员横向超越
+  ///<0:未超越
+  ///<1:超越
+  ///<2:无效
+  uint32 grd_driver_takeover_lateralctl = 32;
+  ///<驾驶员晃方向盘: [/],(0,0,2),[/],(1,0),驾驶员晃方向盘
+  ///<0:未超越
+  ///<1:晃动
+  ///<2:无效
+  uint32 grd_driver_shake_ster_wheel_sts = 33;
+  ///<stm状态机代码版本号: [/],(0,0,4294967295),[/],(1,0),stm状态机代码版本号
+  uint32 stm_code_versionnumber = 34;
+    ///<预留1: [/],(0,0,4294967295),[/],(1,0),预留1
+   uint32 reserved1 = 35;
+
+    ///<预留2: [/],(0,0,4294967295),[/],(1,0),预留2
+   uint32 reserved2 = 36;
+} 
+/**
+* @brief STM 输入模块诊断
+* @detail STM对输入模块运行状态的诊断信号
+*/
+message StsInputDiagnose{
+  ///<dnp诊断:[/],(0,0,1),[/],(1,0),dnp诊断
+  ///<false:无故障
+  ///<true:故障
+  bool dnp_diagnose = 1;
+  ///<sab诊断:[/],(0,0,1),[/],(1,0),sab诊断
+  ///<false:无故障
+  ///<true:故障
+  bool sab_diagnose = 2;
+  ///<fc诊断:[/],(0,0,1),[/],(1,0),fc诊断
+  ///<false:无故障
+  ///<true:故障
+  bool fc_diagnose = 3;
+  ///<fus诊断:[/],(0,0,1),[/],(1,0),fus诊断
+  ///<false:无故障
+  ///<true:故障
+  bool fus_diagnose = 4;
+  ///<insdata诊断:[/],(0,0,1),[/],(1,0),insdata诊断
+  ///<false:无故障
+  ///<true:故障  
+  bool insdata_diagnose = 5;
+  ///<gw诊断:[/],(0,0,1),[/],(1,0),gw诊断
+  ///<false:无故障
+  ///<true:故障
+  bool gw_diagnose = 6;
+  ///<rnp_ego诊断:[/],(0,0,1),[/],(1,0),rnp_ego诊断
+  ///<false:无故障
+  ///<true:故障
+  bool rnp_diagnose = 7;
+  ///<hmi诊断:[/],(0,0,1),[/],(1,0),hmi诊断
+  ///<false:无故障
+  ///<true:故障
+  bool hmi_diagnose = 8;
+  ///<mcu_stm诊断:[/],(0,0,1),[/],(1,0),mcu_stm诊断 
+  ///<false:无故障
+  ///<true:故障
+  bool mcu_stm_diagnose = 9;
+  ///<mstm诊断:[/],(0,0,1),[/],(1,0),mstm诊断
+  ///<false:无故障
+  ///<true:故障
+  bool mstm_diagnose = 10;
+  ///<10papcs诊断:[/],(0,0,1),[/],(1,0),apapcs诊断
+  ///<false:无故障
+  ///<true:故障
+  bool apapcs_diagnose = 11;
+  ///<uss诊断:[/],(0,0,1),[/],(1,0),uss诊断
+  ///<false:无故障
+  ///<true:故障
+  bool uss_diagnose = 12;
+  ///<sc诊断:[/],(0,0,1),[/],(1,0),sc诊断
+  ///<false:无故障
+  ///<true:故障
+  bool sc_diagnose = 13;
+  ///<long_plan诊断:[/],(0,0,1),[/],(1,0),long_plan诊断
+  ///<false:无故障
+  ///<true:故障
+  bool long_plan_diagnose = 14;
+  ///<lat_plan诊断:[/],(0,0,1),[/],(1,0),lat_plan诊断
+  ///<false:无故障
+  ///<true:故障
+  bool lat_plan_diagnose = 15;
+  ///<kalmanfilter诊断:[/],(0,0,1),[/],(1,0),kalmanfilter诊断
+  ///<false:无故障
+  ///<true:故障
+  bool kalmanfilter_diagnose = 16;
+  ///<整车信号超时: [/],(0,0,1),[/],(1,0),整车信号超时
+  ///<false:无故障
+  ///<true:故障
+  bool vehicle_signal_diagnose = 17;
+  ///<<adr诊断:[/],(0,0,1),[/],(1,0),adr诊断
+  ///<false:无故障
+  ///<true:故障
+  bool adr_diagnose = 18;
+  ///<预留2: [/],(0,0,255),[/],(1,0),预留2
+  bool reserved2 = 19;
+}
+
+ 
+  /**
+* @brief 泊车STM中间变量
+* @detail 泊车STM中间变量
+*/
+message DebugParkSTM 
+{
+  ///<泊车STM版本号:[/],(0,0,4294967295),[/],(1,0),泊车stm状态机模型版本号
+  uint32 park_stm_version = 1;
+ 
+  ///<功能开启信号:[/],(0x0,0x0,0x21),[/],(1,0),触发开启的泊车功能
+  ///<0x0:默认;
+  ///<0x1:车内泊入;
+  ///<0x2:钥匙泊入;
+  ///<0x3:蓝牙泊入;
+  ///<0x4:车内泊出;
+  ///<0x5:选择泊入模式;
+  ///<0x6:蓝牙泊出;
+  ///<0x7:钥匙直进直出;
+  ///<0x8:蓝牙直进直出;
+  ///<0x9:蓝牙ASP;
+  ///<0xA:车内ASP;
+  ///<0xB:4G启动;
+  ///<0xC:4G归位;
+  ///<0xD:4G泊出;
+  ///<0xE:4G直进直出;
+  ///<0xF:倒车循迹;
+  ///<0x10:HZP建图;
+  ///<0x11:APPHZP;
+  ///<0x12:HZP召唤;
+  ///<0x13:AVP召唤;
+  ///<0x14:APPAVP;
+  ///<0x15:学习模式;
+  ///<0x16:车内AVP;
+  ///<0x17:车内HZP;
+  ///<0x18:预留;
+  ///<0x19:4G泊出结束;
+  ///<0x20:HZP学图完成;
+  ///<0x21:蓝牙启动;
+  uint32 function_start = 2;
+
+  ///<功能跳转:[/],(0x0,0x0,0x26),[/],(1,0),泊车功能跳转信号
+  ///<0x1:车内泊入转泊出
+  ///<0x2:车内泊入转模式选择
+  ///<0x3:车内泊入转RFBT
+  ///<0x4:车内泊入转hzp建图
+  ///<0x5:车内泊入转hzp
+  ///<0x6:车内泊入转avp
+  ///<0x7:车内泊出转泊入
+  ///<0x8:车内泊出转hzp建图
+  ///<0x9:车内泊出转hzp
+  ///<0xA:车内泊出转avp
+  ///<0xB:模式选择转车内
+  ///<0xC:模式选择转Key
+  ///<0xD:模式选择转RFBT
+  ///<0xE:RFBT模式选择转RFBT直进直出
+  ///<0xF:RFBT模式选择转RFBT泊出
+  ///<0x10:挪车模式选择转直进直出
+  ///<0x11:挪车模式选择转泊出
+  ///<0x12:挪车直进直出转泊出
+  ///<0x13:挪车直进直出转泊入
+  ///<0x14:挪车泊出转泊出结束
+  ///<0x15:挪车泊出结束转直进直出
+  ///<0x16:挪车泊出结束转归位
+  ///<0x17:挪车泊出结束转泊出
+  ///<0x18:挪车泊入/归位转模式选择
+  ///<0x19:挪车功能降级
+  ///<0x1A:HZP建图转泊入
+  ///<0x1B:HZP建图转试一试
+  ///<0x1C:试一试转HZP泊出建图
+  ///<0x1D:试一试转HZP泊入
+  ///<0x1E:车内HZP转泊入
+  ///<0x1F:车内HZP车位被占转泊入
+  ///<0x20:车内HZP转HZP建图
+  ///<0x21:车内HZP转车外HZP
+  ///<0x22:车外HZP转车内HZP
+  ///<0x23:车内AVP转泊入
+  ///<0x24:车内AVP车位被占转泊入
+  ///<0x25:车内AVP转车外AVP
+  ///<0x26:车外AVP转车内AVP
+  uint32 function_changge = 3;
+
+  ///<功能信号:[/],(0x0,0x0,0x21),[/],(1,0),开启的泊车功能
+  ///<0x0:默认;
+  ///<0x1:车内泊入;
+  ///<0x2:钥匙泊入;
+  ///<0x3:蓝牙泊入;
+  ///<0x4:车内泊出;
+  ///<0x5:选择泊入模式;
+  ///<0x6:蓝牙泊出;
+  ///<0x7:钥匙直进直出;
+  ///<0x8:蓝牙直进直出;
+  ///<0x9:蓝牙ASP;
+  ///<0xA:车内ASP;
+  ///<0xB:4G启动;
+  ///<0xC:4G归位;
+  ///<0xD:4G泊出;
+  ///<0xE:4G直进直出;
+  ///<0xF:倒车循迹;
+  ///<0x10:HZP建图;
+  ///<0x11:APPHZP;
+  ///<0x12:HZP召唤;
+  ///<0x13:AVP召唤;
+  ///<0x14:APPAVP;
+  ///<0x15:学习模式;
+  ///<0x16:车内AVP;
+  ///<0x17:车内HZP;
+  ///<0x18:预留;
+  ///<0x19:4G泊出结束;
+  ///<0x20:HZP学图完成;
+  ///<0x21:蓝牙启动;
+  uint32 apafunction = 4;
+}

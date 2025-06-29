@@ -1,0 +1,174 @@
+/**
+* @file     calibration.proto
+* @author   wangzipeng
+* @details  在线标定消息输出接口
+* @date     2024-1-4
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴对地的投影中心（虚拟投影中心） 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2024.1.4          <th>1.0                 <th>wangziepng
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3";
+package calibration;
+import "header.proto";
+
+/**
+ * @brief 畸变模型
+ * @detail 描述相机畸变模型
+ */
+enum DistortType {
+  ///< 针孔模型： [/],(/，/,/),[/],(/,/),针孔模型
+  kPinholeModel = 0;
+  ///< 鱼眼模型： [/],(/，/,/),[/],(/,/),鱼眼模型
+  kFisheyeModel = 1;
+}
+
+/**
+ * @brief 传感内参
+ * @detail 描述传感内部参数
+ */
+message IntrinsicParameter {
+  ///< 横向焦距： [/],(/，/,/),[/],(/,/),横向焦距
+  double fx = 1;
+  ///< 纵向焦距： [/],(/，/,/),[/],(/,/),纵向焦距
+  double fy = 2;
+  ///< 光心横向坐标： [/],(/，/,/),[/],(/,/),光心横向坐标
+  double cx = 3;
+  ///< 光心纵向坐标： [/],(/，/,/),[/],(/,/),光心纵向坐标
+  double cy = 4;
+  ///< 畸变模型： [/],(/，/,/),[/],(/,/),畸变模型
+  DistortType distort_type = 5;
+  ///< 畸变参数： [/],(/，/,/),[/],(/,/),畸变参数
+  repeated double distort = 6;
+  ///< 原始图像宽度：[pixels],(/,/,/),[/],(1,0),原始图像宽度
+  int32 image_width = 7;
+  ///< 原始图像高度：[pixels],(/,/,/),[/],(1,0),原始图像高度
+  int32 image_height = 8;
+  ///< 工装盲区： [/],(/，/,/),[/],(/,/),工装盲区
+  repeated int64 valid_area = 9;
+}
+
+/**
+ * @brief 传感外参
+ * @detail 所有传感到车辆后轴中心对地投影点（虚拟投影中心）
+ */
+message ExtrinsicParameter {
+  ///< 传感平移外参： [/],(/，/,/),[/],(/,/),传感平移外参
+  ///< x方向距离： [m],(0，-20,20),[/],(1,0),x方向距离
+  double t_x = 1;
+  ///< y方向距离： [m],(0，-20,20),[/],(1,0),y方向距离
+  double t_y = 2;
+  ///< z方向距离： [m],(0，-20,20),[/],(1,0),z方向距离
+  double t_z = 3;
+  ///< 传感四元数旋转外参： [/],(/，/,/),[/],(1,0),传感四元数旋转外参
+  ///< q_x:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q_x
+  double q_x = 4;
+  ///< q_y:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q_y
+  double q_y = 5;
+  ///< q_z:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q_z
+  double q_z = 6;
+  ///< q_w:[/],(1，-1，1),[/],(/,/),标识Hamilton单位四元数的q_w
+  double q_w = 7;
+  ///< 传感欧拉角外参： [/],(/，/,/),[/],(1,0),传感欧拉角外参
+  ///< 侧滚旋转角度： [rad],(0，-4,4),[/],(1,0),侧滚旋转角度
+  double roll = 8;
+  ///< 俯仰旋转角度： [rad],(0，-4,4),[/],(1,0),俯仰旋转角度
+  double pitch = 9;
+  ///< 横摆旋转角度： [rad],(0，-4,4),[/],(1,0),横摆旋转角度
+  double yaw = 10;
+}
+
+/**
+ * @brief 标定方式
+ * @detail 描述传感标定方式
+ */
+enum CalibType {
+  ///< 未知： [/],(/，/,/),[/],(/,/),标定方式未知
+  kUnknown = 0;
+  ///< 下线标定： [/],(/，/,/),[/],(/,/),下线标定
+  kEolCalib = 1;
+  ///< 在线标定： [/],(/，/,/),[/],(/,/),在线标定
+  kOnlineCalib = 2;
+  ///< 售后标定： [/],(/，/,/),[/],(/,/),售后标定
+  kAfterSalesCalib = 3;
+}
+
+/**
+ * @brief 通用参数
+ * @detail 描述传感通用参数
+ */
+message GeneralParam {
+  ///< 车辆车架号: [/],(/,/,/),[/],(/,/),车辆车架号
+  string vin = 1;
+  ///< 传感序列号: [/],(/,/,/),[/],(/,/),传感序列号
+  string serial_num = 2;
+  ///< 传感型号： [/],(/，/,/),[/],(/,/),传感型号
+  string vendor = 3;
+   ///< 标定方式: [/],(/,/,/),[/],(/,/),标定方式
+  CalibType calib_type = 4;
+  ///< UNIX时间: [s],(/,/,/),[/],(1,0),UNIX时间
+  ///< UNIX时间: [s],(/,/,/),[/],(1,0),UNIX时间
+  double calib_time = 5;
+  ///< 传感编号: [/],(/,/,/),[/],(/,/),该传感器在该车型上的编号
+  ///< 1-20: 针孔相机
+  ///< 21-40: 鱼眼相机
+  ///< 41-60: 激光雷达
+  ///< 61-80: 毫米波雷达
+  ///< 81-100: 超声波雷达
+  int32 sensor_id = 6;
+  ///< 传感描述: [/],(/,/,/),[/],(/,/),与id配套使用，表达相机的更多信息，如前后左右
+  string sensor_description = 7;
+  ///< 传感视场角： [/],(/，/,/),[/],(/,/),传感视场角
+  double fov = 8;
+}
+
+/**
+ * @brief 相机标定参数
+ * @detail 描述相机标定参数
+ */
+message CameraCalibParam {
+  ///< 数据头信息: [/],(/,/,/),[/],(/,/),标识数据头信息，用于判断数据是否异常
+  localization.Header header = 1;
+  ///< 标定通用信息: [/],(/,/,/),[/],(/,/),通用信息
+  GeneralParam general = 2;
+  ///< 传感内参： [/],(/，/,/),[/],(/,/),传感内参
+  IntrinsicParameter intrinsic = 3;
+  ///< 传感外参： [/],(/，/,/),[/],(/,/),传感外参
+  ExtrinsicParameter extrinsic = 4;
+}
+
+/**
+ * @brief 激光标定参数
+ * @detail 描述激光标定参数外参
+ */
+message LidarCalibParam {
+  ///< 数据头信息: [/],(/,/,/),[/],(/,/),标识数据头信息，用于判断数据是否异常
+  localization.Header header = 1;
+  ///< 标定通用信息: [/],(/,/,/),[/],(/,/),通用信息
+  GeneralParam general = 2;
+  ///< 传感外参： [/],(/，/,/),[/],(/,/),传感外参
+  ExtrinsicParameter extrinsic = 3;
+}
+
+/**
+ * @brief 标定参数
+ * @detail 描述相机标定参数和激光标定参数外参
+ */
+message CalibParams {
+  ///< 相机标定结果： [/],(/，/,/),[/],(/,/),车辆所有相机标定结果
+  repeated CameraCalibParam camera_calib_params = 1;
+  ///< 激光标定结果： [/],(/，/,/),[/],(/,/),车辆所有激光标定结果
+  repeated LidarCalibParam  lidar_calib_extrinsic_params = 2;
+}

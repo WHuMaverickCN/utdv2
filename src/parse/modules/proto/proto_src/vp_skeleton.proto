@@ -1,0 +1,136 @@
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+/**
+* @file     vp_skeleton.proto
+* @author   huyoucheng
+* @details  skeleton输出数据结构信息
+* @date     2022-07-26
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.26          <th>1.0                 <th>huyoucheng
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto2";
+package VpSkeletonProto;
+
+
+import "vp_obstacle_raw.proto";
+import "vp_perception_base.proto";
+
+
+/**
+*@brief   行人关键点位置的索引表示
+*@detail  人体关键点储存位置索引,目前并未使用（没有相关模型）
+*/
+enum SkeletonType {
+  ///< SkeletonType_nose ：[/], (/,/,/), [/], (/,/), 鼻子关键点位置索引
+  SkeletonType_nose = 0;//鼻子关键点位置索引
+
+  ///< SkeletonType_left_eye ：[/], (/,/,/), [/], (/,/), 左眼关键点位置索引
+  SkeletonType_left_eye = 1;//左眼关键点位置索引
+
+  ///< SkeletonType_right_eye ：[/], (/,/,/), [/], (/,/), 右眼关键点位置索引
+  SkeletonType_right_eye = 2;//右眼关键点位置索引
+
+  ///< SkeletonType_left_ear ：[/], (/,/,/), [/], (/,/), 左耳关键点位置索引
+  SkeletonType_left_ear = 3;//左耳关键点位置索引
+
+  ///< SkeletonType_right_ear ：[/], (/,/,/), [/], (/,/), 右耳关键点位置索引
+  SkeletonType_right_ear = 4;//右耳关键点位置索引
+
+  ///< SkeletonType_left_shoulder ：[/], (/,/,/), [/], (/,/), 左肩关键点位置索引
+  SkeletonType_left_shoulder = 5;//左肩关键点位置索引
+
+  ///< SkeletonType_right_shoulder ：[/], (/,/,/), [/], (/,/), 右肩关键点位置索引
+  SkeletonType_right_shoulder = 6;//右肩关键点位置索引
+
+  ///< SkeletonType_left_elbow ：[/], (/,/,/), [/], (/,/), 左手肘关键点位置索引
+  SkeletonType_left_elbow = 7;//左手肘关键点位置索引
+
+  ///< SkeletonType_right_elbow ：[/], (/,/,/), [/], (/,/), 右手肘关键点位置索引
+  SkeletonType_right_elbow = 8;//右手肘关键点位置索引
+
+  ///< SkeletonType_left_wrist ：[/], (/,/,/), [/], (/,/), 左手腕关键点位置索引
+  SkeletonType_left_wrist = 9;//左手腕关键点位置索引
+
+  ///< SkeletonType_right_wrist ：[/], (/,/,/), [/], (/,/), 右手腕关键点位置索引
+  SkeletonType_right_wrist = 10;//右手腕关键点位置索引
+
+  ///< SkeletonType_left_hip ：[/], (/,/,/), [/], (/,/), 左臀部关键点位置索引
+  SkeletonType_left_hip = 11;//左臀部关键点位置索引
+
+  ///< SkeletonType_right_hip ：[/], (/,/,/), [/], (/,/), 右臀部关键点位置索引
+  SkeletonType_right_hip = 12;//右臀部关键点位置索引
+
+  ///< SkeletonType_left_knee ：[/], (/,/,/), [/], (/,/), 左膝关节关键点位置索引
+  SkeletonType_left_knee = 13;//左膝关节关键点位置索引
+
+  ///< SkeletonType_right_knee ：[/], (/,/,/), [/], (/,/), 右膝关节关键点位置索引
+  SkeletonType_right_knee = 14;//右膝关节关键点位置索引
+
+  ///< SkeletonType_left_ankle ：[/], (/,/,/), [/], (/,/), 左踝关节关键点位置索引
+  SkeletonType_left_ankle = 15;//左踝关节关键点位置索引
+
+  ///< SkeletonType_right_ankle ：[/], (/,/,/), [/], (/,/), 右踝关节关键点位置索引
+  SkeletonType_right_ankle = 16;//右踝关节关键点位置索引
+}
+/**
+*@brief   人体关键点
+*@detail  描述人体关键点信息
+*/
+message SkeletonPoint {
+   ///< pt： [VpPerceptionBaseProto.Point], (0,/,/), [/], (/,/), 储存人体关键位置点信息
+  optional VpPerceptionBaseProto.Point pt = 1;//储存人体关键位置信息
+  ///< valid： [int32], (0,0,1), [1], (/,/), 储存人体关键点位置信息是否有效
+  optional int32 valid = 2;//储存人体关键点位置信息是否有效
+}
+/**
+*@brief   人体关键点 及对应跟踪ID
+*@detail  存储人体关键点信息和对应行人ID
+*/
+message Skeleton {
+  ///< id： [int32], (0,0,/), [/], (/,/), 行人对应的ID
+  optional int32 id = 1;
+  ///< skeleton： [SkeletonPoint], (/,/,/), [/], (/,/), 描述人体关键点信息
+  repeated SkeletonPoint skeleton = 2;
+}
+/**
+*@brief   行人和人体关键点信息
+*@detail  包括行人感知结果（检测框 置信度 类别）人体关键点信息 
+*/
+message SkeletonRaw {
+  ///< percept： [ObstacleRaw percept], (/,/,/), [/], (/,/), 行人检测信息包括检测框 置信度 类别等信息
+  optional VpObstacleRawProto.ObstacleRaw percept = 1;
+   ///< skeleton： [SkeletonPoint], (/,/,/), [/], (/,/), //人体关键点
+  repeated SkeletonPoint skeleton = 2;
+}
+/**
+*@brief   对应相机ID 和行人检测结果
+*@detail  对应采集的相机ID 和行人检测信息、关键点信息。 
+*/
+message SkeletonRaws {
+   ///< cam_id： [int32], (/,/,/), [/], (/,/), 相机ID
+  optional int32 cam_id = 1;
+   ///< skeleton_raw： [SkeletonRaw], (/,/,/), [/], (/,/), //行人检测信息 和 人体关键点信息
+  repeated SkeletonRaw skeleton_raw = 2;
+}
+
+

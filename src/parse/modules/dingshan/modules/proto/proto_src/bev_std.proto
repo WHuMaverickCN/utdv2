@@ -1,0 +1,139 @@
+/**
+* @file     bev_std.proto
+* @author   bev
+* @details  视觉感知消息输出接口
+* @date     2024-02-01
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数,偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2024.02.01        <th>42                   <th>bev
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package BevStdProto;
+
+/**
+ * @brief  时间戳.
+ * @detail 时间戳
+ */
+message TimeStamp {
+  ///< 毫秒：[ms],(0,/,/),[/],(1,/),毫秒
+   int64 msec = 1;
+  ///< 微秒：[ms],(0,/,/),[/],(1,/),微秒
+   int64 usec = 2; 
+}
+
+/**
+ * @brief  时间段.
+ * @detail 时间段
+ */
+message Duration {
+  ///< 毫秒：[ms],(0,/,/),[/],(1,/),毫秒
+   int64 msec = 1;
+
+  ///< 微秒：[ms],(0,/,/),[/],(1,/),微秒
+   int64 usec = 2;
+}
+/**
+ * @brief  帧头信息.
+ * @detail 帧头信息
+ */
+message Header {
+
+  ///< 序号：[/],(0,/,/),[/],(1,/),序号
+   uint32 seq = 1;
+  
+  ///< 时间戳：[/],(0,/,/),[/],(1,/),时间戳
+   TimeStamp time_stamp = 2;
+  
+  ///< 帧序号：[/],(0,/,/),[/],(1,/),帧序号
+   string frame_id = 3;
+}
+
+/**
+ * @brief  RGBA色彩空间.
+ * @detail RGBA色彩空间
+ */
+message ColorRGBA {
+  
+  ///< 红色通道：[/],(0,/,/),[/],(1,/),红色通道
+   float r = 1;      // RGBA r
+  
+  ///< 绿色通道：[/],(0,/,/),[/],(1,/),绿色通道
+   float g = 2;      // RGBA g
+  
+  ///< 蓝色通道：[/],(0,/,/),[/],(1,/),蓝色通道
+   float b = 3;      // RGBA b
+  
+  ///< 透明通道：[/],(0,/,/),[/],(1,/),透明通道
+   float a = 4;      // RGBA a
+}
+/**
+ * @brief  uint32数组.
+ * @detail uint32数组
+ */
+message UInt32Array {
+  ///< uint32数据：[/],(0,/,/),[/],(1,/),uint32数据
+  repeated uint32 data = 1;
+}
+/**
+ * @brief  bool 状态.
+ * @detail bool 状态
+ */
+message BoolStatus{
+  ///< bool 状态：[/],(0,/,/),[/],(1,/),bool 状态
+   bool status = 1; 
+}
+
+/**
+ * @brief  DataType.
+ * @detail 数据类型
+ */
+enum DataType {
+  ///<  数据类型_未知
+  DATA_TYPE_UNKNOWN = 0;
+
+  ///<  数据类型_bool
+  DATA_TYPE_BOOL = 1;
+
+  ///<  数据类型_uint8
+  DATA_TYPE_UINT_8 = 2;
+
+  ///<  数据类型_int8
+  DATA_TYPE_INT_8 = 3;
+
+  ///<  数据类型_uint16
+  DATA_TYPE_UINT_16 = 4;
+
+  ///<  数据类型_int16
+  DATA_TYPE_INT_16 = 5;
+
+  ///<  数据类型_uint32
+  DATA_TYPE_UINT_32 = 6;
+
+  ///<  数据类型_int32
+  DATA_TYPE_INT_32 = 7;
+
+  ///<  数据类型_float32
+  DATA_TYPE_FLOAT_32 = 8;
+
+  ///<  数据类型_uint64
+  DATA_TYPE_UINT_64 = 9;
+
+  ///<  数据类型_int64
+  DATA_TYPE_INT_64 = 10;
+
+  ///<  数据类型_float64
+  DATA_TYPE_FLOAT_64 = 11;
+}

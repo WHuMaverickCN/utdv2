@@ -1,0 +1,287 @@
+/**
+* @file     urban_map_info.proto
+* @author   langshibing
+* @details  泊车地图管理模块信息和状态
+* @date     2023-10-19
+* @version  1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.10.19        <th>1.0                 <th>langshibing
+* <tr><th>2024.01.23        <th>1.1                 <th>langshibing
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+import "header.proto";
+import "urban_map_common.proto";
+import "odometry.proto";
+
+/**
+* @brief  地图列表
+* @details  地图列表，包含所有地图的信息
+*/
+message UrbanMapLists
+{
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 地图列表:[/],(/,/,/),[/],(/,/), 标志地图列表，包含所有地图的信息
+  map<string, MapInfo> id_to_mapinfo = 2;
+
+  ///< 地图总数量:[/],(/,/,/),[/],(/,/), 标志所有地图总数量
+  uint32 total_map_num = 3;
+
+  ///< 收藏库位总数量:[/],(/,/,/),[/],(/,/), 标志所有地图收藏库位总数量
+  uint32 total_favority_slot_num = 4;
+
+  ///< 距离:[m],(/,/,/),[/],(/,/),标识全部地图完整距离
+  double total_map_distance = 5;
+
+  ///< 停车场数量:[m],(/,/,/),[/],(/,/),标识停车场路线数量
+  uint32 total_parking_num = 6;
+
+  ///< 问题类型:[/],(/,/,/),[/],(/,/),详细故障信息
+  double reserved_1 = 7;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 8;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string reserved_3 = 9;
+}
+
+/**
+* @brief  地图管理组件状态信息
+* @details  地图管理组件对外播发的状态信号，包括学图，制图，地图管理等
+*/
+message ComponentStatus
+{
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///<Cs模块是否运行:[/],(/,/,/),[/],(/,/),检查模块运行情况
+  bool cs_running = 2;
+
+  ///<地图信息:[/],(/,/,/),[/],(/,/),标志本次学习的地图信息
+  MapInfo map_info = 3;
+
+  ///< 学图建图状态:[/],(/,/,/),[/],(/,/),标识学图建图状态
+  UrbanMapStudyStatus study_status = 4;
+
+  ///< umm状态:[/],(/,/,/),[/],(/,/),标识umm状态
+  UmmStatus umm_status = 5;
+
+  ///< 问题类型:[/],(/,/,/),[/],(/,/),详细故障信息
+  ErrorType error_type = 6;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 status_res_1 = 7;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string status_res_2 = 8;
+}
+
+/**
+* @brief  地图学习信号及地图信息
+* @details  地图选择和地图学习时的地图信息，主要发送给地图引擎和实时建图组件
+*/
+message UrbanMapInfo
+{
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 信息类型:[/],(/,/,/),[/],(/,/),标识地图信息的类型
+  InfoType info_type = 2;
+
+  ///< 地图学习状态:[/],(/,/,/),[/],(/,/),标识地图学习的状态
+  LearnReq map_learn_req = 3;
+
+  ///< 地图信息:[/],(/,/,/),[/],(/,/),标识地图的属性信息
+  MapInfo map_info = 4;
+
+  ///< 地图更新:[/],(/,/,/),[/],(/,/),标识地图新建成功、更新标志
+  bool map_update = 5;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  double reserved_1 = 6;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 7;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string reserved_3 = 8;
+}
+
+/**
+* @brief  地图信息
+* @details  地图信息，包括地图ID，实时学图距离，地图总距离，存储路径等
+*/
+message MapInfo
+{
+  ///< 地图名称:[/],(/,/,/),[/],(/,/),标识泊车地图ID
+  string map_id = 1;
+
+  ///< 地图别名:[/],(/,/,/),[/],(/,/),标识泊车地图别名
+  string map_alias = 2;
+
+  ///< 地图路径:[/],(/,/,/),[/],(/,/),标识泊车地图存储路径
+  string map_path = 3;
+
+  ///< 地图创建时间:[/],(/,/,/),[/],(/,/),标识泊车地图创建时间
+  string map_time = 4;
+
+  ///< 地图创建时间:[/],(/,/,/),[/],(/,/),标识泊车地图创建时间
+  double utc_time = 5;
+
+  ///< 进度信息:[/],(/,/,/),[/],(/,/),标识泊车学习进度
+  double pace = 6;
+
+  ///< 地图类型:[/],(/,/,/),[/],(/,/),标识地图是停车场还是高速城区
+  UrbanMapType urban_map_type = 7;
+
+  ///< 停车场地图类型:[/],(/,/,/),[/],(/,/),标识地图是入库还是出库
+  ParkUrbanMapType park_map_type = 8;
+
+  ///< 地图内元素信息:[/],(/,/,/),[/],(/,/),标识元素信息，库位，坡道数量等
+  ParkingElementNum parking_element = 9;
+
+  ///< 地图长度:[/],(/,/,/),[/],(/,/),标识地图长度距离信息
+  MapDistanceInfo map_dist_info = 10;
+
+  ///< 地图未知:[/],(/,/,/),[/],(/,/),标识地图位置信息
+  UrbanMapLocation map_loc_info = 11;
+
+  ///< 使用次数:[/],(/,/,/),[/],(/,/),标识地图使用次数
+  uint32 usage_times = 12;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  double reserved_1 = 13;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 14;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string reserved_3 = 15;
+}
+
+/**
+* @brief  实时建图模块状态
+* @details  标志实时建图模块的相关状态和信息
+*/
+message RealMappingStatus
+{
+  ///<地图信息:[/],(/,/,/),[/],(/,/),标志本次学习的地图信息
+  MapInfo map_info = 1;
+
+  ///< 学图建图状态:[/],(/,/,/),[/],(/,/),标识学图建图状态
+  UrbanMapStudyStatus mapping_status = 2;
+
+  ///< 问题类型:[/],(/,/,/),[/],(/,/),详细故障信息
+  ErrorType error_type = 3;
+}
+
+/**
+* @brief  GPS偏置信息
+* @details  GPS偏置信息
+*/
+message GpsBias
+{
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 有效性标志:[m],(/,/,/),[/],(/,/),标识信息是否有效
+  bool valid_flag = 2;
+
+  ///< 经度偏置:[deg],(0,-360,360),[/],(/,/),标识经度偏置
+  double longitude_bias = 3;
+
+  ///< 纬度偏置:[deg],(0,-180,180),[/],(/,/),标识纬度偏置
+  double latitude_bias = 4;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  double reserved_1 = 5;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 6;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string reserved_3 = 7;
+}
+
+/**
+* @brief  停车场各类信息数量统计
+* @details  标志地图学习时的地图元素或语义信息统计信息
+*/
+message ParkingElementNum
+{
+  ///< 单张地图库位数量:[/],(/,/,/),[/],(/,/), 标志当前单张地图库位数量
+  uint32 curr_slot_num = 1;
+
+  ///< 单张收藏库位数量:[/],(/,/,/),[/],(/,/), 标志当前地图收藏库位数量
+  uint32 curr_favority_slot_num = 3;
+
+  ///< 单张地图减速带数量:[/],(/,/,/),[/],(/,/), 标志单张地图减速带数量
+  uint32 curr_speed_bump_num = 5;
+
+  ///< 单张地图坡道数量:[/],(/,/,/),[/],(/,/), 标志单张地图坡道数量
+  uint32 ramp_num = 6;
+
+  ///< 楼层 id :[/],(/,/,/),[/],(/,/), 标志学图时实时的相对楼层信息
+  string current_floor_id = 7;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  double reserved_1 = 8;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 9;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  string reserved_3 = 10;
+}
+
+/**
+* @brief  地图学习距离信息
+* @details  标志地图学习的所有距离信息
+*/
+message MapDistanceInfo
+{
+  ///< 距离:[m],(/,/,/),[/],(/,/),标识本次学图实时距离
+  double current_study_dist = 1;
+
+  ///< 距离:[m],(/,/,/),[/],(/,/),标识单张地图完整距离
+  double current_map_distance = 2;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  double reserved_1 = 3;
+
+  ///< 预留信息位:[/],(/,/,/),[/],(/,/),用来补充信息
+  uint32 reserved_2 = 4;
+}
+
+/**
+* @brief  地图位置信息
+* @details  标记该地图的位置信息
+*/
+message UrbanMapLocation
+{
+  ///< 学图ins起点:[m],(/,/,/),[/],(/,/),标识学图起点INS信息
+  Point learn_start_ins = 1;
+
+ ///< 学图ins终点:[m],(/,/,/),[/],(/,/),标识学图起点INS信息
+  Point learn_end_ins = 2;
+
+ ///< 学图sd起点:[m],(/,/,/),[/],(/,/),标识学图起点车机导航GNSS信息
+  Point sd_start_loc = 3;
+
+ ///< 学图sd终点:[m],(/,/,/),[/],(/,/),标识学图起点车机导航GNSS信息
+  Point sd_end_loc = 4;
+}

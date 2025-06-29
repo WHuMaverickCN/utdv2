@@ -1,0 +1,205 @@
+/**
+ * @file     routing_path.proto
+ * @author   冯荣
+ * @detail  全局规划路径信息
+ * @date     2022-04-19
+ * @version  V1.0
+ * @copyright(C)，changan，2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name
+ *：[uint]，(default，min，max)，[max_number]，(factor，offset)，description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+ * ///<车辆坐标系 原点：车辆后轴 右手法则
+ *
+ * @par 修改日志：新增  double point_dist和goal_matched_idx_on_path
+ * <table>
+ * <tr><th>date              <th>version             <th>author
+ * <tr><th>2022.4.19         <th>1.0                 <th>冯荣
+ * <table>
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package RoutePlanning;
+
+/**
+ * @brief RoutingPath
+ * @detail 全局规划路径信息
+ */
+message RoutingPath {
+  ///< 发送帧数：[/],(/,/,/),[/],(/,/), 标识帧数
+  uint32 frame_id = 1;
+  ///< 全局路径规划类型: [/]，(/，/，/)，[/]，(1，0)，全局路径规划类型
+  FunctionType function_type = 2;
+  ///< 全局路径规划状态: [/]，(/，/，/)，[/]，(1，0)，全局路径规划状态
+  RoutingPlanningStatus planning_status = 3;
+  ///< 全局规划路径点数量: [/]，(0，0，/)，[/]，(1，0)，全局规划路径点数量
+  int32 points_num = 4;
+  ///< 全局规划路径点: [/]，(/，/，/)，[/]，(1，0)，全局规划路径点
+  repeated RoutePoint route_points = 5;
+  ///< 全局规划目标车位信息: [/]，(/，/，/)，[/]，(1，0)，全局规划目标车位信息
+  Slot goal_slot = 6;
+  ///< 点间隔: [m]，(0，0，/)，[/]，(1，0)，点间隔
+  double point_dist = 7;
+  ///< 目标点在路径上的编号: [/]，(0，0，/)，[/]，(1，0)，目标点在路径上的编号
+  int32 goal_matched_idx_on_path = 8;
+}
+
+/**
+ * @brief planctrl_sab信息
+ * @detail xxxxxxxx
+ */
+enum FunctionType {
+  ///< 未知: [/],(/，/,/),[/],(1,0),未知
+  FUNCTION_TYPE_UNKNOWN = 0; ///<未知
+
+  ///< AVP: [/],(/，/,/),[/],(1,0),AVP
+  FUNCTION_TYPE_AVP = 1; ///< AVP
+
+  ///< HZP: [/],(/，/,/),[/],(1,0),HZP
+  FUNCTION_TYPE_HZP = 2; ///< HZP
+
+  ///< 接驳: [/],(/，/,/),[/],(1,0),接驳
+  FUNCTION_TYPE_SUMMON_AVP = 3; ///<接驳
+
+  ///< 接驳: [/],(/，/,/),[/],(1,0),接驳
+  FUNCTION_TYPE_SUMMON_HZP = 4; ///<接驳
+
+  ///< 错误状态: [/],(/，/,/),[/],(1,0),错误状态
+  FUNCTION_TYPE_ERROR = 5; //错误状态
+};
+
+/**
+ * @brief RoutingPlanningStatus
+ * @detail 全局路径规划状态
+ */
+enum RoutingPlanningStatus {
+  ///< 默认: [/]，(/，/，/)，[/]，(1，0)，默认
+  ROUTING_DEFAULT = 0; //默认
+  ///< 规划成功: [/]，(/，/，/)，[/]，(1，0)，规划成功
+  ROUTING_SUCCESS = 1;
+  ///< 规划失败: [/]，(/，/，/)，[/]，(1，0)，规划失败
+  ROUTING_FAILED = 2;
+  ///< 重规划成功: [/]，(/，/，/)，[/]，(1，0)重规划成功
+  ROUTING_RESET_SUCCESS = 3;
+  ///< 重新规划中: [/]，(/，/，/)，[/]，(1，0)重新规划中
+  ROUTING_RESETING = 4;
+  ///< 起始车位匹配车道失败: [/]，(/，/，/)，[/]，(1，0)起始车位匹配车道失败
+  ROUTING_PLANNING_FAILED_CASE1 = 201;
+  ///< 起始点匹配车道失败: [/]，(/，/，/)，[/]，(1，0)起始点匹配车道失败
+  ROUTING_PLANNING_FAILED_CASE2 = 202;
+  ///< 目标点匹配车道失败: [/]，(/，/，/)，[/]，(1，0)目标点匹配车道失败
+  ROUTING_PLANNING_FAILED_CASE3 = 203;
+  ///< 目的车位匹配车道失败: [/]，(/，/，/)，[/]，(1，0)目的车位匹配车道失败
+  ROUTING_PLANNING_FAILED_CASE4 = 204;
+  ///< 楼层通道内激活，楼层去向与目标楼层相反: [/]，(/，/，/)，[/]，(1，0)楼层通道内激活，楼层去向与目标楼层相反
+  ROUTING_PLANNING_FAILED_CASE5 = 205;
+}
+
+/**
+ * @brief RoutePoint
+ * @detail  全局路径的点信息
+ */
+message RoutePoint {
+  ///< 楼层id: [/]，(0，0，/)，[/]，(1，0)，楼层id
+  int32 map_id = 1;
+  ///< 序号: [/]，(0，0，/)，[/]，(1，0)，序号，属于路径点中的第几个点
+  int32 idx = 2;
+  ///< x坐标值: [m]，(0，0，/)，[/]，(1，0)，x坐标值，坐标系定义和坐标值全部来自于立得的地图
+  double x = 3;
+  ///< y坐标值: [m]，(0，0，/)，[/]，(1，0)，y坐标值，坐标系定义和坐标值全部来自于立得的地图
+  double y = 4;
+  ///< z坐标值: [m]，(0，0，/)，[/]，(1，0)，z坐标值，坐标系定义和坐标值全部来自于立得的地图
+  double z = 5;
+  ///< 航向值:[rad]，(0，-PI，PI)，[/]，(1，0)，航向值，坐标系定义和坐标值全部来自于立得的地图
+  double heading = 6;
+  ///< 曲率:[/]，(0，/，/)，[/]，(1，0)，曲率，坐标系定义和坐标值全部来自于立得的地图
+  double curvature = 7;
+  ///< 路径点左侧边界距离路径点的距离: [m]，(0，/，/)，[/]，(1，0)，路径点左侧边界距离路径点的距离
+  double left_boudary = 8;
+  ///< 路径点右侧边界距离路径点的距离: [m]，(0，/，/)，[/]，(1，0)，路径点右侧边界距离路径点的距离
+  double right_boudary = 9;
+  ///< 坡道值: [/]，(0，/，/)，[/]，(1，0)，坡道值，坐标系和范围定义和坐标值全部来自于立得的地图
+  double slope = 10;
+  ///< 类型: [/]，(0，0，/)，[/]，(1，0)，类型，属于路口、直道等
+  ///< 1: 其他
+  ///< 2: 路口
+  int32 type = 11;
+  ///< 楼层名字: [/]，(/，/，/)，[/]，(/，/)，楼层名字，如B1 B2
+  string floor_name = 12;
+}
+
+/**
+ * @brief Slot
+ * @detail  车位信息
+ */
+message Slot {
+  ///< 楼层id: [/]，(0，0，/)，[/]，(1，0)，楼层id
+  int32 map_id = 1;
+  ///< 车位可用状态: [/]，(0，0，/)，[/]，(1，0)，车位可用状态，手机端目前没有可以先保留字段
+  Status status = 2;
+  ///< 车位id: [/]，(/，/，/)，[/]，(/，/)，车位id，先用parkcode（B1-202）
+  string id = 3;
+  ///< 车位类型: [/]，(0，0，/)，[/]，(1，0)，车位类型，手机端目前没有可以先保留字段
+  SlotType type = 4;
+  ///< link id: [/]，(0，0，/)，[/]，(1，0)，link
+  int32 link_id = 5;
+  ///< 车位四个角点: [/]，(/，/，/)，[4]，(/，/)，link 车位四个角点
+  repeated Pose3D vertices = 6;
+  ///< 楼层名字: [/]，(/，/，/)，[/]，(/，/)，楼层名字，如B1 B2
+  string floor_name = 7;
+}
+
+/**
+ * @brief Status
+ * @detail  可用状态
+ */
+enum Status {
+  ///< 未知状态: [/]，(/，/，/)，[/]，(1，0)，未知状态
+  UNKNOWN = 0;
+  ///< 可用状态: [/]，(/，/，/)，[/]，(1，0)，可用状态
+  AVAILABLE = 1;
+  ///< 不可用状态: [/]，(/，/，/)，[/]，(1，0)，不可用状态
+  UNAVAILABLE = 2;
+}
+
+/**
+ * @brief SlotType
+ * @detail  车位类型
+ */
+enum SlotType {
+  ///< 车位类型未知: [/]，(/，/，/)，[/]，(1，0)，车位类型未知
+  SLOT_TYPE_UNKNOWN = 0;
+  ///< 平行车位类型: [/]，(/，/，/)，[/]，(1，0)，平行车位类型
+  PARALLEL = 1;
+  ///< 垂直车位类型: [/]，(/，/，/)，[/]，(1，0)，垂直车位类型
+  VERTICAL = 2;
+  ///< 斜车位类型: [/]，(/，/，/)，[/]，(1，0)，斜车位类型
+  ANGULAR = 3;
+}
+
+/**
+ * @brief Pose2D
+ * @detail  二维点
+ */
+message Pose2D {
+  ///< 横坐标: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  double x = 1;
+  ///< 纵坐标: [m]，(/，/，/)，[/]，(1，0)，纵坐标
+  double y = 2;
+}
+
+/**
+ * @brief Pose2D
+ * @detail  二维点
+ */
+message Pose3D {
+  ///< 横坐标: [m]，(/，/，/)，[/]，(1，0)，横坐标
+  double x = 1;
+  ///< 纵坐标: [m]，(/，/，/)，[/]，(1，0)，纵坐标
+  double y = 2;
+  ///< 垂向坐标: [m]，(/，/，/)，[/]，(1，0)，垂向坐标
+  double z = 3;
+}

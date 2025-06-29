@@ -1,0 +1,209 @@
+/**
+
+* @file     free_space_v2.proto
+* @author   zhanghongjie
+* @details  BEV freespace相关信号的输出接口定义
+* @date     2023-05-29
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+  *
+
+* @par      修改日志：
+
+* <table>
+
+* <tr><th>date              <th>version             <th>author
+
+* <tr><th>2023.5.29         <th>1.0                 <th>zhanghongjie
+
+* <table>
+
+**********************************************************************************
+*/
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+syntax = "proto3";
+import "vp_perception_base.proto";
+package VpPerceptionBaseProto;
+
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+enum SensorType {
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  PIN_HOLE = 0;                                        // 针孔摄像头
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  FISH_EYE = 1;                                        // 鱼眼摄像头
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+enum RawDataSource {
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_UNKNOWN = 0;                         // 未知
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_PIN_HOLE = 1;                        // 针孔摄像头
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_FISH_EYE = 2;                        // 鱼眼摄像头
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_IPM_PARSING = 3;                     // 逆透视变换分割结果
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_ULTRASONIC = 4;                      // 超声波
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_RADAR = 5;                           // 毫米波雷达
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  RAW_DATA_SOURCE_LIDAR = 6;                           // 激光雷达
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+enum FreespaceLabelType {
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  STATIC = 0;                                           // 静态区域
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  VEHICLE = 1;                                          // 车辆
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  PEDESTRIAN = 2;                                       // 行人
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  TWO_WHEEL = 3;                                        // 两轮车
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  CONE = 4;                                             // 锥桶
+  ///< 枚举信息：[/],(0,0,1),[/],(1,0),枚举信息
+  INVALID = 255;                                        // 无效
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+message MatchedObjectInfo {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 id = 1;                               // 匹配目标id
+  ///< proto信号:[/],(0,0,1),[/],(1,0),proto信息
+  optional uint32 type = 2;                              // 匹配目标类型
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+message ContourPoint {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),置信度
+  optional float conf = 1;                               
+  ///< proto信号:[/],(0,0,1),[/],(1,0),vcs坐标系下与自车夹角
+  optional float angle = 2;                              
+  ///< proto信号:[/],(0,0,1),[/],(1,0),vcs坐标系下与自车径向距离
+  optional float ray_length = 3;                         
+  ///< proto信号:[/],(0,0,1),[/],(1,0),融合后的类型
+  optional uint32 label = 4;                                                 
+  ///< proto信号:[/],(0,0,1),[/],(1,0),原始类型
+  optional uint32 origin_label = 5;                                         
+  ///< proto信号:[/],(0,0,1),[/],(1,0),vcs坐标系下的位置
+  optional Point pt_vcs = 6;                             
+  ///< proto信号:[/],(0,0,1),[/],(1,0),vcs坐标系下的速度
+  optional Point vel_vcs = 7;        
+  ///< proto信号:[/],(0,0,1),[/],(1,0),世界坐标系下的位置
+  optional Point pt_world = 8;       
+  ///< proto信号:[/],(0,0,1),[/],(1,0),世界坐标系下的速度
+  optional Point vel_world = 9;      
+  ///< proto信号:[/],(0,0,1),[/],(1,0),多摄像头检测的同一目标匹配信息
+  optional MatchedObjectInfo matched_obj = 10;           
+  ///< proto信号:[/],(0,0,1),[/],(1,0),潜在的可通行区域
+  optional bool pb_pass = 11;                            
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+message CamContourPoint {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),基础轮廓点信息
+  optional ContourPoint base_info = 1;                                       
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点在去畸变后图像中的位置
+  optional Point pt_im = 2;                              
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点在原图中的位置
+  optional Point pt_distort_im = 3;  
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点在camera坐标系下的弧度
+  optional float cam_angle = 4;                          
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点在camera坐标系下的径向距离
+  optional float cam_ray_length = 5;                     
+}
+
+
+/**
+* @brief freespace信息
+* @detail TODO
+*/
+message CamContourPointsMsg {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),消息头
+  optional Header header = 1;        
+  ///< proto信号:[/],(0,0,1),[/],(1,0),感知类型
+  optional SensorType sensor_type = 2;                   
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点
+  repeated CamContourPoint cam_contour_points = 3;       
+  ///< proto信号:[/],(0,0,1),[/],(1,0),数据源类型
+  optional RawDataSource raw_data_source = 4;            
+  ///< proto信号:[/],(0,0,1),[/],(1,0),定周期输出时间戳
+  optional int64 refer_time = 5;                         
+}
+
+
+/**
+* @brief 目标圈信息
+* @detail TODO
+*/
+message ObstacleCircle {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓id
+  optional uint32 contours_id = 1;                       
+  ///< proto信号:[/],(0,0,1),[/],(1,0),多摄像头检测的同一目标匹配信息
+  optional MatchedObjectInfo matched_obj = 2;            
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点，最多40个
+  repeated ContourPoint points = 3;                      
+}
+
+
+/**
+* @brief BEV freespace信息
+* @detail TODO
+*/
+message FreespacePointsMsg {
+  ///< proto信号:[/],(0,0,1),[/],(1,0),时间戳
+  optional int64 time_stamp = 1;                         
+  ///< proto信号:[/],(0,0,1),[/],(1,0),轮廓点
+  repeated ContourPoint freespace_points = 2;            
+  ///< proto信号:[/],(0,0,1),[/],(1,0),消息头
+  optional  Header header = 3;        
+  ///< proto信号:[/],(0,0,1),[/],(1,0),障碍物轮廓，最多50个
+  repeated ObstacleCircle obs_points = 4;                
+}

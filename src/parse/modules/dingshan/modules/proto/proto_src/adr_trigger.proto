@@ -1,0 +1,96 @@
+/**
+* @file     trigger.proto
+* @author   huangchuan
+* @details
+* @date     2023-03-23
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位],(默认值、最小值、最大值),[repeated最大值],（因数，偏移量）,信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<数据记录B类事件trigger --B类事件：不需要采集模块触发的事件
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.3.23          <th>1.0                 <th>huangchuan 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	AdrTrigger;
+/**
+* @brief Trigger
+* @detail Trigger
+*/
+message Trigger{
+	///< trigger事件ID: [/],(/，/,/),[/],(1,0),trigger事件ID
+    string event_id = 1;		
+	///< 时间戳: [s],(/，/,/),[/],(1,0),时间戳
+	double time_stamp = 2;
+} 
+
+/**
+* @brief SignalSnapshot
+* @detail SignalSnapshot
+*/
+message SignalSnapshot{
+	///< 信号快照: [/],(/，/,/),[/],(1,0),信号快照
+    string signals = 1;		
+} 
+
+/**
+* @brief EventSnapshot
+* @detail EventSnapshot
+*/
+message EventSnapshot{
+	///< 事件快照上云: [/],(/，/,/),[/],(1,0),事件快照上云
+    string events = 1;	
+} 
+
+/**
+* @brief GpsData
+* @detail GpsData
+*/
+message GpsData
+{
+	///< 经度: [s],(/，/,/),[/],(1,0),经度
+    uint32 lng = 1;
+	///< 纬度: [s],(/，/,/),[/],(1,0),纬度
+    uint32 lat = 2;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 alti = 3;
+	///< GPS时间戳: [s],(/，/,/),[/],(1,0),GPS时间戳
+    repeated uint32 gps_time = 4;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 sat_num = 5;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 heading = 6;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 status = 7;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 ns = 8;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 ew = 9;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 speed = 10;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 decline = 11;
+	///< 未用: [s],(/，/,/),[/],(1,0),未用
+    uint32 direction = 12;
+};
+
+/**
+* @brief AndroidEnvironment
+* @detail AndroidEnvironment
+*/
+message AndroidEnvironment
+{
+	///< android环境: [s],(/，/,/),[/],(1,0),环境
+    uint32 environment = 1;
+}
+
+ 

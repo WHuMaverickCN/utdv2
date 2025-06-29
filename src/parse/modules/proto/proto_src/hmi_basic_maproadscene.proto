@@ -1,0 +1,324 @@
+/**
+* @file     hmi_basic_maproadscene.proto
+* @author   HMITEAM
+* @details  bev渲染  Basic_RoadScene - Ntf_MapRoadScene
+* @date     2023-11-21
+* @version  V2.3
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.1.79         <th>1.0                 <th>wangqing 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package HmiInterface;
+
+/**
+* @brief 点
+* @details 
+*/
+message PointM
+{
+    ///<y轴坐标：[m],(/,/,/),[/],(1，0),y轴坐标
+    double 	pos_y = 1;
+
+    ///<x轴坐标：[m],(/,/,/),[/],(1，0),x轴坐标
+    double  pos_x = 2;
+
+    ///<z轴坐标：[m],(/,/,/),[/],(1，0),z轴坐标
+    double 	pos_z = 3;
+}
+
+
+/**
+* @brief 停止线
+* @details 
+*/
+message MapStopLine
+{
+    ///<停止线距离：[m],(/,/,/),[/],(1，0),停止线距离
+    double  distance = 1;
+
+    ///<左侧点坐标：[/],(/,/,/),[/],(1，0),左侧点坐标
+    PointM 	stopline_pointleft = 2;
+
+	///<右侧点坐标：[/],(/,/,/),[/],(1，0),右侧点坐标
+    PointM 	stopline_pointright = 3;
+}
+
+
+/**
+* @brief 角点
+* @details 
+*/
+message TopPoints
+{
+    ///<左上点坐标：[/],(/,/,/),[/],(/，/),左上点坐标
+    PointM  point_left_top = 1;
+
+    ///<左下点坐标：[/],(/,/,/),[/],(/，/),左下点坐标
+    PointM  point_left_bottom = 2;
+
+	///<右上点坐标：[/],(/,/,/),[/],(/，/),右上点坐标
+    PointM  point_right_top = 3;
+
+	///<右下点坐标：[/],(/,/,/),[/],(/，/),右下点坐标
+    PointM  point_right_bottom = 4;
+}
+
+/**
+* @brief 地面标识
+* @details 
+*/
+message GroundMark
+{
+    ///<角点坐标：[/],(/,/,/),[/],(/，/),角点坐标
+    TopPoints  groundmark_toppoints = 1;
+
+    ///<类型：[/],(0,0,18),[/],(1，0),类型
+    ///<0x0: 无识别目标
+    ///<0x1: 直行
+    ///<0x2: 左转
+    ///<0x3: 右转
+    ///<0x4: 掉头+左转
+    ///<0x5: 掉头+右转
+    ///<0x6: 直行+左转
+    ///<0x7: 直行+右转
+    ///<0x8: 直行+左掉头
+    ///<0x9: 直行+右掉头
+    ///<0xA: 左掉头+右掉头
+    ///<0xB: 左转+向左掉头
+    ///<0xC: 右转+向右掉头
+    ///<0xD: 左转+向右掉头
+    ///<0xE: 右转+向左掉头
+    ///<0xF: 左转+直行+右转
+    ///<0x10: 左转+直行+向右掉头
+    ///<0x11: 右转+直行+向左掉头
+    ///<0x12: 向右掉头+直行+向左掉头
+    uint32  groundmark_type = 2;
+}
+
+/**
+* @brief 线集
+* @details 
+*/
+message LineM
+{
+    ///<车道线点集：[/],(/,/,/),[100],(1，0),输出
+    repeated PointM lane_pointarr = 1;
+
+	///<车道线线型：[/],(0,0,0x17),[/],(1，0),输出
+    ///<0x0:Solid
+	///<0x1:Dashed
+	///<0x2:Double_Dashed
+	///<0x3:Double_Dashed_Solid
+	///<0x4:Double_Solid_Dashed
+	///<0x5:Double_Solid_Solid
+	///<0x6:Multiple
+	///<0x7:Multiple_Warning
+	///<0x8:Car_Pool
+	///<0x9:Asphalt_Joint
+	///<0xA:Bot_Dott
+	///<0xB:Road_Edge
+	///<0xC:Guardrail
+	///<0xD:Curbstone
+	///<0xE:Wall
+	///<0xF:Traffic_Cone
+	///<0x10:Delineator_Post
+	///<0x11:Parking_Car
+	///<0x12:Unknown_Raised
+	///<0x13:Fishbone
+	///<0x14:Unknown
+	///<0x15:Line_Diversion_Inside
+	///<0x16:Line_Diversion_Outside
+	///<0x17:Line_Ramp
+    uint32 lane_type = 2;
+
+	///<车道线颜色：[/],(0,0,0x8),[/],(1，0),输出
+    ///<0x1:白色
+    ///<0x2:黄色
+    ///<0x3:白色加黄色
+    uint32 lane_color = 3;
+
+	///<车道线ID：[/],(/,/,/),[/],(1，0),输出
+    uint64 lane_id = 4;
+}
+
+/**
+* @brief 车道线状态
+* @details 
+*/
+
+message LaneStatusData
+{
+    ///<左车道线ID：[/],(/,/,/),[/],(1，0),输出
+    uint32 laneleft_status = 1;
+
+   ///<右车道线ID：[/],(/,/,/),[/],(1，0),输出
+    uint32 laneright_status = 2;	
+}
+
+
+/**
+* @brief 路径点
+* @details 
+*/
+message TrackPointM
+{
+    ///< 路径点X坐标:[m],(0,0,/),[/],(1,0),   路径点X坐标
+    double pointx_m = 1;
+
+    ///< 路径点Y的坐标 :[m],(0,0,/),[/],(1,0),   路径点Y的坐标 
+    double pointy_m = 2; 
+}
+
+/**
+* @brief 路经点集
+* @details 
+*/
+message TrackPointLineStruct
+{
+    ///< 意图轨迹:[/],(0,0,/),[100],(1,0),   意图轨迹
+	repeated TrackPointM track_pointarr = 1; 
+
+	///< 意图轨迹可用点数:[/],(0,0,/),[/],(1,0),   意图轨迹可用点数匝道距离
+	int32 trackpointnum = 2; 	
+}
+
+
+/**
+* @brief road scene
+* @detail road scene detail  data
+*/
+message TunnelData
+{
+	///<隧道距离:[m],(0,0,/),[/],(1,0),   隧道距离
+	float tunneldis_m = 1;
+
+	///<隧道距离:[m],(0,0,/),[/],(1,0),   隧道距离
+	uint32 tunnelstatus_m = 2;		
+}
+    
+
+/**
+* @brief 道路面
+* @details  abbr:GMP
+*/
+message RoadFace 
+{
+	///<左侧边界线ID：[/],(/,/,/),[6],(/，/),输出
+    repeated uint64 roadface_leftid = 1;
+
+	///<右侧边界线ID：[/],(/,/,/),[6],(/，/),输出
+    repeated uint64 roadface_rightid = 2;
+}
+
+
+/**
+* @brief 减速带
+* @details  abbr:GMP
+*/
+message RubberSpdPoint 
+{
+	///<橡胶减速带边界点：[/],(/,/,/),[/],(/，/),输出
+    PointM rubber_point = 1;
+}
+
+/**
+* @brief 减速带
+* @details  abbr:GMP
+*/
+message RubberSpdBumpData 
+{
+	///<橡胶减速带左边界点：[/],(/,/,/),[/],(/，/),输出
+    RubberSpdPoint rubberspdbump_leftpoints = 1;
+
+	///<橡胶减速带右边界点：[/],(/,/,/),[/],(/，/),输出
+    RubberSpdPoint rubberspdbump_rightpoints = 2;
+}
+
+/**
+* @brief 左车道线ID
+* @details  左车道线ID
+*/
+message LeftLineID 
+{
+	///<车道线ID：[/],(/,/,/),[/],(1，0),输出
+    uint64 lane_id = 1;
+}
+
+/**
+* @brief 右车道线ID
+* @details  右车道线ID
+*/
+message RightLineID 
+{
+	///<车道线ID：[/],(/,/,/),[/],(/，/),输出
+    uint64 lane_id = 1;
+}
+
+
+/**
+* @brief 道路面
+* @details  MapRoadScene
+*/
+message MapRoadSceneStruct
+{
+	///<点线集：[/],(/,/,/),[6],(/，/),点线集
+    repeated LineM line_point_info = 1;
+
+	///<车道线状态：[/],(/,/,/),[/],(/，/),车道线状态
+    LaneStatusData lane_status = 2;
+
+	///<轨迹线：[/],(/,/,/),[/],(/，/),轨迹线
+    TrackPointLineStruct  track_point_line = 3;
+
+	///<隧道信息：[/],(/,/,/),[/],(/，/),隧道信息
+    TunnelData tunneldata = 4;
+
+	///<停止线：[/],(/,/,/),[6],(/，/),停止线
+    repeated MapStopLine  stop_line_info = 5;
+
+	///<人形横道：[/],(/,/,/),[6],(/，/),人形横道
+    repeated TopPoints crosswalk_toppoints = 6;
+
+	///<黄色网格线：[/],(/,/,/),[6],(/，/),黄色网格线
+    repeated TopPoints yellowgrid_toppoints = 7;
+
+	///<地面标识：[/],(/,/,/),[6],(/，/),地面标识
+    repeated GroundMark  ground_mark_info = 8;
+
+	///<道路面：[/],(/,/,/),[6],(/，/),道路面
+    repeated RoadFace  road_face = 9;
+
+	///<减速带：[/],(/,/,/),[/],(/，/),减速带
+    repeated RubberSpdBumpData  rubber_spd_bump_data = 10;
+
+	///<左车道线ID：[/],(/,/,/),[6],(/，/),左车道线ID
+	repeated LeftLineID  leftlineid = 11;
+
+	///<右车道线ID：[/],(/,/,/),[6],(/，/),右车道线ID
+	repeated RightLineID  rightlineid = 12;
+}
+
+
+
+/**
+ * @brief 座舱需要信息输出
+ * @details 封装所有信号，包括目标、车道线、交通灯等
+ */
+ message BasicMapRoadScene 
+ {
+   ///< 道路场景重构数据 :[/],(0,0,/),[/],(1,0),     道路场景重构数据
+   MapRoadSceneStruct maproadscene = 1;
+ }
+ 

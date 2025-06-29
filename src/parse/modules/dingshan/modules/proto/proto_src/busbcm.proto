@@ -1,0 +1,1248 @@
+/**
+* @file     busbcm.proto
+* @author   zhangfeilong
+* @details  Busbcm
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>zhangfeilong 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	BusbcmProto;
+
+/**
+* @brief BusBcm
+* @detail BusBcm
+*/
+message BusBcm{ 
+	///<BusBcmLightSts：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmLightSts bcm_light_sts = 1;
+	
+	///< BusBcmSts：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmSts bcm_sts = 2;
+	
+	///< BusBcmWinSts：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmWinSts bcm_win_sts = 3;
+	
+	///< BusBcmDoorSts：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmDoorSts bcm_door_sts = 4;
+	
+	///< BusPEPS：[/],(0x0,0,/),[32],(/,/),/
+    BusPEPS peps = 5;
+    
+    ///<BusBcmTMS：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmTMS bcm_tms = 6;
+	
+	///< BusBcmDsmSts：[/],(0x0,0,/),[32],(/,/),/
+    BusBcmDsmSts bcm_dsm_sts = 7;
+    
+    ///< BusBCMEnvironmentInfo：[/],(0x0,0,/),[32],(/,/),/
+    BusBCMEnvironmentInfo bcm_environment_info = 8;
+
+    ///< BusSRS：[/],(/,/,/),[32],(/,/),/
+    BusSRS srs = 9;   
+
+    ///< BusBcmTPMS：[/],(/,/,/),[32],(/,/),/
+    BusBcmTPMS bcm_tpms = 10;     
+} 
+
+/**
+* @brief Busbcm40ms
+* @detail Busbcm40ms
+*/
+message Busbcm40ms{ 
+	///<BusBcmLightSts：[/],(/,/,/),[32],(1,0),/
+    BusBcmLightSts bcm_light_sts = 1;
+	
+	///< BusBcmSts：[/],(/,/,/),[32],(1,0),/
+    BusBcmSts bcm_sts = 2;
+	
+	///< BusBcmWinSts：[/],(/,/,/),[32],(1,0),/
+    BusBcmWinSts bcm_win_sts = 3;
+	
+	///< BusBcmDoorSts：[/],(/,/,/),[32],(1,0),/
+    BusBcmDoorSts bcm_door_sts = 4;
+	
+	///< BusPEPS：[/],(/,/,/),[32],(1,0),/
+    BusPEPS peps = 5;
+} 
+
+/**
+* @brief Busbcm100ms
+* @detail Busbcm100ms
+*/
+message Busbcm100ms{ 
+	///<BusBcmTMS：[/],(/,/,/),[32],(1,0),/
+    BusBcmTMS bcm_tms = 1;
+	
+	///< BusBcmDsmSts：[/],(/,/,/),[32],(1,0),/
+    BusBcmDsmSts bcm_dsm_sts = 2;
+}
+
+/**
+* @brief busbcm
+* @detail BusBcmDoorSts 40ms
+*/
+message BusBcmDoorSts{ 
+    ///< 驾驶侧门锁状态信号：[/],(0x0,0,3),[/],(1,0),
+    ///< 0x0：初始默认状态
+    ///< 0x1：解锁；
+    ///< 0x2：闭锁；
+    ///< 0x3：解锁中；
+    ///< 0x4：闭锁中；
+    ///< 0x5：释放中；
+    ///< 0x6：吸合中；
+    ///< 0xFF：无效
+    uint32 bcm_drvr_door_lck_sts = 1;
+
+    ///< 左前门状态：[/],(0x0,0,1),[/],(1,0),
+    ///< Pos0 : FL 
+    ///< Pos1 : FR 
+    ///< Pos2 : RL 
+    ///< Pos3 : RR
+    ///< 0x1： open；
+    ///< 0x2： close; 
+    ///< 0xFF： invalid
+    uint32 bcm_drvr_door_sts = 2;
+
+    ///< 左后门状态：[/],(0x0,0,1),[/],(1,0),
+    ///< Pos0 : FL 
+    ///< Pos1 : FR 
+    ///< Pos2 : RL 
+    ///< Pos3 : RR
+    ///< 0x1： open；
+    ///< 0x2： close; 
+    ///< 0xFF： invalid
+    uint32 bcm_le_re_door_sts = 3;
+
+    ///< 右前门状态：[/],(0x0,0,1),[/],(1,0),
+    ///< Pos0 : FL 
+    ///< Pos1 : FR 
+    ///< Pos2 : RL 
+    ///< Pos3 : RR
+    ///< 0x1： open
+    ///< 0x2： close 
+    ///< 0xFF： invalid
+    uint32 bcm_pass_door_sts = 4;
+
+    ///< 右后门状态：[/],(0x0,0,1),[/],(1,0),0x1:Open 0x2:Close 0xff:invalid
+    uint32 bcm_ri_re_door_sts = 5;//右后门状态,[/],(0,0,1)
+
+    ///< 行李箱门状态：[/],(0x0,0,7),[/],(1,0),
+    ///< 0x00: Unknown 
+    ///< 0x01: FullyOpened 
+    ///< 0x02: FullyClosed  
+    ///< 0x03: Opening 
+    ///< 0x04: Closing 
+    ///< 0x05: Stop  
+    ///< 0x06: Halfclock  
+    ///< 0x07: APReverse 防夹反转
+    ///< 0x08: ACReverse  防撞反转
+    ///< 0xFF: Invalid  
+    uint32 bcm_tr_door_sts = 6;
+    ///< 发动机舱盖状态/：[/],(0,0,1),[/],(1,0),0x01:Open、0x02:CLose、0xFF:无效
+	uint32 bcm_hood_status = 7;
+     ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 8;
+
+    ///< 乘员侧门锁状态信号：[/],(0,0,1),[/],(1,0),
+    ///< "0x0：初始默认状态
+    ///< 0x1：解锁；
+    ///< 0x2：闭锁；
+    ///< 0x3：解锁中；
+    ///< 0x4：闭锁中；
+    ///< 0x5：释放中；
+    ///< 0x6：吸合中；
+    ///< 0xFF：无效"
+    uint32 bcm_pass_door_lck_sts = 9;	
+    ///< 闭锁信号: [/],(0,0,10),[/],(1,0),0x0:Inactive 0x1:遥控按键闭锁 0x2:遥控感应闭锁 0x3:蓝牙按键闭锁 0x4:蓝牙感应闭锁 0x5:中控按键闭锁 0x6:远程闭锁 0x7:行车闭锁 0x8:语音控制闭锁 0x9:二次落锁 0xA:小憩模式闭锁 0xFF:invalid(E2E/signalvalid)
+    uint32 bodycan_pepslcksig = 10;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 11;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 12;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 13;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 14;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 15;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 16;	
+
+
+} 
+
+/**
+* @brief busbcm
+* @detail BusBcmDsmSts 100ms
+*/
+message BusBcmDsmSts{ 
+
+    ///< 左后视镜左右调节状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xCB:0%~100% 0xCC~0xFE:Reserved 0xFF:Invalid
+    double dsm_left_mirror_left_right_sts = 1;
+
+    ///< 左后视镜上下调节状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xCB:0%~100% 0xCC~0xFE:Reserved 0xFF:Invalid
+    double dsm_left_mirror_up_down_sts = 2;
+
+    ///< 右后视镜左右调节状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xCB:0%~100% 0xCC~0xFE:Reserved 0xFF:Invalid
+    double dsm_right_mirror_left_right_sts = 3;
+
+    ///< 右后视镜上下调节状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xCB:0%~100% 0xCC~0xFE:Reserved 0xFF:Invalid
+    double dsm_right_mirror_up_down_sts = 4;
+
+    ///< 座椅靠背前后调节位置状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xC9:0%~100% 0xCA~0xFE:Reserved 0xFF:Invalid
+    double dsm_dsm_backrest_position_sts = 5;
+
+    ///< 座椅前端上下调节位置状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xC9:0%~100% 0xCA~0xFE:Reserved 0xFF:Invalid
+    double dsm_dsm_front_end_position_sts = 6;
+
+    ///< 座椅水平前后调节位置状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xC9:0%~100% 0xCA~0xFE:Reserved 0xFF:Invalid
+    double dsm_dsm_horizontal_position_sts = 7;
+
+    ///< 座椅垂直上下调节位置状态：[%],(0x0,0,100),[/],(1,0),0x0:Inactive 0x1~0xC9:0%~100% 0xCA~0xFE:Reserved 0xFF:Invalid
+    double dsm_dsm_vertical_position_sts = 8;
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 9;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 10;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 11;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 12;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 13;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 14;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 15;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 16;	
+} 
+
+/**
+* @brief busbcm
+* @detail BusBcmLightSts 40ms
+*/
+message BusBcmLightSts{ 
+    ///< 转向灯开关状态信号：[/],(0x0,0,3),[/],(1,0),
+    ///< 0x0:Not Actived 
+    ///< 0x1:Left Actived 
+    ///< 0x2:Right Actived 
+    ///< 0x3:LeftLanechangeLight 左变道 
+    ///< 0x4:RightLanechangeLight 右变道 
+    ///< 0x5: OFFRequest 关闭请求
+    ///< 0xff:invalid
+    uint32 bcm_turn_light_switch_sts = 1;
+
+    ///< 自动大灯状态：[/],(0x0,0,1),[/],(1,0),
+    ///< 0x0: OFFMod  关闭模式
+    ///< 0x1: PosnLiMod  位置的模式
+    ///< 0x2: LoBeamMod  近光灯模式
+    ///< 0x3: AutoLiMod  自动灯模式
+    uint32 bcm_aut_head_li_sts = 2;
+    ///< 前雾灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Reserved
+    uint32 bcm_frnt_fog_lmp_sts = 3;
+    ///< 远光灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Reserved 0xff:invalid
+    uint32 bcm_hi_beam_sts = 4;
+
+    ///< 紧急报警灯状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Error（故障）0xff:invalid
+    uint32 bcm_emgy_li_sts = 5;
+
+    ///< 刹车灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:无故障 0x1:有故障 0xff:invalid
+    uint32 bcm_brake_lamp_error = 6;
+
+    ///< 制动灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Not used 0x3:Reserved 0xff:invalid
+    uint32 bcm_brake_lamp_status = 7;
+
+    ///< 远光灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:No error 0x1:error 0xff:invalid
+    uint32 bcm_high_beam_lamp_error = 8;
+
+    ///< 左近光灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:无故障 0x1:有故障 0xff:invalid
+    uint32 bcm_left_low_beam_error = 9;
+
+    ///< 右近光灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:无故障 0x1:有故障 0xff:invalid
+    uint32 bcm_right_low_beam_error = 10;
+
+    ///< 左前转向灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:无故障 0x1:有故障 0xff:invalid
+    uint32 bcm_turn_indicator_left_error = 11;
+
+    ///< 右前转向灯故障状态：[/],(0x0,0,1),[/],(1,0),0x0:无故障 0x1:有故障 0xff:invalid
+    uint32 bcm_turn_indicator_right_error = 12;
+
+    ///< 近光灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Reserved 0xff:invalid
+    uint32 bcm_lo_beam_sts = 13;
+
+    ///< 位置灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Reserved 0xff:invalid
+    uint32 bcm_posn_lmp_sts = 14;
+
+    ///< 后雾灯工作状态：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Error
+    uint32 bcm_re_foglmp_sts = 15;
+
+    ///< 左转向灯信号：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Error 0xff:invalid
+    uint32 bcm_turn_indcr_le = 16;
+
+    ///< 右转向灯信号：[/],(0x0,0,3),[/],(1,0),0x0:OFF 0x1:ON 0x2:Notused 0x3:Error 0xff:invalid
+    uint32 bcm_turn_indcr_ri = 17;
+
+    ///< 转向灯开关信号：[/],(0x0,0,8),[/],(1,0),标识转向灯开关信号,0x0:OFF 0x1:左转向 0x2:左变道 0x3:右转向 0x4:右变道 0x7:Invalid 0xFF:invalid(E2E/signalvalid)
+    uint32 bcmturnliswtsts = 18;
+
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 19;
+	
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 20;
+    
+    ///< VIU外灯服务化信号：[/],(0x0,0,/),[/],(/,/),/
+    BusExtrLightInfo bus_extr_light_info = 21;
+
+	///< 左前位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    ///< 0xff: invalid
+    uint32 bcm_posn_fl_li_flt_info = 22;	
+	
+	///< 右前位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    ///< 0xff: invalid
+    uint32 bcm_posn_fr_li_flt_info = 23;	
+	
+	///< 左后位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    ///< 0xff: invalid
+    uint32 bcm_posn_rl_li_flt_info = 24;	
+	
+	///< 右后位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    ///< 0xff: invalid
+    uint32 bcm_posn_rr_li_flt_info = 25;	
+
+    ///< 转向灯拨杆开关状态：[/],(0x0,0,4),[/],(/,/),/
+    ///< 0x00: 拨杆初始默认位置 NoRequet
+    ///< 0x01: 左转向开关位置 LeftTurnLight
+    ///< 0x02: 右转向开关位置 RightTurnLight
+    ///< 0x03: 左变道开关位置 LeftLanechangeLight
+    ///< 0x04: 右变道开关位置 RightLanechangeLight
+    uint32 bcm_turn_li_key_swt_sts = 26;
+	
+	///< 左后转向灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x0:无故障 
+    ///< 0x1:有故障 
+    ///< 0xff:invalid
+    uint32 bcm_turn_rl_li_flt_st = 27;	
+	
+	///< 右后转向灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x0:无故障 
+    ///< 0x1:有故障 
+    ///< 0xff:invalid
+    uint32 bcm_turn_rr_li_flt_st = 28;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 29;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 30;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 31;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 32;	
+} 
+
+/**
+* @brief BusExtrLightInfo
+* @detail VIU外灯服务化信号
+*/
+message BusExtrLightInfo{
+    ///< 转向灯开关请求状态 ：[/],(0x0,0,/),[/],(1,0),转向灯开关请求状态
+    ///< 0x0:	NoRequet	无请求
+    ///< 0x1:	LeftTurnLight	左转向
+    ///< 0x2:	RightTurnLight	右转向
+    ///< 0x3:	LeftLanechangeLight	左变道
+    ///< 0x4:	RightLanechangeLight	右变道
+    ///< 0x5:	OFFRequest	关闭请求
+    uint32 extr_turn_li_swt_st = 1;
+
+    ///< 前大灯工作模式 ：[/],(0x0,0,/),[/],(1,0),前大灯工作模式
+    ///< 0x0:	OFFMod	关闭模式
+    ///< 0x1:	PosnLiMod	位置的模式
+    ///< 0x2:	LoBeamMod	近光灯模式
+    ///< 0x3:	AutoLiMod	自动灯模式
+    uint32 extr_hd_lamp_mod = 2;
+
+    ///< 紧急报警开关请求状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x0:	NoRequest	无请求
+    ///< 0x1:	Request	有效请求
+    uint32 extr_hzrd_swt_st = 3;
+
+    ///< 左刹车灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_brk_li_flt_le_st = 4;
+
+    ///< 右刹车灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_brk_li_flt_ri_st = 5;
+
+    ///< 高位制动灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_brk_li_flt_chsml_st = 6;
+
+    ///< 左侧远光灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_hi_beam_flt_le_st = 7;
+
+    ///< 右侧远光灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_hi_beam_flt_ri_st = 8;
+
+    ///< 左侧近光灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_lo_beam_flt_le_st = 9;
+
+    ///< 右侧近光灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_lo_beam_flt_ri_st = 10;
+
+    ///< 左前转向灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_turn_li_flt_fl_st = 11;
+
+    ///< 右前转向灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_turn_li_flt_rl_st = 12;
+
+    ///< 左后转向灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_turn_li_flt_fr_st = 13;
+
+    ///< 右后转向灯故障状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_turn_li_flt_rr_st = 14;
+
+    ///< 左前位置灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_posn_li_act_ctrl_fl_st = 15;
+
+    ///< 左后位置灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_posn_li_act_ctrl_rl_st = 16;
+
+    ///< 右前位置灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_posn_li_act_ctrl_fr_st = 17;
+
+    ///< 右后位置灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_posn_li_act_ctrl_rr_st = 18;
+
+    ///< 左侧近光灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_lo_beam_act_ctrl_le_st = 19;
+
+    ///< 右侧近光灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_lo_beam_act_ctrl_ri_st = 20;
+
+    ///< 左侧远光灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_hi_beam_act_ctrl_le_st = 21;
+
+    ///< 右侧远光灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_hi_beam_act_ctrl_ri_st = 22;
+
+    ///< 左前雾灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_fog_act_ctrl_fl_st = 23;
+
+    ///< 右前雾灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_fog_act_ctrl_fr_st = 24;
+
+    ///< 左后雾灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_fog_act_ctrl_rl_st = 25;  
+
+    ///< 右后雾灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_fog_act_ctrl_rr_st = 26;  
+
+    ///< 左刹车灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_brk_li_act_ctrl_le_st = 27;
+
+    ///< 右刹车灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_brk_li_act_ctrl_ri_st = 28;
+
+    ///< 高位制动灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_brk_li_act_ctrl_chsml_st = 29;
+
+    ///< 左前转向灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_turn_li_act_ctrl_fl_st = 30;
+
+    ///< 左后转向灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_turn_li_act_ctrl_rl_st = 31;
+
+    ///< 右前转向灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_turn_li_act_ctrl_fr_st = 32;
+
+    ///< 右后转向灯实际驱动状态 ：[/],(0x0,0,/),[/],(1,0),description
+    ///< 0x1:	ON	ON
+    ///< 0x0:	OFF	OFF
+    uint32 extr_turn_li_act_ctrl_rr_st = 33;
+
+	///< 左前位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_posn_fl_li_flt_info = 34;	
+	
+	///< 右前位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_posn_fr_li_flt_info = 35;	
+	
+	///< 左后位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_posn_rl_li_flt_info = 36;	
+	
+	///< 右后位置灯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x1:	Error	Error
+    ///< 0x0:	Normal	Normal
+    uint32 extr_posn_rr_li_flt_info = 37;	
+	
+    ///< 转向灯拨杆开关状态：[/],(0x0,0,4),[/],(/,/),/
+    ///< 0x00: 拨杆初始默认位置 NoRequet
+    ///< 0x01: 左转向开关位置 LeftTurnLight
+    ///< 0x02: 右转向开关位置 RightTurnLight
+    ///< 0x03: 左变道开关位置 LeftLanechangeLight
+    ///< 0x04: 右变道开关位置 RightLanechangeLight
+    uint32 extr_trun_li_key_swt_sts = 38;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 39;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 40;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 41;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 42;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 43;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 44;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 45;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 46;	
+	
+	///< 预留信号14：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved13 = 47;	
+	
+	///< 预留信号15：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved14 = 48;	
+} 
+
+/**
+* @brief busbcm
+* @detail BusBcmSts 40ms
+*/
+message BusBcmSts{ 
+    ///< 雨量强度：[/],(0xE,0,15),[/],(1,0),
+    ///< 0x0:No rain 
+    ///< 0x1:Level 1 
+    ///< 0x2:Level 2 
+    ///< 0x3:Level 3 
+    ///< 0x4:Level 4 
+    ///< 0x5:Level 5  
+    ///< 0x6:Level 6 
+    ///< 0x7:Level 7 
+    ///< 0x8:Level 8 
+    ///< 0x9:Level 9 
+    ///< 0xA:Level 10 
+    ///< 0xB:Level 11 
+    ///< 0xC:Level 12 
+    ///< 0xD:level 13 
+    ///< 0xE:init value 
+    ///< 0xF:Invalid value 
+    ///< 0xff:invalid
+    uint32 bcm_rainfall_level = 1;
+
+    ///< 前雨刮工作状态：[/],(0x0,0,3),[/],(1,0),
+    ///< 0x0: off 雨刮回位；
+    ///< 0x1: WiperSpeed1  最低；
+    ///< 0x2: WiperSpeed2 
+    ///< 0x3: WiperSpeed3 低；
+    ///< 0x4: WiperSpeed4 
+    ///< 0x5: WiperSpeed5 较高；
+    ///< 0x6: WiperSpeed6 
+    ///< 0x7: WiperSpeed7 高
+    ///< 0x8: Auto 自动档；
+    ///< 0x9: INT 间歇档;
+    ///< 0xA: Repair 维修位置；
+    ///< 0xB: Stop 停止；
+    ///< 0xFF: Invalid 无效值"
+    uint32 bcm_frnt_wiper_sts = 2;
+
+    ///< RLS环境光检测信号：[/],(0xFF,0,255),[/],(1,0),
+    ///< 0x0: Day Day
+    ///< 0x1: Twilight Twilight
+    ///< 0x2: Darkness Darkness
+    ///< 0x4: Precipitation Precipitation
+    ///< 0x8: Tunnel Tunnel
+    ///< 0x10: Underground_Car_Park_Exit Underground_Car_Park_Exit
+    ///< 0x20: High_Speed High_Speed
+    ///< 0xFF: Invalid  Invalid
+    uint32 bcm_rls_light_switch_reason = 3;
+
+    ///< 警戒状态信息：[/],(LastValue,0,3),[/],(1,0),0x0:Disarmed 0x1:Prearmed 0x2:Armed 0x3:Activated
+    uint32 bcm_key_alrm_sts = 4;
+
+    ///< 电源状态反馈：[/],(0x0,0,3),[/],(1,0),0x0:Off 0x1:FBLpower 0x2:ON 0x3:Start. 0xff:invalid
+    uint32 bcm_pwr_sts_fb = 5;
+
+    ///< 雨量传感器故障：[/],(0x0,0,1),[/],(1,0),
+    ///< 0x00: Normal_Wiping_Run 
+    ///< 0x01: Gush_Of_WaterImmediately 
+    ///< 0x02: Rain_Sensor_All_Right 
+    ///< 0x03: Rain_Sensor_In_Failsafe 
+    ///< 0xF: Signal_Invalid 
+    uint32 bcm_sts_rain_snsr = 6;
+
+    ///< 光传感器故障信号：[/],(0x0,0,1),[/],(1,0),0x0:NOerror 0x1:Error 0xff:invalid
+    uint32 bcm_li_snsr_flt = 7;
+
+    ///< 电源管理等级信号：[/],(0x0,0,7),[/],(1,0),0x0:电量正常 0x1:电量低 0x2:电量消耗过多 0x3-0x7:预留Reserved
+    uint32 bcm_pms_level = 8;
+
+    ///< 蓄电池寿命百分比：[%],(0xFF,0,100),[/],(1,0),0x0-0x64:%0-100% 0x65-0xFE:Reserved 0xFF:invalid
+    uint32 bcm_soh_life_percent = 9;
+
+    ///< 驾驶模式：[/],(0,0,15),[/],(1,0),
+    ///< 0x0:Not set 无请求；
+    ///< 0x1:Comfort 舒适；
+    ///< 0x2:Sport 运动；
+    ///< 0x3:Eco 经济；
+    ///< 0x4:SuperEco 超级省电；
+    ///< 0x5:ATS 脱困； 
+    ///< 0x6:Selfdefined 自定义
+    ///< 0x7:CrazyCow 狂牛
+	uint32 bcm_drive_mode = 10;
+    
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 11;
+
+    ///< 实际剩余蓄电池电量:[/],(0,0,127),[/],(0.5,0),0xFF:invalid(E2E/signalvalid)
+	double bcm_sqf_q = 12;
+
+     ///< 蓄电池传感器温度信号:[°C],(0,-40,105),[/],(1,-40),蓄电池传感器温度信号,0xFF:invalid(E2E/signalvalid)
+	int32 bcm_t_batt = 13;
+    
+     ///< 蓄电池传感器温度状态信号:[/],(0,0,3),[/],(1,0),蓄电池传感器温度状态信号,0x0:No error 0x1:not used 0x2:HW defect (ADC defect) 0x3:LIN saturation (no HW  defect) 0xFF:invalid(E2E/signalvalid)
+	uint32 bcm_status_temp = 14;
+    
+     ///< 实际剩余蓄电池电量状态:[/],(0,0,3),[/],(1,0),实际剩余蓄电池电量状态,
+     ///< 0x0:deviation > 15% 
+     ///< 0x1:deviation <15% 
+     ///< 0x2:deviation < 10% 
+     ///< 0x3:invalid 
+     ///< 0xFF:invalid(E2E/signalvalid)
+	uint32 bcm_sof_q_state = 15;
+
+    ///< 乘员侧门锁状态信号:[/],(0,0,3),[/],(1,0),乘员侧门锁状态信号,0x0:Lock 0x1:Unlock 0x2:Notused 0x3:Error 0xFF:invalid(E2E/signalvalid)
+	uint32 bcmpassdoorlcksts = 16;
+    
+     ///< 主驾座椅人员状态:[/],(0,0,15),[/],(1,0),主驾座椅人员状态,
+     ///< 0x0:有人 
+     ///< 0x1:无人 
+     ///< 0x2：未知状态 
+     ///< 0xFF:invalid(E2E/signalvalid)
+	uint32 bdcdrvrsts = 17;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 18;
+
+    ///< 前雨括故障状态：[/],(0x0,0,1),[/],(1,0),0x0:NOerror 0x1:Error
+    uint32 fwiper_flt_sts = 19;
+
+    ///< 后雨括故障状态：[/],(0x0,0,1),[/],(1,0),0x0:NOerror 0x1:Error
+    uint32 rwiper_flt_sts = 20;
+
+    ///< 超低功耗模式：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x0: OFF 关闭
+    ///< 0x1: ON 开启
+    uint32 sys_lo_u_mode = 21;
+
+    ///< 电源档位切换响应码：[/],(0x0,0,1),[/],(1,0),
+    ///< 0x1000: RECEIVECMD	未知错误
+    ///< 0x2000: RECEIVECMD	接收到指令(一级反馈)
+    ///< 0x2001: SUCCESS	所有指令执行成功(二级反馈)
+    ///< 0x2002: SUCCESSPARTIAL	部分指令执行成功(二级反馈)
+    ///< 0x3000: PARAMETEROUTOFRANGE	参数超出范围
+    ///< 0x3001: HIGHERPRIORITYTASKONGOING	优先级不满足高优先级在运行
+    ///< 0x3002: INVALIDSOURCE	无效的资源车型(配置字未打开)
+    ///< 0x4000: HIGHERPRIORITYTASKBREAK	被高优先级指令打断
+    ///< 0x4001: INVALIDPWRSTS	电源挡位不满足
+    ///< 0x4002: INVALIDVEHICLESPPD	车速不满足
+    ///< 0x4003: INVALIDRDYSTS	行驶状态不满足
+    ///< 0x4004: INVALIDGEARPOSN	整车挡位不满足
+    ///< 0x4005: INVALIDSOC	电量不足
+    ///< 0x4006: INVALIDOTASTS	OTA状态不满足
+    ///< 0x4007: INVALIDDOORSTS	门状态不满足
+    ///< 0x4008: INVALIDDOORLOCKSTS	门锁状态不满足
+    ///< 0x4009: ANTIPINCHOCCUR	防夹触发
+    ///< 0x400A: OVERHEATING	热保护
+    ///< 0x400B: ANTIPLAY	防玩保护
+    ///< 0x400C: NOTLEARNED	功能未学习
+    ///< 0x400D: NOTINIT	功能未初始化
+    ///< 0xff: invalid
+    uint32 power_shift_rtn_code = 22;
+	
+	///< 下电执行状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x00: 空闲 IDLE
+    ///< 0x01: 执行中 RUNNING
+    ///< 0x02: 当前指令被打断 INTERRUPTED
+    ///< 0x03: 执行完成 COMPLETED
+    ///< 0xFF: 初始化 INITIALIZING
+    uint32 power_shift_operation_st = 23;
+
+    ///< 动力电池高压状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0: Initializing
+    ///< 0x1: Standby
+    ///< 0x2: PreCharge
+    ///< 0x3: HVActive
+    ///< 0x4: Powerdown
+    ///< 0x5: Failure
+    ///< 0x7: ReadytoSleep
+    uint32 batt_hv_oper_mode = 24;	
+	
+	///< 电子悬架高度模式状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0: Normal
+    ///< 0x1: sport
+    ///< 0x2: Off road
+    ///< 0x3: Comfort
+    ///< 0x4: Auto
+    ///< 0x5: eCDCAirApringAccess
+    ///< 0x6: Load
+    ///< 0x7: reserved
+    ///< 0x8: Trailer mode
+    ///< 0x9: maintenance
+    ///< 0xA: 10%
+    ///< 0xB: 20%
+    ///< 0xC: 30%
+    ///< 0xD: 40%
+    ///< 0xE: 50%
+    ///< 0xF: 60%
+    ///< 0x10: 70%
+    ///< 0x11: 80%
+    ///< 0x12: 90%
+    ///< 0x13: 100%
+    uint32 ele_susp_high_mod_sts = 25;	
+	
+	///< RLS通讯故障状态：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x00: No_Error 
+    ///< 0x01: Error
+    uint32 bcm_rls_com_error_sts = 26;	
+	
+    ///< 副驾座椅人员状态：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x00： 有人 InSeat
+    ///< 0x01： 无人，上电默认状态 NoInSeat
+    ///< 0x02： 未知状态 UnKown
+    uint32 psg_seat_sts = 27;	
+
+    ///< 电源档位状态有效：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0: 无效 Invalid
+    ///< 0x1: 有效 Valid
+    uint32 power_shift_swt_sts_vld = 28;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 29;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 30;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 31;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 32;	
+} 
+
+
+
+/**
+* @brief busbcm
+* @detail BusBcmTMS 100ms
+*/
+message BusBcmTMS{ 
+    ///< 车外温度信号：[℃],(0xFF,-40,87.5),[/],(0.5,-40),车外温度（0x00~0xFF：-40~87.5℃）
+    double tms_ac_envtlt = 1;
+    ///< 车外温度有效：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid
+    uint32 tms_ac_envtl_t_vld = 2;
+
+    ///< 前吹风模式：[/],(lastvalue,0,7),[/],(1,0),0x0:blow face 0x1:blow face/blow feet 0x2:blow feet 0x3:blow fee/defroster 0x4:defroster 0x7:error
+    uint32 tms_frnt_blow_mod = 3;
+
+    ///< 热管理系统实际消耗功率：[kW],(0x0,0,20.47),[/],(1,0),
+    double tms_act_pwr = 4;
+    
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 5;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 6;
+	
+	///< 热管理系统工作模式：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x0： 初始化 Initializing
+    ///< 0x1： 待机 Standby
+    ///< 0x2：激活 HVActive
+    ///< 0x3： 后运行 afterrun
+    ///< 0x4： 故障 Failure
+    ///< 0x5： 准备下电 ReadyToShutDown
+    ///< 0x6： 电池制冷模式 BattHeatSftyCoolingMod
+    ///< 0xF： 准备休眠 readyToSleep
+    uint32 tms_oper_mod = 7;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 8;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 9;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 10;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 11;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 12;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 13;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 14;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 15;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 16;	
+} 
+
+/**
+* @brief busbcm
+* @detail BusBcmTPMS 500ms
+*/
+message BusBcmTPMS{ 
+    ///< 左前轮胎压力：[KPa],(LastValue,0,350),[/],(1.373,0),0x00~0xFE:NormalValue 正常值,0xFF:Invalid 无效值
+    double tpms_le_frnt_tirep = 1;
+    ///< 左前轮胎压力报警：[/],(0x0,0,7),[/],(1,0),0x0:Nowarning 0x1:Highpressurewarning 0x2:Lowpressurewarning 0x3:Quikleakage 0x4:LostSensor 0x5:Sensorbatterylow 0x6:Sensorfailure 0x7:Unlearning
+    uint32 tpms_le_frnt_tire_p_warn = 2;
+
+    ///< 左前轮胎温度报警：[/],(0x0,0,1),[/],(1,0),0x0:Notemperaturewarning 0x1:Temperaturewarning
+    uint32 tpms_le_frnt_t_warn = 3;
+
+    ///< 左后轮胎压力：[KPa],(LastValue,0,350),[/],(1.373,0),0x00~0xFE: NormalValue 正常值,0xFF: Invalid 无效值
+    double tpms_le_re_tirep = 4;
+
+    ///< 左后轮胎压力报警：[/],(0x0,0,7),[/],(1,0),0x0:Nowarning 0x1:Highpressurewarning 0x2:Lowpressurewarning 0x3:Quikleakage 0x4:LostSensor 0x5:Sensorbatterylow 0x6:Sensorfailure 0x7:Unlearning
+    uint32 tpms_le_re_tire_p_warn = 5;
+
+    ///< 左后轮胎温度报警：[/],(0x0,0,1),[/],(1,0),0x0:Notemperaturewarning 0x1:Temperaturewarning
+    uint32 tpms_le_re_t_warn = 6;
+    ///< 右前轮胎压力：[KPa],(LastValue,0,350),[/],(1.373,0),0x00~0xFE: NormalValue 正常值,0xFF: Invalid 无效值
+    double tpms_ri_frnt_tirep = 7;
+
+    ///< 右前轮胎压力报警：[/],(0x0,0,7),[/],(1,0),0x0:Nowarning 0x1:Highpressurewarning 0x2:Lowpressurewarning 0x3:Quikleakage 0x4:LostSensor 0x5:Sensorbatterylow 0x6:Sensorfailure 0x7:Unlearning
+    uint32 tpms_ri_frnt_tire_p_warn = 8;
+
+    ///< 右前轮胎温度报警：[/],(0x0,0,1),[/],(1,0),0x0:Notemperaturewarning 0x1:Temperaturewarning
+    uint32 tpms_ri_frnt_t_warn = 9;
+
+    ///< 右后轮胎压力：[KPa],(LastValue,0,350),[/],(1.373,0),0x00~0xFE: NormalValue 正常值,0xFF: Invalid 无效值
+    double tpms_ri_re_tirep = 10;
+
+    ///< 右后轮胎压力报警：[/],(0x0,0,7),[/],(1,0),0x0:Nowarning 0x1:Highpressurewarning 0x2:Lowpressurewarning 0x3:Quikleakage 0x4:LostSensor 0x5:Sensorbatterylow 0x6:Sensorfailure 0x7:Unlearning
+    uint32 tpms_ri_re_tire_p_warn = 11;
+    
+    ///< 右后轮胎温度报警：[/],(0x0,0,1),[/],(1,0),0x0:Notemperaturewarning 0x1:Temperaturewarning
+    uint32 tpms_ri_re_t_warn = 12;
+
+    ///< 胎压信号状态：[/],(0x0,0,1),[/],(1,0),0x0:Valid 0x1:Invalid
+    uint32 tpms_tire_p_sig_sts = 13;
+
+    
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 14;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 15;
+
+    ///< 左前轮胎漏气报警：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: 正常 Normal
+    ///< 0x01: 轮胎漏气1级 DrvLeakLevel1
+    ///< 0x02: 轮胎漏气2级 DrvLeakLevel2
+    uint32 tpms_tire_p_leak_warn_fl = 16;
+
+    ///< 右前轮胎漏气报警：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: 正常 Normal
+    ///< 0x01: 轮胎漏气1级 DrvLeakLevel1
+    ///< 0x02: 轮胎漏气2级 DrvLeakLevel2
+    uint32 tpms_tire_p_leak_warn_fr = 17;
+
+    ///< 左后轮胎漏气报警：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: 正常 Normal
+    ///< 0x01: 轮胎漏气1级 DrvLeakLevel1
+    ///< 0x02: 轮胎漏气2级 DrvLeakLevel2
+    uint32 tpms_tire_p_leak_warn_rl = 18;
+
+    ///< 右后轮胎漏气报警：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: 正常 Normal
+    ///< 0x01: 轮胎漏气1级 DrvLeakLevel1
+    ///< 0x02: 轮胎漏气2级 DrvLeakLevel2
+    uint32 tpms_tire_p_leak_warn_rr = 19;
+
+    ///< 左前胎压传感器故障：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: - Normal
+    ///< 0x01: 传感器丢失 SnsrLost 
+    ///< 0x02: 电量低 BattLow 
+    ///< 0x03: 传感器故障 SnsrFailr
+    uint32 tpms_tire_p_snsr_flt_fl = 20;
+
+    ///< 右前胎压传感器故障：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: - Normal
+    ///< 0x01: 传感器丢失 SnsrLost 
+    ///< 0x02: 电量低 BattLow 
+    ///< 0x03: 传感器故障 SnsrFailr
+    uint32 tpms_tire_p_snsr_flt_fr = 21;
+
+    ///< 左后胎压传感器故障：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: - Normal
+    ///< 0x01: 传感器丢失 SnsrLost 
+    ///< 0x02: 电量低 BattLow 
+    ///< 0x03: 传感器故障 SnsrFailr
+    uint32 tpms_tire_p_snsr_flt_rl = 22;
+
+    ///< 右后胎压传感器故障：[/],(0x0,0,1),[/],(1,0),/
+    ///< 0x00: - Normal
+    ///< 0x01: 传感器丢失 SnsrLost 
+    ///< 0x02: 电量低 BattLow 
+    ///< 0x03: 传感器故障 SnsrFailr
+    uint32 tpms_tire_p_snsr_flt_rr = 23;
+} 
+/**
+* @brief busbcm
+* @detail BusBcmWinSts 40ms
+*/
+message BusBcmWinSts{ 
+    ///< 天窗状态：[/],(0x0,0,1),[/],(1,0),
+    ///< 0x00: Stopped 
+    ///< 0x01: Openingtilt 
+    ///< 0x02: Closingtilt 
+    ///< 0x03: Openingslide 
+    ///< 0x04: Closingslide 
+    ///< 0x05: Reversing 
+    ///< 0x06: Invalidstatus 
+    ///< 0x07: reserved 
+    uint32 bcm_sunroof_status = 1;
+    ///< 主驾车窗状态：[%],(0x0,0,100),[/],(1,0),0x00:无效 / 0x01:0%(全关) / 0x65:100%(全开)
+    double bcm_drvr_win_sts = 2;
+
+    ///< 左后车窗状态：[%],(0x0,0,100),[/],(1,0),0x00:无效 / 0x01:0%(全关) / 0x65:100%(全开)
+    double bcm_le_re_win_sts = 3;
+
+    ///< 副驾车窗状态：[%],(0x0,0,100),[/],(1,0),0x00:无效 / 0x01:0%(全关) / 0x65:100%(全开)
+    double bcm_pass_win_sts = 4;
+
+    ///< 右后车窗状态：[%],(0x0,0,100),[/],(1,0),0x00:无效 / 0x01:0%(全关) / 0x65:100%(全开)
+    double bcm_ri_re_win_sts = 5;
+
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 6;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+	
+} 
+
+/**
+* @brief busbcm
+* @detail BusPEPS 40ms
+*/
+
+message BusPEPS{ 
+    ///< 遥控泊车完成关窗请求反馈：[/],(0x0,0,3),[/],(1,0),0x0:InActive  0x1:Success  0x2:Failed  0x3:Reserved
+    uint32 peps_apa_close_win_feedback = 1;
+
+    ///< 遥控泊车完成熄火请求反馈：[/],(0x0,0,3),[/],(1,0),0x0:InActive  0x1:Success  0x2:Failed  0x3:Reserved
+    uint32 peps_apa_engine0ff_feedback = 2;
+
+    ///< 遥控泊车完成闭锁请求反馈：[/],(0x0,0,3),[/],(1,0),0x0:InActive  0x1:Success  0x2:Failed  0x3:Reserved
+    uint32 peps_apa_lock_feedback = 3;
+
+    ///< 泊车过程外后视镜折叠状态反馈：[/],(0x0,0,3),[/],(1,0),
+    ///< 0x00: Stop
+    ///< 0x01: Unfold
+    ///< 0x02: Fold
+    ///< 0x00FF: Invalid
+    uint32 peps_apa_power_mirror_fold_feedback = 4;
+
+    ///< 遥控泊车一键关闭：[/],(0x0,0,1),[/],(1,0),0x0:Not Pressed 0x1:Pressed
+    uint32 peps_apa_remote_parking_off = 5;
+
+    ///< 遥控泊车一键启动：[/],(0x0,0,1),[/],(1,0),0x0:Not Pressed 0x1:Pressed
+    uint32 peps_apa_remote_parking_on = 6;
+
+    ///< 钥匙闭锁按键状态：[/],(0x0,0,3),[/],(1,0),0x0:invalid 0x1:pressed 0x2:not pressed  0x3:reserve
+    uint32 peps_lock_key_status = 7;
+
+    ///< PEPS系统故障：[/],(0x0,0,1),[/],(1,0),0x0:No Error 0x1:Error
+    uint32 peps_peps_fail_status = 8;
+
+    ///< 遥控APA后钥匙熄火请求：[/],(0x0,0,3),[/],(1,0),0x0:invalid 0x1:request 0x2:not request 0x3:reserved
+    uint32 peps_remote_apa_done_key_off_req = 9;
+
+    ///< 钥匙远程启动按键信号：[/],(0x0,0,3),[/],(1,0),0x0:invalid 0x1:pressed 0x2:not pressed  0x3:reserve
+    uint32 peps_remote_start_key_status = 10;
+
+    ///< 钥匙行李箱按键状态：[/],(0x0,0,3),[/],(1,0),0x0:invalid 0x1:pressed 0x2:not pressed  0x3:reserve
+    uint32 peps_trunk_key_status = 11;
+
+    ///< 钥匙解锁按键状态：[/],(0x0,0,3),[/],(1,0),0x0:invalid 0x1:pressed 0x2:not pressed  0x3:reserve
+    uint32 peps_un_lock_key_status = 12;
+
+    ///< 遥控及远程启动反馈：[/],(0x0,0,31),[/],(1,0),0x0:无反馈 0x1:启动成功 0x2:连续启动次数过多 0x3:整车电量不足 0x4:车门或引擎盖或行李箱未关闭 0x5:遥控钥匙在车内 0x6:防盗激活 0x7:紧急报警灯光激活 0x8:整车不在P档 0x9:车速不为0 0xA:发动机已经运行 0xB:电子手刹未夹紧 0xC:油量不足 0xD:启动系统故障 0xE:发动机机油压力过低 0xF:发动机冷却液温度过高 0x10:电喷系统故障 0x11:运行时间到正常熄火 0x12:环境温度过低 0x13:周边防盗未处于设防状态 0x14:远程/遥控熄火成功 0x15:启动时间已达30min 上限 0x16：续航里程不足 0x17:车辆已在Ready档 0x18：BDC电源状态导致启动不成功 0x19:VCU未响应导致启动失败 0x20-0x1F:Reserved
+    uint32 peps_remote_start_feedback = 13;
+
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 14;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 15;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 16;	
+	
+}
+
+/**
+* @brief busbcm
+* @detail BusSRS 20ms
+*/
+
+message BusSRS{ 
+    ///< 碰撞输出信号：[/],(0x0,0,15),[/],(1,0),0x0:NoCrash 0x1:crash
+    uint32 srs_crash_outp_sts = 1;
+
+    ///< 主驶安全带扣状态：[/],(0x0,0,3),[/],(1,0),0x0:Buckled 0x1:Unbuckle 0x2:NotUsed 0x3:NotUsed
+    uint32 srs_drvr_buc_swt_sts = 2;
+
+    ///< 副驶安全带扣状态：[/],(0x0,0,3),[/],(1,0),0x0:Buckled 0x1:Unbuckle 0x2:NotUsed 0x3:NotUsed
+    uint32 srs_pass_buc_swt_sts = 3;
+
+    ///< EDR触发输出：[/],(0x0,0,1),[/],(1,0),0x0:No Crash 0x1:C-EDR Trigger
+    uint32 srs_crash_out_cedr = 4;
+
+    ///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 5;
+
+    ///< 正面碰撞输出:[/],(0x0,0,1),[/],(1,0),正面碰撞输出,0x0:No Crash 0x1:Front Crash 0xFF:invalid(E2E/signalvalid)
+    uint32 srs_crashout_front = 6;
+
+    ///< 侧面碰撞输出（左）：[/],(0x0,0,1),[/],(1,0),侧面碰撞输出（左）,0x0:No Crash 0x1:Left Side Crash 0xFF:invalid(E2E/signalvalid)
+    uint32 srs_crashout_left = 7;
+
+    ///< 侧面碰撞输出（右）:[/],(0x0,0,1),[/],(1,0),侧面碰撞输出（右）,0x0:No Crash 0x1:Right Side Carsh 0xFF:invalid(E2E/signalvalid)
+    uint32 srs_crashout_right = 8;
+
+    ///< 后面碰撞输出:[/],(/,0,1),[/],(1,0),后面碰撞输出,0x0:No Crash 0x1:Rear Crash 0xFF:invalid(E2E/signalvalid)
+    uint32 srs_crashout_rear = 9;
+
+    ///< 低风险碰撞输出:[/],(0x0,0,1),[/],(1,0),低风险碰撞输出,0x0:No Crash 0x1:Micro Crash 0xFF:invalid(E2E/signalvalid)
+	uint32 srs_crashout_micro = 10;
+
+    ///< SRS故障信号警告灯信号:[/],(0x0,0,/),[/],(/,/),SRS故障信号警告灯信号,
+    ///< 0x0:Lampoff 
+    ///< 0x1:Lampon 
+    ///< 0x2:LampFlashing 
+    ///< 0x3:not used 
+    ///< 0xFF:invalid(E2E/signalvalid)
+	uint32 srswarnlampsts = 11;
+    ///< 碰撞校验信号:[/],(0x0,0,/),[/],(/,/),碰撞校验信号,0xFFFF:invalid(E2E/signalvalid)	
+    uint32 srscrashoutpstschks = 12;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 13;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 14;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 15;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 16;	
+	
+} 
+
+/**
+* @brief busbcm
+* @detail BusBCMEnvironmentInfo
+*/
+
+message BusBCMEnvironmentInfo{ 
+    ///< 左侧光照强度:[/]:,(0x0,0,1200),[/],(1,0),左侧光照强度,0xFFFF:invalid(E2E/signalvalid)
+    uint32 rls_solarleft = 1;
+
+    ///< 右侧光照强度:[/],(0x0,0,1200),[/],(1,0),右侧光照强度,0xFFFF:invalid(E2E/signalvalid)
+    uint32 rls_solarright = 2;
+
+    ///< AMB照度：[/],(0x0,0,20420),[/],(1,0),Valid 0x0~0x3FD 有效值 Initial 0x3FE 初始值 Fault 0x3FF 故障值
+    uint32 amb_brightness = 3;
+
+    ///< FW照度:[/],(0x0,0,6126),[/],(1,0),FW照度,0x3FF:invalid(E2E/signalvalid)
+    uint32 fw_brightness = 4;
+
+    ///< 相对湿度:[/],(0x0,0,/),[/],(/,/),相对湿度,0xFF:invalid(E2E/signalvalid)
+	double rls_relativehumidity = 5;
+
+    ///< 前挡风玻璃温度:[/]:,(0x0,0,15),[/],(1,0),前挡风玻璃温度,0xFF:invalid(E2E/signalvalid)
+    double rls_windshieldtemp = 6;
+
+    ///< RLS环境光检测信号:[/],(0x0,0,3),[/],(1,0),RLS环境光检测信号,0xFFFF:invalid(E2E/signalvalid)
+    uint32 bcm_rls_light_switch_reason = 7;
+
+    ///< 雨量强度：[/],(0x0,0,15),[/],(1,0),雨量强度,0x0:No rain 0x1:Level 1 0x2:Level 2 0x3:Level 3 0x4:Level 4 0x5:Level 5  0x6:Level 6 0x7:Level 7 0x8:Level 8 0x9:Level 9 0xA:Level 10 0xB:Level 11 0xC:Level 12 0xD:level 13 0xE:init value 0xF:invalid value 0xFF:invalid(E2E/signalvalid)
+    uint32 bcm_rainfalllevel = 8;
+
+    ///< 前雨刮工作状态:[/],(/,0,1),[/],(1,0),前雨刮工作状态,0x0:Off 0x1:Low 0x2:High 0x3:Error 0xFF:invalid(E2E/signalvalid)
+    uint32 bcmfrntwipersts = 9;
+
+    ///< 雨量传感器故障:[/],(0x0,0,/),[/],(/,/),雨量传感器故障,0x0:NOerror 0x1:Error 0xFF:invalid(E2E/signalvalid)
+	double bcmstsrainsnsr = 10;
+    
+    ///< 光传感器故障信号:[/],(0x0,0,/),[/],(/,/),光传感器故障信号,0x0:NOerror 0x1:Error 0xFF:invalid(E2E/signalvalid)
+	double bcmlisnsrflt = 11;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 12;
+	
+	///< 雨刮速度：[/],(0x0,0,/),[/],(/,/),/
+    ///< 0x00: No_Wipe
+    ///< 0x01: 40cycles/min
+    ///< 0x02: 45cycles/min
+    ///< 0x03: 48cycles/min
+    ///< 0x04: 51cycles/min
+    ///< 0x05: 54cycles/min
+    ///< 0x06: 57cycles/min
+    ///< 0x07: 60cycles/min
+    uint32 wiper_rls_sts = 13;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 14;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 15;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 16;	
+} 

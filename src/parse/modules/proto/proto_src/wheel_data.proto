@@ -1,0 +1,58 @@
+/**
+* @file     wheel_data.proto
+* @author   yangzhao
+* @details  轮速相关信号接口定义
+* @date     2022-03-2
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto3";
+package localization;
+import "header.proto";
+
+/**
+* @brief 轮速输出
+* @detail xxxxxxxx
+*/
+message WheelData {
+  ///<轮速header:[/],(/,/,/),[/],(/,/),标识轮速header
+  Header header = 1;
+  ///<左前轮轮速:[m/s],(/,/,/),[/],(/,/),标识左前轮轮速
+  double fl_wheel_vel = 2;
+  ///<右前轮轮速:[m/s],(/,/,/),[/],(/,/),标识右前轮轮速
+  double fr_wheel_vel = 3;
+  ///<左后轮轮速:[m/s],(/,/,/),[/],(/,/),标识左后轮轮速
+  double rl_wheel_vel = 4;
+  ///<右后轮轮速:[m/s],(/,/,/),[/],(/,/),标识右后轮轮速
+  double rr_wheel_vel = 5;
+  ///<车轮速度因子:[/],(/,/,/),[/],(/,/),标识车轮速度因子
+  double l_wheel_factor = 6;
+  ///<车轮速度因子:[/],(/,/,/),[/],(/,/),标识车轮速度因子
+  double r_wheel_factor = 7;
+  ///<左前轮轮速脉冲:[],(/,/,/),[/],(/,/),标识左前轮轮速脉冲
+  double fl_wheel_pulse = 8;
+  ///<右前轮轮速脉冲:[],(/,/,/),[/],(/,/),标识右前轮轮速脉冲
+  double fr_wheel_pulse = 9;
+  ///<左后轮轮速脉冲:[],(/,/,/),[/],(/,/),标识左后轮轮速脉冲
+  double rl_wheel_pulse = 10;
+  ///<右后轮轮速脉冲:[],(/,/,/),[/],(/,/),标识右后轮轮速脉冲
+  double rr_wheel_pulse = 11;
+  ///<档位信息:[],(/,/,/),[/],(/,/),标识档位信息
+  double vcu_gear_position = 12;
+  ///<档位信息有效位:[],(/,/,/),[/],(/,/),标识档位信息有效位
+  double vcu_gear_position_valid = 13;
+}

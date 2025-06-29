@@ -1,0 +1,295 @@
+/**
+
+* @file     environment_input.proto
+* @details  环境模型输出（决策部分）
+* @date     2023-01-04
+* @version  1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+package rnp;
+import "rnp_common.proto";
+import "seq_header.proto";
+
+/**
+* @brief 自车当前位置UTM坐标
+* @details 20ms
+*/
+message UTMLocalization
+{
+     ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+    SeqHeaderProto.SeqHeader seq_header = 1;
+    ///< utm经度：[deg],(0,0,360),[/],(/，/),输出
+    double x = 2; 
+    ///< utm纬度：[deg],(0,0,360),[/],(/，/),输出
+    double y = 3; 
+    ///<航向角:[deg],(0,0,360),[/],(/,/),标识航向角,正东方向逆时针为正
+    double heading = 4;
+
+    ///< 预留信息：[/],(/,/,/),[10],(/，/),
+    repeated double reserve_utmloc_double = 5;
+}
+
+/**
+* @brief 自车场景信息
+* @details ///
+*/
+message DrivingEnvInfo
+{ 
+    ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+    SeqHeaderProto.SeqHeader seq_header = 1;
+    ///< 自车场景信息：[/],(/,/,/),[/],(/，/),输出
+    Scenario ego_scenario = 2;
+    ///<红绿灯认知结果:[/],(/,/,/),[200],(/,/),/，输出
+    TrafficLight traffic_light_status = 3;
+    ///< 路面标识:[/],(/,/,/),[200],(/,/),/，输出
+    repeated GroundMarking ego_ground_marking = 4;
+    ///< 交通标志牌:[/],(/,/,/),[200],(/,/),/，输出
+	repeated TrafficSign ego_traffic_sign = 5;
+    ///< 自车在地图中环境信息：[/],(/,/,/),[/],(/，/),输出
+    EgoPositionInMap ego_pos_in_map = 6;      
+    ///< 原L3环境重构模块的相关功能信号:[/],(0,0,/),[/],(1,0),description 缩减接口只保留LegacyL3
+	LegacyL3 legacy_info = 7;
+    ///< 自车场景信息：[/],(/,/,/),[/],(/，/),输出
+    EnvironmentInfo ego_env_info = 8;
+    ///<交通车流相关信息:[/],(0,0,/),[200],(1,0),description
+    repeated TrafficFlow traffic_flow  = 9; 
+    ///< 预留信息：[/],(/,/,/),[10],(/，/),
+    repeated int32 reserve_drivingenvinfo_int32 = 10;
+    ///< 预留信息2：[/],(/,/,/),[10],(/，/),
+    repeated double reserve_drivingenvinfo_double = 11;
+    
+}
+
+/**
+* @brief IACCNIDSwitch
+* @details ///
+*/
+message IACCNIDSwitch
+{ 
+    ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+    SeqHeaderProto.SeqHeader seq_header = 1; 
+    ///<是否可以领航标志:[/],(0,0,1),[/],(1,0),/，输出
+    uint32 rnp_nid_valid_flag = 2; 
+    ///< nid和iacc标志：[/],(0,0,1),[/],(1，0),
+    uint32 nid_iacc_flag = 3;
+    ///< NID模式有效信息：[/],(/,/,/),[/],(/，/),
+    NIDValidInfo nid_valid_info = 4;    
+    ///< 当前智驾模式维持/切换原因：[/],(0,-7,3),[/],(1，0),
+    uint32 switch_reason = 5; 
+    ///< 预留信息2：[/],(/,/,/),[10],(/，/),
+    repeated int32 reserve_switch_int32 = 6;
+    ///< 预留信息3：[/],(/,/,/),[10],(/，/),
+    repeated double reserve_switch_double = 7; 
+}
+
+/**
+* @brief 场景渲染
+* @details ///
+*/
+message EdcRendering
+{
+    ///< 消息头：[/],(/,/,/),[/],(/，/),标识消息头
+    SeqHeaderProto.SeqHeader seq_header = 1; 
+    ///< 点线：[/],(/,/,/),[300],(/，/),输出
+    repeated Line line_point_infos = 2;
+    ///< 车道线方程线：[/],(/,/,/),[300],(/，/),输出
+    repeated LineInfo line_info_equ = 3;
+	///< 地面标识：[/],(/,/,/),[300],(/，/),输出
+    repeated GroundMarking  ground_mark_info = 4;
+    ///< 停止线：[/],(/,/,/),[300],(/，/),输出
+    repeated StopLine  stop_line_info = 5;
+    ///< 人形横道：[/],(/,/,/),[300],(/，/),输出
+    repeated TopPoints cross_walk_line = 6;
+    ///< 黄色网格线：[/],(/,/,/),[300],(/，/),输出
+    repeated TopPoints yellow_grid_line = 7;
+    ///< 道路面：[/],(/,/,/),[300],(/，/),输出
+    repeated RoadFace road_face = 8; 
+    ///< 左边界ID序列：[/],(/,/,/),[300],(/，/),输出
+    repeated int32 left_ids = 9;
+    ///< 右边界ID序列：[/],(/,/,/),[300],(/，/),输出
+    repeated int32 right_ids = 10;
+    ///< 左左车道ID序列：[/],(/,/,/),[10],(/，/),输出
+    repeated int32 left_left_ids = 11;
+    ///< 右右车道ID序列：[/],(/,/,/),[10],(/，/),输出
+    repeated int32 right_right_ids = 12;
+
+    ///< 预留信息：[/],(/,/,/),[10],(/，/),
+    repeated int32 reserve_edc_int32 = 13;
+    ///< 预留信息2：[/],(/,/,/),[10],(/，/),
+    repeated double reserve_edc_double = 14;
+   
+}
+
+/**
+* @brief 环境预处理中心线边界线等参考轨迹
+* @details 输出对感知环境、地图等预处理后的参考轨迹
+*/
+message ReferenceLineWithConstraints
+{
+    ///<延时统计信息:[/],(/,/,/),[/],(/,/),/,输出
+	SeqHeaderProto.SeqHeader seq_header = 1;
+    ///< header：[/],(/,/,/),[/],(/，/),
+    Header header = 2;
+    ///< ReferenceLineXY：[3条],(0条,0条,3条),[3],(/，/),单参考线信息
+    repeated ReferenceLineXY reference_line = 3;
+    ///< is_get_into_iacc：[0],(0,0,1),[/],(/，/),判断是否进入IACC
+    uint32 is_get_into_iacc = 4;
+
+    ///< reserved：[/],(/,/,/),[10],(/，/),
+    repeated int32 reserve_referenceline_int32 = 5;
+    ///< reserved：[/],(/,/,/),[10],(/，/),
+    repeated double reserve_referenceline_double = 6;    
+}
+
+/**
+ * @brief dnp_common
+ * @detail ReferenceLineXY 参考线信息
+ */
+ message ReferenceLineXY 
+ {
+    ///< id：[/],(0,0,2),[/],(/，/),参考线唯一id
+    int32 id = 1;
+    ///< confidence：[/],(100,0,100),[100],(/，/), confidence
+    int32 confidence = 2;
+    ///< lane_id：[/],(/,/,/),[/],(/，/),起始处所在的车道id（对应高精地图车道id）
+    uint64 lane_id = 3;
+    ///< lane_change_type：[/],(0,0,2),[/],(1，0),对应变道类型
+    LaneChangeType lane_change_type = 4;    
+    ///< ego_s：[m],(0,0,230),[/],(/，/),主车s
+    float ego_s = 5;
+    ///< exploration_distance：[m],(2000,0,2000),[/],(/，/),能探索到的远方距离
+    float exploration_distance = 6;
+    ///< ego_desired_v：[/],(/,/,/),[/],(/，/),自车期望速度
+    float ego_desired_v = 7;
+    ///< cost：[m],(0,0,200),[/],(/，/),
+    float cost = 8;
+    ///< ramp_dis：[/],(/,/,/),[/],(/，/),
+    float ramp_dis = 9;    
+    ///< to_confluence_distance：[m],(0,0,/),[/],(/，/), 参考线车道前方汇流距离
+    float to_confluence_distance = 10;
+    ///< reserve_b：[m],(0,0,/),[/],(/，/),参考线车道前方分流距离
+    float to_split_distance = 11;
+    ///< reserve_b：[m],(0,0,/),[/],(/，/),参考线距离截断点距离
+    float to_cut_distance = 12;
+    ///< to_current_lane_end_dist：[m],(0,0,/),[/],(/，/),自车距离当前车道末端距离
+    float to_current_lane_end_dist = 13;
+    ///< stop_s：[m],(10000,-200,10000),[/],(/，/),停止线距离
+    float stop_s = 14;
+
+    ///< is_get_into_iacc：[/],(0,0,1),[/],(/，/),判断是否进入IACC
+    bool is_get_into_iacc = 15;
+    ///< is_leftmost_lane：[/],(0,0,1),[/],(/，/),判断当前位置是否处于最左侧车道
+    bool is_leftmost_lane = 16;
+    ///< is_rightmost_lane：[/],(0,0,1),[/],(/，/),判断当前位置是否处于最右侧车道
+    bool is_rightmost_lane = 17;    
+    ///< is_unkonw_obstacle_cut：[0],(0,0,1),[/],(/，/),是否由于不规则障碍物截断
+    bool is_unknown_obstacle_cut = 18;
+    ///< 跨线：[/],(0,0,1),[/],(/，/),是否跨线
+    bool is_cross_line = 19;
+    ///< real_sense：[/],(/,/,/),[100],(/，/), is real or fake
+    bool is_real_sense = 20;
+    ///< in_emergency_lane_flag：[/],(0,0,1),[/],(/，/),是否在应急车道上
+    bool in_emergency_lane_flag = 21;
+
+    ///< num_points：[/],(0,0,461),[/],(/，/),参考路径对应的位置点数量， 461
+    int32 num_points = 22;
+    ///< point：[/],(/,/,/),[461],(/，/),位置点数组
+    repeated UTMPoint2D point = 23;
+    ///< headings：[deg],(0,/,/),[461],(/，/),位置点的航向，弧度,-pi~pi,(正北pi/2,正东0，逆时针旋转)
+    repeated float headings = 24;
+    ///< kappas：[/],(0,/,/),[461],(/，/),位置点的曲率
+    repeated float kappas = 25;
+    ///< dkappas：[/],(0,/,/),[461],(/，/),位置点的曲率变化率
+    repeated float dkappas = 26;
+    ///< accumulated_s：[m],(0,0,230),[461],(/，/),累计s
+    repeated float accumulated_s = 27;
+    ///< l_offset：[m],(0,/,/),[461],(/，/),位置点与车道map车道中心线的横向偏移量
+    repeated float l_offset = 28;
+    ///< lane_id_v：[/],(/,/,/),[30],(/，/),参考线候选车道id序列
+    repeated uint64 lane_id_v = 29;
+    ///< lane_length_v：[m],(0,0,/),[200],(/，/),车道lane-id序列对应的车道长度
+    repeated float lane_length_v = 30;
+
+    ///< left_boundary：[m],(0,/,10e5),[/],(/，/),左边界，左正右负
+    Boundary left_boundary = 31;
+    ///< right_boundary：[m],(0,/,-10e5),[/],(/，/),右边界，左正右负
+    Boundary right_boundary = 32;
+    ///< left_actual_boundary：[/],(0,/,10e5),[/],(/，/),左实体边界，左正右负
+    Boundary left_actual_boundary = 33;
+    ///< right_actual_boundary：[/],(0,-10e5,/),[/],(/，/),右实体边界，左正右负
+    Boundary right_actual_boundary = 34;
+    ///< lane_left_boundary：[/],(0,/,10e5),[/],(/，/),参考线所在车道左边界，左正右负
+    Boundary lane_left_boundary = 35;
+    ///< lane_right_boundary：[/],(0,-10e5,/),[/],(/，/),参考线所在车道右边界，左正右负
+    Boundary lane_right_boundary = 36;
+
+    ///< unknown_obstacle：[/],(/,/,/),[10],(/，/),不规则障碍物信息
+    repeated UnknownObstalce unknown_obstacles = 37;
+    ///< single_unknown_obstacle：[/],(/,/,/),[/],(/，/),不规则障碍物信息
+    UnknownObstalce single_unknown_obstacle = 38;
+    
+    ///< boundary_reserve_a：[/],(/,/,/),[/],(/，/),保留字段
+    Boundary reserve_referencelinexy_boundary = 39;
+    ///< reserve_d：[/],(/,/,/),[10],(/，/),保留字段
+    repeated int32 reserve_referencelinexy_int32 = 40;
+    ///< reserve_c：[/],(/,/,/),[10],(/，/),保留字段
+    repeated double reserve_referencelinexy_double = 41;
+
+}
+
+/**
+* @brief 目标相关信号
+* @details 输出的目标信号
+*/
+message PredictedObjects
+{
+	///<延时统计信息:[/],(/,/,/),[/],(/,/),/,输出
+	SeqHeaderProto.SeqHeader seq_header = 1;
+    ///<目标预测结果及目标属性（所有目标）:[/],(0,0,/),[33],(1,0),description
+	repeated Object objects = 2;
+	///<目标选择结果:[/],(0,0,/),[/],(1,0),description
+	TargetSelect target_select = 3;
+    ///<车道线上目标数量:[/],(0,0,/),[/],(1,0),description
+    LaneObjNum lane_obj_num = 4;
+	
+}
+
+/**
+* @brief 静态车道线拓扑结构有关
+* @details 
+*/
+message LocalLaneTopology
+{
+	///<延时统计信息:[/],(/,/,/),[/],(/,/),/,输出
+	SeqHeaderProto.SeqHeader seq_header = 1;
+    ///<车道线认知结果:[/],(0,0,/),[/],(1,0),输出左左、左、右、右右感知车道线信息
+	LaneMarkingVCS lane_marking_filtered = 2;
+	///<重构后的车道线-下游决策规划的ACC模式使用:[/],(0,0,/),[/],(1,0),输出预测内部重建的自车附件车道线拓扑结构
+	ReconstructedLanes reconstructed_lanes = 3;    
+	
+}
+
+/**
+* @brief RNP切换信号
+* @details 
+*/
+message RnpStateSwitchRsp
+{
+  ///<时间戳:[s],(/,/,/),[/],(1,0),时间戳
+  double time_stamp = 1;
+
+  ///<诊断信息:[/],(/,/,/),[/],(/,/),反馈rnp模块工作状态
+  ///<0:无效值
+  ///<1:开启状态
+  ///<2:关闭状态
+  uint32 rnp_sts_feedback = 2;
+}

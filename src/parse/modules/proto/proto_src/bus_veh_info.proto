@@ -1,0 +1,161 @@
+/**
+ * @file     bus_veh_info.proto
+ * @author
+ * @details  数据抽象收集的相关方版本信息
+ * @date     2023-05-31
+ * @version  V1.0
+ * @copyright(C),changan,2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+ * ///<车辆坐标系 原点：车辆后轴 右手法则
+ *
+ * @par      修改日志：
+ * <table>
+ * <tr><th>date              <th>version             <th>author
+ * <tr><th>2023.5.31         <th>1.0                 <th>zhangpeng
+ * <tr><th>			         <th>1.1                 <th>
+ * <table>
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package BusVehInfoProto;
+
+/**
+ * @brief BusVehInfo
+ * @detail 车辆基本信息
+ */
+message BusVehInfo {
+  ///< 时间戳：[s],(0,/,/),[/],(1,0),/
+  double time_stamp = 1;
+
+  ///< 车型信息：[/],(/,/,/),[/],(1,0),/
+  BusVehType veh_type = 2;
+
+  ///< 车辆基本参数信息：[/],(/,/,/),[/],(1,0),/
+  BusVehParameters veh_param = 3;
+
+  ///< 版本信息：[/],(/,/,/),[/],(1,0),/
+  BusHardwareVersion hard_version = 4;
+
+  ///< 版本信息：[/],(/,/,/),[/],(1,0),/
+  BusSoftwareVersion soft_version = 5;
+}
+
+/**
+ * @brief BusVehType
+ * @detail 车型信息
+ */
+message BusVehType {
+  ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial
+  ///< 0x1:Valid 0x2:Error
+  uint32 message_valid = 1;
+
+  ///< 车型车系：[/],(/,/,/),[/],(/,/),/
+  bytes vehiche_type = 2;
+
+  ///< 车型配置：[/],(/,/,/),[/],(/,/),0 低配；1 中配；2 高配
+  uint32 vehicle_model = 3;
+}
+
+/**
+ * @brief BusVehParameters
+ * @detail 车辆基本参数信息
+ */
+message BusVehParameters {
+  ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial
+  ///< 0x1:Valid 0x2:Error
+  uint32 message_valid = 1;
+
+  ///< 本车长度：[m],(0x0,0,/),[/],(/,/),/
+  uint32 veh_length = 2;
+
+  ///< 本车宽度：[m],(0x0,0,/),[/],(/,/),/
+  uint32 veh_width = 3;
+
+  ///< 本车高度：[m],(0x0,0,/),[/],(/,/),/
+  VehHeight veh_height = 4;
+
+  ///< 轴距：[m],(0x0,0,/),[/],(/,/),/
+  uint32 wheel_base = 5;
+
+  ///< 转向比：[/],(0x0,0,/),[/],(/,/),/
+  uint32 st_ratio = 6;
+
+  ///< 转弯半径：[m],(0x0,0,/),[/],(/,/),/
+  uint32 steering_radius = 7;
+
+  ///< 滚动半径：[m],(0x0,0,/),[/],(/,/),/
+  uint32 rolling_radius = 8;
+}
+
+/**
+ * @brief VehHeight
+ * @detail 车身高度相关信号
+ */
+message VehHeight{
+    ///< 左前车身高度：[/],(0x0,-32767,32767),[/],(0.01,0),物理值=16位传输值*精度0.01
+    double height_posn_fl = 1;
+
+    ///< 右前车身高度：[/],(0x0,-32767,32767),[/],(0.01,0),物理值=16位传输值*精度0.01
+    double height_posn_fr = 2;
+
+    ///< 左后车身高度：[/],(0x0,-32767,32767),[/],(0.01,0),物理值=16位传输值*精度0.01
+    double height_posn_rl = 3;
+
+    ///< 右后车身高度：[/],(0x0,-32767,32767),[/],(0.01,0),物理值=16位传输值*精度0.01
+    double height_posn_rr = 4;
+}
+
+/**
+ * @brief BusHardwareVersion
+ * @detail 车辆相关硬件版本号
+ */
+message BusHardwareVersion {
+  ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial
+  ///< 0x1:Valid 0x2:Error
+  uint32 message_valid = 1;
+
+  ///< 车辆vin编号：[/],(/,/,/),[/],(/,/),/
+  bytes vin_identifier = 2;
+}
+
+/**
+ * @brief BusSoftwareVersion
+ * @detail 版本信息
+ */
+message BusSoftwareVersion {
+  ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial
+  ///< 0x1:Valid 0x2:Error
+  uint32 message_valid = 1;
+
+  ///< 传感数据抽象与服务软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes sab_sw_version = 2;
+
+  ///< 激光雷达传感器固件软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes lidar_sw_version = 3;
+
+  ///< 4D前雷达传感器固件软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes fr4d_sw_version = 4;
+
+  ///< 角雷达传感器固件软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes cr_sw_version = 5;
+
+  ///< 超声波传感器固件软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes uss_sw_version = 6;
+
+  ///< 智驾域SOC版本 软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes soc_sw_version = 7;
+
+  ///< viu软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes viu_sw_version = 8;
+
+  ///< C2 mcu软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes mcu_sw_version = 9;
+
+  ///< edc软件版本号：[/],(/,/,/),[/],(/,/),/
+  bytes edc_sw_version = 10;
+}

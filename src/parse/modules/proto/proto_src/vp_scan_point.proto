@@ -1,0 +1,80 @@
+/**
+* @file     vp_scan_point.proto
+* @author   zhangdeze
+* @details  freespace输出数据
+* @date     2022-07-27
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.27          <th>1.0                 <th>zhangdeze
+* <table>
+**********************************************************************************
+*/
+
+syntax = "proto2";
+package VpScanPointProto;
+
+import "vp_perception_base.proto";
+
+/**
+*@brief   freespace标签
+*@detail  描述freespace区域中的点的分割标签
+*/
+enum ParsingLabelType {
+  ///< ParsingLabelType_Road: [/], (/,/,/), [/], (1,0), 路面
+  ParsingLabelType_Road = 0;
+  
+  ///< ParsingLabelType_LaneMarks: [/], (/,/,/), [/], (1,0), 车道线
+  ParsingLabelType_LaneMarks = 1;
+
+  ///< ParsingLabelType_Invalid: [/], (/,/,/), [/], (1,0), 错误区域
+  ParsingLabelType_Invalid = 255;
+}
+
+/**
+*@brief   freespace输出数据点
+*@detail  描述freespace输出数据的点坐标及类型标签
+*/
+message ScanPoints {
+  ///< header: [/], (/,/,/), [/], (1,0), 数据头
+  optional VpPerceptionBaseProto.Header header = 10;
+  
+  ///< pts_cam_gnd: [m], (0,0,/), [/], (1,0), 相机坐标系下的freespace边界点
+  repeated VpPerceptionBaseProto.Point pts_cam_gnd = 1; 
+  
+  ///< ray_angles: [rad], (0,0,2*pi), [/], (1,0), 点在VCS坐标系下的方位角  
+  repeated float ray_angles = 2; 
+  
+  ///< property：[/], (0,0,15), [/], (1,0), 输出点的标签类型  
+  repeated int32 property = 3;
+  
+  ///< pts_vcs: [m], (0,0,/), [/], (1,0), 点在VCS下的坐标
+  repeated VpPerceptionBaseProto.Point pts_vcs = 5; 
+  
+  ///< pts_img: [pixel], (0,0,/), [/], (1,0), 点在去畸变图像中的像素坐标
+  repeated VpPerceptionBaseProto.Point pts_img = 6; 
+  
+  ///< cam_id: [/], (0,0,/), [/], (1,0), 相机ID
+  optional int32 cam_id = 4;
+  
+  ///< time_stamp: [ms], (/,/,/), [/], (1,0), 时间戳
+  optional int64 time_stamp = 7;
+  
+  ///< frame_id: [/], (/,/,/), [/], (1,0), 帧号
+  optional int32 frame_id = 8;
+  
+  ///< pb_pass: [/], (0,0,1), [/], (1,0), 描述freespace输出边界是否在该点出现分段标志位
+  repeated bool  pb_pass = 9;  
+
+  ///< conf: [/], (0,0.001,1), [/], (1,0), 输出点的置信度
+  repeated float conf = 11;
+}

@@ -1,0 +1,686 @@
+/**
+* @file     bushuset.proto
+* @author   ljp
+* @details  bushuset.proto
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>ljp
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	BushusetProto;
+/**
+* @brief Bushuset
+* @detail Bushuset
+*/
+message Bushuset{ 
+	///<BusHuDaFunSet：[/],(/,/,/),[32],(1,0),
+    BusHuDaFunSet hu_da_fun_set = 1;
+	
+	///< BusHuAdsFunSet：[/],(/,/,/),[32],(1,0),
+    BusHuAdsFunSet hu_ads_fun_set = 2;
+	
+	///< BusHuApaSet：[/],(/,/,/),[32],(1,0),
+    BusHuApaSet hu_apa_set = 3;
+	
+	///< BusHuDvrSet：[/],(/,/,/),[32],(1,0),
+    BusHuDvrSet hu_dvr_set = 4;
+	
+	///< BusHuScreenSet：[/],(/,/,/),[32],(1,0),
+    BusHuScreenSet hu_screen_set = 5;
+    
+ 	///<BusHuVcReq：[/],(/,/,/),[32],(1,0),
+    BusHuVcReq hu_vc_req = 6;   
+    
+    ///< BusHuAvmSet：[/],(/,/,/),[32],(1,0),
+    BusHuAvmSet hu_avm_set = 7;
+    	
+	///< BusHuScreenOper：[/],(/,/,/),[32],(1,0),
+    BusHuScreenOper hu_screen_oper = 8;
+} 
+/**
+* @brief Bushuset100ms
+* @detail Bushuset100ms
+*/
+message Bushuset100ms{ 
+	///<BusHuDaFunSet：[/],(/,/,/),[32],(1,0),
+    BusHuDaFunSet hu_da_fun_set = 1;
+	
+	///< BusHuAdsFunSet：[/],(/,/,/),[32],(1,0),
+    BusHuAdsFunSet hu_ads_fun_set = 2;
+	
+	///< BusHuApaSet：[/],(/,/,/),[32],(1,0),
+    BusHuApaSet hu_apa_set = 3;
+	
+	///< BusHuDvrSet：[/],(/,/,/),[32],(1,0),
+    BusHuDvrSet hu_dvr_set = 4;
+	
+	///< BusHuScreenSet：[/],(/,/,/),[32],(1,0),
+    BusHuScreenSet hu_screen_set = 5;
+} 
+/**
+* @brief Bushuset50ms
+* @detail Bushuset50ms
+*/
+message Bushuset50ms{ 
+    
+ 	///<BusHuVcReq：[/],(/,/,/),[32],(1,0),
+    BusHuVcReq hu_vc_req = 1;   
+    
+    ///< BusHuAvmSet：[/],(/,/,/),[32],(1,0),
+    BusHuAvmSet hu_avm_set = 2;
+    	
+	///< BusHuScreenOper：[/],(/,/,/),[32],(1,0),
+    BusHuScreenOper hu_screen_oper = 3;
+} 
+
+/**
+* @brief BusHuAdsFunSet
+* @detail BusHuAdsFunSet 100ms
+*/
+message BusHuAdsFunSet{
+	///< 自动调整巡航车速使能请求：[/],(0x3,0,3),[/],(1,0),0x0:OFF 0x1:All Speed-Limit 0x2:Road Camera 0x3:invalid 
+    uint32 hu_csla_enable = 1;
+	
+	///< HWA使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved 
+    uint32 hu_hwa_enable = 2;
+	
+	///< IACC使能开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_iacc_enable = 3;
+	
+	///< 主动推荐换道开关：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved 
+    uint32 hu_irlc_enable = 4;
+	
+	///< 超速报警声音提醒开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_overspeed_sound_war_enable = 5;
+	
+	///< 超速预警使能开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved
+    uint32 hu_overspeed_warning_enable = 6;
+	
+	///< 超速预警偏差设置：[/],(/,-10,10),[/],(1,0),0x0~0x14:-10~10km/h 0x15~0x1E:Reserved 0x1F:Invalid.
+    int32 hu_overspeed_warning_offset = 7;
+	
+	///< TJP开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_tjp_enable = 8;
+	
+	///< 交通灯辅助使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved
+    uint32 hu_tla_enable = 9;
+	
+	///< 主动换道使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved 
+    uint32 hu_udlc_enable = 10;
+	
+	///< NDA使能开关：[/],(0x0,0,3),[/],(1,0),0x0 =Inactive；0x1 =Off； 0x2=On；  0x3= Reserved
+    uint32 hu_nda_enable = 11;
+	
+	///< NDA语音提示开关：[/],(0x0,0,3),[/],(1,0),0x0 =Inactive；0x1 =Off； 0x2=On；  0x3= Reserved
+    uint32 hu_nda_audio_war_enable = 12;
+	
+	///< NDA导航开关：[/],(0x0,0,3),[/],(1,0),0x0 =Inactive；0x1 =Off； 0x2=On；  0x3= Reserved
+    uint32 hu_nda_nav_enable = 13;
+	
+	///< 安全报警提示开关：[/],(0x0,0,3),[/],(1,0),0x0 =Inactive；0x1 =Off；0x2=On；  0x3= Reserved
+    uint32 hu_ads_safe_voice_enable = 14;
+	
+	///< 智慧换道提示开关：[/],(0x0,0,3),[/],(1,0),0x0=Inactive；0x1=Off；0x2=On；  0x3= Reserved
+    uint32 hu_ads_lane_change_voice_enable = 15;
+	
+	///< 路况播报提示开关：[/],(0x0,0,3),[/],(1,0),0x0 =Inactive；0x1=Off；0x2=On；  0x3= Reserved
+    uint32 hu_ads_road_voice_enable = 16;
+	
+	///< NDA设定车速模式：[/],(/,0,3),[/],(1,0),0x0=Inactive；0x1=Manual/Normal； 0x2=Auto/Sport;0x3=Auto/Eco
+    uint32 hu_nda_set_spd_mode = 17;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 18;
+
+    ///< 智驾风格开关: [/],(0x0,0,/),[/],(/,/),智驾风格开关,0x0:inactive 0x1:Conservative 0x2:Standard 0x3:Compete Speed 0x4:Custom 0x5:Self-adapting 0x6~0x7：reserved0xFF:invalid(E2E/signalvalid)
+    uint32 hu_smartdrivingstyle = 19; 
+
+    ///< 加速风格开关: [/],(0x0,0,/),[/],(/,/),加速风格开关,0x0:inactive 0x1:Soft 0x2:Comfortable 0x3:Radical0xFF:invalid(E2E/signalvalid)
+    uint32 hu_acceleratedstyle = 20;
+
+    ///< 起步风格开关: [/],(0x0,0,/),[/],(/,/),起步风格开关,0x0:inactive 0x1:Soft 0x2:Comfortable 0x3:Radical0xFF:invalid(E2E/signalvalid)
+    uint32 hu_startingstyle = 21;
+
+    ///< 过弯风格开关: [/],(0x0,0,/),[/],(/,/),过弯风格开关,0x0:inactive 0x1:Soft 0x2:Comfortable 0x3:Radical0xFF:invalid(E2E/signalvalid)
+    uint32 hu_bendingstyle = 22;
+
+    ///< 新手模式开启语音回复: [/],(0x0,0,/),[/],(/,/),ica新手模式开启语音回复n_过弯风格开关,0x0:inactive 0x1:ON 0x2:OFF 0x3:Reserved0xFF:invalid(E2E/signalvalid)
+    uint32 hu_novice_response = 23;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 24;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 25;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 26;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 27;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 28;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 29;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 30;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 31;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 32;	
+}
+/**
+* @brief BusHuApaSet
+* @detail BusHuApaSet 100ms
+*/ 
+message BusHuApaSet{
+	///< APA模式选择：[/],(0x7,0,7),[/],(1,0),0x0:Parallel Mode（平行） 0x1:Cross Mode（垂直） 0x2:POC Mode （泊出） 0x3:Invalid 0x4:Echelon Mode（斜列式） 0x5:function  off 0x6:default 0x7:No selection
+    uint32 hu_apa_mode_select = 1;
+	
+	///< 远程泊车视频监控：[/],(0x0,0,1),[/],(1,0),0x0:off 0x1:on
+    uint32 hu_apa_remote_disp_sts = 2;
+	
+	///< ASP模式选择：[/],(0x0,0,7),[/],(1,0),0x0:Idle 0x1:HU ASP mode 0x2:APP ASP mode 0x3:Cancle 0x4~0x6:Reserved 0x7:Invalid
+    uint32 hu_asp_mode_select = 3;
+	
+	///< ASP主动提示使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_asp_remind_enable = 4;
+	
+	///< ASP开关：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_asp_switch = 5;
+	
+	///< 垂直泊车进入模式设置：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Back In 0x2:Head In 0x3:Reserved
+    uint32 hu_cross_parking_mode_set = 6;
+	
+	///< 界面操作信号：[/],(0x0,0,15),[/],(1,0),0x0:Default 0x1:长按 0x2:拖动 0x3:左旋转 0x4:右旋转 0x5:放大 0x6:缩小 0x7-0x15:reserved
+    uint32 hu_interface_change_singnal = 7;
+	
+	///< LAEB使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_laeb_enable = 8;
+	
+	///< 遥控泊车距障碍物停止距离设置：[cm],(/,0,7),[/],(1,0),0x0:Inactive 0x1:30 0x2:40 0x3:50 0x4:60 0x5:70 0x6:80 0x7:Reserved
+    uint32 hu_obstacle_safe_distance_set = 9;
+	
+	///< 泊车轨迹模式：[/],(0x0,0,3),[/],(1,0),0x0:normal 0x1:parallel 0x2:asistant line off 0x3:Invalid 
+    uint32 hu_pac_mode_select = 10;
+	
+	///< HU确认开始泊车：[/],(/,0,1),[/],(1,0),0x0:No Request 0x1:Request
+    uint32 hu_parking_confirm = 11;
+	
+	///< 用户选择泊车模式：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:InteriorParking 0x2:RemoteParking 0x3:ParkingResume
+    uint32 hu_parking_mode_select = 12;
+	
+	///< HU确认恢复泊车：[/],(/,0,1),[/],(1,0),0x0:No Request 0x1:Request
+    uint32 hu_parking_resume = 13;
+	
+	///< 泊车过程语音交互设置状态：[/],(0x0,0,3),[/],(1,0),0x0:inactive 0x1:On 0x2:Off 0x3:Reserved
+    uint32 hu_park_voice_int_set_status = 14;
+	
+	///< 遥控泊车行驶距离设置：[m],(/,0,15),[/],(1,0),0x0:Inactive 0x1~0xF:1~15
+    uint32 hu_remote_distance_set = 15;
+	
+	///< 用户选择的车位：[/],(0x0,0,7),[/],(1,0),0x0:No selected 0x1:Left Slot 1 0x2:Left Slot 2 0x3:Right Slot 1 0x4:Right Slot 2 0x5:Left Park Out 0x6:Right ParkOut 0x7:Invalid
+    uint32 hu_slot_user_selected = 16;
+	
+	///< 语音选择第几个车位：[/],(0x0,0,15),[/],(1,0),0x0:Inactive 0x1:No.1 0x2:No.2 0x3:No.3 0x4:No.4 0x5:No.5 0x6:No.6 0x7:No.7 0x8:No.8 0x9:No.9 0xA:No.10 0xB-0x15:Reserved
+    uint32 hu_slot_voice_select = 17;
+	
+	///< 超声波变道辅助设置：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:On 0x2:Off 0x3:Reserved 
+    uint32 hu_uls_bsd_activation = 18;
+	
+	///< 超声波侧面保护声音设置：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:On 0x2:Off 0x3:Reserved
+    uint32 hu_uls_fkp_activation = 19;
+	
+	///< RADS开关请求信号：[/],(0x0,0,3),[/],(1,0),0x0:inactive 0x1:on 0x2:off 0x3:Reserved
+    uint32 hu_rads_switch = 20;
+
+	///< APA界面开启：[/],(0x0,0,3),[/],(1,0),0x0=Default 0x1=Touch Switch off; 0x2=Custom Switch Off; 0x3=Voice Control off; 0x4=Touch Switch on; 0x5=Custom Switch on; 0x6=Voice Control on;
+    uint32 hu_apa_on_off = 21;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 22;
+	
+    ///< APA推荐反馈：[/],(0x0,0,/),[/],(/,/),标识507,0x0:default 0x1:Voiceresponse 0x2:Touchrecommend 0x3:cancel recommendation 0xFF:invalid(E2E/signalvalid)
+	uint32 hu_aparecomendres = 23;
+	
+    ///< 泊车辅助功能激活：[/],(0x0,0,/),[/],(/,/),0x0:invalid 0x1:Activate 0x2:Deactivate 0x3:Reserved 0xFF:invalid(E2E/signalvalid)
+	uint32 hu_apaactive2 = 24;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 25;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 26;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 27;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 28;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 29;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 30;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 31;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 32;	
+	
+}
+/**
+* @brief BusHuAvmSet
+* @detail BusHuAvmSet 50ms
+*/  
+message BusHuAvmSet{
+	///< 360全景检测请求：[/],(0x0,0,31),[/],(1,0),0x0=No Request； 0x1=All+Left； 0x2=All+Right； 0x3=All+ Front； 0x4=All+Rear； 0x5=180° Front； 0x6=Left+Right； 0x7=180°Rear； 0x8=All+3DFront； 0x9=All+3DRear； 0xA=All+3DLeft； 0xB=All+3DRight； 0xC=All+3DLeftFront； 0xD=All+3DRightFront； 0xE=All+3DLeftRear； 0xF=All+3DRightRear；0x10=All+FrontLookdown； 0x11=All+RearLookdown； 0x12=ALL+TopFront； 0x13=ALL； 0x14=Left； 0x15=Right； 0x16=Front； 0x17=Rear； 0x18~0x1F=Reserved
+    uint32 hu_360_av_mdetection_request = 1;
+	///< AVM3D请求：[/],(0x3,0,3),[/],(1,0),0x0:Disable 0x1:Enable 0x2:Reserved 0x3:Invalid
+    uint32 hu_3_davm_req = 2;
+	///< 3D视图水平角度请求：[°],(/,0,360),[/],(1,0),0x0:inactive 0x1-0x169:0~360° 0x16A-0x1FE:reserved 0x1FF:invalid
+    uint32 hu_3_d_hor_angle_req = 3;
+	///< 标定确认：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Yes 0x2:No 0x3:Reserved
+    uint32 hu_avm_calibration_confirm = 4;
+	///< 自动标定开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Calibrate 0x2:Edit Calibrate 0x3:Reset
+    uint32 hu_avm_calibration_switch = 5;
+	///< 全景行车记录回放模式请求：[/],(/,0,7),[/],(1,0),0x0:no request 0x1:enter cycle mode browse 0x2:enter emergency mode browse 0x3:enter photo mode browse 0x4:enter DAS mode browse 0x5:Reserved 0x6:Reserved 0x7:Reserved 
+    uint32 hu_avmdvr_replay_mode_req = 6;
+	///< 全景切换开关：[/],(0x0,0,1),[/],(1,0),0x0:no request  0x1:request
+    uint32 hu_av_mswitch = 7;
+	///< 车身颜色设置：[/],(/,0,15),[/],(1,0),0x0:Inactive 0x1:colour 1 0x2:colour 2 0x3:colour 3 0x4:colour 4 0x5:colour 5 0x6:colour 6 0x7:colour 7 0x8:colour 8 0x9:colour 9 0xA:colour 10 0xB:colour 11 0xC:colour 12 0xD:colour 13 0xE:colour 14 0xF:Reserved
+    uint32 hu_body_colour_set = 8;
+	///< 车牌号值：[/],(/,0,127),[/],(1,0),0x0:Inactive 0x1:A 0x2:B 0x3:C 0x4:D 0x5:E 0x6:F 0x7:G 0x8:H 0x9:I 0xA:J 0xB:K 0xC:L 0xD:M 0xE:N 0xF:O 0x10:P 0x11:Q 0x12:R 0x13:S 0x14:T 0x15:U 0x16:V 0x17:W 0x18:X 0x19:Y 0x1A:Z 0x1B:∙  0x1C:-  0x1D:0 0x1E:1 0x1F:2 0x20:3 0x21:4 0x22:5 0x23:6 0x24:7 0x25:8 0x26:9 0x27:京 0x28:津 0x29:冀 0x2A:晋 0x2B:蒙 0x2C:辽 0x2D:吉 0x2E:黑 0x2F:沪 0x30:苏 0x31:浙 0x32:皖 0x33:闽 0x34:赣 0x35:鲁 0x36:豫 0x37:鄂 0x38:湘 0x39:粤 0x3A:桂 0x3B:琼 0x3C:渝 0x3D:川 0x3E:贵 0x3F:云 0x40:臧 0x41:陕 0x42:甘 0x43:青 0x44:宁 0x45:新 0x46:港 0x47:澳 0x48:台 0x49:领 0x4A:使 0x4B:警 0x4C:学 0x4D~0x7F:Reserved 
+    uint32 hu_license_number = 9;
+	///< 车牌号设置信号：[/],(/,0,15),[/],(1,0),0x0:Inactive 0x1:Set Number 1 0x2:Set Number 2 0x3:Set Number 3 0x4:Set Number 4 0x5:Set Number 5 0x6:Set Number 6 0x7:Set Number 7 0x8:Set Number 8 0x9:Set Number 9 0xA~0xF:Reserved
+    uint32 hu_license_number_set = 10;
+	///< MOD移动物体检测使能开关信号：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_mod_enable = 11;
+	///< 雷达触发全景开关信号：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_radar_avm_switch = 12;
+	///< 录影循环设置：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:1min 0x2:3min 0x3:5min
+    uint32 hu_recordingcycle_setting = 13;
+	///< 自动俯视大图开关：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved 
+    uint32 hu_top_look_down_switch = 14;
+	///< 透明车身开关信号：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_transparent_car_switch = 15;
+	///< 转向灯触发全景开关信号：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_turn_light_avm_switch = 16;
+	///< AVM_显示角度：[/],(0x0,0,3),[/],(1,0),0x0:No Request 0x1:120°请求 0x2:180°请求 0x3:Invalid
+    uint32 hu_vision_angle_req = 17;
+	///< 轮毂样式设置：[/],(/,0,7),[/],(1,0),0x0:Inactive 0x1:type 1 0x2:type 2 0x3:type 3 0x4:type 4 0x5~0x7:Reserved
+    uint32 hu_wheel_hub_set = 18;
+	///< 车牌号值校验和：[/],(/,0,255),[/],(1,0),
+    uint32 hu_license_number_check_sum = 19;
+	///< 全车速全景开关：[/],(0x0,0,3),[/],(1,0),0x0:Not Active 0x1:Open 0x2:Close 0x3:Invalid
+    uint32 hu_full_speed_panoramic_select = 20;
+	///< AVM触发方式：[/],(0x0,0,3),[/],(1,0),0x0:no request  0x1:硬按键触发 0x2:语音触发 0x3:软开关触发
+    uint32 hu_avm_triggermethod = 21;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 22;
+ ///< 哨兵模式工作请求：[/],(0x0,0,3),[/],(1,0),哨兵模式工作请求,0x0:无请求 0x1:激活 0x2:未激活 0x3:reserved 0xFF:invalid(E2E/signalvalid)
+    uint32 cdcsentrymodeworkreq = 23;
+ ///< 盲区监测功能设置信号：[/],(0x0,0,3),[/],(1,0),盲区监测功能设置信号,0x0:无请求 0x1:关闭 0x2:开启 0x3:reserved0xFF:invalid(E2E/signalvalid)
+    uint32 cdcblindzonefunset = 24;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 25;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 26;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 27;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 28;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 29;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 30;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 31;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 32;	
+}
+/**
+* @brief BusHuDaFunSet
+* @detail BusHuDaFunSet 100ms
+*/   
+message BusHuDaFunSet{ 
+	///< 救援确认：[/],(0x0,0,3),[/],(1,0),0x0:no response 0x1:do not need rescue 0x2:need rescue 0x3:cancel 
+    uint32 hu_ads_rescue_confirm = 1;
+	///< 语音警示开关：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_audio_warning_enable = 2;
+	///< 自动制动使能开关：[/],(/,0,1),[/],(1,0),0x0:off 0x1:on
+    uint32 hu_auto_brake_enable = 3;
+	///< 盲点检测/换道辅助设置：[/],(/,0,7),[/],(1,0),0x0:early 0x1:normal 0x2:late 0x3:Off
+    uint32 hu_bsdlca_setting = 4;
+	///< 紧急车道保持使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved
+    uint32 hu_elk_enable = 5;
+	///< 紧急转向辅助使能：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:OFF 0x2:ON 0x3:Reserved 
+    uint32 hu_ess_enable = 6;
+	///< 前侧横向制动报警开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_fcta_enable = 7;
+	///< 前侧横向制动开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_fctb_enable = 8;
+	///< 前碰撞预警设置：[/],(/,0,7),[/],(1,0),0x0:Early 0x1:Normal 0x2:Late 0x3:Off 0x4~0x6:Reserved 0x7:Invalid
+    uint32 hu_fcw_setting = 9;
+	///< 前雷达功能激活：[/],(/,0,3),[/],(1,0),0x0:Invalid 0x1:Activate 0x2:Deactivate 0x3:Reserved
+    uint32 hu_front_radar_active = 10;
+	///< 智能远光功能开启：[/],(/,0,1),[/],(1,0),0x0:off 0x1:on
+    uint32 hu_hma_enable = 11;
+	///< LAS模式选择信号：[/],(/,0,7),[/],(1,0),0x0:Inactive 0x1:LDW 0x2:LKA 0x3:LCS 0x4~0x6:Reserved 0x7:OFF
+    uint32 hu_las_mode_selection = 12;
+	///< LAS警告方式：[/],(/,0,7),[/],(1,0),0x0:inactive 0x1:visual 0x2:sound 0x3:vibration 0x4:sound and vibration 0x5~0x7:Reserved
+    uint32 hu_las_warning_mode_selection = 13;
+	///< LAS震动强度：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:low 0x2:normal 0x3:high
+    uint32 hu_ldw_shake_lev = 14;
+	///< 闭锁保护开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_lock_ctrl_enable = 15;
+	///< 后侧横向预警开关：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_rcta_enable = 16;
+	///< 后侧横向制动开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_rctb_enable = 17;
+	///< 后追尾预警使能：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_rcw_enable = 18;
+	///< 开门预警开关：[/],(/,0,3),[/],(1,0),0x0 =inactive；0x1 =Off； 0x2=On；  0x3= Reserved；
+    uint32 hu_tsr_switch = 19;
+	///< 交通标志识别使能：[/],(/,0,1),[/],(1,0),0x0:off 0x1:on
+    uint32 hu_sea_enable = 20;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 21;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 22;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 23;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 24;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 25;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 26;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 27;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 28;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 29;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 30;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 31;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 32;	
+}
+/**
+* @brief BusHuDvrSet
+* @detail BusHuDvrSet 100ms
+*/   
+message BusHuDvrSet{
+	///< DVR浏览控制：[/],(/,0,15),[/],(1,0),0x0:No Req 0x1:Up 0x2:Down 0x3:Left 0x4:Right 0x5:Delete Files 0x6:NormalToEmergency 0x7:Edit Enter 0x8:Edit Cancel 0x9~0xF:Reserved 
+    uint32 hu_dvr_browse_command = 1;
+	///< 全景DVR显示视角：[/],(/,0,7),[/],(1,0),0x0:No Request 0x1:Front 0x2:Rear 0x3:Left 0x4:Right 0x5:All 0x6:Reserved 0x7:Invalid
+    uint32 hu_dvr_display_vision = 2;
+	///< DVR畸变校正开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_dvr_distort_correct_switch = 3;
+	///< 视频/照片选择：[/],(0x0,0,4095),[/],(1,0),0x0:Not Selected 0x1:Selected bit0:Play1 bit1:Play2 bit2:Play3 bit3:Play4 bit4:Play5 bit5:Play6 bit6:Play7 bit7:Play8 bit8:Play9 bit9~bit12:Reserved
+    uint32 hu_dvr_edit_selected = 4;
+	///< 一键紧急录制开关：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Record 0x2:Reserved 0x3:Invalid
+    uint32 hu_dvr_emergency_record = 5;
+	///< DVR使能设置信号：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Off 0x2:On 0x3:Reserved
+    uint32 hu_dvr_enable_set = 6;
+	///< DVR格式化请求：[/],(/,0,3),[/],(1,0),0x0:inactive 0x1:Format cancel 0x2:Format 0x3:Reserved
+    uint32 hu_dvr_format_req = 7;
+	///< DVR模式请求：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:RealTimeMode 0x2:ReplayMode 0x3:SettingMode
+    uint32 hu_dvr_mode = 8;
+	///< DVR截图：[/],(/,0,3),[/],(1,0),0x0:Inactive 0x1:Print Screen 0x2:Reserved 0x3:Reserved
+    uint32 hu_dvr_print_screen = 9;
+	///< 视频播放指令：[/],(0x0,0,3),[/],(1,0),0x0:No Request 0x1:Play 0x2:Pause 0x3:Reserved
+    uint32 hu_dvr_replay_command = 10;
+	///< 全景DVR回放模式：[/],(/,0,3),[/],(1,0),0x0:No Request 0x1:Enter Cycle Mode Browse 0x2:Enter Emergency Mode Browse 0x3:Enter Photo Mode Browse
+    uint32 hu_dvr_replay_mode = 11;
+	///< 播放速度控制：[/],(/,0,3),[/],(1,0),0x0:No Request 0x1:Forward Play 0x2:Rewind Play 0x3:Reserved
+    uint32 hu_dvr_replay_speed = 12;
+	///< DVR视频+-：[/],(/,0,7),[/],(1,0),0x0:No Request 0x1:Prev 0x2:Next 0x3:Exit 
+    uint32 hu_dvr_vedio_seek = 13;
+	///< 用户拖动进度条时间：[second],(0x1FF,0,511),[/],(1,0),0x0~0x1FE:0~510 0x1FF:Inactive 
+    uint32 hu_dvr_video_play_user_time = 14;
+	///< 车外远程监控上传状态：[/],(0x0,0,3),[/],(1,0),0x0:Invalid 0x1:Yes 0x2:No 0x3:Reserved
+    uint32 hu_ext_remote_detect_upload_status = 15;
+	///< DVR语言设置信号：[/],(/,0,15),[/],(1,0),0x0:Inactive 0x1:Chinese 0x2:English 0x3~0xF:Reserved 
+    uint32 hu_language_set = 16;
+	///< DVR实时显示请求：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Quit 0x2:Enter 0x3:Reserved 
+    uint32 hu_real_time_req = 17;
+	///< DVR回放请求：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Quit 0x2:Enter 0x3:Reserved 
+    uint32 hu_rebroadcast_req = 18;
+	///< 远程视频监控状态：[/],(0x0,0,1),[/],(1,0),0x0:Inactive 0x1:Active
+    uint32 hu_remote_disp_sts = 19;
+	///< 容量查询：[/],(0x0,0,3),[/],(1,0),0x0:Inactive 0x1:Quit 0x2:DisplayReq 0x3:Reserved 
+    uint32 hu_sd_capacity = 20;
+	///< 拍照请求信号：[/],(/,0,3),[/],(1,0),0x0:Inactive   0x1:ShootReq   0x2:Reserved   0x3:Reserved 
+    uint32 hu_shoot_control = 21;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 22;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 23;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 24;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 25;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 26;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 27;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 28;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 29;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 30;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 31;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 32;	
+}
+/**
+* @brief BusHuScreenOper
+* @detail BusHuScreenOper 50ms
+*/ 
+message BusHuScreenOper{ 
+	///< 屏幕操作状态信号：[/],(/,0,7),[/],(1,0),0x0:released 0x1:pressed 0x3~0x7:Reserved
+    uint32 hu_screen_operate_status = 1;
+	///< X坐标：[/],(0x0,0,1920),[/],(1,0),/
+    uint32 hu_xlevel = 2;
+	///< Y坐标：[/],(0x0,0,720),[/],(1,0),/
+    uint32 hu_ylevel = 3;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 4;
+	
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 5;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 6;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 7;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 8;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 9;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 10;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 11;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 12;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 13;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 14;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 15;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 16;	
+	
+}
+/**
+* @brief BusHuScreenSet
+* @detail BusHuScreenSet 100ms
+*/ 
+message BusHuScreenSet{
+	///< 语言同步：[/],(/,0,7),[/],(1,0),0x0:Chinese 0x1:English 0x2:Russian 0x3:Arabic  其他位预留
+    uint32 hu_language_sync = 1;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 2;
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 3;
+	
+		///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 4;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 5;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 6;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 7;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 8;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 9;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 10;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 11;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 12;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved9 = 13;	
+	
+	///< 预留信号11：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved10 = 14;	
+	
+	///< 预留信号12：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved11 = 15;	
+	
+	///< 预留信号13：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved12 = 16;	
+}
+/**
+* @brief BusHuVcReq
+* @detail BusHuVcReq 50ms
+*/ 
+message BusHuVcReq{
+	///< 语音推荐换道请求：[/],(0x0,0,3),[/],(1,0),0x0:NoRequest 0x1:LaneChangeToLeft 0x2:LaneChangeToRight 0x3:Reserved
+    uint32 hu_lane_change_req = 1;
+	///< 语音巡航控制：[/],(/,0,7),[/],(1,0),0x0:No Request 0x1:ACC Activate 0x2:ACC Resume 0x3:IACC Activate 0x4:IACC Resume 0x5:Cancel 0x6:Reserved 0x7:Invalid
+    uint32 hu_vc_cruise_control = 2;
+	///< 语音设置巡航跟车距离：[/],(/,0,7),[/],(1,0),0x0:No Request 0x1:Level 1 0x2:Level 2 0x3:Level 3 0x4:Level 4 0x5:Forward Req 0x6:Backward Req 0x7:Invalid
+    uint32 hu_vc_cruise_set_distance = 3;
+	///< 语音设置巡航车速：[/],(/,0,255),[/],(1,0),0x0:No Request 0x1~0xFA:1-250 0xFB-0xFE:Reserved 0xFF:Invalid
+    uint32 hu_vc_cruise_set_speed = 4;
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 5;
+	///< HU巡航语音激活开关：[/],(0x0,0,/),[/],(/,/),
+    ///< 0x0：inactive	未激活
+    ///< 0x1：off	关闭
+    ///< 0x2：active	激活
+    uint32 hu_vc_accactive = 6;
+	
+    ///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 7;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 8;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 9;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 10;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 11;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 12;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 13;	
+	
+	///< 预留信号7：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved6 = 14;	
+	
+	///< 预留信号8：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved7 = 15;	
+	
+	///< 预留信号9：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved8 = 16;	
+	
+	///< 预留信号10：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved14 = 32;	
+} 

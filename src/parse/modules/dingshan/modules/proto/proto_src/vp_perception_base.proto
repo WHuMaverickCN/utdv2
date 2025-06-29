@@ -1,0 +1,266 @@
+/**
+* @file     vp_perception_base.proto
+* @author   wuchuanping
+* @details  基础感知信息消息
+* @date     2022-08-2
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.8.2          <th>1.0                 <th>wuchuanping
+* <table>
+**********************************************************************************
+*/
+// See README.txt for information and build instructions.
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+syntax = "proto3";
+package VpPerceptionBaseProto;
+
+/**
+*@brief   Header 数据头
+*@detail  包含摄像头id，图像帧id，时间戳
+*/
+message Header {
+  ///< cam_idx: [/], (0,0,/), [/], (1,0), 摄像头索引id，前视默认为0
+  int32 cam_idx = 1;
+  ///< frame_id: [/], (0,0,/), [/], (1,0), 图像帧索引id
+  int32 frame_id = 2;
+  ///< time_stamp: [ms], (0,0,/), [/], (1,0), 时间戳
+  int64 time_stamp = 3;
+}
+/**
+*@brief   float类型点的定义
+*@detail  float类型点的定义，参数z为可选参数，用于区分3D坐标和2D坐标
+*/
+message Point {
+  ///< x: [/], (0,/,/), [/], (1,0), 2d横轴值或者3d纵向值
+  float x = 1;
+  ///< y: [/], (0,/,/), [/], (1,0), 2d纵轴值或者3d横向值
+  float y = 2;
+  ///< z: [/], (0,/,/), [/], (1,0), 2d为0或者3dz轴(竖向)值
+  float z = 3;
+}
+/**
+*@brief   int32类型点的定义
+*@detail  int32类型点的定义，参数z为可选参数，用于区分3D坐标和2D坐标
+*/
+message PointI {
+  ///< x: [/], (0,/,/), [/], (1,0), 2d横轴值或者3d纵向值
+  int32 x = 1;
+  ///< y: [/], (0,/,/), [/], (1,0), 2d纵轴值或者3d横向值
+  int32 y = 2;
+  ///< z: [/], (0,/,/), [/], (1,0), 2d为0或者3dz轴(竖向)值
+  int32 z = 3;
+}
+/**
+*@brief   由多个点组成的封闭区域
+*@detail  由多个点组成的封闭区域
+*/
+message Polygon {
+  ///< pts: [/], ((0,0),/,/), [/], (1,0), 点的坐标
+  repeated Point pts = 1;
+}
+/**
+*@brief   描述图像中的矩形区域
+*@detail  描述图像中的矩形区域，通常在图像像素坐标系中u向右，v向下
+*/
+message Rect {
+  ///< left: [pixel], (0,/,/), [/], (1,0),左上点在x轴方向上的像素偏移
+  float left = 1;
+  ///< top: [pixel], (0,/,/), [/], (1,0),左上点在y轴方向上的像素偏移
+  float top = 2;
+  ///< right: [pixel], (0,/,/), [/], (1,0),右下点在x轴方向上的像素偏移
+  float right = 3;
+  ///< bottom: [pixel], (0,/,/), [/], (1,0),右下点在y轴方向上的像素偏移
+  float bottom = 4;
+}
+/**
+*@brief   3D检测框
+*@detail  在图像像素坐标系中，用八个顶点来表示3D检测框
+*/
+message Box3D {
+  ///< lower_lt: [pixel], (0,/,/), [/], (1,0),长方体底面四边形的左前方点坐标
+  Point lower_lt = 1;
+  ///< lower_lb: [pixel], (0,/,/), [/], (1,0),长方体底面四边形的左后方点坐标
+  Point lower_lb = 2;
+  ///< lower_rb: [pixel], (0,/,/), [/], (1,0),长方体底面四边形的右后方点坐标
+  Point lower_rb = 3;
+  ///< lower_rt: [pixel], (0,/,/), [/], (1,0),长方体底面四边形的右前方点坐标
+  Point lower_rt = 4;
+  ///< upper_lt: [pixel], (0,/,/), [/], (1,0),长方体顶面四边形的左前方点坐标
+  Point upper_lt = 5;
+  ///< upper_lb: [pixel], (0,/,/), [/], (1,0),长方体顶面四边形的左后方点坐标
+  Point upper_lb = 6;
+  ///< upper_rb: [pixel], (0,/,/), [/], (1,0),长方体顶面四边形的右后方点坐标
+  Point upper_rb = 7;
+  ///< upper_rt: [pixel], (0,/,/), [/], (1,0),长方体顶面四边形的右前方点坐标
+  Point upper_rt = 8;
+  ///< conf: [/], (0,/,/), [/], (1,0),3D box置信度[0-100]
+  float conf = 9;
+}
+/**
+*@brief   描述多个3D box信息
+*@detail  Box3Ds 用于描述多个3D box信息
+*/
+message Box3Ds {
+  ///< cam_idx: [/], (0,/,/), [/], (1,0),摄像头索引id，前视默认为0
+  int32 cam_idx = 1;
+  ///< frame_id: [/], (0,/,/), [/], (1,0),图像帧索引id
+  int32 frame_id = 2;
+  ///< time_stamp: [ms], (0,/,/), [/], (1,0),unix时间戳
+  int64 time_stamp = 3;
+  ///< box3d: [pixel], (0,/,/), [/], (1,0),一组3D框信息
+  repeated Box3D box3d = 4;
+}
+/**
+*@brief   描述感知结果分类属性
+*@detail  描述感知结果分类属性，包含属性类型、属性通道和对应的名字,以及置信度
+*/
+message Category {
+  ///< property_type: [/], (0,/,/), [/], (1,0),属性类型
+  int32 property_type = 1;  // e.g. weather
+  ///< property: [/], (0,/,/), [/], (1,0),属性的通道序号，对property_type进一步描述，举个例子：如果property_type为 0 (即Property_Weather)，property输出天气类型WeatherType中类别所对应的枚举值
+  int32 property = 2;  // channel index of category result
+  ///< property_name: [/], (0,/,/), [/], (1,0),特定通道的属性名字，即用字符串描述property，与property一一对应
+  string property_name = 3;  // category name of specific channel
+  ///< property_conf: [/], (0,/,/), [/], (1,0),属性的置信度
+  float property_conf = 4;
+}
+
+/**
+*@brief   描述了地面（XZ平面）和摄像头标定坐标系、图像空间的3x3坐标转换矩阵
+*@detail  描述了地面（XZ平面）和摄像头标定坐标系、图像空间的3x3坐标转换矩阵
+*/
+message CameraMatrix {
+  ///< mat_gnd2img: [/], (0,/,/), [/], (1,0),地面(XZ平面)到图像空间
+  repeated float mat_gnd2img = 1;  // 3x3
+  ///< mat_img2gnd: [/], (0,/,/), [/], (1,0),图像空间到地面(XZ平面)
+  repeated float mat_img2gnd = 2;  // 3x3
+  ///< mat_vcsgnd2img: [/], (0,/,/), [/], (1,0),vcs空间到图像空间
+  repeated float mat_vcsgnd2img = 3;  // 3x3
+  ///< mat_img2vcsgnd: [/], (0,/,/), [/], (1,0),图像空间到vcs空间
+  repeated float mat_img2vcsgnd = 4;  // 3x3
+  ///< mat_local2img: [/], (0,/,/), [/], (1,0),摄像头坐标系到图像空间
+  repeated float mat_local2img = 5;  // 3x3
+  ///< mat_img2local: [/], (0,/,/), [/], (1,0),图像空间到摄像头坐标系 
+  repeated float mat_img2local = 6;  // 3x3
+}
+/**
+*@brief   描述曲线类型
+*@detail  描述曲线类型
+*/
+enum LineType {
+  ///< LINE_DEFAULT: [/], (/,/,/), [/], (1,0),/
+  LINE_DEFAULT = 0;
+
+  ///< LINE_LEFT: [/], (/,/,/), [/], (1,0),左车道线
+  LINE_LEFT = 1;
+
+  ///< LINE_RIGHT: [/], (/,/,/), [/], (1,0),右车道线
+  LINE_RIGHT = 2;
+
+  ///< LINE_LEFT_LEFT: [/], (/,/,/), [/], (1,0),左左车道线
+  LINE_LEFT_LEFT = 4;
+
+  ///< LINE_RIGHT_RIGHT: [/], (/,/,/), [/], (1,0),右右车道线
+  LINE_RIGHT_RIGHT = 8;
+
+  ///< LINE_LEFT_OUTER: [/], (/,/,/), [/], (1,0),left outer
+  LINE_LEFT_OUTER = 16;
+
+  ///< LINE_RIGHT_OUTER: [/], (/,/,/), [/], (1,0),right outer
+  LINE_RIGHT_OUTER = 32;
+
+  ///< LINE_RAMP: [/], (/,/,/), [/], (1,0),匝道线
+  LINE_RAMP = 256;
+
+  ///< LINE_DOUBLE: [/], (/,/,/), [/], (1,0),双线
+  LINE_DOUBLE = 512;
+
+  ///< LINE_DASH: [/], (/,/,/), [/], (1,0),虚线
+  LINE_DASH = 1024;
+
+  ///< LINE_RAMP: [/], (/,/,/), [/], (1,0),实线
+  LINE_SOLID = 2048;
+
+  ///< LINE_WHITE: [/], (/,/,/), [/], (1,0),白线
+  LINE_WHITE = 4096;
+
+  ///< LINE_YELLOW: [/], (/,/,/), [/], (1,0),黄线
+  LINE_YELLOW = 8192;
+
+  ///< LINE_BLUE: [/], (/,/,/), [/], (1,0),蓝线
+  LINE_BLUE = 16384;
+
+  ///< LINE_GREEN: [/], (/,/,/), [/], (1,0),绿线
+  LINE_GREEN = 32768;
+
+  ///< LINE_FENCE: [/], (/,/,/), [/], (1,0),栅栏
+  LINE_FENCE = 65536;
+
+  ///< LINE_ROAD_HEIGHT: [/], (/,/,/), [/], (1,0),道路高度线
+  LINE_ROAD_HEIGHT = 131072;
+
+  ///< LINE_DIVERSION_INSIDE: [/], (/,/,/), [/], (1,0),导流内侧线
+  LINE_DIVERSION_INSIDE = 262144;
+
+  ///< LINE_BARRIER: [/], (/,/,/), [/], (1,0),障碍线
+  LINE_BARRIER = 524288;
+
+  ///< LINE_DIVERSION_OUTSIDE: [/], (/,/,/), [/], (1,0),导流外侧线
+  LINE_DIVERSION_OUTSIDE = 1048576;
+
+  ///< LINE_DIVERSION_OUTSIDE: [/], (/,/,/), [/], (1,0),RAW线
+  LINE_RAW = 8388608;
+
+  ///< LINE_ROAD: [/], (/,/,/), [/], (1,0),Roadmodel线
+  LINE_ROAD = 16777216;
+
+  ///< LINE_POLE: [/], (/,/,/), [/], (1,0),pole线
+  LINE_POLE = 33554432;
+
+  ///< LINE_ROAD_UNPARALLEL: [/], (/,/,/), [/], (1,0),Roadmodel 不平行线
+  LINE_ROAD_UNPARALLEL = 67108864;
+  
+  ///< LINE_TYPE_PATH: [/], (/,/,/), [/], (1,0),道路中心线
+  LINE_TYPE_PATH = 536870912;
+}
+
+/**
+ * @brief   模型运行时间信息
+ * @detail  模型运行时间模型信息
+ */
+message RunTimeModelInfo {
+  ///< model_id: [/], (0,/,/), [/], (1,0),模型id
+  int32 model_id = 1;
+  ///< model_name: [/], (0,/,/), [/], (1,0),模型名称
+  string model_name = 2;  
+}
+
+/**
+ * @brief   模型感兴趣区域信息
+ * @detail  模型感兴趣区域信息以及嵌入式模型信息
+ */
+message ModelROI {
+  ///< roi: [/], (0,/,/), [/], (1,0),模型感兴趣矩形区域坐标位置信息
+  Rect roi = 1;
+  ///< model_input_scale: [/], (0,/,/), [/], (1,0),图像和模型输入之间的系数
+  float model_input_scale = 2;
+  ///< parsing_padding_at_head: [/], (0,/,/), [/], (1,0),图像顶部的一些填充信息
+  int32 parsing_padding_at_head = 3;
+  ///< runtime_model_info: [/], (0,/,/), [/], (1,0),模型嵌入式信息
+  repeated RunTimeModelInfo runtime_model_info  = 4;
+}

@@ -1,0 +1,2495 @@
+/**
+ * @file     dnp_common.proto
+ * @brief    决策规划统一 dnp_common.proto文件
+ * @author   tan,lian
+ * @details  主要包含决策信息、横向规划、纵向规划、轨迹选择信息等
+ * @date     2022-07-11
+ * @version  V2.2
+ * @copyright Copyright (c) 2050
+ **********************************************************************************
+ * @attention 信号注释规则：
+ * ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+ * ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+ * @par 修改日志：
+ * <table>
+ * <tr><th>Date       <th>Version      <th>Author      <th>Description
+ * <tr><th>2022.07.11 <th>V2.2         <th>tan,lian    <th>创建初始版本
+ * <tr><th>2022.10.13 <th>V2.9         <th>tan,lian    <th>update 2.9
+ * <tr><th>2022.11.03 <th>V3.1         <th>tan,lian    <th>update 3.1
+ * <tr><th>2022.11.17 <th>V3.2         <th>tan,lian    <th>update 3.2
+ * <tr><th>2022.12.1  <th>V3.3         <th>tan,lian    <th>更新参考线生成
+ * <tr><th>2022.12.1  <th>V3.4         <th>jin,shufeng <th>新增安全预警信号
+ * <tr><th>2023.1.5   <th>V3.5         <th>tan,lian    <th>新增融合限速信号
+ * <tr><th>2023.02.02 <th>V3.6         <th>tan,lian    <th>新增横向、ots Debug信号、Hmi信号 
+ * <tr><th>2023.05.22 <th>V4.3         <th>tan,lian    <th>新增路口、减速类型hmi信号
+ * <tr><th>2023.06.21 <th>V30          <th>tan,lian    <th>规范HMI信号
+ * <table>
+ *
+ **********************************************************************************
+ */
+
+syntax = "proto3";
+package dnp;
+
+/**
+ * @brief dnp_common
+ * @detail ErrorCode 消息错误码
+ */
+enum ErrorCode {
+  OK = 0;                               // No error, returns on success.
+  MASTER_DECISION_ERROR = 1;            // 主决策error
+  LAT_PLANNING_ERROR = 2;               // 横向规划error
+  LON_PLANNING_ERROR = 3;               // 纵向规划error
+  LAT_CONTROL_ERROR = 4;                // 横向控制error
+  LON_CONTROL_ERROR = 5;                // 纵向控制error
+  BUILD_CONSTRAINT_MODEL_ERROR = 6;     // 构建约束error
+  REFERENCE_LINES_GENERATION_ERROR = 7; // 参考线生成error
+  OPTIMAL_TRAJECTORY_SELECTION = 8;     // 轨迹选择error
+  ENV_MODEL_FOR_DECISION_ERROR = 9;     // 决策用环境模型error
+}
+
+/**
+ * @brief dnp_common
+ * @detail StatusPb 状态码
+ */
+message StatusPb {
+  ///< 错误码：[/],(/,/,/),[/],(/，/),标识错误码
+  ErrorCode error_code = 1;
+  ///< 状态返回附带的信息：[/],(/,/,/),[/],(/，/),
+  string msg = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail Header 消息头
+ */
+message Header {
+  ///< 时间戳：[/],(/,/,/),[/],(/，/),标识时间戳
+  double timestamp_sec = 1;
+  ///< 模块名称：[/],(/,/,/),[/],(/，/),标识模块名称
+  string module_name = 2;
+  ///< 版本：[/],(/,/,/),[/],(/，/),标识版本
+  string version = 3;
+  ///< 主决策序列号：[/],(/,/,/),[/],(/，/),标识主决策序列号
+  uint32 master_decision_sequence_num = 4;
+  ///< 后决策序列号：[/],(/,/,/),[/],(/，/),标识后决策序列号
+  uint32 post_decision_sequence_num = 5;
+  ///< 横向规划序列号：[/],(/,/,/),[/],(/，/),标识横向规划序列号
+  uint32 lat_planning_sequence_num = 6;
+  ///< 纵向规划序列号：[/],(/,/,/),[/],(/，/),标识纵向规划序列号
+  uint32 lon_planning_sequence_num = 7;
+  ///< 横向控制序列号：[/],(/,/,/),[/],(/，/),标识横向控制序列号
+  uint32 lat_control_sequence_num = 8;
+  ///< 纵向控制序列号：[/],(/,/,/),[/],(/，/),标识纵向控制序列号
+  uint32 lon_control_sequence_num = 9;
+  ///< 横向偏移序列号：[/],(/,/,/),[/],(/，/),标识横向偏移序列号
+  uint32 lat_offset_iacc_sequence_num = 10;
+  ///< 状态信息：[/],(/,/,/),[/],(/，/),标识状态信息
+  StatusPb status = 11;
+}
+
+/**
+ * @brief dnp_common
+ * @detail LaneChangeType 转向变道类型
+ */
+enum LaneChangeType {
+  STRAIGHT_AHEAD = 0; // 直行
+  TURN_LEFT = 1;      // 左转
+  TURN_RIGHT = 2;     // 右转
+  ERROR_STATUS = 3;   // 无效状态
+}
+
+/**
+ * @brief dnp_common
+ * @detail DirectionType 转向方向类型
+ */
+ enum DirectionType {
+  DIRECTION_TYPE_STRAIGHT = 0; // 直行
+  DIRECTION_TYPE_LEFT = 1;     // 左转
+  DIRECTION_TYPE_RIGHT = 2;    // 右转
+  DIRECTION_TYPE_INVALID = 3;  // 无效
+}
+
+/**
+ * @brief dnp_common
+ * @detail RoadSpeedLimitType  道路限速类型
+ */
+enum RoadSpeedLimitType {
+  ROAD_SPEED_LIMIT_NULL = 0;
+  ROAD_SPEED_LIMIT_LANE_SPEED_MAX = 1; // idmap推荐最高速
+  ROAD_SPEED_LIMIT_TUNNEL_URBAN = 2;  // 隧道-城区
+  ROAD_SPEED_LIMIT_TUNNEL_HIGHWAY = 3; // 隧道-高速
+  ROAD_SPEED_LIMIT_CROSSWALK = 4;  // 斑马线
+  ROAD_SPEED_LIMIT_BUMP = 5; // 减速带
+  ROAD_SPEED_LIMIT_CONFLUENCE_URBAN = 6; // 汇流-城区
+  ROAD_SPEED_LIMIT_CONFLUENCE_HIGHWAY = 7;// 汇流-高速路
+  ROAD_SPEED_LIMIT_CONFLUENCE_EXPRESS = 8;// 汇流-快速路
+  ROAD_SPEED_LIMIT_RAMP = 9;  // 匝道
+  ROAD_SPEED_LIMIT_SPEED_SIGN = 10; // 限速标志
+  ROAD_SPEED_LIMIT_PEDESTRAIN = 11; // 行人
+  ROAD_SPEED_LIMIT_INTERSECTION = 12; // 路口
+  ROAD_SPEED_LIMIT_DESTINATION = 13; // 目的地
+  ROAD_SPEED_LIMIT_ZONE = 14; // 区间
+  ROAD_SPEED_LIMIT_ELECTRONIC_EYE = 15; // 电子眼
+  ROAD_SPEED_LIMIT_NEIGHBOUR_LANE_SLOW = 16; // 邻车道缓行
+  ROAD_SPEED_LIMIT_PARKING_LOT = 17; // 停车场
+  ROAD_SPEED_LIMIT_LONGITUDINAL_SLOPE = 18; // 纵坡 
+  ROAD_SPEED_LIMIT_CROSS_SLOPE = 19; //横坡
+  ROAD_SPEED_LIMIT_SPECIAL_AREA = 20; // 特殊区域
+  ROAD_SPEED_LIMIT_CURVE = 21; // 弯道
+  ROAD_SPEED_LIMIT_TIME_DAY = 100;   // 白天
+  ROAD_SPEED_LIMIT_TIME_NIGHT = 101; // 夜晚
+  ROAD_SPEED_LIMIT_WEATHER_RAINY = 102; // 天气-雨天
+  ROAD_SPEED_LIMIT_WEATHER_HEAVYRAIN = 103; // 天气-暴雨
+  ROAD_SPEED_LIMIT_WEATHER_SNOWY = 104; // 天气-雪天
+  ROAD_SPEED_LIMIT_SENSOR_BACKLIGHT = 105; // 传感器逆光
+  ROAD_SPEED_LIMIT_RESERVE_TYPE_A = 106; // 备用
+  ROAD_SPEED_LIMIT_RESERVE_TYPE_B = 107; // 备用
+  ROAD_SPEED_LIMIT_RESERVE_TYPE_C = 108; // 备用
+}
+
+/**
+* @brief dnp_common
+* @detail SpeedLimitSource 限速数据源
+*/
+enum SpeedLimitSource {
+  SPEED_LIMIT_SOURCE_NULL = 0;
+  SPEED_LIMIT_SOURCE_FC = 1;   // 前视
+  SPEED_LIMIT_SOURCE_ADAS = 2;  // ADAS地图
+  SPEED_LIMIT_SOURCE_IDMAP = 3;  // 众包地图
+  SPEED_LIMIT_SOURCE_BCM = 4; // 车身电子
+}
+
+
+/**
+ * @brief dnp_common
+ * @detail AccelInfo 加速度信息
+ */
+ message AccelInfo {
+  ///< acc_lon_flag：[/],(/,/,/),[/],(/，/),纵向加速度有效性，0=无效；1=指定值；2=最小值；3=最大值；
+  uint32 acc_lon_flag = 1; 
+  ///< acc_lon_value：[/],(/,/,/),[/],(/，/),纵向加速度值
+  double acc_lon_value = 2; 
+  ///< acc_lon_type：[/],(/,/,/),[/],(/，/),纵向加速度类型
+  uint32 acc_lon_type = 3; 
+  ///< acc_lon_style：[/],(/,/,/),[/],(/，/),纵向加速度风格，0=正常；1=保守；2=激进；
+  uint32 acc_lon_style = 4; 
+}
+
+/**
+ * @brief dnp_common
+ * @detail Point 坐标点
+ */
+message Point {
+  ///< 位置点坐标：[/],(/,/,/),[/],(/，/),标识位置点坐标：
+  double x = 1;
+  ///< 位置点坐标：[/],(/,/,/),[/],(/，/),标识位置点坐标：
+  double y = 2;
+  ///< 高度，当前未使用：[/],(/,/,/),[/],(/，/),标识高度，当前未使用
+  double z = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectIgnore
+ */
+message ObjectIgnore {}
+
+/**
+ * @brief dnp_common
+ * @detail StopReasonCode
+ */
+enum StopReasonCode {
+  STOP_REASON_HEAD_VEHICLE = 0;
+  STOP_REASON_DESTINATION = 1;
+  STOP_REASON_PEDESTRIAN = 2;
+  STOP_REASON_OBSTACLE = 3;
+  STOP_REASON_PREPARKING = 4;
+  STOP_REASON_SIGNAL = 100; // only for red signal
+  STOP_REASON_STOP_SIGN = 101;
+  STOP_REASON_YIELD_SIGN = 102;
+  STOP_REASON_CLEAR_ZONE = 103;
+  STOP_REASON_CROSSWALK = 104;
+  STOP_REASON_CREEPER = 105;
+  STOP_REASON_REFERENCE_END = 106; // end of the reference_line
+  STOP_REASON_YELLOW_SIGNAL = 107; // yellow signal
+  STOP_REASON_PULL_OVER = 108;     // pull over
+  STOP_REASON_SIDEPASS_SAFETY = 109;
+  STOP_REASON_PRE_OPEN_SPACE_STOP = 200;
+  STOP_REASON_LANE_CHANGE_URGENCY = 201;
+  STOP_REASON_EMERGENCY = 202;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectStop 停车决策信息
+ */
+message ObjectStop {
+  ///< reason_code：[/],(/,/,/),[/],(/，/),标识reason_code
+  StopReasonCode reason_code = 1;
+  ///< in meters：[/],(/,/,/),[/],(/，/),标识in meters
+  double distance_s = 2; // in meters
+  ///< stop_point：[/],(/,/,/),[/],(/，/),
+  Point stop_point = 3;
+  ///< stop_heading：[/],(/,/,/),[/],(/，/),
+  double stop_heading = 4;
+  ///< wait_for_obstacle：[/],(/,/,/),[/],(/，/),标识wait_for_obstacle
+  string wait_for_obstacle = 5;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectFollow 跟车信息
+ */
+message ObjectFollow {
+  ///< distance_s：[/],(/,/,/),[/],(/，/),minimum longitudinal distance in
+  double distance_s = 1; //
+  ///< fence_point：[/],(/,/,/),[/],(/，/),标识fence_point
+  Point fence_point = 2;
+  ///< fence_heading：[/],(/,/,/),[/],(/，/),标识fence_heading
+  double fence_heading = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectYield 纵向（减速/停车）避让目标决策信息
+ */
+message ObjectYield {
+  ///< distance_s：[/],(/,/,/),[/],(/，/),标识distance_s
+  double distance_s = 1;
+  ///< fence_point：[/],(/,/,/),[/],(/，/),标识fence_point
+  Point fence_point = 2;
+  ///< fence_heading：[/],(/,/,/),[/],(/，/),标识fence_heading
+  double fence_heading = 3;
+  ///< ftime_buffer：[/],(/,/,/),[/],(/，/),标识time_buffer
+  double time_buffer = 4;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectOvertake 超车信息
+ */
+message ObjectOvertake {
+  ///< distance_s：[/],(/,/,/),[/],(/，/),标识distance_s
+  double distance_s = 1; // minimum longitudinal distance in meters
+  ///< fence_point：[/],(/,/,/),[/],(/，/),标识fence_point
+  Point fence_point = 2;
+  ///< fence_heading：[/],(/,/,/),[/],(/，/),标识fence_heading
+  double fence_heading = 3;
+  ///< time_buffer：[/],(/,/,/),[/],(/，/),标识time_buffer
+  double time_buffer = 4;
+}
+
+/**
+ * @brief dnp_common
+ * @detail NudgeReasonCode, deprecated
+ */
+ enum NudgeReasonCode {
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识左车道目标离自车道左边界太近
+  NUDGE_REASON_LEFT_LANE_OBS_CLOSE_TO_LEFT_BOUNDARY = 0;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识左车道目标有大车较近 
+  NUDGE_REASON_LEFT_LANE_OBS_OVERSIZE = 1;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识左车道目标有VRU较近
+  NUDGE_REASON_LEFT_LANE_OBS_VRU = 2;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识左车道目标有死物较近
+  NUDGE_REASON_LEFT_LANE_OBS_DEAD = 3;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识目标侵入自车道左边界
+  NUDGE_REASON_LEFT_INTRUSION = 4;
+   ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_A = 5;
+  ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_B = 6;
+  ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_C = 7;
+  ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_D = 8;
+  ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_E = 9;
+  ///< xxx：[/],(/,/,/),[/],(/，/),保留字段
+  NUDGE_REASON_RESERVE_F = 10;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识右车道目标离自车道左边界太近
+  NUDGE_REASON_RIGHT_LANE_OBS_CLOSE_TO_RIGHT_BOUNDARY = 11;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识右车道目标有大车较近 
+  NUDGE_REASON_RIGHT_LANE_OBS_OVERSIZE = 12;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识右车道目标有VRU较近
+  NUDGE_REASON_RIGHT_LANE_OBS_VRU = 13;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识右车道目标有死物较近
+  NUDGE_REASON_RIGHT_LANE_OBS_DEAD = 14;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识目标侵入自车道右边界
+  NUDGE_REASON_RIGHT_INTRUSION = 15;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectNudge 侧向小偏移障碍物决策信息
+ * //dodge the obstacle in lateral direction when driving
+ */
+message ObjectNudge {
+  /**
+   * @brief Type
+   * @detail Type
+   */
+  enum Type {
+    LEFT_NUDGE = 0;
+    RIGHT_NUDGE = 1;
+    DYNAMIC_LEFT_NUDGE = 2;
+    DYNAMIC_RIGHT_NUDGE = 3;
+  }
+  ///< type：[/],(/,/,/),[/],(/，/),标识动静态目标偏移方向
+  Type type = 1;
+  ///< distance_l：[/],(/,/,/),[/],(/，/),标识偏移量
+  double distance_l = 2;
+  ///< roi_distance_l：[/],(/,/,/),[/],(/，/),标识预留
+  double roi_distance_l = 3;
+  ///< nudge_reason：[/],(/,/,/),[/],(/，/),标识偏移原因
+  SmartOffsetReason nudge_reason = 4;
+  ///< nudge_level：[/],(/,/,/),[/],(/，/),标识大小偏移级别
+  uint32 nudge_level = 5;
+  ///< nudge_state：[/],(/,/,/),[/],(/，/),标识偏移进入退出状态
+  uint32 nudge_state = 6;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectBigNudge 侧向大偏移障碍物决策信息
+ * //dodge the obstacle in lateral direction when driving
+ */
+ message ObjectBigNudge {
+  /**
+   * @brief Type
+   * @detail Type
+   */
+  enum Type {
+    LEFT_NUDGE = 0;
+    RIGHT_NUDGE = 1;
+    DYNAMIC_LEFT_NUDGE = 2;
+    DYNAMIC_RIGHT_NUDGE = 3;
+  }
+  ///< type：[/],(/,/,/),[/],(/，/),标识动静态目标偏移方向
+  Type type = 1;
+  ///< distance_l：[/],(/,/,/),[/],(/，/),标识偏移量
+  double distance_l = 2;
+  ///< roi_distance_l：[/],(/,/,/),[/],(/，/),标识预留
+  double roi_distance_l = 3;
+  ///< nudge_reason：[/],(/,/,/),[/],(/，/),标识偏移原因
+  SmartOffsetReason nudge_reason = 4;
+  ///< nudge_level：[/],(/,/,/),[/],(/，/),标识大小偏移级别
+  uint32 nudge_level = 5;
+  ///< nudge_state：[/],(/,/,/),[/],(/，/),标识偏移进入退出状态
+  uint32 nudge_state = 6;
+}
+
+/**
+ * @brief dnp_common
+ * @detail AvoidReason  
+ */
+ enum AvoidReason {
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识特殊借道绕障原因为默认不区分
+  AVOID_REASON_DEFAULT = 0;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识特殊借道绕障原因为目标运动状态发生了改变
+  AVOID_REASON_OBJECT_STATE_CHANGED = 1;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识特殊借道绕障原因
+  AVOID_REASON_OTHER_2 = 2;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识特殊借道绕障原因
+  AVOID_REASON_OTHER_3 = 3;
+ }
+
+/**
+ * @brief dnp_common
+ * @detail ObjectAvoid 目标参考线上的目标状态发生变化取消借道后仍需对其有特殊标记，为avoid类型，状态机接收此信号考虑回退原参考线
+ */
+message ObjectAvoid {
+   /**
+   * @brief Type
+   * @detail Type
+   */
+   enum Type {
+    LEFT_AVOID = 0;
+    RIGHT_AVOID = 1;
+    DYNAMIC_LEFT_AVOID = 2;
+    DYNAMIC_RIGHT_AVOID = 3;
+  }
+  ///< type：[/],(/,/,/),[/],(/，/),标识type
+  Type type = 1;
+  ///< distance_l：[/],(/,/,/),[/],(/，/),标识distance_l
+  double distance_l = 2;
+  ///< avoid_reason：[/],(/,/,/),[/],(/，/),标识nudge_reason
+  AvoidReason avoid_reason = 4;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectSidePass 左右超车
+ */
+message ObjectSidePass {
+  /**
+   * @brief dnp_common
+   * @detail ObjectSidePass  Type
+   */
+  enum Type {
+    LEFT = 0;
+    RIGHT = 1;
+  }
+  ///< type：[/],(/,/,/),[/],(/，/),标识type
+  Type type = 1;
+  ///< intrusion_vol：[/],(/,/,/),[/],(/，/),标识intrusion_vol
+  double intrusion_vol = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail LaneBorrowReasonCode 左右超车
+ */
+enum LaneBorrowReasonCode {
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为默认不区分
+  LANE_BORROW_REASON_DEFAULT = 0;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为前方静止车辆
+  LANE_BORROW_REASON_STATIC_OBJECT = 1;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为低速缓行目标
+  LANE_BORROW_REASON_LOW_SPEED_OBJECT = 2;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为行人
+  LANE_BORROW_REASON_PEDESTRIAN = 3;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为骑行者
+  LANE_BORROW_REASON_RIDER = 4;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为锥桶
+  LANE_BORROW_REASON_CONE = 5;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为临停车
+  LANE_BORROW_TEMPORARY_PARKING = 6;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为前方施工
+  LANE_BORROW_REASON_CONSTRUCTION = 7;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为前方异常车辆
+  LANE_BORROW_REASON_ABNORMAL_VEHICLE = 8;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为前方大车
+  LANE_BORROW_REASON_BIG_VEHICLE = 9;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识借道绕障原因为其他
+  LANE_BORROW_REASON_OTHER = 10;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识预留
+  LANE_BORROW_REASON_ANIMAL = 11;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识预留
+  LANE_BORROW_REASON_B = 12;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识预留
+  LANE_BORROW_REASON_C = 13;
+}
+
+/**
+ * @brief dnp_common
+ * @detail LaneBorrowReturnReasonCode 左右超车
+ */
+ enum LaneBorrowReturnReasonCode {
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识默认状态
+  LANE_BORROW_RETURN_REASON_DEFAULT = 0;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识正常绕障返回
+  LANE_BORROW_RETURN_REASON_COMMON = 1;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识正在绕障，无法取消
+  LANE_BORROW_RETURN_REASON_NO_CANCEL = 2;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识人工接管
+  LANE_BORROW_RETURN_REASON_TAKE_OVER = 3;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识绕障等待超时回退
+  LANE_BORROW_RETURN_REASON_OVERTIME = 4;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识前车危险回退
+  LANE_BORROW_RETURN_REASON_FRONT_DANGER = 5;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识后车危险回退
+  LANE_BORROW_RETURN_REASON_BACK_DANGER = 6;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识路径不满足绕障回退
+  LANE_BORROW_RETURN_REASON_PATH = 7;
+  ///< xxx：[/],(/,/,/),[/],(/，/),标识其他情况
+  LANE_BORROW_RETURN_REASON_OTHER = 8;
+ }
+/**
+ * @brief dnp_common
+ * @detail LaneBorrowStatus 借道状态
+ */
+ enum LaneBorrowStatus {
+  LANE_BORROW_STANDBY = 0;   // 待机
+  LANE_BORROW_ACTIVE = 1;    // 借道激活
+  LANE_BORROW_EXECUTE = 2;   // 借道执行
+  LANE_BORROW_RETURN = 3;    // 借道回退
+  LANE_BORROW_COMPLETE = 4;  // 借道完成
+  LANE_BORROW_TAKE_OVER = 5; // 立即接管
+  LANE_BORROW_WAIT = 6;      // 等待状态
+  LANE_BORROW_OFF = 7;       // 关闭
+  LANE_BORROW_FAULT = 8;     // 故障
+  LANE_BORROW_CANCEL = 9;    // 取消借道
+  LANE_BORROW_OUT = 10;      // 借出邻车道
+  LANE_BORROW_RECOMMEND = 11; // 推荐绕障
+  LANE_BORROW_STATUS_RESERVE = 12; // 预留字段
+}
+/**
+ * @brief dnp_common
+ * @detail ObjectLaneBorrow 左右借道
+ */
+ message ObjectLaneBorrow {
+  /**
+   * @brief dnp_common
+   * @detail ObjectLaneBorrow  Type
+   */
+  enum Type {
+    LEFT = 0;
+    RIGHT = 1;
+  }
+  ///< type：[/],(/,/,/),[/],(/，/),标识type
+  Type type = 1;
+  ///< distance_l：[/],(/,/,/),[/],(/，/),标识distance_l
+  double distance_l = 2;
+  ///< distance_s：[/],(/,/,/),[/],(/，/),标识distance_s
+  double distance_s = 3;
+  ///< fence_point：[/],(/,/,/),[/],(/，/),标识fence_point
+  Point fence_point = 4;
+  ///< fence_heading：[/],(/,/,/),[/],(/，/),标识fence_heading
+  double fence_heading = 5;
+  ///< time_buffer：[/],(/,/,/),[/],(/，/),标识time_buffer
+  double time_buffer = 6;
+  ///< lane_borrow_reason：[/],(/,/,/),[/],(/，/),标识lane_borrow_reason
+  LaneBorrowReasonCode lane_borrow_reason = 7;
+  ///< object_lane_borrow_reserve：[/],(/,/,/),[10],(/，/),标识object_lane_borrow_reserve
+  repeated double object_lane_borrow_reserve = 8;
+  ///< object_lane_borrow_state：[/],(/,/,/),[10],(/，/),标识object_lane_borrow_state
+  LaneBorrowStatus lane_borrow_state = 9;
+  ///< current_invade_val：[/],(/,/,/),[10],(/，/),标识current_invade_val
+  double current_invade_val = 10;
+}
+
+/**
+ * @brief dnp_common
+ * @detail DecisionStateMachine 左右借道状态机信息
+*/
+message LaneBorrowStateMachine {
+  ///< status：[/],(/,/,/),[/],(/，/),标识借道绕障状态
+  LaneBorrowStatus lb_status = 1;
+  ///< type：[/],(/,/,/),[/],(/，/),标识绕障方向
+  DirectionType type = 2;
+  ///< front_obstacle_track_id：[/],(/,/,/),[/],(/，/),标识前方最近绕障目标track_id
+  uint32 front_obstacle_track_id = 3;
+  ///< front_obstacle_id：[/],(/,/,/),[/],(/，/),标识front_obstacle_id
+  string front_obstacle_id = 4;
+  ///< lane_borrow_obstacles_ids：[/],(/,/,/),[50],(/，/),标识lane_borrow_obstacles_ids
+  repeated uint32 lane_borrow_obstacles_ids = 5;
+  ///< object_lane_borrow：[/],(/,/,/),[50],(/，/),标识所有借道目标决策信息
+  repeated ObjectLaneBorrow object_lane_borrow_res = 6;  
+  ///< lane_borrow_reason：[/],(/,/,/),[/],(/，/),标识借道绕障原因
+  LaneBorrowReasonCode lane_borrow_reason = 7;
+  ///< lane_borrow_return_reason：[/],(/,/,/),[/],(/，/),标识借道回退原因
+  LaneBorrowReturnReasonCode lane_borrow_return_reason = 8;
+  ///< lane_borrow_return_reason：[/],(/,/,/),[/],(/，/),标识借道目标决策信息（总）
+  ObjectDecision lane_borrow_decision_info = 9;
+  ///< lane_borrow_state_machine_reserve_string：[/],(/,/,/),[10],(/，/),标识lane_borrow_state_machine_reserve_string
+  repeated string lane_borrow_state_machine_reserve_string = 10;
+  ///< lane_borrow_state_machine_reserve_double：[/],(/,/,/),[10],(/，/),标识lane_borrow_state_machine_reserve_double
+  repeated double lane_borrow_state_machine_reserve_double = 11;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectStatic
+ */
+message ObjectStatic {}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectDynamic
+ */
+message ObjectDynamic {}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectMotionType 动态或静态
+ */
+ message ObjectMotionType {
+  ///< motion_tag:[/],(/,/,/),[/],(/,/),/
+  oneof motion_tag {
+    ///< static:[/],(/,/,/),[/],(/,/),/
+    ObjectStatic static = 1;
+    ///< dynamic:[/],(/,/,/),[/],(/,/),/
+    ObjectDynamic dynamic = 2;
+  }
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectDecisionType 目标决策结果
+ */
+ message ObjectDecisionType {
+  ///< object_tag:[/],(/,/,/),[/],(/,/),横向纵向决策分类
+  oneof object_tag {
+    ///< ignore:[/],(/,/,/),[/],(/,/),忽略，无需横向决策
+    ObjectIgnore ignore = 1;
+    ///< stop:[/],(/,/,/),[/],(/,/),停止
+    ObjectStop stop = 2;
+    ///< follow:[/],(/,/,/),[/],(/,/),跟车
+    ObjectFollow follow = 3;
+    ///< yield:[/],(/,/,/),[/],(/,/),（减速/停车）避让目标
+    ObjectYield yield = 4;
+    ///< overtake:[/],(/,/,/),[/],(/,/),超车
+    ObjectOvertake overtake = 5;
+    ///< nudge:[/],(/,/,/),[/],(/,/),偏移决策
+    ObjectNudge nudge = 6;
+    ///< avoid:[/],(/,/,/),[/],(/,/),/
+    ObjectAvoid avoid = 7;
+    ///< side_pass:[/],(/,/,/),[/],(/,/),用于换道标签
+    ObjectSidePass side_pass = 8;
+    ///< lane_borrow:[/],(/,/,/),[/],(/,/),借道标签
+    ObjectLaneBorrow lane_borrow = 9;
+    ///< big_nudge:[/],(/,/,/),[/],(/,/),大偏移标签
+    ObjectBigNudge big_nudge = 10;
+  }
+  ///< blocking_status：[/],(/,/,/),[/],(/，/),障碍物阻塞类型
+  ///< 0:非阻塞障碍物
+  ///< 1:最右车道停止车或障碍车故障灯亮起或锥桶等静止障碍物
+  ///< 2:低速缓行
+  int32 blocking_status = 11;
+  ///< priority_status：[/],(/,/,/),[/],(/，/),自车道静态地图优先级类型
+  ///< -1:异常
+  ///<  0:自车道优先级高于左右车道
+  ///<  1:自车道右车道优先级高于左车道 RLC
+  ///<  2:自车道左车道优先级高于右车道 LLC
+  ///<  3:左中右优先级一样 LLC / RLC
+  ///<  4:左侧优先级更高 LLC
+  ///<  5:右侧优先级更高 RLC
+  ///< 100:
+  ///< 101:
+  int32 priority_status = 12;
+  ///< roi_distance:[/],(/,/,/),[/],(/，/),当前的决策纵向最大范围
+  double roi_distance = 13;
+  ///< obs_layer_left_lane_available：[/],(/,/,/),[/],(/，/),动静态障碍物影响下的左侧车道可行性
+  bool obs_layer_left_lane_available = 14;
+  ///< obs_layer_right_lane_available：[/],(/,/,/),[/],(/，/),动静态障碍物影响下的右侧车道可行性
+  bool obs_layer_right_lane_available = 15;
+}
+/**
+ * @brief dnp_common
+ * @detail ObjectStatus
+ */
+message ObjectStatus {
+  ///< motion_type：[/],(/,/,/),[/],(/，/),标识motion_type
+  ObjectMotionType motion_type = 1;
+  ///< decision_type：[/],(/,/,/),[/],(/，/),标识decision_type
+  ObjectDecisionType decision_type = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectClass 目标障碍物类型
+ */
+ enum ObjectClass {
+  ///<未知目标:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_UNKNOWN = 0; 
+  ///<汽车:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_CAR = 1;
+  ///<卡车:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_TRUCK = 2; 
+  ///<摩托车:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_MOTORCYCLE = 3;
+  ///<行人:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_PEDESTRIAN = 4; 
+  ///<自行车:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_CYCLIST = 5; 
+  ///<动物:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_ANIMAL = 6;
+  ///<巴士:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_BUS = 7; 
+  ///<其他:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_OTHER = 8; 
+  ///<购物车、婴儿推车:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_HANDCART = 9;
+  ///<柱子:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_COLUMN = 10; 
+  ///<锥桶:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_CONE = 11;
+  ///<已被锁上的车位锁:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_PARKING_LOCKED = 12;
+  ///<未被锁上的车位锁:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_PARKING_UNLOCKED = 13;
+  ///< 遮挡行人:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_PEDHEAD = 14; 
+  ///< 一般静止物品:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_GENERAL = 15;
+  ///< 三角警示牌:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_WARNING_TRIANGLE = 16; 
+  ///< 水马:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_WATER_BARRIER = 17;
+  ///< BUMP:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_SPEED_BUMP = 18;
+  ///< NCURBEW:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_ROAD_CURB = 19;
+  ///< WALL:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_WALL = 20;
+  ///< WHEELSTOPER:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_WHEELSTOPER = 21;
+  ///< 隔离柱:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_ISOLATION_COLUMN = 22;
+  ///< 防撞桶:[/],(0,0,/),[/],(1,0),description
+  OBJECT_CLASS_ANTICOLLISION_DRUM = 23;
+}
+
+/**
+ * @brief dnp_common
+ * @detail TargetLane
+ */
+message TargetLane {
+  ///< id：[/],(/,/,/),[/],(/，/),标识id
+  string id = 1;
+  ///< start_s：[/],(/,/,/),[/],(/，/),标识start_s
+  double start_s = 2;
+  ///< end_s：[/],(/,/,/),[/],(/，/),标识end_s
+  double end_s = 3;
+  ///< speed_limit：[/],(/,/,/),[/],(/，/),标识speed_limit
+  double speed_limit = 4;
+}
+
+/**
+ * @brief dnp_common
+ * @detail Boundary 边界线
+ */
+message Boundary {
+  ///< id：[/],(/,/,/),[/],(/，/),标识id
+  int64 id = 1;
+  ///< 横向偏移量：[/],(/,/,/),[461],(/，/),标识横向偏移量
+  repeated double l = 2;
+  ///< 横向偏移类型：[/],(0,/,/),[461],(/，/),标识横向偏移类型，1导流区
+  repeated uint32 type = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail RampInfo 匝道信息
+ */
+message RampInfo {
+  ///< ramp_cross_type：[/],(/,/,/),[/],(/，/),匝道口类型 0= 无 1=入口 2 = 出口
+  int32 ramp_cross_type = 1; //
+  ///< to_ramp_distance：[/],(/,/,/),[/],(/，/),距离匝道口距离
+  double to_ramp_distance = 2; //
+  ///< is_passed：[/],(/,/,/),[/],(/，/),
+  int32 is_passed = 3; //
+}
+/**
+ * @brief dnp_common
+ * @detail ConesInfo 锥桶群信息
+ */
+message ConesInfo {
+  ///< cone_id_vec：[/],(/,/,/),[100],(/，/),锥桶群中每一个锥桶的id 
+  repeated string cone_id_vec = 1;
+  ///< start_s：[/],(/,/,/),[/],(/，/),锥桶群SL系下起始s
+  double start_s = 2;
+  ///< end_s：[/],(/,/,/),[/],(/，/),锥桶群SL系下终止s
+  double end_s = 3;
+  ///< start_l：[/],(/,/,/),[/],(/，/),锥桶群SL系下起始l
+  double start_l = 4;
+  ///< end_l：[/],(/,/,/),[/],(/，/),锥桶群SL系下终止l
+  double end_l = 5;
+  ///< left_line_crossed_by_cones：[/],(/,/,/),[/],(/，/),左侧是否存在联排锥桶 true=存在 false=不存在
+  bool left_line_crossed_by_cones = 6;
+  ///< right_line_crossed_by_cones：[/],(/,/,/),[/],(/，/),右侧是否存在联排锥桶 true=存在 false=不存在
+  bool right_line_crossed_by_cones = 7;
+  ///< cone_cluster_position：[/],(/,/,/),[/],(/，/),锥桶群位置分布 0=中间 1=左侧 2=右侧
+  uint32 cone_cluster_position = 8;
+  ///< time_stamp：[/],(/,/,/),[/],(/，/),锥桶群时间戳
+  double time_stamp = 9;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ReferenceLineXY 参考线信息
+ */
+message ReferenceLineXY {
+  ///< id：[/],(/,/,/),[/],(/，/),参考线唯一id
+  int32 id = 1;
+  ///< lane_id：[/],(/,/,/),[/],(/，/),自车起始处所在的车道id（对应地图车道id）
+  uint64 lane_id = 2;
+  ///< lane_change_type：[/],(/,/,/),[/],(/，/),对应左中右参考线方向类型
+  LaneChangeType lane_change_type = 3;
+  ///< num_points：[/],(/,/,/),[/],(/，/),参考路径对应的离散位置点数量， 最大500
+  int32 num_points = 4;
+  ///< point：[/],(/,/,/),[461],(/，/),位置点坐标xy
+  repeated Point point = 5;
+  ///< headings：[/],(/,/,/),[461],(/，/),位置点的航向，弧度,-pi~pi,(正北pi/2,正东0，逆时针旋转)
+  repeated double headings = 6;
+  ///< kappas：[double],(/,/,/),[461],(/，/),位置点的曲率
+  repeated double kappas = 7;
+  ///< dkappas：[/],(/,/,/),[461],(/，/),位置点的曲率变化率
+  repeated double dkappas = 8;
+  ///< accumulated_s：[m],(/,/,/),[461],(/，/),位置点相对第一个点累计s
+  repeated double accumulated_s = 9;
+  ///< l_offset：[m],(/,/,/),[461],(/，/),位置点与map车道中心线的横向偏移量
+  repeated double l_offset = 10;
+  ///< left_boundary：[/],(/,/,/),[/],(/，/),左边界信息，左正右负
+  Boundary left_boundary = 11;
+  ///< right_boundary：[/],(/,/,/),[/],(/，/),右边界信息，左正右负
+  Boundary right_boundary = 12;
+  ///< speed_limit：[m],(/,/,/),[461],(/，/),速度限制， 每个点都有对应的速度限制
+  repeated double speed_limit = 13; // 
+  ///< speed_limit_types：[/],(/,/,/),[461],(/，/),道路限速类型
+  repeated RoadSpeedLimitType speed_limit_types = 14;
+  ///< obstacles_s：[m],(/,/,/),[461],(/，/),虚拟障碍物或停止线投射纵向距离s
+  repeated double obstacles_s = 15;
+  ///< ego_s：[m],(/,/,/),[/],(/，/),主车投射纵向距离s
+  double ego_s = 16;
+  ///< exploration_distance：[m],(/,/,/),[/],(/，/),导航能探索到的远方距离，2km左右以内？
+  double exploration_distance = 17;
+  ///< ego_desired_v：[m],(/,/,/),[/],(/，/),自车期望速度
+  double ego_desired_v = 18; // 
+  ///< cost：[/],(/,/,/),[/],(/，/),参考线权重
+  double cost = 19;
+  ///< to_intersection_distance：[m],(/,/,/),[/],(/，/),距离交叉路口距离
+  double to_intersection_distance = 20;
+  ///< ramp_info：[/],(/,/,/),[/],(/，/),匝道信息
+  RampInfo ramp_info = 21;
+  ///< to_branch_dis：[m],(/,/,/),[/],(/，/),距离2-1点纵向距离，默认发-1.0，小于200m(TBD)发出
+  double to_branch_dis = 22;
+  ///< is_approach_target：[/],(0,0,1),[/],(/，/),是否接近目的地
+  bool is_approach_target = 23;
+  ///< lane_id_v：[/],(/,/,/),[100],(/，/),参考线候选车道id序列
+  repeated uint64 lane_id_v = 24;
+  ///< is_rightmost_lane：[/],(/,/,/),[/],(/，/),判断当前位置是否处于最右侧车道
+  bool is_rightmost_lane = 25;
+  ///< cur_lane_nums：[/],(/,/,/),[/],(/，/), 当前位置车道数量
+  int32 cur_lane_nums = 26; // 
+  ///< lane_num_reduce_flag：[/],(/,/,/),[/],(/，/),当前位置前方100米是否出现车道数减少变化
+  bool lane_num_reduce_flag = 27;
+  ///< left_actual_boundary：[/],(/,/,/),[/],(/，/),左实体边界，左正右负
+  Boundary left_actual_boundary = 28;
+  ///< right_actual_boundary：[/],(/,/,/),[/],(/，/),右实体边界，左正右负
+  Boundary right_actual_boundary = 29;
+  ///< is_in_electronic_eye_scope：[/],(/,/,/),[461],(/，/),是否在电子眼范围内
+  repeated uint32 is_in_electronic_eye_scope = 30;
+  ///< accerlaration_depress：[/],(/,/,/),[/],(/，/),0-允许加速，1-加速抑制
+  uint32 accerlaration_depress = 31; // 
+  ///< speed_limit_sources：[/],(/,/,/),[461],(/，/),道路限速数据源
+  repeated SpeedLimitSource speed_limit_sources = 32;
+  ///< 车流速度：[km/h],(125,0,125),[/],(1,0),标识该参考线所在车道的车流
+  double lane_flow_speed = 33;
+  ///< is_unknown_obstacle_cut：[km/h],(125,0,125),[/],(1,0),标识该参考线是否截断
+  bool is_unknown_obstacle_cut = 34;
+  ///< safety_class：[/],(9,0,9),[/],(1,0),标识该参考线最终换道安全等级分类-用于后决策等模块
+  uint32 safety_class = 35;
+  ///< safety_class：[/],(9,0,9),[/],(1,0),标识该参考线考虑动态目标后安全等级分类-用于内部换道绕障决策debug
+  uint32 safety_class_dynamic = 36;
+  ///< safety_class：[/],(9,0,9),[/],(1,0),标识该参考线考虑动静态目标后安全等级分类-用于内部偏移决策debug
+  uint32 safety_class_dynamic_static = 37;
+  ///< lane_flow_density：[/],(/,/,/),[/],(/,/),标识该参考线所在车道的车流密度
+  double lane_flow_density = 38;
+  ///< cones_info：[/],(/,/,/),[/],(/，/),参考线上的锥桶群信息
+  ConesInfo cones_info = 39;
+}
+
+/**
+ * @brief dnp_common
+ * @detail DecisionSpeedLimit
+ */
+ message DecisionSpeedLimit {
+  ///< speed_limit_valid：[/],(/,/,/),[/],(/，/),
+  bool speed_limit_valid = 1;//限速有效性
+ ///< speed_limit_value：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_value = 2;//限速值
+  ///< speed_limit_type：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_type = 3;//限速类型
+  ///< speed_limit_source：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_source = 4;//限速来源
+ }
+
+/**
+ * @brief dnp_common
+ * @detail RoadFlow
+ */
+ message RoadFlow {
+  ///< road_flow_speed：[/],(/,/,/),[/],(/，/),
+  double road_flow_speed = 1;//道路车流值
+ ///< road_flow_density：[/],(/,/,/),[/],(/，/),
+  double road_flow_density = 2;//道路车流密度
+  ///< lane_flow_speed：[/],(/,/,/),[3],(/，/),
+  repeated double lane_flow_speed = 3;//车道车流值
+  ///< lane_flow_density：[/],(/,/,/),[3],(/，/),
+  repeated double lane_flow_density = 4;//车道车流密度
+  ///< var1：[/],(/,/,/),[/],(/，/),
+  double var1 = 11;//预留1
+  ///< var2：[/],(/,/,/),[/],(/，/),
+  double var2 = 12;//预留2
+  ///< var3：[/],(/,/,/),[/],(/，/),
+  double var3 = 13;//预留3
+  ///< var4：[/],(/,/,/),[/],(/，/),
+  double var4 = 14;//预留4
+  ///< var_r：[/],(/,/,/),[10],(/，/),
+  repeated double var_r = 15;//预留
+  ///< uint_var1：[/],(/,/,/),[/],(/，/),
+  uint32 uint_var1 = 21;//预留1
+  ///< uint_var2：[/],(/,/,/),[/],(/，/),
+  uint32 uint_var2 = 22;//预留2
+  ///< uint_var2：[/],(/,/,/),[10],(/，/),
+  repeated uint32  uint_var_r = 23;//预留
+ }
+
+/**
+ * @brief dnp_common
+ * @detail VehicleSignal 主车信号灯/喇叭/提醒等
+ */
+message VehicleSignal {
+  /**
+ * @brief dnp_common
+ * @detail TurnSignal 主车信号灯/喇叭/提醒等
+ */
+  enum TurnSignal {
+    TURN_NONE = 0;
+    TURN_LEFT = 1;
+    TURN_RIGHT = 2;
+  }
+  ///< turn_signal：[/],(/,/,/),[/],(/，/),
+  TurnSignal turn_signal = 1;
+  ///< high_beam：[/],(/,/,/),[/],(/，/),灯光、喇叭开关
+  bool high_beam = 2;
+  ///< low_beam：[/],(/,/,/),[/],(/，/),
+  bool low_beam = 3;
+  ///< horn：[/],(/,/,/),[/],(/，/),
+  bool horn = 4;
+  ///< emergency_light：[/],(/,/,/),[/],(/，/),
+  bool emergency_light = 5;
+  ///< stop_and_go：[/],(/,/,/),[/],(/，/),
+  bool stop_and_go = 6;           // 起步提醒
+  ///< over_road_speed_limit：[/],(/,/,/),[/],(/，/),
+  bool over_road_speed_limit = 7; // 超速提醒
+  ///< speed_limit_value_hmi：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_value_hmi = 8;//当前的限速值toHMI
+  ///< speed_limit_type_hmi：[/],(/,/,/),[/],(/，/),
+  RoadSpeedLimitType speed_limit_type_hmi = 9;//当前的限速类型toHMI
+  ///< speed_limit_true_value：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_true_value = 10;//当前的限速值to安全辅助
+  ///< speed_limit_true_type：[/],(/,/,/),[/],(/，/),
+  uint32 speed_limit_true_type = 11;//当前的限速类型to安全辅助
+  ///< speed_limit_safe：[/],(/,/,/),[/],(/，/),
+  DecisionSpeedLimit speed_limit_safe = 12;//安全限速
+  ///< speed_limit_var1：[/],(/,/,/),[/],(/，/),
+  DecisionSpeedLimit speed_limit_var1 = 13;//预留限速1
+  ///< speed_limit_var2：[/],(/,/,/),[/],(/，/),
+  DecisionSpeedLimit speed_limit_var2 = 14;//预留限速2
+  ///< d_speed_limit_var：[/],(/,/,/),[10],(/，/),
+  repeated DecisionSpeedLimit d_speed_limit_var = 21; //预留限速
+  ///< d_speed_limit_var：[/],(/,/,/),[/],(/，/),
+  uint32 dnp_speed_limit_info = 31; //限速提示信息
+  ///< road_flow：[/],(/,/,/),[/],(/，/),
+  RoadFlow road_flow = 32; //车流信息
+}
+
+/**
+ * @brief dnp_common
+ * @detail Pos2D 
+ */
+message Pos2D {
+  ///< x：[/],(/,/,/),[/],(/，/),
+  int32 x = 1;
+  ///< y：[/],(/,/,/),[/],(/，/),
+  int32 y = 2;
+}
+/**
+ * @brief dnp_common
+ * @detail Pos3D 
+ */
+message Pos3D {
+  ///< x：[/],(/,/,/),[/],(/，/),
+  int32 x = 1;
+  ///< y：[/],(/,/,/),[/],(/，/),
+  int32 y = 2;
+  ///< z：[/],(/,/,/),[/],(/，/),
+  int32 z = 3;
+}
+/**
+ * @brief dnp_common
+ * @detail Target2D
+ */
+message Target2D {
+  ///< x：[/],(/,/,/),[/],(/，/),
+  int32 x = 1;
+  ///< y：[/],(/,/,/),[/],(/，/),
+  int32 y = 2;
+  ///< theta：[/],(/,/,/),[/],(/，/),
+  int32 theta = 3;
+}
+/**
+ * @brief dnp_common
+ * @detail BusHeader
+ */
+message BusHeader {
+  ///< timestamp：[/],(/,/,/),[/],(/，/),
+  uint64 timestamp = 1;
+  ///< seq：[/],(/,/,/),[/],(/，/),
+  uint32 seq = 2;
+  ///< frame_id：[/],(/,/,/),[/],(/，/),
+  string frame_id = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail SlotLineType
+ */
+enum SlotLineType {
+  PARK_MARK_LINE_NORMAL = 0;
+  PARK_MARK_LINE_THREE_D = 1;
+  PARK_MARK_LINE_VIRTUAL = 2;
+  OBJECT_OBSTACLE_HIGH = 3;
+  OBJECT_OBSTACLE_UNKOWN = 4;
+  OBJECT_OBSTACLE_LOW = 5;
+  OBJECT_OBSTACLE_CURB = 6;
+}
+
+/**
+ * @brief dnp_common
+ * @detail SlotType
+ */
+enum SlotType {
+  SLOT_INVALID = 0;
+  SLOT_PARAL = 1;
+  SLOT_VERTICAL = 2;
+  SLOT_TILT = 3;
+}
+/**
+ * @brief dnp_common
+ * @detail SlotSource
+ */
+enum SlotSource {
+  USS_SLOT = 0;
+  PLD_SLOT = 1;
+}
+/**
+ * @brief dnp_common
+ * @detail SlotInfo
+ */
+message SlotInfo {
+  ///< slot_id：[/],(/,/,/),[/],(/，/),
+  int32 slot_id = 1;
+  ///< type：[/],(/,/,/),[/],(/，/),
+  SlotType type = 2;
+  ///< source：[/],(/,/,/),[/],(/，/),
+  SlotSource source = 3;
+  ///< Point_odom：[/],(/,/,/),[500],(/，/),
+  repeated Pos3D point_odom = 4;     // mm
+  ///< Point_baselink：[/],(/,/,/),[500],(/，/),
+  repeated Pos3D point_baselink = 5; // mm
+  ///< slot_lines：[/],(/,/,/),[500],(/，/),
+  repeated SlotLineType slot_lines = 6;
+  ///< target_pose：[/],(/,/,/),[/],(/，/),
+  Target2D target_pose = 7; // (mm, mm, rad * 1000)
+}
+
+/**
+ * @brief dnp_common
+ * @detail MainDecision 主车决策
+ */
+message MainDecision {
+  ///< vehicle_signal：[/],(/,/,/),[/],(/，/),
+  VehicleSignal vehicle_signal = 1;
+  ///< scenario_type：[/],(/,/,/),[/],(/，/),
+  int32 scenario_type = 2;
+  ///< stage_type：[/],(/,/,/),[/],(/，/),
+  int32 stage_type = 3;
+  ///< lane_borrow_status：[/],(/,/,/),[/],(/，/),  
+  LaneBorrowStateMachine lane_borrow_state_machine = 4;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectBaseInfo 单目标信息,透传，主要用于调试
+ */
+message ObjectBaseInfo {
+  ///<目标长度：[m], (0,0,20),[/],(1,0),description
+  double length = 1;
+  ///<宽度:[m], (0,0,10),[/],(1,0),description
+  double width = 2;
+  ///< utm_e：[/],(/,/,/),[/],(/，/), 目标utm坐标e
+  double utm_e = 3;
+  ///< utm_n：[/],(/,/,/),[/],(/，/),目标utm坐标n
+  double utm_n = 4;
+  ///<大地坐标系下目标航向角：[rad], (0,-3.14,3.14),[/],(1,0),description
+  double heading_angle_utm = 5;
+  ///<本车坐标系下航向角：[rad], (0,-1.6,1.55),[/],(1,0),description
+  double heading_angle_local = 6;
+  ///<目标纵向绝对速度：[m/s], (0,-50,50),[/],(1,0),description
+	double velx = 7;
+  ///<目标横向绝对速度：[m/s], (0,-50,50),[/],(1,0),description
+  double vely = 8;
+  ///<保留字段：[m/s], (0,-50,50),[10],(1,0),description
+  repeated double reserve_base_info = 9;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectDecision 单目标决策
+ */
+message ObjectDecision {
+  /**
+ * @brief dnp_common
+ * @detail PositionType 
+ */
+  enum PositionType {
+    ON_CENTER = 0;     // 目标box压参考线
+    ON_LEFT_SIDE = 1;  // 目标box在参考线的左侧
+    ON_RIGHT_SIDE = 2; // 目标box在参考线的右侧
+  }
+  ///< position_type：[/],(/,/,/),[/],(/，/),目标相对参考线位置
+  PositionType position_type = 1;
+  ///< track_id：[/],(/,/,/),[/],(/，/),与预测目标id一致
+  uint32 track_id = 2;
+  ///< object_class：[/],(/,/,/),[/],(/，/),目标类型
+  ObjectClass object_class = 3;
+  ///< is_on_self_lane：[/],(/,/,/),[/],(/，/),是否在自车道
+  bool is_on_self_lane = 4;
+  ///< is_on_target_lane：[/],(/,/,/),[/],(/，/),是否在目标车道；2-1场景可能既在目标车道也在自车道
+  bool is_on_target_lane = 5;
+  ///< velocity：[/],(/,/,/),[/],(/，/),目标速度
+  double velocity = 6;
+  ///< longitudal_relative_dist：[/],(/,/,/),[/],(/，/),Frenet下纵向相对主车距离，前方为正，后方为负
+  double longitudal_relative_dist = 7;
+  ///< lateral_relative_dist：[/],(/,/,/),[/],(/，/),Frenet下横向相对于主车距离，左正右负
+  double lateral_relative_dist = 8;
+  ///< target_lane_rear_vehicle_ttc：[/],(/,/,/),[/],(/，/),目标车道后车与本车的碰撞时间
+  double target_lane_rear_vehicle_ttc = 9;
+  ///< intrusion_vol：[/],(/,/,/),[/],(/，/),侵入量，有侵入为正，取max(box各角点侵入距离)；无侵入为<=0,取-min(box角点离边界距离量)
+  double intrusion_vol = 10;
+  ///< decision_type：[/],(/,/,/),[100],(/，/),目标/障碍物决策
+  repeated ObjectDecisionType decision_type = 11;
+  ///< base_info：[/],(/,/,/),[/],(/，/),目标基本信息，透传
+  ObjectBaseInfo base_info = 12;
+  ///< lat_turn_mode：[/],(/,/,/),[/],(/，/),换道模式（柔和，标准，激进）
+  int32 lat_turn_mode = 13;
+  ///< lat_turn_time：[/],(/,/,/),[/],(/，/),换道所需时间
+  double lat_turn_time = 14;
+  ///< safety_class：[/],(/,/,/),[/],(/，/),目标层换道安全等级
+  double object_safety_class = 15;
+}
+
+/**
+ * @brief dnp_common
+ * @detail ObjectDecisions ROI内所有目标决策结果
+ */
+message ObjectDecisions { 
+  ///< ObjectDecision：[/],(/,/,/),[100],(/，/),
+  repeated ObjectDecision decision = 1; 
+}
+/**
+ * @brief dnp_common
+ * @detail ObjectDecisions ROI内所有目标决策结果
+ */
+ message ObjectLatDecisions 
+ { 
+  ///< ObjectDecision：[/],(/,/,/),[100],(/，/),
+  repeated ObjectDecision decision = 1; 
+  ///< lat_turn_type：[/],(/,/,/),[/],(/，/),
+  int32 lat_turn_type = 2;
+  ///< reserved_lat_a：[/],(/,/,/),[/],(/，/),
+  bool reserved_lat_a = 3;
+  ///< reserved_lat_b：[/],(/,/,/),[/],(/，/),
+  double reserved_lat_b = 4;
+ }
+/**
+ * @brief dnp_common
+ * @detail Decision
+ */
+message Decision {
+  ///< 单参考线信息：[/],(/,/,/),[/],(/，/), 单参考线信息
+  ReferenceLineXY reference_line = 1;
+  ///< 目标决策结果：[/],(/,/,/),[/],(/，/), 该条参考线下目标障碍物决策结果
+  ObjectDecisions object_decision = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail PathPoint 路径点信息
+ */
+
+ message PathPoint {
+  ///< 路径点id：[/],(0,0,500),[/],(/,/),标识路径点的id
+  int32 id = 1;
+  ///< 路径点X坐标：[m],(0,/,/),[/],(/,/),路径点的X坐标
+  double x = 2;
+  ///< 路径点Y坐标：[m],(0,/,/),[/],(/,/),路径点的Y坐标
+  double y = 3;
+  ///< 路径点限速值：[km/h],(0,0,130),[/],(/,/),路径点的限速值
+  int32 speed_limit = 4;
+  ///< 高程：[m],(0,/,/),[/],(/,/),高程
+  double alt = 5;
+  ///< 方向：[rad],(0,-pi,pi),[/],(/,/),方向
+  double heading = 6;
+  ///< 曲率：[1/m],(0,0,0.1),[/],(/,/),曲率
+  double curvature = 7;
+}
+
+/**
+ * @brief dnp_common
+ * @detail PlanningPath 规划路径信息
+ */
+message PlanningPath {
+  ///< 参考线唯一id：[/],(0,0,2),[/],(/,/),参考线唯一id
+  int32 id = 1;
+  ///< 起始处所在的车道id：[/],(0,0,/),[/],(/,/),起始处所在的车道id（对应高精地图车道id）
+  uint64 lane_id = 2;
+  ///< 路径点数量：[/],(0,0,500),[/],(/,/),路径点数量
+  int32 num_points = 3;
+  ///< 路径规划状态：[/],(0,-2,1),[/],(/,/),路径规划状态
+  ///< 0：不正常
+  ///< 1: 正常
+  ///< -2: 求解失败
+  int32 path_status = 4;
+  ///< 路径点（UTM坐标）：[/],(/,/,/),[500],(/,/),路径点（UTM坐标）
+  repeated PathPoint point = 5;
+  ///< 路径点（自车坐标）：[/],(/,/,/),[500],(/,/),路径点（自车坐标，左正右负）
+  repeated PathPoint point_host = 6;
+  ///< 路径点（Frenet坐标）：[/],(/,/,/),[500],(/,/),路径点（Frenet坐标，左正右负）
+  repeated PathPoint point_frenet = 7;
+  ///< 迭代状态：[/],(0,-6,1),[/],(/,/),迭代状态
+  ///< -6：检测到非凸问题
+  ///< -3: 问题无界
+  ///< -2: 问题不可行
+  ///< 0： 超出迭代次数
+  ///< 1: 函数收敛于解 x
+  int32 iter_status = 8;
+  ///< 迭代次数：[/],(0,0,500),[/],(/,/),迭代次数
+  int32 iter_num = 9;
+  ///< 路径长度：[m],(0,0,500),[/],(/,/),路径长度
+  double path_length = 10;
+  ///< 参考线长度：[m],(0,0,500),[/],(/,/),参考线长度，从决策模块来，转发出来
+  double ref_line_length = 11;
+  ///< 最小距离：[m],(0,0,1000),[/],(/,/),最小距离
+  double min_dist = 12;
+  ///< 最小偏移：[m],(0,0,1000),[/],(/,/),最小偏移
+  double min_l = 13;
+  ///< 对应变道类型：[/],(0,0,2),[/],(/,/),对应变道类型
+  dnp.LaneChangeType lane_change_type = 14;
+  ///< 决策参考线：[/],(/,/,/),[/],(/,/),透传决策参考线
+  ReferenceLineXY reference_line = 15;
+  ///< 智慧偏移信息：[/],(/,/,/),[/],(/，/),标识智慧偏移信息
+  SmartOffsetInfo smart_offset_info = 16;
+  ///<备用信号接口：[/],(/,/,/),[10],(/，/),标识智慧偏移信息
+  repeated double lat_var_interface = 17;
+  ///< 横向驾驶风格：[/],(0,0,2),[/],(/,/),横向驾驶风格
+  ///< 0：柔和
+  ///< 1: 标准
+  ///< 2: 激进
+  int32 lat_drive_style = 18;
+  ///< 横向报警原因：[/],(0,0,3),[/],(/,/),横向报警原因
+  ///< 0：正常
+  ///< 1: 压线报警
+  ///< 2: 无法绕障报警
+  ///< 3: 整车道截断报警
+  int32 lat_warning_reason = 19;
+  ///< 横向不规划原因：[/],(0,0,3),[/],(/,/),横向报警原因
+  ///< 0：正常规划
+  ///< 1: 无参考线
+  ///< 2: minL不满足
+  ///< 3: 状态不满足
+  int32 lat_not_planning_reason = 20;  
+}
+
+/**
+ * @brief dnp_common
+ * @detail LinePathPlanningWarning 车道线规划报警信息
+ */
+message LinePathPlanningWarning{
+  ///<< LPP报警信息: [/], (0，0,8),[/],(1,0),标识报警信息
+  ///<< 0：无报警
+  ///<< 1：过路口，方向盘未回正；
+  ///<< 2：匝道进主路，轨迹规划失败
+  ///<< 3：压线报警
+  ///<< 4：车道内障碍物碰撞报警
+  ///<< 5：车道变窄
+  ///<< 6：跟车流横向距离过近
+  ///<< 7：两侧车道线消失
+  ///<< 8：护栏碰撞报警
+  uint32 warning_notice = 1;
+
+  ///<< LPP报警信息: [/], (0，0,7),[/],(1,0),标识报警提示信息
+  ///<< 0：无报警
+  ///<< 1：障碍物入侵车道
+  ///<< 2：单线控制；
+  ///<< 3：超宽车道；
+  ///<< 4：车道线跳变（内八、外八,车道线横向轨迹置信度低报警）；
+  ///<< 5：分流汇流规划失败报警
+  ///<< 6：前方经过十字路口，方向盘为回正状态(车道线规划失败报警)；
+  ///<< 7：主路进匝道，轨迹规划失败
+  ///<< 8：接近收费站报警
+  ///<< 9：匝道变道回退报警
+  uint32 notice = 2;
+
+  ///<< 规划报警标志: [/], (0，0,1),[/],(1,0),规划报警标志
+  ///<< 0：未报警
+  ///<< 1：报警
+  uint32 pathplanning_warningsts = 3;
+}
+/**
+ * @brief dnp_common
+ * @detail PlanningPathInfo 车道线规划路径Debug信息
+ */
+message PlanningPathInfo {
+  ///<path_planning_mode:[/],(/,/,/),[/],(/,/),/
+  int32 path_planning_mode = 1; // 路径规划模式：0x0 = 没有规划; 0x1 = 使用决策参考线规划; //  0x2 = 使用是视觉车道线规划
+  ///<lane_change_in_progress:[/],(/,/,/),[/],(/,/),/
+  int32 lane_change_in_progress = 2; // UDLC变道进行标志位 0X0=没有变道；// 0x1 = 正在向左变道； 0x2 = 正在向右变道
+}
+
+/**
+ * @brief dnp_common
+ * @detail LnpPathCoeffProto 纵向二次规划位置多项式系数
+ */
+message LnpPathCoeffProto {
+  ///<多项式系数第一项: [/],(0,/,/),[/],(/,/),/
+  double a0 = 1;
+  ///<多项式系数第二项: [/],(0,/,/),[/],(/,/),/
+  double a1 = 2;
+  ///<多项式系数第三项: [/],(0,/,/),[/],(/,/),/
+  double a2 = 3;
+  ///<多项式系数第四项: [/],(0,/,/),[/],(/,/),/
+  double a3 = 4;
+  ///<多项式系数第五项: [/],(0,/,/),[/],(/,/),/
+  double a4 = 5;
+  ///<多项式系数第六项: [/],(0,/,/),[/],(/,/),/
+  double a5 = 6;
+}
+
+/**
+ * section 4 - lon_planning 纵向规划
+ */
+
+/**
+ * @brief dnp_common
+ * @detail DpqpVelPlanProto 纵向规划指令输出
+ */
+message DpqpVelPlanProto {
+  ///<加速度指令: [m/s²],(0,-10,10),[/],(/,/),加速度指令
+  double accel_ref = 1;
+  ///<速度指令: [m/s],(0,0,40),[/],(/,/),速度指令
+  double velocity_ref = 2;
+  ///<纵向二次规划位置多项式系数:[/],(/,/,/),[8],(/,/),纵向二次规划位置多项式系数
+  repeated LnpPathCoeffProto path_coeff = 3;
+  ///<纵向速度规划状态: [/],(0,0,2),[/],(/,/),正常（1）,故障（1）
+  uint32 lnp_velplan_status = 4;
+  ///<纵向速度规划故障ID: [/],(0,0,15),[/],(/,/),正常（0）,详细故障ID值（1~15)
+  uint32 lnp_velplan_faultid = 5;
+  ///<坡道加速度输出: [m/s²],(0,-10,10),[/],(/,/),坡道加速度输出
+  double road_grade_mpss = 6;
+  ///<本车加速度输出: [m/s²],(0,-10,10),[/],(/,/),坡道加速度输出
+  double accelvh_mpss = 7;
+  ///<参考线唯一id: [/],(/,/,/),[/],(/,/),参考线唯一id
+  int32 id = 8;
+  ///<起始处所在的车道id（对应高精地图车道id）:[/],(/,/,/),[/],(/,/),起始处所在的车道id（对应高精地图车道id）
+  uint64 lane_id = 9;
+  ///<对应变道类型: [/],(/,/,/),[/],(/,/),对应变道类型
+  dnp.LaneChangeType lane_change_type = 10;
+  ///<触发类型: [/],(/,/,/),[/],(/,/),触发类型
+  double trigger = 11;
+  ///<换道安全等级: [/],(/,/,/),[/],(/,/),danger(0); relatively safe(1); safe(2)
+  uint32 lc_safety_class = 12;
+  ///<创造换道条件规划状态: [/],(0,0,2),[/],(/,/),正常（1），故障（2）
+  int32 clc_plan_status = 13;
+  ///<创造换道条件可执行标志位: [/],(0,0,2),[/],(/,/),可执行（1），不可执行（0）
+  int32 clc_satisfy_class = 14;
+  ///<纵向8s可以到达的最远距离: [/],(/,/,/),[/],(/,/),纵向8s可以到达的最远距离
+  double maximum_distant = 15;
+  ///<继承上一周期规划结果:[/],(/,/,/),[/],(/,/),继承上一周期规划结果(修改：Inherit_previous_planning inherit_previous_planning)
+  uint32 inherit_previous_planning = 16;
+  ///<纵向规划的ST图输出的目标信息:[/],(/,/,/),[/],(/,/),纵向规划的ST图输出的目标信息
+  StGraphObjectInfo st_graph_object_info = 17;
+  ///<纵向规划的限速信息: [/],(/,/,/),[/],(/,/),纵向规划的限速信息
+  LnpSpeedLimitInfo lnp_speed_limit_info = 18;
+  ///<纵向换道相关信息: [/],(/,/,/),[/],(/,/),纵向换道相关信息
+  LongLaneChangeInfo long_lane_change_info = 19;
+  ///<纵向规划输出的预警类信息: [/],(/,/,/),[/],(/,/),纵向规划输出的预警类信息
+  LnpWarningInfo lnp_warning_info = 20;
+  ///<纵向规划加速度仲裁值: [/],(/,/,/),[/],(/,/),纵向规划加速度仲裁值
+  double accel_quorum_value = 21;  
+  ///<有无跟车目标: [/],(/,/,/),[/],(/,/),有无跟车目标
+  uint32 have_follow_object = 22;  
+  ///<纵向规划反馈给前决策的规划失败信息: [/],(/,/,/),[/],(/,/),纵向规划反馈给前决策的规划报错信息
+  repeated double lnp_fault_info_to_dcs = 23;
+
+}
+
+/**
+ * @brief dnp_common
+ * @detail 换道原因hmi信息
+ */
+enum LaneChangeReason {
+  LANE_CHANGE_NOT_DISPLAY = 0;           // 默认状态，HMI不显示
+  LANE_CHANGE_TO_LEFT_FOR_OBSTACLE = 1;  // 避让前方障碍物，向左换道
+  LANE_CHANGE_TO_RIGHT_FORO_BSTACLE = 2; // 避让前方障碍物，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_CONSTRUCTION = 3; // 前方道路施工，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_CONSTRUCTION = 4; // 前方道路施工，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_TRAFFIC_ACCIDENT = 5; // 前方交通事故，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_TRAFFIC_ACCIDENT = 6; // 前方交通事故，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_QUICK_ROAD = 7;        // 汇入主路, 向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_QUICK_ROAD = 8;       // 汇入主路，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_ENTER_RAMP = 9;     // 前方下匝道，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_ENTER_RAMP = 10;   // 前方下匝道，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_INTERSECTION = 11;  // 前方路口，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_INTERSECTION = 12; // 前方路口，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_SPECIAL_LANE = 13; // 避让前方特殊车道，向左换道。暂时做不了，特殊车道无法定义
+  LANE_CHANGE_TO_RIGHT_FOR_SPECIAL_LANE = 14; // 避让前方特殊车道，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_DESTINATION = 15;  // 前方目的地，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_DESTINATION = 16; // 前方目的地，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_INCREASES_EFFICIENCY = 17; // 换道至高通行效率车道,向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_INCREASES_EFFICIENCY = 18; // 车道换道至高通行效率车道,向右换道
+  LANE_CHANGE_TO_LEFT_FOR_PEDESTRIAN = 19;  // 避让前方行人,向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_PEDESTRIAN = 20; // 避让前方行人,向右换道
+  LANE_CHANGE_TO_LEFT_FOR_ABNORMAL_VEHICLE = 21; // 前方异常车辆,向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_ABNORMAL_VEHICLE = 22; // 前方异常车辆,向右换道
+  LANE_CHANGE_TO_LEFT_FOR_BIG_VEHICLE = 23;       // 前方大车,向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_BIG_VEHICLE = 24;      // 前方大车,向右换道
+  LANE_CHANGE_TO_LEFT_FOR_SLOW_MOVING = 25; // 前车车辆缓行，向左变道
+  LANE_CHANGE_TO_RIGHT_FOR_SLOW_MOVING = 26; // 前车车辆缓行，向右变道
+  LANE_CHANGE_TO_LEFT_FOR_CONFLUENCE = 27;   // 避让前方右侧汇流
+  LANE_CHANGE_TO_RIGHT_FOR_CONFLUENCE = 28;  // 避让前方左侧汇流
+  LANE_CHANGE_TO_LEFT = 29;                  // 向左换道（通用）
+  LANE_CHANGE_TO_RIGHT = 30;                 // 向右换道（通用）
+  LANE_CHANGE_FOLLOW_PATH_LEN_TO_LEFT = 31; // 按导航路径长度向左换道
+  LANE_CHANGE_FOLLOW_PATH_LEN_TO_RIGHT = 32; // 按导航路径长度向右换道
+  LANE_CHANGE_TO_LEFT_FOR_DIVERGING = 33; // 避让分流，向左换道
+  LANE_CHANGE_TO_RIGHT_FOR_DIVERGING = 34; // 避让分流，向右换道
+  LANE_CHANGE_TO_LEFT_FOR_RESERVED = 35; // 预留信号
+  LANE_CHANGE_TO_RIGHT_FOR_RESERVED = 36; // 预留信号
+  LANE_CHANGE_TO_LEFT_FOR_RESERVED_B = 37;  // 预留信号
+  LANE_CHANGE_TO_RIGHT_FOR_RESERVED_B = 38; // 预留信号
+  LANE_CHANGE_TO_LEFT_FOR_RESERVED_C = 39;  // 预留信号
+  LANE_CHANGE_TO_RIGHT_FOR_RESERVED_C = 40; // 预留信号
+}
+
+/**
+ * @brief dnp_common
+ * @detail LaneChangeReturnReason 换道回退原因
+ */
+enum LaneChangeReturnReason {
+  LANE_CHANGE_RETURN_NOT_DISPLAY = 0; // 默认状态，HMI不显示
+  LANE_CHANGE_RETURN_FOR_COMMON = 1; // 非驾驶员操作通用原因，返回原车道
+  LANE_CHANGE_RETURN_FOR_DRIVER = 2;      // 驾驶员操作回退
+  LANE_CHANGE_RETURN_FOR_FOLLOW_PATH = 3; // 正在沿导航路径行驶
+  LANE_CHANGE_RETURN_FOR_NO_CANCEL = 4;   // 正在换道，无法取消
+  LANE_CHANGE_RETURN_FOR_RESERVED = 5;    // 预留信号
+}
+
+/**
+ * @brief dnp_common
+ * @detail LaneChangeStatus 换道状态
+ */
+enum LaneChangeStatus {
+  LANE_CHANGE_STANDBY = 0;   // 待机
+  LANE_CHANGE_ACTIVE = 1;    //换道激活（激活等待）
+  LANE_CHANGE_EXECUTE = 2;   //换道执行（激活控制）
+  LANE_CHANGE_RETURN = 3;    //换道回退
+  LANE_CHANGE_COMPLETE = 4;  //换道完成
+  LANE_CHANGE_TAKE_OVER = 5; //立即接管(系统接管)
+  LANE_CHANGE_WAIT = 6;      //等待状态
+  LANE_CHANGE_OFF = 7;       //关闭
+  LANE_CHANGE_FAULT = 8;     //故障
+  LANE_CHANGE_CANCEL = 9;    // 取消换道
+  LANE_CHANGE_SUPPRESSION = 10; // 换道抑制
+  LANE_CHANGE_DRIVER_RETURN = 11;//驾驶员触发回退
+  LANE_CHANGE_SYSTEM_RETURN = 12;//系统触发回退
+}
+
+/**
+ * @brief dnp_common
+ * @detail AlarmRequest
+ */
+message AlarmRequest {
+  ///< 接管报警请求：[uint32],(0,0,3),[/],(/，/),标识接管报警等级请求
+  ///< 0x0:默认值
+  ///< 0x1:有报警请求
+  uint32 take_over_alarm = 1;
+  ///< 接管报警原因：[uint32],(0,0,3),[/],(/，/),标识接管报警等级请求
+  ///< 0x0:默认值
+  ///< 0x1:换道辅助系统故障，请立即接管
+  ///< 0x2:换道辅助系统退出，请立即接管
+  ///< 0x3:其他接管
+  uint32 take_over_reason = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail SmartOffsetInfo 智慧偏移信息
+ */
+ message SmartOffsetInfo {
+   ///< 偏移原因唯一id：[int32],(0,0,65535),[/],(/,/),偏移原因唯一id
+   int32 smart_offset_id = 1;
+   ///< 偏移方向: [/],(0，0,7),[/],(1,0),偏移方向
+   SmartOffsetDirection smart_offset_direction = 2;
+   ///< 偏移状态: [/],(0，0,7),[/],(1,0),偏移状态
+   SmartOffsetStatus smart_offset_status = 3;
+   ///< 偏移原因: [/],(0，0,7),[/],(1,0),偏移原因
+   SmartOffsetReason smart_offset_reason = 4;
+   ///< 偏移量: [double],(0，0,10.0),[/],(1,0),偏移量
+   double smart_offset_distance = 5;
+}
+
+/**
+* @brief dnp_common
+* @detail SmartOffsetDirection 智慧偏移方向
+*/
+enum SmartOffsetDirection {
+  DIRECTION_ERROR_STATUS = 0;   // 无效状态
+  DIRECTION_LEFT = 1;      // 左转
+  DIRECTION_RIGHT = 2;     // 右转
+}
+/**
+* @brief dnp_common
+* @detail SmartOffsetStatus 智慧偏移状态
+*/
+enum SmartOffsetStatus {
+  INVALID_STATUS = 0;   // 无偏移
+  SHIFTING = 1;      // 正在偏移
+  SHIFTED = 2;     // 偏移完成
+}
+/**
+* @brief dnp_common
+* @detail SmartOffsetReason 智慧偏移原因
+*/
+enum SmartOffsetReason 
+{
+  ///<未知目标：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_UNKNOWN = 0; 
+  ///<汽车：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_CAR = 1;
+  ///<卡车：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_TRUCK = 2; 
+  ///<摩托车：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_MOTORCYCLE = 3;
+  ///<行人：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_PEDESTRIAN = 4; 
+  ///<自行车：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_CYCLIST = 5; 
+  ///<动物：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_ANIMAL = 6;
+  ///<巴士：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_BUS = 7; 
+  ///<其他：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_OTHER = 8; 
+  ///<购物车、婴儿推车：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_HANDCART = 9;
+  ///<柱子：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_COLUMN = 10; 
+  ///<锥桶：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_CONE = 11;
+  ///<已被锁上的车位锁：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_PARKING_LOCKED = 12;
+  ///<未被锁上的车位锁：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_PARKING_UNLOCKED = 13;
+  ///< 遮挡行人：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_PEDHEAD = 14; 
+  ///< 一般静止物品：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_GENERAL = 15;
+  ///< 三角警示牌：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_WARNING_TRIANGLE = 16; 
+  ///< 水马：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_WATER_BARRIER = 17;
+  ///< BUMP：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_SPEED_BUMP = 18;
+  ///< NCURBEW：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_ROAD_CURB = 19;
+  ///< WALL：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_WALL = 20;
+  ///< WHEELSTOPER：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_WHEELSTOPER = 21;
+  ///< 隔离柱：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_ISOLATION_COLUMN = 22;
+  ///< 防撞桶：[/],(0,0,/),[/],(1,0),description
+  OFFSET_OBJECT_CLASS_ANTICOLLISION_DRUM = 23;
+}
+
+
+/**
+ * @brief dnp_common
+ * @detail LaneChangeTargetPointInfo 换道目标点的横向距离信息
+ */
+message LaneChangeTargetPointInfo {
+  ///<是否正在换道：[bool],(false,/,/),[/],(/，/),标识是否存在换道过程
+  bool exist_lane_change_process = 1;
+  ///< 换道原因：[int32],(0,0,6),[/],(/，/),标识换道原因
+  int32 lane_change_reason = 2; // 0x0=fida,0x1=NID,0x2=ALC
+  ///< 与换道目标点的横向距离：[float],(0,-20.0,20.0),[/],(/，/),标识换道前保中心与目标车道中心线距离
+  float to_target_lane_distance = 3;
+}
+
+/**
+ * @brief dnp_common
+ * @detail TrafficFlowInfo 车流速度信息
+ */
+message TrafficFlowInfo {
+  ///<车流方向：[int32],(0,0,2),[/],(/，/),标识车流方向
+  ///< 0x0:直行
+  ///< 0x1:左侧
+  ///< 0x2:右侧
+  int32 traffic_flow_direction = 1;
+  ///<车流速度：[float],(0,0.0,9999.0),[/],(/，/),标识车流速度
+  float traffic_flow_speed = 2;
+}
+
+/**
+ * @brief dnp_common
+ * @detail HmiInfo hmi提示信息
+ */
+message HmiInfo {
+  ///< 换道模式提示信号：[uint32],(0,0,5),[/],(/，/), 标识换道模式提示信号
+  ///< 0x0:默认值
+  ///< 0x1:ALC换道
+  ///< 0x2:PLC强制换道
+  ///< 0x3:UDLC换道
+  ///< 0x4:借道绕障
+  ///< 0x5:换道绕障
+  uint32 lane_change_model = 1;
+  ///< 换道原因提示信号：[/],(/,/,/),[/],(/，/),标识换道原因提示信号
+  LaneChangeReason lane_change_reason = 2;
+  ///< 换道回退原因提示信号：[/],(/,/,/),[/],(/，/),标识换道回退原因提示信号
+  LaneChangeReturnReason lane_change_return_reason = 3;
+  ///< 换道过程状态信号：[/],/(,/,/),[/],(/，/),标识换道状态
+  LaneChangeStatus lane_change_status = 4;
+  ///< udlchmi提示信号：[uint32],(0,0,20),[/],(/，/),标识udlc hmi信号
+  ///< 0x0:无提示
+  ///< 0x1:取消换道
+  ///< 0x2:换道回退
+  ///< 0x3:已跨越禁止回退线，驾驶员关灯，无法取消换道
+  ///< 0x4:预留
+  ///< 0x5:自动换道系统故障
+  ///< 0x7:换道功能暂时不可用
+  ///< 0x8:车速不满足条件，无法执行换道
+  ///< 0x9:预留
+  uint32 udlc_hmi_info = 5;
+  ///< 接管报警请求：[/],(/,/,/),[/],(/，/),标识接管报警请求
+  AlarmRequest alarm_request = 6;
+  ///< 记忆车速：[/],(/,/,/),[/],(/，/),缓存上次退出巡航的设置速度
+  float memory_speed = 7;
+  ///< 智慧偏移信息：[/],(/,/,/),[/],(/，/),标识智慧偏移信息
+  SmartOffsetInfo smart_offset_info = 8;
+  ///< 换道目标点距离信息：[/],(/,/,/),[/],(/，/),标识换道目标点距离信息
+  LaneChangeTargetPointInfo lane_change_target_point_info = 9;
+  ///< 路口通行信息：[int32],(0,0,7),[/],(/，/),标识路口通行信息
+  ///< 0:straight_ahead
+  ///< 1:turn_left
+  ///< 2:turn_right
+  ///< 3:turn_about
+  int32 intersection_traffic_info = 10;
+  ///< 车流速度信息：[/],(/,/,/),[3],(/，/),标识车流速度信息
+  repeated TrafficFlowInfo traffic_flow_info = 11;
+  ///< 闯红灯标志位：[int32],(0,0,1),[/],(/，/),标识闯红灯标志位
+  ///< 0x0:noWarning
+  ///< 0x1:Warning
+  int32 ad_runredlight_warning = 12;
+  ///< 换道方向：[int32],(0,0,3),[/],(/，/),标识换道方向信息(含UDLC和ALC)
+  ///< 0x0:Invalid
+  ///< 0x1:LaneChangeToLeft
+  ///< 0x2:LaneChangeToRight
+  ///< 0x3:Reserved
+  int32 lane_change_direction = 13;
+  ///< udlc接管报警请求：[/],(/,/,/),[/],(/，/),标识udlc接管报警请求
+  AlarmRequest udlc_alarm_request = 14;
+  ///< udlc抑制换道目标id：[int32],(0,0,65535),[/],(/，/),标识udlc抑制换道目标id
+  int32 inhibit_lane_change_id = 15;
+  ///< 邻车道换道可用状态：[int32],(0,0,3),[/],(/，/),标识邻车道换道可用状态
+  ///< 0x0:无可用车道
+  ///< 0x1:仅左侧可换道
+  ///< 0x2:仅右侧可换道
+  ///< 0x3:两侧均可换道
+  int32 adjacent_lane_change_status = 16;
+  ///< 匝道辅助状态：[int32],(0,0,10),[/],(/，/),标识匝道辅助状态
+  ///< 0x0:OFF
+  ///< 0x1:StandBy
+  ///< 0x2:Active
+  int32 ramp_assist_status = 17;
+  ///< 匝道辅助提示信息：[int32],(0,0,10),[/],(/，/),标识匝道辅助提示信息
+  ///< 0x0:无提示
+  ///< 0x1:即将汇入主路
+  ///< 0x2:即将汇入匝道
+  ///< 0x3:等待汇入
+  ///< 0x4:正在汇入主路勿打转向灯
+  ///< 0x5:正在汇入匝道勿打转向灯
+  int32 ramp_assist_hmi_info = 18;
+  ///< 匝道辅助接管报警请求：[/],(/,/,/),[/],(/，/),标识匝道辅助接管报警请求
+  AlarmRequest ramp_assist_alarm_request = 19;
+  ///< 路口通行状态：[int32],(0,0,10),[/],(/，/),标识路口通行状态
+  ///< 0x0:OFF
+  ///< 0x1:StandBy
+  ///< 0x2:Active
+  int32 cross_status = 20;
+  ///< 路口辅助提示信息：[int32],(0,0,10),[/],(/，/),标识路口辅助提示信息
+  ///< 0x0:直行
+  ///< 0x1:左转
+  ///< 0x2:右转
+  ///< 0x3:左掉头
+  ///< 0x4:右掉头
+  ///< 0x5:未知
+  int32 cross_assist_hmi_info = 21;
+  ///< 路口辅助接管报警请求：[/],(/,/,/),[/],(/，/),标识路口辅助接管报警请求
+  AlarmRequest cross_assist_alarm_request = 22;
+  ///< 跨线状态：[int32],(0,0,4),[/],(/，/),标识车辆变道跨线
+  ///< 0x0:默认
+  ///< 0x1:未跨越取消换道线
+  ///< 0x2:换道侧前轮跨越取消换道线，但未跨越禁止回退线
+  ///< 0x3:换道侧前轮跨越禁止回退线
+  ///< 0x4:本车后保中心距离目标车道中心线小于1m，自动关灯作用线
+  int32 cross_line_status = 23;
+  ///< udlc不可激活条件：[int32],(0,0,6),[/],(/，/),标识udlc不可激活条件
+  ///< 0x0:默认
+  ///< 0x1:【BSC_UDLC功能配置】为关闭，或车机上的UDLC开关为关闭;
+  ///< 0x2: 关联模块输出横向接管请求
+  ///< 0x3: 关联模块输出纵向接管请求
+  ///< 0x4: ODC模块输出抑制UDLC条件(暂不考虑)
+  ///< 0x5: 驾驶员横向接管
+  ///< 0x6: 驾驶员纵向接管
+  int32 udlc_inactive_condition = 24;
+  ///< 关联子系统故障：[int32],(0,0,50),[/],(/，/),标识关联子系统故障
+  ///< 0x0：默认值
+  ///< 0x1: 前向毫米波雷
+  ///< 0x2：前视摄像头30°、120°同时故障
+  ///< 0x3：前视摄像头30°
+  ///< 0x4：前视摄像头120°
+  ///< 0x5：预留
+  ///< 0x6：预留
+  ///< 0x7：预留
+  ///< 0x8：预留
+  ///< 0x9：预留
+  ///< 0x10：预留
+  ///< 0x11: 预留
+  ///< 0x12：预留
+  ///< 0x13：预留
+  ///< 0x14：预留
+  ///< 0x15：左前角雷达、周视同时故障
+  ///< 0x16：右前角雷达、周视同时故障
+  ///< 0x17：左后角雷达、周视同时故障
+  ///< 0x18：右前角雷达、周视同时故障
+  ///< 0x19：左前或左后转向灯故障，或者左前、左后转向灯同时故障
+  ///< 0x20：右前或右后转向灯故障，或者右前、右后转向灯同时故障
+  ///< 0x21：左前角雷达故障
+  ///< 0x22：右前角雷达故障
+  ///< 0x23：左后角雷达故障
+  ///< 0x24：右后角雷达故障
+  ///< 0x25：预留
+  ///< 0x26：预留
+  ///< 0x27：预留
+  ///< 0x28：预留
+  ///< 0x29：预留
+  ///< 0x30：预留
+  ///< 0x31：预留
+  ///< 0x32：预留
+  ///< 0x33：预留
+  ///< 0x34：预留
+  ///< 0x35：左前周视故障
+  ///< 0x36：右前周视故障
+  ///< 0x37：左后周视故障
+  ///< 0x38：右后周视故障
+  ///< 0x39：后视摄像头故障
+  ///< 0x40：Lidar（左）故障
+  ///< 0x41: Lidar（右）故障
+  ///< 0x42：预留
+  ///< 0x43：预留
+  ///< 0x44：预留
+  ///< 0x45：预留
+  ///< 0x46：预留
+  ///< 0x47：预留
+  ///< 0x48：预留
+  ///< 0x49：预留
+  ///< 0x50：预留
+  int32 associate_subsystem_fault = 25;
+  ///< udlc抑制换道条件：[int32],(0,0,23),[/],(/，/),标识udlc抑制换道条件
+  ///< 0x0:默认值
+  ///< 0x1:FC目标车道侧线类型为实线
+  ///< 0x2:FC左线长度<1s(TBD)时距（暂不考虑）
+  ///< 0x3:地图左线为虚线的长度<7s(TBD)时距
+  ///< 0x4:目标车道宽度>4.7m(TBD)或目标车道宽度<2.5m(TBD)
+  ///< 0x5:FC目标道车道线与目标侧边界/护栏的距离＜3.2(TBD)米
+  ///< 0x6:左侧车道前方50m(TBD)内（标定量，考虑传感识别能力）存在行人
+  ///< 0x7:左侧车道前方50m(TBD)内（标定量，考虑传感识别能力）存在障碍物（包括锥形桶、水马、未知类型障碍物、FREESPACE）
+  ///< 0x8:左侧车道前方300m(TBD)内为截止车道；(没有地图信息来源)
+  ///< 0x9:本车道前方车辆目标为TTC或时距满足
+  ///< 0x10:左前方车辆目标为TTC或时距满足
+  ///< 0x11:左侧方车辆目标为TTC或时距满足
+  ///< 0x12:左后方车辆目标为TTC或时距满足
+  ///< 0x13:参考线前方100m(TBD)弯道半径600m(TBD)
+  ///< 0x14:STM模块未输出脱眼、脱手、中间接管状态（待补充）；
+  ///< 0x15:本车速度＜30 kph，或本车速度＞TBD kph（标定量，推荐130kph）；
+  ///< 0x16:本车横向加速度> 最大安全车速对应的最大安全横向加速度
+  ///< 0x17:纵向减速度＜-2.5m/s2（TBD）
+  ///< 0x18:目标车道为汇流支路
+  ///< 0x19:预留
+  ///< 0x20:预留
+  ///< 0x21:预留
+  ///< 0x22:预留
+  ///< 0x23:预留
+  int32 udlc_curb_condition = 26;
+  ///< udlc换道回退条件：[int32],(0,0,23),[/],(/，/),标识udlc换道回退条件
+  ///< 0x0:默认值
+  ///< 0x1:STM输出纵向或横向接管请求
+  ///< 0x2:目标车道侧护栏、边界距离＜TBD米（暂不开发）
+  ///< 0x3:目标车道存在危险目标ttc不安全
+  ///< 0x4:左侧车道宽度＜2.5米
+  ///< 0x5:左侧车道前方50米内（标定量，考虑传感识别能力）存在障碍物（包括锥形桶、水马、未知类型障碍物、FREESPACE）；
+  ///< 0x6:左侧车道前方100米内（标定量，推荐150米）为截止车道；（没有地图信息来源，暂不开发）
+  ///< 0x7:左侧角雷达出现故障、遮挡；（还要考虑其它关联系统）
+  ///< 0x8:目标车道车道线类型为实线
+  ///< 0x9:预留
+  ///< 0x10:预留
+  ///< 0x11:预留
+  ///< 0x12:预留
+  ///< 0x13:预留
+  int32 udlc_return_condition = 27;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  int32 info_reserved_a = 28;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  int32 info_reserved_b = 29;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  int32 info_reserved_c = 30;
+}
+
+/**
+ * @brief dnp_common
+ * @detail OtherInfo
+ */
+message OtherInfo {
+  ///< 转向灯请求信号：[uint32],(0,0,7),[/],(/，/),标识转向灯请求信号
+  ///< 0x0: no request
+  ///< 0x1: Left Request OFF
+  ///< 0x2: Right Request
+  ///< 0x3: Left Request ON
+  ///< 0x4: Right Request ON
+  ///< 0x7: Invalid
+  uint32 ads_udlc_turn_light_req = 1;
+  ///< UDLC换道请求信号：[int32],(0,0,2),[/],(/，/),标识UDLC换道请求
+  ///< 0x0: ahead
+  ///< 0x1: left
+  ///< 0x2: right
+  int32 lane_change_request = 2;
+  ///< hmi提示信息：[/],(/,/,/),[/],(/，/),标识hmi提示信息
+  HmiInfo hmi_info = 3;
+  ///< 变道原因：[int32],(0,0,50),[/],(/，/),标识变道原因（内部使用）
+  int32 lane_change_reason = 4;
+  ///< 超车变道静态条件满足标志位：[bool],(0,0,1),[/],(/，/),标识超车变道静态条件满足标志位
+  bool overtake_lc_static_condition = 5;
+  ///< 超车变道动态条件满足标志位：[bool],(0,0,1),[/],(/，/),标识超车变道动态条件满足标志位
+  bool overtake_lc_dynamic_condition = 6;
+  ///< 跟车距离：[0],(0,0,1000.0),[/],(/，/),标识跟车距离
+  float follow_distance = 7;
+  ///< 左侧变道原因：[/],(/,/,/),[/],(/，/),标识左侧变道原因
+  int32 left_lc_reason = 8;
+  ///< 右侧变道原因：[/],(/,/,/),[/],(/，/),标识右侧变道原因
+  int32 right_lc_reason = 9;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  double other_info_reserved_a = 10;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  double other_info_reserved_b = 11;
+  ///< 预留信号：[int32],(0,0,20),[/],(/，/),标识预留信号
+  double other_info_reserved_c = 12;
+}
+
+/**
+ * @brief dnp_common
+ * @detail LNPSpeedLimitInfo 纵向输出限速类信息
+ */
+message LnpSpeedLimitInfo {
+  ///<车辆当前位置的弯道曲率： [/],(/,/,/),[/],(/,/)，/
+  double bend_curvature = 1;
+  ///<车辆当前位置的弯道半径： [/],(/,/,/),[/],(/,/)，/
+  double bend_radius = 2;
+  ///<车辆当前位置的弯道限速值： [/],(/,/,/),[/],(/,/)，/
+  double bend_speed_limit = 3;
+  ///<邻车道低速车流缓行状态： [/],(/,/,/),[/],(/,/)，0-无效； 1-限制加速；2-缓慢减速
+  uint32 neigbor_lanes_slow_traffic_status = 4;
+  ///<邻车道低速车流缓行限速值： [/],(/,/,/),[/],(/,/)，/
+  double neigbor_lanes_slow_traffic_speed_limit = 5;
+  ///<车辆当前位置的交规类路径点限速值： [/],(/,/,/),[/],(/,/)，/
+  double decision_speed_limit = 6;
+  ///<并行车辆回避状态： [/],(/,/,/),[/],(/,/)，0-无效； 1-减速避让； 2-加速避让
+  uint32 parrel_avoid_status = 7;
+  ///<并行车辆回避限速值： [/],(/,/,/),[/],(/,/)，/
+  double parrel_avoid_speed_limit = 8;
+  ///<纵向最终限速类型： [/],(/,/,/),[/],(/,/)，/
+  uint32 final_speed_limit_type = 9;
+  ///<纵向最终目标限速值： [/],(/,/,/),[/],(/,/)，/
+  double final_speed_limit = 10;
+  ///<纵向丢油标志位： [/],(/,/,/),[/],(/,/)，/
+  double loose_throttle_flag = 11;
+  ///<纵向丢油策略的最大规划加速度： [/],(/,/,/),[/],(/,/)，/
+  double planning_accel_max = 12;
+  ///<安全停车有效标志位： [/],(/,/,/),[/],(/,/)，/
+  uint32 safe_stop_status = 13;  
+  ///<安全停车输出的目标限速值： [/],(/,/,/),[/],(/,/)，/
+  double safe_stop_target_speed = 14;
+  ///<交通约束输出的加速度信息： [/],(/,/,/),[/],(/,/)，/
+  AccelInfo accel_info = 15;
+}
+/**
+ * @brief dnp_common
+ * @detail 纵向规划的ST图输出的目标信息
+ */
+ message StGraphObjectInfo {
+  ///< ST图选中的所有目标数量： [/],(/,/,/),[/],(/,/)，/
+  uint32 obj_num_st = 1;
+  ///< ST图选中的所有目标的id： [/],(/,/,/),[32],(/,/)，/
+  repeated uint32 id_st = 2;
+  ///< ST图中的跟车目标，或称为0时刻的上方目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_follow = 3;
+  ///< ST图中导致制动的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_decel = 4;
+  ///< ST图中导致进入松油策略的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_loose_throttle = 5;  
+  ///< ST图中距离规划曲线上方最近的cutin目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_cutin = 6;
+  ///< ST图中被选为汇流的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_merge = 7;
+  ///< ST图中被选为横穿的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_cross = 8;
+  ///< ST图中被选为换道绕障的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_has_side_pass = 9;
+  ///< ST图中被选为偏移绕障的目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_nudge = 10;
+  ///< ST图中的跟车目标距离： [/],(/,/,/),[/],(/,/)，/
+  double follow_obj_dist = 11;
+  ///< ST图中的参考线长度： [/],(/,/,/),[/],(/,/)，/
+  double refer_line_dist = 12;
+  ///< ST图中的目标实际纵向选择距离： [/],(/,/,/),[/],(/,/)，/
+  double obj_long_select_dist = 13;
+  ///< 前方抑制目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_udlc_front_restrain_object = 14;
+  ///< 侧前方抑制目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_udlc_beside_front_restrain_object = 15; 
+  ///< 侧方抑制目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_udlc_beside_restrain_object = 16; 
+  ///< 侧后方抑制目标： [/],(/,/,/),[/],(/,/)，/
+  uint32 id_udlc_beside_rear_restrain_object = 17; 
+  ///< 纵向规划输出的区域目标信息： [/],(/,/,/),[32],(/,/)，/
+  repeated ZoneObjectInfo zone_object_info = 18;
+  ///< upper bound target info： [/],(/,/,/),[32],(/,/)，/
+  repeated UpperBoundTargetInfo upper_bound_target_info = 19;
+}
+
+/**
+ * @brief dnp_common
+ * @detail 纵向规划输出的区域目标信息
+ */
+message ZoneObjectInfo {
+  ///< 区域目标id： [/],(/,/,/),[/],(/,/)，/
+  uint32 track_id = 1;
+  ///< 目标危险程度： [/],(/,/,/),[/],(/,/)，/
+  uint32 object_danger_class = 2;
+}
+
+/**
+* @brief LatOffsetIACC
+* @detail LatOffsetIACC
+*/
+message OffsetBusDebug{
+  ///< Lane_Offset_Perfect_MC:[/],(/,0,1),[/],(1,0),车道状态良好
+  bool lane_offset_perfect_mc = 1;
+  ///< Lane_Offset_NotPerfect_MC:[/],(/,0,1),[/],(1,0),车道状态不好
+  bool lane_offset_notperfect_mc = 2;
+  ///< Car3_OverSized_MC:[/],(/,0,1),[/],(1,0),目标区域3车辆超出尺寸，为大型车
+  double car3_oversized_mc = 3;
+  ///< Car4_OverSized_MC:[/],(/,0,1),[/],(1,0),目标区域4车辆超出尺寸，为大型车
+  double car4_oversized_mc = 4;
+  ///< Car5_OverSized_MC:[/],(/,0,1),[/],(1,0),目标区域5车辆超出尺寸，为大型车
+  double car5_oversized_mc = 5;
+  ///< Car6_OverSized_MC:[/],(/,0,1),[/],(1,0),目标区域6车辆超出尺寸，为大型车
+  double car6_oversized_mc = 6;
+  ///< Car3_NotOverSized_MC:[/],(/,0,1),[/],(1,0),目标区域3车辆未超出尺寸，为小型车
+  double car3_notoversized_mc = 7;
+  ///< Car4_NotOverSized_MC:[/],(/,0,1),[/],(1,0),目标区域4车辆未超出尺寸，为小型车
+  double car4_notoversized_mc = 8;
+  ///< Car5_NotOverSized_MC:[/],(/,0,1),[/],(1,0),目标区域5车辆未超出尺寸，为小型车
+  double car5_notoversized_mc = 9;
+  ///< Car6_NotOverSized_MC:[/],(/,0,1),[/],(1,0),目标区域6车辆未超出尺寸，为小型车
+  double car6_notoversized_mc = 10;
+  ///< OffsetBack_from_Right_Free_MC:[/],(/,0,1),[/],(1,0),从偏移到的右侧区域返回
+  bool offsetback_from_right_free_mc = 11;
+  ///< OffsetBack_from_Left_Free_MC:[/],(/,0,1),[/],(1,0),从偏移到的左侧区域返回
+  bool offsetback_from_left_free_mc = 12;
+  ///< Offset_to_Left_Free_MC:[/],(/,0,1),[/],(1,0),偏移到的左侧区域
+  bool offset_to_left_free_mc = 13;
+  ///< Offset_to_Right_Free_MC:[/],(/,0,1),[/],(1,0),偏移到的右侧区域
+  bool offset_to_right_free_mc = 14;
+  ///< Car_Existence7:[/],(/,0,1),[/],(1,0),7号目标区域有车
+  bool car_existence7 = 15;
+  ///< Car_Existence8:[/],(/,0,1),[/],(1,0),8号目标区域有车
+  bool car_existence8 = 16;
+  ///< Car_Existence9:[/],(/,0,1),[/],(1,0),9号目标区域有车
+  bool car_existence9 = 17;
+  ///< Car_Existence10:[/],(/,0,1),[/],(1,0),10号目标区域有车
+  bool car_existence10 = 18;
+  ///< Offset_Min_Time3:[s],(/,0,100),[/],(1,0),对3号目标区域车辆完成偏移的最小时间
+  double offset_min_time3 = 19;
+  ///< Offset_Min_Time4:[s],(/,0,100),[/],(1,0),对4号目标区域车辆完成偏移的最小时间
+  double offset_min_time4 = 20;
+  ///< Offset_Min_Time5:[s],(/,0,5000),[/],(1,0),对5号目标区域车辆完成偏移的最小时间
+  double offset_min_time5 = 21;
+  ///< Offset_Min_Time6:[s],(/,0,5000),[/],(1,0),对5号目标区域车辆完成偏移的最小时间
+  double offset_min_time6 = 22;
+  ///< Offset_to_Car3_Fine:[/],(0,0,1),[/],(1,0),可向3号目标区域偏移
+  double offset_to_car3_fine = 23;
+  ///< Offset_to_Car4_Fine:[/],(0,0,1),[/],(1,0),可向4号目标区域偏移
+  double offset_to_car4_fine = 24;
+  ///< Car_Close_Trend3_Offset:[/],(0,0,1),[/],(1,0),3号目标区域车辆靠近
+  bool car_close_trend3_offset = 25;
+  ///< Car_Close_Trend4_Offset:[/],(0,0,1),[/],(1,0),4号目标区域车辆靠近
+  bool car_close_trend4_offset = 26;
+  ///< Car_Close_Trend5_Offset:[/],(0,0,1),[/],(1,0),5号目标区域车辆靠近
+  bool car_close_trend5_offset = 27;
+  ///< Car_Close_Trend6_Offset:[/],(0,0,1),[/],(1,0),6号目标区域车辆靠近
+  bool car_close_trend6_offset = 28;
+  ///< Car_Out_Trend3_Offset:[/],(0,0,1),[/],(1,0),3号目标区域车辆远离
+  bool car_out_trend3_offset = 29;
+  ///< Car_Out_Trend4_Offset:[/],(0,0,1),[/],(1,0),4号目标区域车辆远离
+  bool car_out_trend4_offset = 30;
+  ///< Car_Out_Trend5_Offset:[/],(0,0,1),[/],(1,0),5号目标区域车辆远离
+  bool car_out_trend5_offset = 31;
+  ///< Car_Out_Trend6_Offset:[/],(0,0,1),[/],(1,0),6号目标区域车辆远离
+  bool car_out_trend6_offset = 32;
+  ///< Offset_Decision_Condition_Satisfy:[/],(0,0,1),[/],(1,0),满足智慧偏移条件
+  bool offset_decision_condition_satisfy = 33;
+  ///< Offset_Decision_Condition_NotSatisfy:[/],(1,0,1),[/],(1,0),不满足智慧偏移条件
+  bool offset_decision_condition_notsatisfy = 34;
+  ///< HV_NotIN_Left_Lane_MC:[/],(/,0,1),[/],(1,0),跟踪目标不在左侧车道
+  bool hv_notin_left_lane_mc = 35;
+  ///< HV_NotIN_Right_Lane_MC:[/],(/,0,1),[/],(1,0),跟踪目标不在右侧车道
+  bool hv_notin_right_lane_mc = 36;
+  ///< LaneChanged_to_Left_UDLC:[/],(0,0,1),[/],(1,0),向左侧变道
+  bool lanechanged_to_left_udlc = 37;
+  ///< LaneChanged_to_Right_UDLC:[/],(0,0,1),[/],(1,0),向右侧变道
+  bool lanechanged_to_right_udlc = 38;
+  ///< Lane_Curv_Fine_MC:[/],(/,0,1),[/],(1,0),车道曲率OK
+  bool lane_curv_fine_mc = 39;
+  ///< Lane_Curv_Fine_Foward_MC:[/],(/,0,1),[/],(1,0),前方车道曲率OK
+  bool lane_curv_fine_foward_mc = 40;
+  ///< HV_Offset:[/],(/,/,/),[/],(1,0),HV_Offset = -((A0_R+A0_L)/2)
+  double hv_offset = 41;
+  ///< Lane_Straight_MC:[/],(/,0,1),[/],(1,0),车道为直
+  bool lane_straight_mc = 42;
+  ///< Lane_Straight_Foward_MC:[/],(/,0,1),[/],(1,0),前方车道为直
+  bool lane_straight_foward_mc = 43;
+  ///< Offset_Condition3_MC:[/],(/,0,1),[/],(1,0),3号目标区域偏移条件成立
+  double offset_condition3_mc = 44;
+  ///< Offset_Condition4_MC:[/],(/,0,1),[/],(1,0),4号目标区域偏移条件成立
+  double offset_condition4_mc = 45;
+  ///< Offset_Condition5_MC:[/],(/,0,1),[/],(1,0),5号目标区域偏移条件成立
+  double offset_condition5_mc = 46;
+  ///< Offset_Condition6_MC:[/],(/,0,1),[/],(1,0),6号目标区域偏移条件成立
+  double offset_condition6_mc = 47;
+  ///< Offset_OversizedCar_Condition3_MC:[/],(/,0,1),[/],(1,0),3号目标区域大型车辆偏移条件成立
+  double offset_oversizedcar_condition3_mc = 48;
+  ///< Offset_OversizedCar_Condition4_MC:[/],(/,0,1),[/],(1,0),4号目标区域大型车辆偏移条件成立
+  double offset_oversizedcar_condition4_mc = 49;
+  ///< Offset_OversizedCar_Condition5_MC:[/],(/,0,1),[/],(1,0),5号目标区域大型车辆偏移条件成立
+  double offset_oversizedcar_condition5_mc = 50;
+  ///< Offset_OversizedCar_Condition6_MC:[/],(/,0,1),[/],(1,0),6号目标区域大型车辆偏移条件成立
+  double offset_oversizedcar_condition6_mc = 51;
+  ///< Offset_Condition3_Release_MC:[/],(/,0,1),[/],(1,0),3号目标区域偏移条件释放
+  double offset_condition3_release_mc = 52;
+  ///< Offset_Condition4_Release_MC:[/],(/,0,1),[/],(1,0),4号目标区域偏移条件释放
+  double offset_condition4_release_mc = 53;
+  ///< Offset_Condition5_Release_MC:[/],(/,0,1),[/],(1,0),5号目标区域偏移条件释放
+  double offset_condition5_release_mc = 54;
+  ///< Offset_Condition6_Release_MC:[/],(/,0,1),[/],(1,0),6号目标区域偏移条件释放
+  double offset_condition6_release_mc = 55;
+  ///< Offset_OversizedCar_Condition3_Release_MC:[/],(/,0,1),[/],(1,0),3号目标区域大型车辆偏移条件释放
+  double offset_oversizedcar_condition3_release_mc = 56;
+  ///< Offset_OversizedCar_Condition4_Release_MC:[/],(/,0,1),[/],(1,0),4号目标区域大型车辆偏移条件释放
+  double offset_oversizedcar_condition4_release_mc = 57;
+  ///< Offset_OversizedCar_Condition5_Release_MC:[/],(/,0,1),[/],(1,0),5号目标区域大型车辆偏移条件释放
+  double offset_oversizedcar_condition5_release_mc = 58;
+  ///< Offset_oversizedCar_Condition6_Release_MC:[/],(/,0,1),[/],(1,0),6号目标区域大型车辆偏移条件释放
+  double offset_oversizedcar_condition6_release_mc = 59;
+  ///< Offset_Con:[/],(/,/,/),[/],(1,0),Offset_Con
+  uint32 offset_con = 60;
+  ///< Offset_State:[/],(/,/,/),[/],(1,0),Offset_State
+  uint32 offset_state = 61;
+  ///< Offset_to_Left:[/],(0,0,1),[/],(1,0),向左偏移
+  bool offset_to_left = 62;
+  ///< Offset_to_Right:[/],(0,0,1),[/],(1,0),向右偏移
+  bool offset_to_right = 63;
+  ///< Offset_Time_Target:[s],(/,/,/),[/],(1,0),目标偏移执行时间
+  double offset_time_target = 64;
+  ///< OffsetBack_from_Left:[/],(/,0,1),[/],(1,0),从左侧偏移位置回来
+  bool offsetback_from_left = 65;
+  ///< OffsetBack_from_Right:[/],(/,0,1),[/],(1,0),从右侧偏移位置回来
+  bool offsetback_from_right = 66;
+  ///< Offsetback_Time_Target:[s],(/,/,/),[/],(1,0),偏移回正执行时间
+  double offsetback_time_target = 67;
+  ///< Offset_Keep_Left:[/],(/,0,1),[/],(1,0),保持向左偏移的状态
+  bool offset_keep_left = 68;
+  ///< Offset_Keep_Right:[/],(/,0,1),[/],(1,0),保持向右偏移的状态
+  bool offset_keep_right = 69;
+  ///< Offset_Brake_Req:[/],(/,0,1),[/],(1,0),暂停偏移请求
+  bool offset_brake_req = 70;
+  ///< Offset_Lat_Target:[m],(0,-1,1),[/],(1,0),目标偏移量
+  double offset_lat_target = 71;
+  ///< Offset_Execute:[/],(/,0,1),[/],(1,0),Offset_Execute
+  bool offset_execute = 72;
+  ///< Offset_TrackedObj_Target:[/],(/,/,/),[/],(1,0),智慧偏移目标
+  double offset_trackedobj_target = 73;
+  ///< Offset_Min_Time:[s],(/,/,/),[/],(1,0),完成偏移最小时间
+  double offset_min_time = 74;
+  ///< Offset_Decision_Making:[/],(/,0,1),[/],(1,0),正在做偏移决策
+  double offset_decision_making = 75;
+  ///< Offset_TrackedObj_Target_Lost:[/],(/,0,1),[/],(1,0),偏移目标丢失
+  bool offset_trackedobj_target_lost = 76;
+  ///< LeftEdge_Lock:[/],(/,0,1),[/],(1,0),左边沿锁定
+  bool leftedge_lock = 77;
+  ///< RightEdge_Lock:[/],(/,0,1),[/],(1,0),右边沿锁定
+  bool rightedge_lock = 78;
+}
+
+/**
+ * @brief dnp_common
+ * @detail 纵向规划输出的换道相关信息
+ */
+ message LongLaneChangeInfo {
+  ///< 启动换道安全标志位： [0/1],(/,/,/),[/],(/,/)，/
+  uint32 enable_lane_change_flag = 1;
+  ///< 换道回退标志位： [0/1],(/,/,/),[/],(/,/)，/
+  uint32 abort_lane_change_flag = 2;
+  ///< 目标信息： [0/1],(/,/,/),[32],(/,/)，/
+  repeated LaneChangeSafetyTargetInfo lane_change_target_info = 3;
+  ///< 换道加速标志位： [0/1],(/,/,/),[/],(/,/)，/
+  uint32 lane_change_accel_flag = 4;
+  ///< 换道加速度： [0/1],(/,/,/),[/],(/,/)，/
+  double lane_change_accel_value = 5;
+  ///< 换道进行时间： [0/1],(/,/,/),[/],(/,/)，/
+  double lane_change_time = 6;
+  ///< 创造换道条件前方目标 ： [0/1],(/,/,/),[/],(/,/)，/
+  int32 clc_front_id = 7;
+  ///< 创造换道条件后方目标： [0/1],(/,/,/),[/],(/,/)，/
+  int32 clc_rear_id = 8;
+  ///< 加速还是减速创造换道条件： [0/1],(/,/,/),[/],(/,/)，/
+  int32 clc_accel_or_decel = 9;
+  ///< 创造换道条件成功率： [0/1],(/,/,/),[/],(/,/)，/
+  int32 clc_success_rate = 10;
+  ///< 换道成功率： [0/1],(/,/,/),[/],(/,/)，/
+  int32 lane_change_success_rate = 11;
+  ///< 换道回退概率: [0/1],(/,/,/),[/],(/,/)，/
+  int32 lane_change_abort_rate = 12;
+}
+
+/**
+ * @brief dnp_common
+ * @detail 纵向规划输出的换道安全目标相关信息
+ */
+message LaneChangeSafetyTargetInfo {
+  ///< 换道安全目标ID： [/],(/,/,/),[/],(/,/)，/
+  uint32 lane_change_safety_id = 1;
+  ///< 启动换道安全标志位： [0/1],(/,/,/),[/],(/,/)，/
+  uint32 enable_lane_change_flag = 2;
+  ///< 换道回退标志位： [0/1],(/,/,/),[/],(/,/)，/
+  uint32 abort_lane_change_flag = 3;
+  ///< TTC： [0/1],(/,/,/),[/],(/,/)，/
+  double lane_change_ttc = 4;
+  ///< 相对距离： [/],(/,/,/),[/],(/,/)，/
+  double target_relative_distance = 5;
+  ///< 当前所在车道： [0/1],(/,/,/),[/],(/,/)，/
+  int32 current_relation2ego = 6;
+  ///< 预测所在车道： [0/1],(/,/,/),[/],(/,/)，/
+  int32 prediction_relation2ego = 7;
+}
+
+/**
+ * @brief dnp_common
+ * @detail 纵向规划st图上边界目标相关信息
+ */
+ message UpperBoundTargetInfo {
+  ///< 目标ID： [/],(/,/,/),[/],(/,/)，/
+  uint32 upper_bound_id = 1;
+  ///< 目标相对距离： [0/1],(/,/,/),[/],(/,/)，/
+  double st_target_relative_distance = 2;
+  ///< 目标车速： [0/1],(/,/,/),[/],(/,/)，/
+  double st_target_speed = 3;
+  ///< 当前所在车道： [0/1],(/,/,/),[/],(/,/)，/
+  int32 st_target_current_relation2ego = 4;
+  ///< 预测所在车道： [0/1],(/,/,/),[/],(/,/)，/
+  int32 st_target_prediction_relation2ego = 5;
+  ///< 目标压线量： [0/1],(/,/,/),[/],(/,/)，/
+  double st_target_cross_lane_value = 6;
+  ///< 目标距离横向轨迹的距离： [0/1],(/,/,/),[/],(/,/)，/
+  double st_target_dis2path_value = 7;
+  ///< QP冲击度权重(w4): [0/1],(/,/,/),[/],(/,/)，/
+  double weight_jerk = 8;
+  ///< QP速度差权重(w5): [0/1],(/,/,/),[/],(/,/)，/
+  double weight_delta_spd = 9;
+  ///< QP距离跟踪权重(w6)： [0/1],(/,/,/),[/],(/,/)，/
+  double weight_delta_dist = 10;
+  ///< 动态跟车安全等级： [0/1],(/,/,/),[/],(/,/)，/
+  double follow_safe_level = 11;  
+}
+
+
+/**
+ * @brief dnp_common
+ * @detail 纵向规划输出的预警信息
+ */
+ message LnpWarningInfo {
+  ///< 制动不足标志位： [0/1],(/,/,/),[/],(/,/)，/
+  double underbraking = 1;  
+  ///< 纵向规划最终减速类型： [0/1],(/,/,/),[/],(/,/)，/ 
+  double final_decel_type = 2;
+  ///< 纵向规划未受约束的原始减速度： [0/1],(/,/,/),[/],(/,/)，/ 
+  double raw_deceleration = 3;
+  ///< DNP_限速提示信息： [0/1],(/,/,/),[/],(/,/)，/ 
+  double speed_limit_warning_info = 4;
+  ///< 危险行人报警信息： [0/1],(/,/,/),[/],(/,/)，/ 
+  double dangerous_pedestrian_warning = 5;
+ }
+  
+
+ /**
+* @brief 纵向输出的目标组
+* @details  纵向输出的目标组
+*/
+message LonObjects
+{
+  ///< lon_objects： [/],(/,/,/),[100],(/,/),纵向标签 
+  repeated LonObject lon_objects = 1;
+  ///< flag： [0/1],(/,/,/),[/],(/,/)，预留标记信号
+  double flag = 2;
+  ///< lon_obj_flag： [0/1],(/,/,/),[100],(/,/)，预留标记信号
+  repeated double lon_obj_flag = 3;
+  ///< lon_obj_debug_info： [0/1],(/,/,/),[100],(/,/)，纵向标签调试信息
+  repeated DebugInfo lon_obj_debug_info = 4;
+}
+
+/**
+* @brief 单个目标
+* @details  单个目标
+*/
+message LonObject
+{
+  ///< track_id： [/],(/,/,/),[/],(/,/)，目标id 
+  uint32 track_id = 1;
+  ///<标签类型:[/],(0,0,/),[100],(1,0),标签类型
+  repeated Decisiontype lon_decision_type = 2;
+  ///<follow_style:[/],(0,0,/),[/],(1,0),跟车类型
+  int32 follow_style = 3;
+  ///<speed_cut_level:[/],(0,0,/),[/],(1,0),减速通过等级
+  int32 speed_cut_level_a = 4;
+  ///<speed_cut_min_time:[/],(0,0,/),[/],(1,0),减速通过最小时间
+  double speed_cut_min_time = 5;
+  ///<keepdis_distance:[/],(0,0,/),[/],(1,0),保持间距距离
+  int32 keepdis_distance = 6;
+  ///<observe_time:[/],(0,0,/),[/],(1,0),观察时间
+  double observe_time = 7;
+  ///<observe_dis:[/],(0,0,/),[/],(1,0),观察距离
+  double observe_dis = 8;
+  ///<减速等级:[/],(0,0,/),[/],(1,0),减速等级
+  SpeedCutType speed_cut_level = 9;
+  ///<横向规划下标:[/],(0,0,/),[/],(1,0),description 0:直行轨迹，1:左行轨迹，2:右行轨迹
+  int32 lat_plan_index = 10;
+  ///<同一轨迹下同一个目标的标签组合:[/],(0,0,/),[100],(1,0),同一轨迹下同一个目标的标签组合
+  repeated Available tag_available = 11;
+  ///<标签原因:[/],(0,0,/),[/],(1,0),标签原因
+  TagReason tag_reason = 12;
+  ///<observe_back_a:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_a = 13;
+  ///<observe_back_a:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_b = 14;
+  ///<observe_back_c:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_c = 15;
+  ///<observe_back_d:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_d = 16;
+  ///<observe_back_e:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_e = 17;
+  ///<observe_back_f:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_f = 18;
+  ///<observe_back_g:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_g = 19;
+  ///<observe_back_h:[/],(0,0,/),[/],(1,0),预留信号
+  double observe_back_h = 20;
+  ///< min_space： [0/1],(/,/,/),[/],(/,/)，最小空间距离 
+  double min_space = 21;
+  ///< alarm_msg: [0/1],(/,/,/),[100],(/,/)，报警信号 
+  repeated int32 alarm_msg = 22;
+  ///< lat_plan_style: [0/1],(/,/,/),[/],(/,/)，横向规划风格 
+  int32 lat_plan_style = 23;
+  ///< lon_plan_style: [0/1],(/,/,/),[/],(/,/)，纵向规划风格
+  int32 lon_plan_style = 24;
+  ///<please_takeover_reason:[/],(0,0,/),[/],(1,0),接管原因
+	int32 please_takeover_reason = 25;
+  ///<please_notice_reason:[/],(0,0,/),[/],(1,0),提示原因
+	int32 please_notice_reason = 26;
+  
+}
+
+
+/**
+* @brief 场景决策类型
+* @details  场景决策类型
+*/
+enum Decisiontype
+{
+	///<忽略区:[/],(0,0,/),[/],(1,0),忽略区
+	IGNORE = 0;
+	///<观察区:[/],(0,0,/),[/],(1,0),观察区
+	OBSERVE = 1;
+	///<跟车区:[/],(0,0,/),[/],(1,0),跟车区
+	FOLLOW = 2;
+	///<减速汇流:[/],(0,0,/),[/],(1,0),减速汇流
+	EGODECEL = 3;
+	///<加速汇流:[/],(0,0,/),[/],(1,0),加速汇流
+	EGOEPLUS = 4;
+	///<减速通过:[/],(0,0,/),[/],(1,0),减速通过
+	SPEEDCUT = 5;
+	///<保持距离:[/],(0,0,/),[/],(1,0),保持距离
+	KEEPDIS = 6;
+	///<切入:[/],(0,0,/),[/],(1,0),切入
+	CUTIN = 7;
+	///<汇流:[/],(0,0,/),[/],(1,0),汇流
+	MERGEPROB = 8;
+  ///<预留:[/],(0,0,/),[/],(1,0),预留
+	OTHER1 = 9;
+  ///<预留:[/],(0,0,/),[/],(1,0),预留
+	OTHER2 = 10;
+  ///<Please_Keep_Safe:[/],(0,0,/),[/],(1,0),请保持安全
+	Please_Keep_Safe = 11;
+  ///<Please_Create_LC:[/],(0,0,/),[/],(1,0),请求换道
+	Please_Create_LC = 12;
+  ///<Please_TakeOver:[/],(0,0,/),[/],(1,0),请求接管
+	Please_TakeOver = 13;
+  ///<Please_Notice:[/],(0,0,/),[/],(1,0),请注意
+	Please_Notice = 14;
+  
+}
+/**
+* @brief 场景决策减速类型
+* @details  场景决策减速类型
+*/
+enum SpeedCutType
+{
+	///<无效值:[/],(0,0,/),[/],(1,0),description
+	INVALID = 0;
+	///<匀速:[/],(0,0,/),[/],(1,0),description
+	CONSTANTSPEED = 1;
+	///<无感:[/],(0,0,/),[/],(1,0),description
+	INSENTIENCE = 2;
+	///<轻微感觉:[/],(0,0,/),[/],(1,0),description
+	SLIGHTLY = 3;
+	///<明显感觉（舒适）:[/],(0,0,/),[/],(1,0),description
+	OBVIOUSSOFT = 4;
+	///<明显感觉（不舒适但可接受）:[/],(0,0,/),[/],(1,0),description
+	OBVIOUSHEAVY = 5;
+	///<较重制动（不易接受）:[/],(0,0,/),[/],(1,0),description
+	HEAVYBRAKE = 6;
+	///<系统极限制动:[/],(0,0,/),[/],(1,0),description
+	SYSTEMBRAKE = 7;
+	///<超出系统制动能力:[/],(0,0,/),[/],(1,0),description
+	OVERSYSTEMBRAKE = 8;
+	///<超出接管制动能力:[/],(0,0,/),[/],(1,0),description
+	OVERDRIVERBRAKE = 9;
+}
+/**
+* @brief 场景决策标签原因
+* @details  场景决策标签原因
+*/
+enum TagReason
+{
+	///<无效值:[/],(0,0,/),[/],(1,0),无效值
+	TR_INVALID = 0;
+	///<忽略原因1:[/],(0,0,/),[/],(1,0),忽略原因1
+	TR_IGNORE1 = 1;
+	///<忽略原因2:[/],(0,0,/),[/],(1,0),忽略原因2
+	TR_IGNORE2 = 2;
+	///<跟车原因1:[/],(0,0,/),[/],(1,0),跟车原因1
+	TR_FOLLOW1 = 3;
+	///<跟车原因2:[/],(0,0,/),[/],(1,0),跟车原因2
+	TR_FOLLOW2 = 4;
+	///<观察原因1:[/],(0,0,/),[/],(1,0),观察原因1
+	TR_OBVIOUSSOFT1 = 5;
+	///<观察原因2:[/],(0,0,/),[/],(1,0),观察原因2
+	TR_OBVIOUSSOFT2 = 6;
+	///<减速原因1:[/],(0,0,/),[/],(1,0),减速原因1
+	TR_SPEEDCUT1 = 7;
+	///<减速原因2:[/],(0,0,/),[/],(1,0),减速原因2
+	TR_SPEEDCUT2 = 8;
+	///<减速原因3:[/],(0,0,/),[/],(1,0),减速原因3
+	TR_SPEEDCUT3 = 9;
+  ///<切入原因1:[/],(0,0,/),[/],(1,0),切入原因1
+	TR_CUTIN1 = 10;
+	///<切入原因2:[/],(0,0,/),[/],(1,0),切入原因2
+	TR_CUTIN2 = 11;
+	///<汇流原因1:[/],(0,0,/),[/],(1,0),汇流原因1
+	TR_MERGEPROB1 = 12;
+	///<汇流原因2:[/],(0,0,/),[/],(1,0),汇流原因2
+	TR_MERGEPROB2 = 13;
+	///<保持距离原因1:[/],(0,0,/),[/],(1,0),保持距离原因1
+	TR_KEEPDIS1 = 14;
+	///<保持距离原因2:[/],(0,0,/),[/],(1,0),保持距离原因2
+	TR_KEEPDIS2 = 15;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	TR_OTHER0 = 16;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	TR_OTHER1 = 17;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	TR_OTHER2 = 18;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	TR_OTHER3 = 19;
+}
+
+/**
+* @brief 标签是否有效和减速等级
+* @details  标签是否有效和减速等级
+*/
+message Available
+{
+  ///<available:[/],(0,0,/),[/],(1,0),标签是否有效
+  bool available = 1;
+  ///<标签类型:[/],(0,0,/),[/],(1,0),标签类型
+  Decisiontype lon_decision_type = 2;
+  ///<减速等级:[/],(0,0,/),[/],(1,0),减速等级
+  SpeedCutType speed_cut_level = 3;
+  ///<标签原因:[/],(0,0,/),[/],(1,0),标签原因
+  TagReason tag_reason = 4;
+}
+/**
+* @brief 横纵向决策状态输出值
+* @details  横纵向决策状态输出值
+*/
+message LatLonState 
+{
+  ///<hsm_track_id:[/],(0,0,/),[/],(1,0),决策目标id
+  uint32 hsm_track_id = 1;
+  ///<lon_state:[/],(0,0,/),[/],(1,0),纵向决策
+  int32 lon_state = 2;
+  ///<lat_state:[/],(0,0,/),[/],(1,0),横向决策
+  int32 lat_state = 3;
+  ///<pre_lon_state:[/],(0,0,/),[/],(1,0),上一帧纵向决策结果
+  int32 pre_lon_state = 4;
+  ///<pre_lat_state:[/],(0,0,/),[/],(1,0),上一帧横向决策结果
+  int32 pre_lat_state = 5;
+}
+/**
+* @brief 横纵向目标决策输出
+* @details  横纵向目标决策输出
+*/
+message LatLonObjects
+{
+  ///<hsm_lon_objects_decision:[/],(0,0,/),[/],(1,0),决策状态机输出纵向决策信息
+  LonObjects hsm_lon_objects_decision = 1;
+  ///<hsm_lon_objects_decision:[/],(0,0,/),[33],(1,0),决策状态机输出横向决策信息
+  repeated ObjectLatDecisions hsm_lat_objects_decision = 2;
+  ///<lat_lon_state:[/],(0,0,/),[33],(1,0),横纵向决策状态输出值
+  repeated LatLonState lat_lon_state = 3;
+  ///<reserve_a:[/],(0,0,/),[10],(1,0),预留信号
+  repeated bool reserve_a = 4;
+  ///<reserve_b:[/],(0,0,/),[10],(1,0),预留信号
+  repeated double reserve_b = 5;
+  ///<mutable_decision_lat_mode:[/],(0,0,/),[10],(1,0),综合决策横向换道模式
+  repeated int32 mutable_decision_lat_mode = 6;
+  ///<mutable_decision_decel_level:[/],(0,0,/),[10],(1,0),综合决策纵向减速等级
+  repeated SpeedCutType mutable_decision_decel_level = 7;
+  ///<mutable_decision_lon_type:[/],(0,0,/),[10],(1,0),综合决策纵向类型
+  repeated Decisiontype mutable_decision_lon_type = 8;
+  ///<decision_lane_change_request:[/],(0,0,/),[10],(1,0),综合决策请求换道
+  int32 decision_lane_change_request = 9;
+  ///<decision_lane_change_request_avoid:[/],(0,0,/),[10],(1,0),综合决策换道回退信号
+  int32 decision_lane_change_request_avoid = 10;
+  ///<mutable_decision_reason:[/],(0,0,/),[10],(1,0),综合决策信号reason
+  double mutable_decision_reason = 11;
+}
+
+/**
+* @brief DebugInfo
+* @details  DebugInfo
+*/
+message DebugInfo
+{
+  ///<预留:[/],(0,0,/),[/],(1,0),预留
+	bool di_other0 = 1;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	uint32 di_other1 = 2;
+	///<预留:[/],(0,0,/),[/],(1,0),预留
+	double di_other2 = 3;
+	///<预留:[/],(0,0,/),[100],(1,0),预留
+	repeated double di_other3 = 4;
+}

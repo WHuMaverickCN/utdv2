@@ -1,0 +1,1768 @@
+/**
+* @file         DataCollection.proto
+* @author   fenglili
+* @details   众包地图-数据收集-车云协议
+* @date      2023-07-12
+* @version  V7.7
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+
+* 信号名称：[单位]、必传项、(默认值、最小值、最大值)、信号描述
+
+**********************************************************************************
+*/
+syntax = "proto3";
+import "CameraParam.proto";
+import "SLAMCommon.proto";
+package datacollection;
+option java_package = "com.mx.changan.datacollect.proto";//生成文件存放的路径
+option java_outer_classname = "DataCollect";//生成类的名
+//数据收集类
+message DataCollectInfo{
+    //数据类型[],必传,(,,),每种类型对应collect_data的内容
+    DataType data_type = 1; 
+
+    //公共信息[],必传,(,,),
+    CommonData common_data = 2;
+
+    //收集内容[],必传,(,,),数据对象序列化后的数据
+    bytes collect_data = 3;
+}
+//DataType 数据类型枚举
+enum DataType{
+    //message LocationData
+    LOCATION_INFO = 0; 
+
+    //message SemanticMapList   
+    SEMANTIC_MAP = 1; 
+   
+    //message IdentifyResults
+    IDENTIFY_OBJECT = 2; 
+
+    //message TaskData
+    TASK_DATA = 3; 
+}
+
+//CommonData 共通数据
+message CommonData {
+    //车辆ID[],必传,(,,),
+    string id = 1; 
+
+    //协议版本[],必传,(,,),
+    ProtoColVersion protocol_version = 2; 
+	
+    //摄像头内参[],,(,,),
+    cameraparam.InstrinsicParam camera_inner_param = 3; 
+   
+    //模型号[],必传,(,,),
+    ModelID  model_id = 4;
+   
+    //数据来源[],,(,,),
+    Datasource data_source = 5;
+	
+    //车端输入数据版本信息[],必传,(++),
+    string dataversion = 6;
+}
+
+//ModelID 模型号
+enum ModelID{
+    //Changan C385 车型 
+    C385 = 0;
+
+    //Changan SDA 车型 
+    SDA = 1;
+
+    //Changan 未知车型
+    MID_UNKNOWN = 1000;
+}
+
+//Datasource 数据来源
+enum Datasource{
+    //不使用
+    DATASOURCE_NO_USE = 0;    
+
+    //Changan 感知
+    DATASOURCE_CHANGAN = 1;	
+	
+    //Meixing 感知
+    DATASOURCE_MEIXING = 2;
+
+    //未知
+    DATASOURCE_UNKNOWN = 1000;     
+}
+
+//ProtoColVersion 协议版本
+enum ProtoColVersion{
+     VERSION_ZERO = 0;
+     VERSION_ONE = 1;
+     VERSION_TWO = 2;
+     VERSION_THREE = 3;
+     VERSION_FOUR = 4;
+     VERSION_FIVE = 5;
+     VERSION_SIX = 6;
+     VERSION_SEVEN = 7;
+     VERSION_EIGHT = 8;
+     PCV_UNKNOWN = 1000;
+}
+
+//BaseInfo 基础信息
+message BaseInfo{
+    //开始时间[微秒],必传,(,2022.01.01,实时收集日期),计算方法参照UTC时间戳计算方法
+    int64 start_time = 1; 
+
+    //持续时间[微秒],必传,(,0,86400000000),采集距离不超过600米
+    int64 work_time = 2; 
+}
+//GeoPoint 定位坐标
+message GeoPoint{
+    //3维坐标mcode[],必传,(,,),18个字符(经纬度XY精度是小数点后8位，约1.07mm；高度Z精度是小数据点3位，即1mm,若Z为最大值，则认定Z值无效)
+    //<经度[度],必传,(0,73.55,135.083333),精度是小数点后8位(约1.07mm)
+    //<纬度[度],必传,(0,3.85,53.55),精度是小数点后8位(约1.07mm)
+    //<高度[毫米],必传,(0,-154320,8844450),精度是小数点后8位(约1.07mm)
+    string mcode = 4; 
+}
+
+//GeoRect 矩形信息
+message GeoRect{
+    //左下[],必传,(,,),
+    GeoPoint lb = 1; 
+    
+    //右上[],必传,(,,),
+    GeoPoint rt = 2;
+}
+
+//OutLine 轮廓
+message OutLine{
+   //外轮廓构成点[],必传,(,,),
+    repeated GeoPoint point = 1;   
+
+    //内轮廓构成点list[],,(,,),
+    repeated GeoPointlist internalpointlist = 2; 
+}
+
+//GeoPointlist 内轮廓构成点list
+message GeoPointlist{
+    //内轮廓构成点[],,(,,),
+    repeated GeoPoint internalpoint = 1; 
+}
+
+//Line 轮廓
+message Line{
+    //线型构成点[],必传,(,,),
+    repeated GeoPoint point = 1;  
+}
+//Solid 杆状物
+message Solid{
+    //杆子顶的点[],必传,(,,),    
+    GeoPoint point_top = 1;
+
+    //杆子顶的半径[厘米],,(,,),    
+    double radius_top = 2;
+
+    //杆子底的点[],必传,(,,),    
+    GeoPoint point_bottom = 3;
+
+    //杆子底的半径[厘米],必传,(,,),    
+    double radius_bottom = 4;
+}
+
+//MMGeoInfo 地图匹配信息
+message MMGeoInfo{
+    //地图匹配的点[],必传,(,,),   
+    GeoPoint mm_geo_point = 1; 
+
+    //方向[度],必传,(0,,),匹配后的车头方向(以航向角标识,正东方向逆时针为正)   
+    double yaw = 2; 
+
+    //车线号[],,(,,),
+    int32 lane_number = 3; 
+
+    //是否匹配成功[],必传,(,,),    
+    bool is_success = 4;
+}
+
+//LocationInfo 定位数据
+message LocationInfo{
+    //相对时间戳[微秒],必传,(0,2022.01.01,实时收集日期),计算方法参照UTC时间戳计算方法     
+    int64 timestamp = 1; 
+
+    //经纬度[],必传,(,,),      
+    GeoPoint geo_point = 2; 
+
+    //方位角[度],必传,(,,),          
+    double yaw = 3;
+
+    //俯仰角[度],必传,(,,),        
+    double pitch = 4;
+
+    //翻滚角[度],必传,(,,),      
+    double roll = 5; 
+
+    //速度信息[],必传,(,,),速度与北地东速度必选其一
+    oneof speed_info{
+         //速度[m/s],,(0,,),速度与北地东速度必选其一         
+         double normal_speed = 6; 
+         
+         //北东地速度[m/s],,(,,),速度与北地东速度必选其一         
+         NEG_Speed neg_speed = 12;
+    }    
+
+    //方位角误差范围[度],,(,,),
+    float yaw_error_range = 7; 
+
+    //俯仰角误差范围[度],,(,,),
+    float pitch_error_range = 8; 
+
+    //翻滚角误差范围[度],,(,,),
+    float roll_error_range = 9; 
+
+    //匹配信息[],,(,,),
+    MMGeoInfo mm_geo_info = 10; 
+
+    //定位状态信息[],,(,,),
+    PositionStateInfo position_state_info = 13; 
+
+    //定位精度信息[],必传,(,,),SDA车型必传(C385非必传)
+    PositionAccuracyInfo position_accuracy_info = 14;
+
+    //轨迹状态信息[],,(,,),
+    TrajectoryStateInfo trajectory_state_info = 15;      
+
+   //颠簸状态[],,(,,),	
+    BumpStatus bump_status = 16;
+}
+
+//NEG_Speed 北，东，地速度
+message NEG_Speed{
+    //北向速度[m/s],,(0,-55.5555556,55.5555556),         
+    double north_velocity = 1;
+
+    //东向速度[m/s],,(0,-55.5555556,55.5555556),  
+    double east_velocity = 2;
+
+    //地向速度[m/s],,(0,-55.5555556,55.5555556),  
+    double ground_velocity = 3;
+}
+
+//LocationData 定位信息
+message LocationData{
+    //基础信息[],必传,(,,),  
+    BaseInfo base_info = 1;
+ 
+    //定位详情信息列表[],必传,(,,),  
+    repeated LocationInfo location_info_list = 2; 
+}
+
+//PositionState 定位状态
+enum PositionState{
+    //不使用
+    PS_NO_USE = 0;
+
+    //成功
+    PS_SUCCESS = 1;
+
+    //未知
+    PS_UNKNOWN = 1000;
+}
+
+//定位型式
+enum PositionType{
+    //不使用   
+    PT_NO_USE = 0;
+
+    //二维定位
+    TWO_POSITION = 1; 
+
+    //三维定位
+    THREE_POSITION = 2;
+
+    //未定位
+    NO_POSITION = 1000;
+}
+
+enum PositionSource{
+    // 不使用
+    POSITIONSOURCE_NO_USE = 0;
+
+    // 原始定位
+    PS_RAW = 1; 
+
+    // DR定位
+    PS_DR = 2;  
+}
+
+//PositionStateInfo 定位状态信息
+message PositionStateInfo{
+    //定位状态[],,(0,,),
+    PositionState position_state = 1;
+
+    //定位型式[],,(0,,),
+    PositionType position_type = 2; 
+
+    //HDOP垂直精度因子[],,(0,0.5,99.9),
+    double hdop = 3; 
+
+    //VDOP垂直精度因子[],,(0,0.5,99.9),
+    double vdop = 4; 
+
+    //定位来源[],,(0,,),
+    PositionSource position_source = 5; 
+}
+
+//PositionAccuracyInfo 定位精度信息
+message PositionAccuracyInfo{
+ 
+   //定位信息精度有效值[],必传,(0,,),true:有效;false:无效
+    bool location_accuracy_valid = 1;   
+ 
+    //定位信息精度_纬度[],必传,(0,,),
+    double lat_std = 2;   
+ 
+    //定位信息精度_经度[],必传,(0,,),
+    double lon_std = 3;   
+
+    //定位信息精度_高度[],必传,(0,,),
+    double h_std = 4;
+
+    //定速信息精度有效值[],必传,(0,,),true:有效;false:无效
+    bool speed_accuracy_valid = 5; 
+
+    //定速信息精度_北向速度[],必传,(0,,),
+    double vn_std = 6;    
+
+    //定速信息精度_东向速度[],必传,(0,,),
+    double ve_std = 7;       
+
+    //定速信息精度_地向速度[],必传,(0,,),
+    double vd_std = 8;          
+
+    //姿态信息精度有效值[],必传,(0,,),true:有效;false:无效
+    bool attitude_accuracy_valid = 9;          
+
+    //姿态信息精度_横滚角[],必传,(0,,),
+    double roll_std = 10;             
+
+    //姿态信息精度_俯仰角[],必传,(0,,),
+    double pitch_std = 11;                
+
+    //姿态信息精度_偏转角[],必传,(0,,),
+    double yaw_std = 12;      
+}
+
+//TrajectoryStateInfo 轨迹状态信息
+message TrajectoryStateInfo{
+    //轨迹信息是否有效[],必传,(0,,),true:有效;false:无效
+    bool m_traj_is_valid = 1;
+
+    //轨迹开始时间戳[微秒],,(0,,),
+    uint64 m_traj_start_timestamp = 2;
+
+    //轨迹结束时间戳[微秒],,(0,,),
+    uint64 m_traj_end_timestamp = 3;
+
+    //轨迹位置均方根差[m],,(0,,),
+    double m_traj_position_rmse = 4;
+
+    //轨迹位置最大距离误差[m],,(0,,),
+    double m_traj_position_max_error = 5;
+
+    //轨迹高度均方根差[m],,(0,,),
+    double m_traj_height_rmse = 6;
+
+    //轨迹高度最大距离误差[m],,(0,,),
+    double m_traj_height_max_error =7;
+
+    //轨迹长度[m],,(0,,),
+    double m_traj_length = 8;
+
+}
+
+//BumpStatus颠簸状态
+message BumpStatus{
+    //颠簸等级
+	int32 bump_level = 1;
+	//颠簸类型
+	BumpType bump_type = 2;
+}
+
+//BumpType颠簸类型
+enum BumpType{
+    BUMP_NO_USE = 0;//不使用
+	VIBRATION_BONE = 1;//振动带
+	BAD_ROAD = 2;//烂路
+	HOLE = 3;//凹坑
+	BUMP_UNKOWN = 1000;//类型未知
+} 
+
+//SemanticMapList 语义地图数据列表
+message SemanticMapList{
+    //语义地图对象集合[],,(,,),
+    repeated SemanticMap semantic_map_info_list = 1;
+}
+
+//Characteristic 特征点
+message Characteristic{
+    //特征点ID[],必传,(,,),扩展用，本项目暂时无数据不传输
+    int32 id = 1; 
+
+    //特征值[],必传,(1,,),
+    slamcommon.ORBFeature value = 2; 
+
+    //相对位置[],必传,(100,,),
+    GeoPoint postion_ref = 3; 
+}
+
+//KeyFrame 关键帧
+message KeyFrame{
+    //时间戳[微秒],必传,(,,),扩展用(本项目暂时无数据不传输)
+    int64 timestamp = 1; 
+
+    //地图对象id列表[],必传,(,,),
+    repeated int32 objdata_id_list = 2; 
+
+    //特征id列表[],,(,,),
+    repeated int32 characteristic_id_list = 3; //特征id列表
+}
+
+//SubIds 子对象组
+message SubIds{
+    //子对象ID[],必传,(,,),
+    repeated int32 sub_id = 1;//id集合
+}
+
+//ObjData 对象数据
+message ObjData{
+    //对象ID[],必传,(,,),    
+    int32 id = 1; 
+	
+   //颜色[],必传,(,,),       
+    Color color = 4; 
+  
+    //颜色置信度[],必传,(,0,100),     
+    int32 confidence = 5;
+
+    //类型[],必传,(,,),     
+    ObjectType type = 6; 
+
+    //子类型[],必传,(,,),9选一    
+    oneof subtype{
+         //子类型[],必传,(,,),10选一
+         RoadLineType lineType = 14;
+         //子类型[],必传,(,,),10选一 
+         MarkType markType = 15;
+         //子类型[],必传,(,,),10选一 
+         SignType signType = 16;
+         //子类型[],必传,(,,),10选一 
+         ArrowType arrowType = 17;
+         //子类型[],必传,(,,),10选一
+         TrafficLightType trafficLightType = 18;
+         //子类型[],必传,(,,),10选一
+         BoundaryType boundaryType = 19;
+        //子类型[],必传,(,,),10选一
+         OverheadType overheadType = 20;
+         //子类型[],必传,(,,),10选一
+         PoleType poleType = 21; 
+         //子类型[],必传,(,,),10选一
+         RoadPoint roadpoint = 30;		 
+        //子类型[],必传,(,,),10选一
+         NoSubType noSubType = 50;
+     }
+	 
+	 //子类型[],,(,,),附加线型(长安感知追加)
+     RoadLineLongitudinalType lineLongitudinalType = 22;
+     
+     //采集车道线类型[],,(0,,), (长安感知追加)
+    CollectLaneType collect_lane_type = 28;	
+	
+    //采集对象时间戳[],,(长安感知追加)
+    BaseInfo time_stamp = 29;
+	
+    //类型置信度[],必传,(,0,100),     
+    int32 type_confidence = 8; // 置信度0-100
+
+    //子类型置信度[],必传,(,0,100),     
+    int32 subtype_confidence = 9; // 置信度0-100
+
+    //数值[],必传,(,,),     
+    int32 value = 10; 
+
+    //数值置信度[],必传,(,0,100),     
+    int32 value_confidence = 11; // 置信度0-100
+
+   //几何信息类型[],必传,(,,),5选1   
+    oneof geo_info{
+         //几何信息轮廓[],必传,(,,),5选1   
+         OutLine outline = 2; 
+         //几何信息矩形框[],必传,(,,),5选1   
+         GeoRect rect = 3; 
+         //几何信息中心点[],必传,(,,),5选1   
+         GeoPoint center_point = 12; 
+         //几何信息线[],必传,(,,),5选1   
+         Line line = 26; 
+         //几何信息杆状[],必传,(,,),5选1   
+         Solid solid = 27;
+    }     
+
+    //子对象组列表[],,(,,),     
+    repeated SubIds sub_ids_list = 13; 
+
+    //来源[],,(,,),     
+    Source source = 23; 
+
+    //图片[],,(,,),   
+    bytes picture = 24; 
+
+    //图片格式[],,(0,,),   
+    PictureFormat picture_format = 25;
+}
+
+//PictureFormat 图片格式类型
+enum PictureFormat{
+     PF_NO_USE = 0; //未使用
+     PF_PNG = 1;//png格式
+     PF_JPG = 2;//jpg格式
+     PF_UNKNOWN = 1000; //未知
+}
+
+//CollectLaneType 采集车道线类型 (长安感知追加)
+enum CollectLaneType{
+     TYPE_NO_USE = 0;//未使用 
+     MAJOR_LANE = 1;//主车道线
+     LEFT_LANE = 2;//采集车道左车道线
+     LEFT_SECONDARY_LANE = 3;//采集车道左左车道线
+     LEFT_BOUNDARY = 4;//左道路边界线
+     RIGHT_LANE = 5;//采集车道线右车道线
+     RIGHT_SECONDARY_LANE = 6;//采集车道线右右车道线
+     RIGHT_BOUNDARY = 7;//右道路边界线	 
+     RAMP_LEFT = 8;//匝道口左
+     RAMP_RIGHT = 9;//匝道口右
+     LEFT_THIRD_LANE = 10;//采集车道左左左车道线
+     RIGHT_THIRD_LANE = 11;//采集车道右右右车道线	 
+     TYPE_UNKOWN = 1000;//未知
+}
+
+//Source 类型
+enum Source{
+     SOURCE_NO_USE = 0;//未使用
+     DETECTION = 1;//检测
+     SEMANTIC_RECOGNITION = 2;//语义识别
+     SOURCE_UNKNOWN = 1000;//未知
+}
+
+//ObjectType 地图对象分类
+enum ObjectType{
+     OBJECT_NO_USE = 0;//不用
+     ROAD_SURFACE_LINE=1;//路面的标线
+     ROAD_SURFACE_ARROW=2;//路面的箭头
+     ROAD_SURFACE_MARK=3;//路上的标志
+     ROAD_SIGN=4;//路上的标牌
+     ROAD_TRAFFIC_LIGHT=5;//路上的信号灯
+     ROAD_BOUNDARY=6;//路边的条带
+     ROAD_POLE=7;//路边的杆子
+     ROAD_OVERHEAD=10;//路顶的高架设施
+     VISUAL_DRIVABLE_BOUNDARY=11;//视觉可行驶边界
+     ROAD_POINT=12;//路面的特征点
+     OBJECT_UNKNOWN=1000;//未知
+}
+
+//NoSubType 没有子类型
+enum NoSubType{
+     NST_NO_USE = 0;//不使用子类型
+}
+
+//RoadLineType 路面的标线类型
+enum RoadLineType{
+     LINE_NO_USE = 0;//不用
+     VIRTUAL_WIRE=1;//虚拟线
+     THIN_DASHED_LINE_SEGMENT=2;//细虚线段
+     THICK_DASHED_LINE_SEGMENT=3;//粗虚线段
+     SINGLE_DASHED_LINE=4;//单虚线
+     SINGLE_SOLID_LINE=5;//单实线
+     DOUBLE_DASHED_LINE=6;//双虚线
+     DOUBLE_SOLID_LINE=7;//双实线
+     LEFT_SOLID_RIGHT_DASHED_LINE=8;//左实右虚线
+     RIGHT_SOLID_LEFT_DASHED_LINE=9;//右实左虚线
+     LAY_EDGE_LINE=10;//铺设边缘线
+     STOP_LINE=101;//停止线
+     PEDESTRIAN_CROSSING_LINE=102;//人行横道（斑马线）
+     DECELERATE_BUMP=103;//减速带
+     DECELERATE_YIELD_LINE=104;//减速让行线
+     STOP_YIELD_LINE=105;//停车让行线
+     DISTANCE_CONFIRMATION_LINE=106;//车距确认标线
+     DIVERSION_LINE=107;//导流线
+     CENTRAL_CIRCLE=108;//中心圈
+     RETICULATED_LINE=109;//网状线
+     PROHIBIT_U_TURN_SIGN=110;//禁止掉头标记
+     PROHIBIT_TURN_SIGN=111;//禁止转弯标记
+     DECELERATE_MOUND_LINE=112;//减速丘标线
+     DECELERATE_RETICLE=113;//减速标线
+     PARKING_SPACE_LINE=114;//停车位标线
+     ROAD_SURFACE_TERRAIN_LINE=401;//路面地形线
+     DRIVABLE_AREA=402;//可行驶区域面
+     PEDESTRIAN_AREA=403;//人行区域面，辅路面
+     WARNING_AREA=404;//警示区域
+     LINE_UNKNOWN=1000;//未分类
+}
+//RoadLineLongitudinalType 路面标线附加类型
+enum RoadLineLongitudinalType{
+     COMMON = 0;//常规线型
+     WHITE_SEMICIRCLE_DISTANCE_CONFIRMATION_LINE=1;//白色半圆车距确认线
+     LONGITUDINAL_DECELERATE_RETICLE=2;//车行道纵向减速标线
+     DIVERSION_ZONE_LINE=3;//导流区边线
+     NO_PARKING_LINE=4;//禁停区边线
+}
+//ArrowType 路面的箭头类型
+enum ArrowType{
+     ARROW_NO_USE=0;//不使用
+     AHEAD=1;//直行
+     LEFT=2;//左转
+     RIGHT=3;//右转
+     AHEAD_LEFT=4;//直行+左转
+     AHEAD_RIGHT=5;//直行+右转
+     LEFT_RIGHT=6;//左转+右转
+     LEFT_FRONT=7;//左前方
+     RIGHT_FRONT=8;//右前方
+     AHEAD_U_TURN=9;//直行+掉头
+     LEFT_U_TURN=10;//左转+掉头
+     LEFTU_TURN_=11;//左掉头
+     RIGHTU_TURN=12;//右掉头
+     PROHIBIT_LEFT=13;//禁止左转
+     PROHIBIT_RIGHT=14;//禁止右转
+     PROHIBIT_U_TURN=15;//禁止调头
+     PROHIBIT_LEFT_RIGHT=16;//禁止左转和右转
+     PROHIBIT_LEFT_U_TURN=17;//禁止左转和调头
+     PROHIBIT_RIGHT_U_TURN=18;//禁止右 = 22;//右合流转和调头
+     LEFT_AHEAD_RIGHT=19;//左转+直行+右转
+     LEFT_RIGHT_U_TURN=20;//左转+右转+调头
+     LEFT_MERGE = 21;//左合流
+     RIGHT_MERGE = 22;//右合流
+     ARROW_UNKNOWN=1000;//未分类
+}
+
+//MarkType 路面的标志类型
+enum MarkType{
+     MARK_NO_USE = 0;//不用
+     MARK_UNKNOWN=1000;//未分类
+     PEDESTRIAN_CROSS_WARNING_LINE=1;//人行横道预告标线
+     BICYCLE_MARK=2;//自行车标志
+     TEXT=3;//文字
+     MIN_SPEED_LIMIT=6;//最低限速
+     MAX_SPEED_LIMIT=7;//最高限速 
+}
+
+//SignType 对应MapObjectType枚举TrafficSign的子分类
+enum SignType{
+     Sign_No_Use = 0;//不用
+     Sign_UNKNOWN=1000;//未分类
+     GroupSign=1001;//组合标牌
+     WarningSign=100;//警告标志
+     WMountLeft=101;//傍山险路（右侧）
+     WMountRight=102;//傍山险路（左侧）
+     WVillage=103;//村庄
+     WDamRight=104;//堤坝路（右侧）
+     WDamLeft=105;//堤坝路（左侧）
+     WTShap=106;//丁字平面交叉
+     WFerry=107;//渡口
+     WRNarrowOnBSide=108;//二侧变窄
+     WLeftFalling=109;//注意落石（左侧）
+     WRLTurn=110;//向左反向弯路
+     WLRTurn=111;//向右反向弯路
+     WFord=112;//过水路面
+     WCrossIntersection=113;//十字交叉路口
+     WIntersection=114;//卡字交叉路口
+     WYIntersectionLB=115;//Y 形交叉（左下侧）
+     WYIntersectionRB=116;//Y 形交叉（右下侧）
+     WYIntersectionLT=117;//Y 形交叉（左上侧）
+     WLeftNarrow=118;//左侧变窄
+     WYIntersectionRT=119;//Y 形交叉（右上侧）
+     WTIntersection=120;//T 形交叉路口
+     WTIntersectionL=121;//T 形交叉（左侧）
+     WTIntersectionR=122;//T 形交叉（右侧）
+     WCircleIntersection=123;//环形交叉路口
+     WContinuousTurn=124;//连续弯路
+     WContinuousDown=125;//连续下坡
+     WUnevenRoadSurface=126;//路面不平
+     WRain=127;//注意雨（雪）天
+     WLowLying=128;//路面低洼
+     WBump=129;//减速丘
+     WSlow=130;//慢行
+     WUp=131;//上陡坡
+     WWorking=132;//施工
+     WCross=133;//十字平面交叉
+     WAccidentProne=134;//事故易发地段
+     WTwoWay=135;//双向交通
+     WAnimal=136;//注意野生动物
+     WTunnel=137;//隧道
+     WTunnelHeadlight=138;//隧道开车灯
+     WHumpBridge=139;//驼峰桥
+     WRailway=140;//无人看守的铁道路口
+     WDown=141;//下陡坡
+     WRightTurn=142;//向右急转弯
+     WLeftTurn=143;//向左急转弯
+     WSlip=144;//易滑
+     WTrafficLight=145;//注意信号灯
+     WGuardedRailway=146;//有人看守的铁道路口
+     WRightNarrow=147;//右侧变窄
+     WDetourRight=148;//右侧绕行
+     WNarrowBridge=149;//窄桥
+     WKeepDistance=150;//注意保持车距
+     WBadWeather=151;//注意不利气象条件
+     WDisabled=152;//注意残疾人
+     WTidal=153;//注意潮汐车道
+     WFog=154;//注意雾天
+     WChildren=155;//注意儿童
+     WCycle=156;//注意非机动车
+     WPedestrain=157;//注意行人
+     WMergeLeft=158;//注意合流（左侧）
+     WMergeRight=159;//注意合流（右侧）
+     WSideWind=160;//注意横风
+     WIce=161;//注意路面结冰
+     WRightFalling=162;//注意落石（右侧）
+     WDanger=163;//注意危险
+     WDomestic=164;//注意牲畜
+     WDetourLeft=165;//左侧绕行
+     WDetourAround=166;//左右绕行
+     WVehicleQueue=167;//注意前方车辆排队
+     WYIntersectionLR=168;//Y 形交叉（左右侧）
+     WIntersectionForThinkThinMeanRoadWithSign=169;//线条粗细示意相交道路宽度的交叉路口标志 
+     WSteepSlopSgnPlusSlopeValue=170;//陡坡标志加坡度值 
+     WForkSign=171;//叉形符号
+     WSlashSign=172;//斜杠符号 
+     WE_BIKE=173;//注意电动自行车 
+     WTrafficAccidentManagement=174;//交通事故管理 
+     WSlowdownAdvice=175;//建议减速 
+     WHedgeLanes=176;//避险车道 
+     WLaneReduce=177;//注意车道数变少 
+     ILinearInducing=178;//线形诱导标 
+     WWater=179;//注意积水
+     ProhibitSign=200;//禁止标志
+     PNoPassing=201;//禁止超车
+     PNoAnimalVehicle=202;//禁止畜力车进入
+     PNoBus=203;//禁止大型载客汽车驶入
+     PNoElectricTricycles=204;//禁止电动三轮车驶入
+     PNoReturn=205;//禁止掉头
+     PNoNonMotor=206;//禁止各类非机动车进入
+     PNoTruckAndTurnLeft=207;//禁止载货汽车左转
+     PNoTrailer=208;//禁止挂车、半挂车驶入
+     PNoHuman=209;//禁止行人进入
+     PNoMotor=210;//禁止机动车驶入
+     PNoHorning=211;//禁止鸣喇叭
+     PNoMotorcycle=212;//禁止摩托车驶入
+     PBothVehicle=213;//禁止标志上所示的两种车辆驶入
+     PNoForward=214;//禁止直行
+     PNoHumanVehicle=215;//禁止人力车进入
+     PNoHumanCargoTriangle=216;//禁止人力货运三轮车进入
+     PNoHumanPassengerTriangle=217;//禁止人力客运三轮车进入
+     PNoTractor=218;//禁止拖拉机驶入
+     PNoRightTurn=219;//禁止向右转弯
+     PNoLeftRightTurn=220;//禁止向左向右转弯
+     PNoForwardRight=221;//禁止直行和向右转弯
+     PNoTricycleAndLowSpeedTruck=222;//禁止三轮汽车、低速货车驶入
+     PNoLeftTurn=223;//禁止向左转弯
+     PPassengerCarRightTurn=224;//禁止小客车向右转弯
+     PNoCar=225;//禁止小型载客汽车驶入
+     PNoTruck=226;//禁止载货汽车驶入
+     PNoDangerous=227;//禁止运输危险物品车辆驶入
+     PNoForwardLeft=228;//禁止直行和向左转弯
+     PQualityLim=229;//限制质量
+     PWeightLimwheel=230;//限制轴重
+     PCustom=231;//海关
+     PParkingCheck=232;//停车检查
+     PNoParking=233;//禁止车辆停放
+     PNoLongParking=234;//禁止车辆长时停放
+     PSpeedLim=235;//限制速度
+     PSpeedLimRev=236;//解除限制速度
+     PHeightLim=237;//限制高度
+     PWidthLim=238;//限制宽度
+     PStopFor=239;//停车让行
+     PSlowFor=240;//减速让行
+     PNoway=241;//禁止通行
+     PGiveWay=242;//会车让行
+     PNoEntry=243;//禁止驶入
+     PNoPassingRev=244;//解除禁止超车
+     PInForE_BIKE=245;//禁止电动自行车进入 
+     PTurnLForCar=246;//禁止小客车向左转弯  
+     PTurnRForTruct=247;//禁止载货汽车右转  
+     NPortStopInspection=248;//口岸停车检查
+     PNoParkingArea=249;//区域禁止车辆长时停放 
+     PNoParkingAreaRev=250;//区域禁止车辆长时停放解除 
+     PNoStopingArea=251;//区域禁止车辆停放
+     PNoStopingAreaRev=252;//区域禁止车辆停放解除
+     PSpeedLimitArea=253;//区域限制速度
+     PSpeedLimitAreaRev=254;//区域限制速度解除
+     IndicationSign=300;//指示标志
+     IWalk=301;//行人
+     INonMotors=302;//非机动车行驶
+     ICircle=303;//环岛行驶
+     IMotors=304;//机动车行驶
+     IRight=305;//分隔带右侧行驶
+     ILeft=306;//分隔带左侧行驶
+     IForwardRightStereo=307;//立体交叉直行和右转弯行驶
+     IForwardLeftStereo=308;//立体交叉直行和左转弯行驶
+     IHonk=309;//鸣喇叭
+     IRightTurn=310;//向右转弯
+     ILeftRight=311;//向左和向右转弯
+     ILeftTurn=312;//向左转弯
+     IForward=313;//直行
+     IForwardRight=314;//直行和向右转弯
+     IForwardLeft=315;//直行和向左转弯
+     IOneWayLeft=316;//单行路向左
+     IOneWayRight=317;//单行路向右
+     IPriorityAtJunction=318;//路口优先通行
+     IPriorityAtMeeting=319;//会车先行
+     IArrowRight=320;//右转车道
+     IArrowLeft=321;//左转车道
+     IArrowForword=322;//直行车道
+     IArrowRightAndForward=323;//直行和右转合用车道
+     IArrowLeftAndForward=324;//直行和左转合用车道
+     IUTurn=325;//掉头车道
+     IUTurnAndLeft=326;//掉头和左转合用车道
+     IBusLane=327;//公交线路专用车道
+     IMotorsLane=328;//机动车车道
+     IBicycle=329;//非机动车车道
+     IBusRapidTransitLane=330;//快速公交系统专用车道
+     IMultiOccupantVehicleLane=331;//多乘员车辆专用车道
+     IParkingSlot=332;//停车位
+     IArrowUTurn=333;//允许掉头
+     ISpeedLimitLow=334;//最低限速
+     IPedestrianCross=335;//人行横道
+     IOneWayRoadStraight=336;//单行路（直行）
+     IOpenLight=337;//开车灯 
+     ICarLane=338;//小型客车车道
+     IE_BIKEDriveSign=339;//电动自行车行驶标志
+     IE_BIKEDriveLane=340;//电动自行车车道
+     INon_motorVehiclesAndPedestriansSeparateSpaceToPass=341;//非机动车与行人分开空间通行
+     INon_motorVehiclesAndPedestriansShareSpaceToPass=342;//非机动车与行人共享空间通行
+     IDifferentSpecialLaneSignsTogether=343;//不同的专用车道标志并设
+     INon_motorVehicleImplementation=344;//非机动车推行
+     IKeepRightLane=345;//靠右侧车道行驶
+     ITramLane=346;//有轨电车专用车道
+     IParkingForDisabilities=347;//残疾人专用停车位 
+     IParkingForSchoolBus=348;//校车专用停车位标志、校车停靠站点标志
+     IParkingForTaxi=349;//出租车专用停车位标志
+     IParkingForNon_motorVehicles=350;//非机动车专用停车位标志 
+     IParkingForBus=351;//公交车专用停车位标志
+     IParkingForCharging=352;//充电停车位标志
+     IParkingForExclusive=353;//专属停车位标志
+     IHardShoulderPermitSign=354;//硬路肩允许行驶标志
+     ITruckSign=355;//货车通行标志
+     IParkingForLongTime=356;//限时长停车位标志
+     InformationSign=400;//指路标志
+     IIntersectionWarningSigns=401;//交叉路口预告标志
+     ICrossIntersection_1=402;//十字交叉路口
+     ICrossIntersectionInformSign=403;//交叉路口告知标志
+     ICrossIntersectionStack =404;//交叉路口堆叠式 
+     ICrossIntersectionFigure=405;//交叉路口图形式
+     IRoundaboutMapForm=406;//环岛图形式
+     INationalHighwayNumber=407;//国道编号
+     IProvincelHighwayNumber=408;//省道编号
+     ICountyHighwayNumber=409;//县道编号
+     ITownshipHighwayNumber=410;//乡道编号
+     IStreetName=411;//街道名称
+     IRoadName=412;//路名
+     IRoadNameDirection=413;//道路名称方向
+     IPlaceDistance=414;//地点距离
+     IPlaceName=415;//地名
+     IFamousPlacesSign=416;//著名地点标志
+     IAdministrativeDivisionDemarcation=417;//行政区划分界
+     IRoadManagementBoundaries=418;//道路管理分界
+     IFirstAidStationIdentificationSign=419;//急救站识别标志
+     IAirportIdentificationSign=420;//飞机场识别标志
+     ISpotIdentificationSign=421;//地点识别标志
+     IParkIdentificationSign=422;//停车场( 区) 标志
+     IPassingBay=423;//错车道
+     IPedestrianOverpass=424;//人行天桥
+     IPedestrianUnderpass=425;//人行地下通道
+     IAccessibleFacilities=426;//残疾人专用设施 
+     IViewingPlatform=427;//观景台
+     IEmergencyShelterFacilitiesplaces=428;//应急避难设施( 场所)
+     IRestArea=429;//休息区
+     IDetourSign=430;//绕行标志
+     ILaneReduction=431;//车道数减少
+     ILaneIncrese=432;//车道数增加
+     ITrafficSurveillance=433;//交通监控设备
+     ITunnelExitDistanceWarning=434;//隧道出口距离预告
+     IPassOnEitherSide=435;//两侧通行
+     IPassOnRightSide=436;//右侧通行
+     IPassOnLeftSide=437;//左侧通行
+     INon_Entry=438;//此路不通
+     IOutsideTheDirectionsSignLayout=439;//设施在指路标志版面外的方向 
+     IOnsideTheDirectionsSignLayout=440;//设施在指路标志版面中的方向
+     IMilestone=441;//里程牌
+     IEntranceAhead=442;//入口预告  
+     IEntrancAheadForNonumberedHighWay=443;//无统一编号高速公路或城市快速路入口预告  
+     IEntranceAheadForTwoExpresswaysConverge=444;//两条高速公路共线时入口预告
+     INoNumberedLocationsAndDirections=445;//不带编号标识的地点、方向
+     INumberedLocationsAndDirections=446;//带编号标识的地点、方向
+     ISerialNumberSign=447;//编号标志
+     INamedSerialNumberSign=448;//命名编号标志
+     IRoadNameSign=449;//路名标志
+     IPlaceDistance_1=450;//地点距离 
+     ILocationDistanceForMultipleExitsInUrban=451;//城市区域多个出口时的地点距离
+     INextExitNotice=452;//下一出口预告
+     IExitNumberMark=453;//出口编号标志 
+     IRightBoardExit=454;//右侧出口预告
+     ILeftBoardExit=455;//左侧出口预告
+     IDirectionForExitSignAndExit=456;//出口标志及出口地点方向
+     IStartForFREEWAY=457;//高速公路起点
+     IStartForNonumberedHighWay=458;//无统一编号的高速公路或城市快速路起点
+     IEndForPrediction=459;//终点预告
+     IEndForPredictionForNonumberedHighWay=460;//无统一编号的高速公路或城市快速路终点预告 
+     IEndPointIndication=461;//终点提示标志
+     IEndForHighway=462;//国家高速公路、省级高速公路终点
+     IEndForNonumberedHighWay=463;//无统一编号的高速公路或城市快速路终点
+     ITrafficInformation=464;//道路交通信息
+     IMilestone_1=465;//里程牌
+     IMilestoneForNonumberedHighWay=466;//无统一编号的高速公路或城市快速路里程牌
+     ISuggestedSpeedUnderSpecialWeather=467;//特殊天气建议速度
+     IStopForTicket=468;//停车领卡
+     ICheckFollowingDistance=469;//车距确认
+     IEmergencyTelephone=470;//紧急电话
+     ITelephonePositionIndication=471;//电话位置指示
+     IFirstAidCall=472;//救援电话
+     INETCPrediction=473;//不设电子不停车收费(ETC) 车道的收费站预告及收费站
+     IETCPrediction=474;//设有电子不停车收费(ETC) 车道的收费站预告及收费站
+     IETC_OR_MTC_OR_Green_ChannelSign=475;//电子不停车收费（ETC）车道、人工收费车道、绿色通道标志
+     IOverloadingStation=476;//超限超载检测站
+     IClimbingLane=477;//爬坡车道
+     IWeightCharges=478;//计重收费
+     IPetrolStation=479;//加油站
+     IBayEmergencyParkingSigns=480;//港湾式紧急停车带标志
+     IServiceAreaPrediction=481;//服务区预告
+     IParkingAreaPrediction=482;//停车区预告标志
+     TravelSign=500;//旅游标志
+     TDistance=501;//旅游区距离
+     TDirection=502;//旅游区方向
+     Tinformationdesk=503;//信息服务
+     TOnFoot=504;//徒步
+     TCableway=505;//索道
+     TCampsite=506;//野营地
+     TCampfire=507;//营火
+     TPlayground=508;//游戏场
+     TRiding=509;//骑马
+     TGoFishing=510;//钓鱼
+     TGolf=511;//高尔夫球
+     TDiving=512;//潜水
+     TSwimming=513;//游泳
+     TRowing=514;//划船
+     TWinterTouristArea=515;//冬季游览区
+     TSkiing=516;//滑雪
+     TSkating=517;//滑冰
+     TRVCamper=518;//旅居车营地
+     NoticesSign=600;//告示标志
+     NNoDrunkDrivingSign=601;//严禁酒后驾车标志
+     NNoLitteringSign=602;//严禁乱扔弃物标志
+     NSlowDownSignAtSharpTurn=603;//急弯减速慢行标志
+     NSharpBendDownhillSign=604;//急弯下坡减速慢行标志
+     NSeatBeltSign=605;//系安全带标志
+     NLargeVehiclesKeepRight=606;//大型车靠右
+     NDisableMobilePhoneWhileDriving=607;//驾驶时禁用手机标志
+     NSchoolBusStop=608;//校车停靠站点
+     NNumberInfoForHighway=609;//高速公路编号信息 
+     NTrafficMonitoringEquipmentInformation=610;//交通监控设备信息
+     NIntervalVelocimetryInformation=611;//区间测速信息 
+     NOff_roadFacilityGuidanceSigns=612;//路外设施指引标志
+     NHand_heldPhoneWhileDrivingSign=613;//驾驶时禁用手持电话标志
+     NThrowAnything=614;//禁扔弃物
+     NBeltUp=615;//系安全带
+     NPassAlternatively=616;//交替通行
+     NNullRundown=617;//严禁空挡下坡 
+     NLaneControlAhead=618;//前方车道控制 
+     Billboard=700;//广告牌预留
+     AssistSign=800;//辅助标志
+     ATimeFrame=801;//时间范围
+     AExceptForBuses=802;//公交车除外
+     ATruckstractors=803;//货车、拖拉机
+     AVehicle=804;//机动车
+     ATruck=805;//货车
+     APrivateExclusive=806;//私人专属
+     ADrivingDirectionSign=807;//行驶方向标志
+     A200mForward=808;//向前200m
+     A100mToTheLeft=809;//向左100m
+     ALeftAndRight50m=810;//向左、向右各50m
+     A100mToTheRight=811;//向右100m
+     AInAnArea=812;//某区域内
+     A200mAwayFromAPlace=813;//距离某地200m
+     ASchool=814;//学校
+     PCustom_1=815;//海关
+     AAccident=816;//事故
+     ALandslide=817;//塌方
+     ADrivingRouteOfCoachCar=818;//教练车行驶路线
+     ADrivingTestRoute=819;//驾驶考试路线
+     ASchoolBusStop=820;//校车停靠点
+     ACombinedAssistance=821;//组合辅助
+     Adistance=822;//长度
+     InforSign_Supple=900;//补充指路标志
+     IPakingPrediction=901;//停车场预告标志
+     IparkingSign=902;//停车场标志
+     IETCLaneSign=903;//电子不停车收费（ETC）车道指引标志
+     ITheDirectionInTheDirectionsSignLayout=904;//设置在指路标志版面中的方向 
+     IPetrolStationSign=905;//加油站识别标志 
+     IChargeStationSign=906;//电动汽车充电站识别标志
+     ISubWaySign=907;//地铁识别标志 
+     IFerrySign=908;//渡口识别标志
+     IEmergencyStopAreaSign=909;//港湾式紧急停车带
+     IServiceAreaSign=910;//服务站标志
+     IParkingPointSign=911;//停车点标志 
+     ICrossRoadNumberAhead=912;//预告前方交叉道路编号 
+     IMultiCrossRoadNumberAhead=913;//预告前方交叉道路编号 
+     IToRoadName=914;//道路名称方向 
+     IToPlaceSign=915;//地点识别标识加辅助标志
+     IToParkingDistanceSign=916;//停车场标志加辅助标志 
+     IToEmergencyStopAreaDistanceSign=917;//港湾式紧急停车带标志加辅助标志 
+     IToServiceAreaDistanceSign=918;//服务站标志加辅助标志
+     IToParkingPointDistanceSign=919;//停车点标志加辅助标志 
+     IToObservationDeckSign=920;//观景台标志加辅助标志 
+     IDetourSign_1=921;//绕行标志 
+     IMultiMilestone=922;//里程碑、里程牌
+     IHectometerStake=923;//百米桩 
+     IHighWayBoundary=924;//公路界碑 
+     ICrossSignParapet=925;//道口标柱
+     IRegionDirectionGuideSign=926;//地点、方向标志 
+     IRoadInfoWithBearing=927;//命名编号标志（增加地理方位）
+     IRoadInfoWithBearingAndDir=928;//命名编号标志（增加地理方位及方向）
+     IMultiRoadInfoWithBearing=929;//命名编号标志（重合路段增加地理方位）
+     IRoadName_1=930;//路名 
+     ISpotDistanceForArriveRoad=931;//同时指引前方到达道路上的地点距离
+     IExitsPredictionForNumberRoadOFJunctionInterconnectPrediction=932;//一般互通式立体交叉出口后道路有编号的出口预告及出口方向 
+     IExitsPredictionForNoNumberRoadOFJunctionInterconnectPrediction=933;//一般互通式立体交叉出口后道路无编号的出口预告及出口方向 
+     IExitForJunctionInterconnectPrediction=934;//枢纽互通式立体交叉的出口预告
+     IDirectionForHubJunctionInterconnectPrediction=935;//枢纽互通式立体交叉的出口方向 
+     IGuidenceOfDirectionForHubJunctionInterconnect=936;//枢纽互通式立体交叉主线方向信息指引
+     IGuidenceOfIncreasingDirectionEntryForHubJunctionInterconnect=937;//枢纽互通式立体交叉出口增加直行方向信息示例
+     IDirectionForStraightOutExit=938;//直出车道出口方向
+     ISpiltRoadAhead=939;//道路分岔预告 
+     IInterchangeDoubleExitsPrediction=940;//双出口枢纽式互通立体交叉的出口预告 
+     IDirectionOfExitFor2LanesRamp=941;//出口匝道为2条车道枢纽式互通立体交叉的出口方向 
+     IHectometersExitAhead=942;//300m、200m、100m出口预告标志
+     IExit=943;//出口 
+     IHectometerSign=944;//百米牌  
+     IFirstAidCallSign=945;//救援电话标志 
+     IClimbingLaneSign=946;//爬坡车道标志
+}
+
+//TrafficLightType 信号灯类型
+enum TrafficLightType{
+     TL_No_Use = 0;//不用
+     TL_MOTORVEHICLELIGHT=1;//机动车信号灯
+     TL_RED=2;//红
+     TL_RED_STRAIGHT=3;//红直行
+     TL_RED_LEFT=4;//红左
+     TL_RED_RIGHT=5;//红右
+     TL_RED_UTURN=6;//红掉头
+     TL_GREEN=7;//绿
+     TL_GREEN_STRAIGHT=8;//绿直行
+     TL_GREEN_LEFT=9;//绿左
+     TL_GREEN_RIGHT=10;//绿右
+     TL_GREEN_UTURN=11;//绿掉头
+     TL_YELLOW=12;//黄
+     TL_NULL=13;//空
+     TL_GROUP_RED=14;//组合灯红
+     TL_GROUP_RED_STRAIGHT=15;//组合灯红直行
+     TL_GROUP_RED_LEFT=16;//组合灯红左
+     TL_GROUP_RED_RIGHT=17;//组合灯红右
+     TL_GROUP_RED_UTURN=18;//组合灯红掉头
+     TL_GROUP_GREEN=19;//组合灯绿
+     TL_GROUP_GREEN_STRAIGHT=20;//组合灯绿直行
+     TL_GROUP_GREEN_LEFT=21;//组合灯绿左
+     TL_GROUP_GREEN_RIGHT=22;//组合灯绿右
+     TL_GROUP_GREEN_UTURN=23;//组合灯绿掉头
+     TL_GROUP_YELLOW=24;//组合灯黄	 
+     TL_UNKNOWN=1000;//未分类
+     TL_GROUPTRAFFICLIGHT=1001;//组合信号灯
+}
+
+//BoundaryType 路边的条带类型
+enum BoundaryType{
+     BOUNDARY_TYPE_NO_USE = 0;//不用
+     CURB=1;//路缘石
+     GUARDRAIL=2;//护栏
+     WALL=3;//墙体
+     GEOGRAPHICAL_BOUNDARTES=4;//地理边界
+     GREENBELTS=5;//绿化带
+     OTHER_HARD_ISOLATION=6;//其它硬隔离
+     PARKING_POST=7;//停车场柱子
+     BOUNDARY_TYPE_UNKNOWN=1000;//未分类
+}
+//PoleType 路边的杆子
+enum PoleType{
+     POLE_TYPE_NO_USE = 0;//不用
+     POLE_TYPE_TRAFFIC_LIGHT = 1;//交通灯
+     POLE_TYPE_SIGN = 2;//标牌
+     POLE_TYPE_HIGH_LIMIT = 3;//限高
+     POLE_TYPE_CAMERA = 4;//摄像头
+     POLE_TYPE_UNKNOWN = 1000;//未分类
+}
+
+//OverheadType 路顶的高架设施类型
+enum OverheadType{
+     OVERHEAD_NO_USE = 0;//不用
+     TUNNEL_START=1;//隧道起点
+     TUNNEL_END=2;//隧道终点
+     PARKING_POLE=3;//停车场杆
+     OVERHEAD_UNKNOWN=1000;//未分类
+}
+
+//Color 颜色枚举
+enum Color
+{
+    COLOR_NO_USE = 0;//不使用
+    WHITE=1; //白色
+    YELLOW=2;  //黄色
+    ORANGE=3; //橙色
+    BLUE=4;   //蓝色
+    GREEN=5;   //绿色
+    LEFT_WHITE_RIGHT_YELLOW=6;   //左白右黄
+    LEFT_YELLOW_RIGHT_WHITE=7;   //左黄右白
+    RED=8;//红色
+    COLOR_UNKNOWN = 1000; //颜色未知
+}
+//RoadPoint路面的特征点枚举
+enum RoadPoint
+{
+    POINT_NO_USE=0;//不用
+	DIV_MER_DIVERSION=1;//分离点
+    DIV_MER_MERGE=2;//合并点
+	PEOPLE_CAR_MIXED=3;//人车混行点
+	POINT_UNKNOWN=1000;//特征点未知
+}	
+
+//SemanticMap 语义地图
+message SemanticMap{
+    //基础信息[],必传,(,,),   
+    BaseInfo base_info = 1; //基础信息
+
+    //地图对象列表[],必传,(,,),   
+    repeated ObjData objdata_list = 2; 
+
+    //特征列表[],,(,,),   
+    repeated Characteristic character_list = 3; 
+
+    //关键帧列表[],,(,,),   
+    repeated KeyFrame keyframe_list = 4;
+
+    //VIO定位轨迹信息[],,(,,),  
+    VIOPostitionTraceInfo viotrack_list = 5; 
+}
+
+//VIOData VIO定位信息
+message VIOData{
+    //时间戳[微秒],必传,(,,),  
+    int64 timestamp = 1; 
+
+   //相对首关键帧位置X[度],必传,(0,,),  
+    double rel_fkframe_postition_x = 2; 
+
+   //相对首关键帧位置Y[度],必传,(0,,),  
+    double rel_fkframe_postition_y = 3; 
+
+   //相对首关键帧位置Z[厘米],必传,(0,,),  
+    double rel_fkframe_postition_z = 4; 
+
+   //相对首关键帧角度X[度],必传,(0,,),  
+    double rel_fkframe_angle_x = 5;
+
+   //相对首关键帧角度Y[度],必传,(0,,),  
+    double rel_fkframe_angle_y = 6; 
+
+   //相对首关键帧角度Z[度],必传,(0,,),  
+    double rel_fkframe_angle_z = 7; 
+
+   //速度[m/s],必传,(0,,),  
+    double speed = 8; 
+
+   //x方位角俯仰角翻滚角误差范围[度],必传,(0,,),  
+    double error_range_x = 9; 
+
+   //Y方位角俯仰角翻滚角误差范围[度],必传,(0,,),  
+    double error_range_y = 10; 
+
+   //Z方位角俯仰角翻滚角误差范围[厘米],必传,(0,,),  
+    double error_range_z = 11; 
+
+   //摄像头外参[],,(,,),  
+    cameraparam.ExtrinsicParam camera_param = 12; 
+}
+//VIOPostitionTraceInfo VIO定位轨迹信息
+message VIOPostitionTraceInfo{
+   //VIO定位信息列表[],必传,(,,),  
+    repeated VIOData VIO_postition_list = 1; 
+}
+
+//Curve2D 2D三次曲线方程（SWC提供的接口方案定义）
+message Curve2D{
+   //三阶曲线参数常数项[],必传,(0,-20,20),  
+    double curve_parameter_a0 = 1;
+
+   //三阶曲线参数一次项[],必传,(0,-1,1),  
+    double curve_parameter_a1 = 2; 
+
+   //三阶曲线参数二次项[],必传,(0,-0.02,0.02),  
+    double curve_parameter_a2 = 3;
+
+   //三阶曲线参数三次项[],必传,(0,-0.0002,0.0002),  
+    double curve_parameter_a3 = 4;
+
+   //平均曲率[],必传,(0,-0.02,0.02),  
+    double mean_curvature = 5;
+}
+
+//LineType 车线分类c385标准
+enum LineType{
+    ///< 实线、重要
+    LINE_TYPE_SOLID = 0;
+    ///< 虚线、重要
+    LINE_TYPE_DASHED = 1; 
+    ///< 双虚线、重要
+    LINE_TYPE_DASHED_DASHED = 2; 
+    ///< 虚实线、重要
+    LINE_TYPE_DASHED_SOLID = 3;
+    ///< 实虚线 、重要
+    LINE_TYPE_SOLID_DASHED = 4;  
+    ///< 双实线、 重要
+    LINE_TYPE_SOLID_SOLID = 5;
+    ///< 0x6 = multiple（Eu&USA）；
+    LINE_TYPE_MULTIPLE = 6;
+    ///< 0x7=multiple_warning（Eu&USA）；
+    LINE_TYPE_MULTIPLE_WARNING = 7; 
+    ///< 0x8 =car_pool；
+    LINE_TYPE_CAR_POOL = 8; 
+    ///< 0x9 =asphalt_joint（USA）；
+    LINE_TYPE_ASPHALT_JOINT = 9;
+    ///< 0xA=Bot-Dott（USA）；
+    LINE_TYPE_BOT_DOTT = 10;
+    ///< 路沿； 
+    LINE_TYPE_ROAD_EDGE = 11; 
+    ///< 护栏；
+    LINE_TYPE_GUARDRAIL = 12; 
+    ///< 0xD =curbstone；
+    LINE_TYPE_CURBSTONE = 13;
+    ///< 墙面线；
+    LINE_TYPE_WALL = 14;
+    ///< 锥形筒线；
+    LINE_TYPE_TRAFFIC_CONE = 15; 
+    ///< 0x10=delineator_post；
+    LINE_TYPE_DELINEATOR_POST = 16; 
+    ///< 0x11 =parking_car；
+    LINE_TYPE_PARKING_CAR = 17; 
+    ///< 0x12=unknown_raised；
+    LINE_TYPE_UNKNOWN_RAISED = 18; 
+    ///< 鱼骨线实线
+    LINE_TYPE_FISHBONE = 19; 
+    ///< 未知；
+    LINE_TYPE_UNKNOWN = 20; 
+    ///< 内分岔
+    LINE_TYPE_DIVERSION_INSIDE = 21; 
+    ///< 外分岔
+    LINE_TYPE_DIVERSION_OUTSIDE = 22; 
+    ///< 宽虚线（匝道的）、 重要
+    LINE_TYPE_WIDE_DASHED = 23; 
+    ///< 鱼骨线虚线
+    LINE_TYPE_FISHBONE_DASHED = 24; 
+}
+
+//曲线方程分类
+enum CurveType {
+     CurveType_Unknown = 0;//未知
+     CurveType_2D = 1;//2D曲线3次曲线方程
+
+}
+
+//LineColor 车道线颜色c385标准
+enum LineColor{
+    ///< 颜色未知
+    LINE_COLOR_UNKNOWN = 0; 
+    ///< 白色
+    LINE_COLOR_WHITE = 1;
+    ///< 黄色
+    LINE_COLOR_YELLOW = 2;  
+    ///< 混合色
+    LINE_COLOR_MIXED = 3; 
+    ///< 车道线颜色最大种类数
+    LINE_COLOR_NUM = 4;   
+}
+
+//LanePartInfo 车线段
+message LanePartInfo{
+   //分类[],必传,(,,),  
+    LineType type = 1; 
+
+   //颜色[],必传,(,,),  
+    LineColor color = 2; 
+
+    //曲线方程类型[],必传,(,,),  
+    CurveType UTCurve_type = 3;
+
+    //曲线方程参数[],必传,(,,),  
+    Curve2D UTCurve_param = 4;
+
+    //x方向车道线起始点距离[],必传,(0,0,300), 标识x方向车道线起始点距离()  
+    double start_x = 5;
+
+    //x方向车道线终点距离[],必传,(0,0,300), 标识x方向车道线起终点距离   
+    double end_x = 12;
+
+    //C385 start_x和end_x不能同时为0，同时start_x也不能大于end_x
+}
+
+//LaneInfo 车线信息
+message LaneInfo{
+   //唯一id[],必传,(,,),  
+    int32 id = 1; //唯一id
+
+   //车线段列表[],必传,(,,),  
+    repeated LanePartInfo lane_part_list = 2; 
+
+   //位置[],必传,(,,),  
+    GeoPoint postiton = 3; 
+
+   //置信度[],必传,(0,0,100),  
+    int32 confidence = 5; 
+}
+//IdentifyType c385要素分类
+enum IdentifyType{
+     Type_TrafficLight = 0; //红绿灯
+     Type_GroundTrafficSign = 1; //地面交通标识
+     Type_TrafficSign = 2; //交通标识
+     Type_Pole = 3; //杆状物标识
+}
+
+
+//TrafficSignType c385定义的交通标识
+enum TrafficSignType {
+    ///< 未定义标识
+    TRAFFIC_SIGN_NONE = 0;
+    ///< 限速标识
+    TRAFFIC_SIGN_SPEED_LIMIT = 1;
+    ///< 取消限速标识 
+    TRAFFIC_SIGN_SPEED_LIMIT_CANCEL = 2; 
+    ///< 禁止标识
+    TRAFFIC_SIGN_PROHIBITION = 3; 
+    ///< 左转标识
+    TRAFFIC_SIGN_TRUN_LEFT = 4;
+    ///< 右转标识
+    TRAFFIC_SIGN_TURN_RIGHT = 5; 
+    ///< 直行标识
+    TRAFFIC_SIGN_STRAIGHT = 6; 
+    ///< 合流标识
+    TRAFFIC_SIGN_CONFLUENCE = 7;
+    ///< 匝道标识 
+    TRAFFIC_SIGN_RAMP = 8;
+    ///< 施工标识 
+    TRAFFIC_SIGN_CONSTURCTION = 9; 
+    ///< 学校标识
+    TRAFFIC_SIGN_SCHOOL = 10; 
+    ///< 医院标识
+    TRAFFIC_SIGN_HOSPITAL = 11; 
+    ///< 拥堵标识
+    TRAFFIC_SIGN_TRAFFIC_JAM = 12; 
+}    
+
+//GroundTrafficSignType  c385定义的地面交通标识
+enum GroundTrafficSignType {
+    ///< 未定义标识
+    GROUND_SIGN_NONE = 0;
+    ///< 直行
+    GROUND_SIGN_STRAIGHT = 1; 
+    ///< 左转标识
+    GROUND_SIGN_TURN_LEFT = 2;
+    ///< 右转标识 
+    GROUND_SIGN_TURN_RIGHT = 3; 
+    ///< 掉头
+    GROUND_SIGN_TURN_AROUND = 4; 
+    ///< 左传直行
+    GROUND_SIGN_TURN_LEFT_STRAIGHT = 5;
+    ///< 右传直行 
+    GROUND_SIGN_TURN_RIGHT_STRAIGHT = 6; 
+    ///< 人行道预警
+    GROUND_SIGN_SIDEWALK_WARNING = 7; 
+    ///< 人行道
+    GROUND_SIGN_SIDEWALK = 8; 
+    ///< 停止线
+    GROUND_SIGN_STOP_LINE = 9; 
+    ///< 代行线
+    GROUND_SIGN_WATING_LINE = 10; 
+    ///< 地下车库导向箭头
+    GROUND_SIGN_UNDERGROUND_GUIDE_SHEAR = 11; 
+    ///< 右转和右掉头,目前未输出
+    GROUND_SIGN_RIGHT_TURNRD_TO_RIGHT  = 12;
+    ///< 左转和右掉头,目前未输出
+    GROUND_SIGN_LEFT_TURNRD_TO_RIGHT  = 13;
+    ///< 目前未输出
+    GROUND_SIGN_RIGHT_TURNRD_TO_LEFT  = 14;
+    ///< 目前未输出
+    GROUND_SIGN_LEFT_FORWARD_RIGHT  = 15;
+    ///< 目前未输出
+    GROUND_SIGN_LEFT_FORWARD_TURNRD_TO_RIGHT  = 16;
+    ///< 目前未输出
+    GROUND_SIGN_RIGHT_FORWARD_TURNRD_TO_LEFT  = 17;
+    ///< 目前未输出
+    GROUND_SIGN_TURNRD_TO_RT_FORWARD_TURNRD_TO_LT  = 18;
+    ///< 保留
+    GROUND_SIGN_RESERVED = 19;
+    ///< 调头和左转
+    GROUND_SIGN_TURN_ROUND_TO_LEFT = 20; 
+    ///< 调头和右转,目前未输出
+    GROUND_SIGN_TURN_ROUND_TO_RIGHT  = 21;
+    ///< 直行和左掉头
+    GROUND_SIGN_FORWARD_TURNRDTOLEFT = 22;
+    ///< 直行和右掉头,目前未输出
+    GROUND_SIGN_FORWARD_TURNRDTORIGHT = 23;
+    ///< 左掉头或右掉头,目前未输出
+    GROUND_SIGN_TURNRD_TO_LEFT_OR_RIGHT  = 24;
+    ///< 左转和左掉头
+    GROUND_SIGN_LEFT_TURNRD_TO_LEFT  = 25;
+}
+//TrafficLightColor  c385定义的红绿灯颜色
+enum TrafficLightColor {
+    ///< 无颜色
+    LIGHT_COLOR_NONE = 0;
+    ///< 红色
+    LIGHT_COLOR_RED = 1;
+    ///< 黄色
+    LIGHT_COLOR_YELLOW = 2;
+    ///< 绿色
+    LIGHT_COLOR_GREEN = 3;
+    ///< 未知颜色
+    LIGHT_COLOR_UNKNOW = 4;
+    ///< 其它
+    LIGHT_OTHER = 5;
+    ///< 保留
+    LIGHT_RESERVED = 6;
+    ///< 无效
+    LIGHT_INVALID = 7;
+    ///< 关闭
+    LIGHT_OFF = 8;
+} 
+//TrafficLightDirection  c385定义的红绿灯方向
+enum TrafficLightDirection 
+{
+    ///< 未检测到
+    LIGHT_DIRECTION_NO_DISPLAY = 0;
+    ///< 直行
+    LIGHT_DIRECTION_FORWARD = 1;
+    ///< 左转
+    LIGHT_DIRECTION_LEFT = 2; 
+    ///< 直行和左转
+    LIGHT_DIRECTION_FORWARD_AND_LEFT = 3; 
+    ///< 右转
+    LIGHT_DIRECTION_RIGHT = 4; 
+    ///< 直行和右转
+    LIGHT_DIRECTION_FORWARD_AND_RIGHT = 5; 
+    ///< 左转和右转
+    LIGHT_DIRECTION_RIGHT_AND_LEFT = 6;  
+    ///< 左转和直行和右转
+    LIGHT_DIRECTION_LEFT_AND_FORWARD_AND_RIGHT = 7;
+    ///< 保留
+    LIGHT_DIRECTION_RESERVED = 8;
+}
+
+//TrafficLightClassficationType  c385定义的交通灯类型
+enum TrafficLightClassficationType
+{
+    ///< 未检测到
+    TYPE_NO_DETECED = 0;
+    ///< 圆形
+    CIRCLE = 1;
+    ///< 箭头
+    ARROW = 2;
+    ///< X
+    X_TYPE = 3;
+    ///< 掉头
+    TURN_ROUND = 4;
+    ///< 直行加掉头
+    ARROW_AND_TURN_ROUND = 5;
+    ///< 其它
+    OTHER = 6;
+    ///< 无效
+    INVALID = 7;
+}
+
+//TrafficLightBlindingStatus  c385定义的交通灯亮灭状态信息
+enum TrafficLightBlindingStatus
+{
+    ///< 未检测到
+    STATUS_NO_DETECED = 0;
+    ///< 灯亮状态
+    LIGHT = 1;
+    ///< 灯闪烁状态
+    FLASHING = 2;
+    ///< 灯灭
+    OFF = 3;
+}
+
+//SpeedLimitType  c385定义的限速值类型
+enum SpeedLimitType 
+{
+    ///< 未知
+    SPEEDLIMIT_UNKNOWN = 0;
+    ///< 匝道限速
+    SPEEDLIMIT_RAMP = 1;
+    ///< 货车限速
+    SPEEDLIMIT_TRUCK = 2;
+    ///< 轿车限速
+    SPEEDLIMIT_CAR = 3;
+    ///< 非机动车限速
+    SPEEDLIMIT_NONMOTOR_VEHICLE = 4;
+    ///< 客车限速
+    SPEEDLIMIT_PASSENGER_CAR = 5;
+    ///< 保留
+    SPEEDLIMIT_RESERVED = 6;
+}
+
+//IdentifyPoleType  c385定义的道闸类型
+enum IdentifyPoleType
+{
+    ///< 未知：[/],(/,/,/),[/],(1,0),标识未知
+    POLETYPE_UNKNOWN = 0;
+    ///< 龙门架：[/],(/,/,/),[/],(1,0),标识龙门架
+    POLETYPE_GANTRY = 1;
+    ///< 悬臂：[/],(/,/,/),[/],(1,0),标识龙悬臂
+    POLETYPE_SIGNPOST = 2;
+    ///< 信号灯杆：[/],(/,/,/),[/],(1,0),标识信号灯杆
+    POLETYPE_SIGNAL = 3;
+    ///< 道闸：[/],(/,/,/),[/],(1,0),标识道闸，包含车库入库、道路闸机杆、高速路出入口
+    POLETYPE_ROADGATE = 4;
+    ///< 限高等横杆：[/],(/,/,/),[/],(1,0),标识限高等横杆
+    POLETYPE_HEIGHTLIMIT = 5;
+}
+
+//ShapeMode 形状类型
+enum ShapeMode{
+     MODE_UNKNOWN = 0;//未知
+     MODE_TRIANGLE = 1;//三角形
+     MODE_RECT = 2;//矩形
+     MODE_MUTIPOLYGON = 3;//多边形
+
+}
+//IdentifyObjectAttr 对象属性
+message IdentifyObjectAttr{
+   //形状类型[],必传,(,,),  
+    ShapeMode shape_mode = 1; 
+
+   //值[],必传,(,,),  
+    string value = 2;
+
+   //是否可变[],必传,(,,),  
+    bool is_variable = 3;
+
+    //高度[厘米],必传,(,,), 
+    double height = 4;//高度
+
+    //半径[厘米],必传,(,,), 
+    double radius = 5;
+}
+
+//IdentifyObject 识别对象
+message IdentifyObject{
+    //唯一id[],必传,(0,,), 
+    int32 id = 1;
+
+    //子对象id列表[],必传,(0,,), 
+    repeated int32 sub_id_list = 2; 
+
+    //分类[],必传,(,,), 
+    IdentifyType type = 3; 
+
+    //子分类[],必传,(,,), 
+    oneof sub_type{
+         //交通标志类型[],,(,,), 
+         TrafficSignType traffic_sign = 21; 
+        
+         //地面交通标志类型[],,(,,),         
+         GroundTrafficSignType ground_traffic_sign = 22;
+
+         //交通灯颜色[],,(,,),    
+         TrafficLightColor traffic_light_color = 23; 
+	
+        //IdentifyPoleType  c385定义的道闸类型
+        IdentifyPoleType poleType = 28;
+    }
+
+    //TrafficLightDirection  c385定义的红绿灯方向
+    TrafficLightDirection traffic_light_direction = 24;
+
+    //TrafficLightClassficationType  c385定义的交通灯类型
+    TrafficLightClassficationType traffic_light_type = 25;
+
+    //TrafficLightBlindingStatus  c385定义的交通灯亮灭状态信息
+    TrafficLightBlindingStatus traffic_light_blindingstatus = 26;
+
+    //SpeedLimitType  c385定义的限速值类型
+    SpeedLimitType  speedlimit_type = 27;
+
+    //置信度[],必传,(0,0,100), 
+    int32 confidence = 5; //置信度0-100
+
+    //矩形框[],必传,(,,), 
+    GeoRect rect = 6; 
+
+    //对象属性[],必传,(,,), 
+    IdentifyObjectAttr object_attr = 7;
+
+    //对象点位置横纵距离[],必传,(,,), 
+    Point2DPosition point_position = 8;
+}
+// FSPointType  可行使区域点类型
+enum FSPointType 
+{
+    ///< 忽略
+    POINT_TYPE_IGNORE = 0;  
+    ///< 汽车
+    POINT_TYPE_CAR = 1; 
+    ///< 路沿
+    POINT_TYPE_ROADDELIMITER = 2;
+    ///< 行人
+    POINT_TYPE_PEDESTRAIN = 3;
+    ///< 锥形桶
+    POINT_TYPE_CONE = 4;
+    ///< 静态目标
+    POINT_TYPE_STATICOBJECT = 5;
+    ///< 未知
+    POINT_TYPE_UNKNOWN = 6;
+    ///< 无效
+    POINT_TYPE_INVALID = 7;
+}
+
+//FSPointMotionState 可行使区域点状态
+enum FSPointMotionState
+{
+    ///< 未知
+    POINT_MOTION_UNKNOWN = 0;
+    ///< 运动
+    POINT_MOTION_MOVING = 1;
+    ///< 静止    
+    POINT_MOTION_STATIONARY = 2; 
+    ///< 未知
+    POINT_MOTION_UNSURE = 3;
+}
+
+//Point2DPosition 点距离
+message Point2DPosition{
+    //纵向距离[m],必传,(0,0,300), 不能为0
+    double longitudinal_distance = 1;
+
+    //横向距离[m],必传,(0,-30,30), 
+    double lateral_distance = 2;
+}
+
+//CamFsPoint 可行使区域点信息
+message CamFsPoint{
+    //freespace点运动状态[],,(,,),  
+    FSPointMotionState motion_state = 1;
+
+    //标识freespace点类型[],,(,,),  
+    FSPointType type = 2;
+
+    //标识Freeespace点位置[],,(,,),  
+    Point2DPosition position = 3;
+}
+
+//Weather 天气
+enum Weather{
+     WEATHER_NO_USE = 0; //< 未使用
+     CLEAR = 1;//晴天
+     RAIN = 2;//雨天
+}
+
+//IdentifyResultsFrame C385识别结果帧
+message IdentifyResultsFrame{
+    //时间戳[微秒],必传,(,,),  
+    int64 timestamp = 1; 
+
+    //车线列表[],必传,(,,),  
+    repeated LaneInfo lane_list = 2;
+
+    //识别对象列表[],必传,(,,),  
+    repeated IdentifyObject identify_obj_list = 3; 
+
+    //可行使区域点集[],必传,(,,),  
+    repeated CamFsPoint cam_fs_point = 4;
+
+    //天气情况[],必传,(,,),  
+    Weather weather = 5;
+}
+
+//IdentifyResults 识别结果
+message IdentifyResults{
+    //基础信息[],必传,(,,),  
+    BaseInfo base_info = 1;
+
+    //识别结果帧列表[],必传,(,,), 
+    repeated IdentifyResultsFrame identify_results_frame_list = 2; 
+}
+
+//ImageInfo 图片
+message ImageInfo{
+    //时间戳[微秒],必传,(,,),  
+    int64 timestamp = 1; //时间戳（必传）单位：微秒
+
+    //任务id[],必传,(,,),  
+    int32 task_id = 2; 
+
+    //位置[],必传,(,,),  
+    GeoPoint geo_point = 3; 
+
+    //角度[度],必传,(,0,360), 3&4这两项合并为data_picture_<timestamp>.yaml 文件具体格式为：geo_point：<x,y,z> angle:<value>
+    double angle = 4;
+
+   //图片filecloud句柄[],必传,(,,),RGB 4K、格式JPEG、原始分辨率:3840*2160 、命名为:data_picture_<timestamp>.JPEG  
+    string data_picture_path = 5;
+}
+
+//SensorInfo 传感器信息
+message SensorInfo{
+    //时间戳[微秒],必传,(,,),  
+    int64 timestamp = 1; //时间戳（必传）单位：微秒
+
+    //任务id[],必传,(,,),  
+    int32 task_id = 2; 
+
+    //位置[],必传,(,,),  
+    GeoPoint geo_point = 3; 
+
+    //角度[度],必传,(,0,360), 3&4这两项合并为data_video_<timestamp>.yaml 文件具体格式为：geo_point：<x,y,z> angle:<value>
+    double angle = 4; 
+
+    //视频filecloud句柄[],必传,(,,),H265、帧率为10hz、期待每张图像都有对应的时间戳(车云协议考虑)、限制1min命名为:data_video_<timestamp>.h265 
+    string data_video_path = 5;
+}
+
+//SlamInfo 车端建图信息
+message SlamInfo{
+    //时间戳[微秒],必传,(,,),  
+    int64 timestamp = 1; //时间戳（必传）单位：微秒
+
+    //任务id[],必传,(,,),  
+    int32 task_id = 2; 
+
+    //位置[],必传,(,,),  
+    GeoPoint geo_point = 3; 
+
+    //角度[度],必传,(,0,360), 3&4这两项合并为data_video_<timestamp>.yaml 文件具体格式为：geo_point：<x,y,z> angle:<value>
+    double angle = 4; 
+
+    //车端建图filecloud句柄[],必传,(,,),
+    string data_video_path = 5;
+}
+
+// 任务收集数据
+message TaskData{
+    //任务信息[],必传,(,,),图片和传感器是或得关系(三选一)  
+    oneof task_info{
+        //图片信息[],必传,(,,), 
+        ImageInfo image = 1; //图片信息
+        
+        //传感器信息[],必传,(,,),
+        SensorInfo sensor = 2;
+
+        //车端建图信息[],必传,(,,), 
+        SlamInfo slam = 3;
+     }
+}
+     
+
+
+

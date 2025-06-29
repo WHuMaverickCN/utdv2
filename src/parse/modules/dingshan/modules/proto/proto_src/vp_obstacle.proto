@@ -1,0 +1,1002 @@
+/**
+* @file     vp_obstacle.proto
+* @author   fandongxue
+* @details  描述前视车道线信息
+* @date     2022-07-13
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.11          <th>1.0                 <th>fandongxue
+* <tr><th>2022.8.26          <th>1.0                 <th>huangshan
+* <table>
+**********************************************************************************
+*/
+
+
+syntax = "proto3";
+package VpObstacleProto;
+
+import "vp_perception_base.proto";
+import "vp_skeleton.proto";
+import "vp_ad_base.proto";
+import "vp_line_v2.proto";
+
+
+/**
+*@brief   用于描述速度
+*@detail  参数vz是可选参数，用于区分3D速度和2D速度
+*/
+message Velocity {
+  ///<x方向速度：[m/s],(0,/,/),[/],(1,0),/
+  float vx = 1;
+  ///<y方向速度：[m/s],(0,/,/),[/],(1,0),/
+  float vy = 2;
+  ///<z方向速度：[m/s],(0,/,/),[/],(1,0),/
+  float vz = 3;
+}
+/**
+*@brief   用于描述加速度
+*@detail  参数vz是可选参数，用于区分3D加速度和2D加速度
+*/
+message Accelerate {
+  ///<x方向加速度：[m/s^2],(0,/,/),[/],(1,0),/
+  float ax = 1;
+  ///<y方向加速度：[m/s^2],(0,/,/),[/],(1,0),/
+  float ay = 2;
+  ///<z方向加速度：[m/s^2],(0,/,/),[/],(1,0),/
+  float az = 3;
+}
+
+/**
+*@brief   用于描述动态障碍属性置信度
+*@detail  动态障碍物位置，yaw，速度等置信度
+*/
+message ObjectConf {
+  ///<位置置信度：[/],(0,/,/),[/],(1,0),/
+  float pos_conf = 1;
+  ///<航向角置信度：[/],(0,/,/),[/],(1,0),/
+  float yaw_conf = 2;
+  ///<速度置信度：[/],(0,/,/),[/],(1,0),/
+  float speed_conf = 3;
+  ///<加速度置信度：[/],(0,/,/),[/],(1,0),/
+  float acc_conf = 4;
+}
+
+/**
+*@brief   用于表示有效可用信息
+*@detail  bitmap方式描述如下，通过做逻辑&运算对VALID_INFO_DIST_CONF_0和VALID_INFO_DIST_CONVERGENCE来判断目标状态稳定且收敛
+*/
+enum ValidInfo {
+  ///<初始值：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_INITIALED = 0;                // 0
+  ///<TTC有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_TTC = 1;                      // 1 << 0
+  ///<距离有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_DISTANCE = 2;                 // 1 << 1
+  ///<车间时距有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_HMW = 4;                      // 1 << 2
+  ///<LDW有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_LDW = 8;                      // 1 << 3
+  ///<数据流有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_INFORWARDIR = 16;             // 1 << 4
+  ///<聚集点有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_POLY = 32;                    // 1 << 5
+  ///<航向角有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_YAW = 64;                     // 1 << 6
+  ///<长度有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_LENGTH = 128;                 // 1 << 7
+  ///<宽度有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_WIDTH = 256;                  // 1 << 8
+  ///<高度有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_HEIGHT = 512;                 // 1 << 9
+  ///<未知有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_TRAVERSABLE = 1024;           // 1 << 10
+  ///<当前车道有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_CURRLANE = 2048;              // 1 << 11
+  ///<漏检有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_MISSDETECTION = 4096;         // 1 << 12
+  ///<3D框有效标志：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_BOX3DIMG = 8192;              // 1 << 13
+  ///<距离转换有效标志：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_DIST_CONVERGENCE = 16384;     // 1 << 14
+  ///<距离置信度有效标志：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_DIST_CONF_0 = 32768;          // 1 << 15
+  ///<运动类型有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_MOTION_CATEGORY = 65536;      // 1 << 16
+  ///<目标位置状态有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_MOTION_STATUS = 131072;       // 1 << 17
+  ///<可预测状态有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_MEASUREMENT_STATUS = 262144;  // 1 << 18
+  ///<不稳定输出有效标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_UNSTABLE_OUTPUT = 524288;     // 1 << 19
+  ///<使用输出的标志位：[/],(0,/,/),[/],(1,0),/
+  VALID_INFO_USE_OUTPUT_INFO = 1048576;   // 1 << 20
+}
+
+/**
+*@brief   用于输出的有效信息（新增加）
+*@detail  bitmap方式描述如下，通过做逻辑&运算对Output_INFO_UNSTABLE_OUTPUT来判断目标状态稳定且收敛
+*/
+enum OutputInfo {
+    ///< 初始值：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_INITIALED = 0;                  // 0
+    ///< unknown输出（预留值）：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_UNKNOWN_OUTPUT = 1;             // 1 << 0;
+    ///<丢失跟踪输出：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_MISDECT_OUTPUT = 2;             // 1 << 1;
+    ///<不稳定输出（测速测距滤波器未收敛）：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_UNSTABLE_OUTPUT = 4;            //1 << 2;
+    //<可稳定输出（测速测距滤波器收敛）：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_STABLE_OUTPUT = 8;              //1 << 3;
+    ///<低优先级输出（车辆优先级排序较低）：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_LOWLEVEL_OUTPUT = 16;           //1 << 4;
+    ///<高优先级输出（车辆优先级排序较高）：[/],(0,/,/),[/],(1,0),/
+    OUTPUT_INFO_HIGHTLEVEL_OUTPUT = 32;          //1 << 5;
+}
+
+/**
+*@brief   描述障碍物所具有的的枚举类型
+*@detail  障碍物的所有类型
+*/
+enum ObstacleType {
+  ///<车尾框：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_VehicleRear = 0;
+  ///<全车框：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_VehicleFull = 1;
+  ///<人：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Pedestrian = 2;
+  ///<交通标志：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_TrafficSign = 3;
+  ///<交通灯：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_TrafficLight = 4;
+  ///<停车位：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_ParkingSlot = 5;
+  ///<交通标识：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_RoadSign = 6;
+  ///<人行横道：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_CrosswalkLine = 7;
+  ///<交通箭头：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_TrafficArrow = 8;
+  ///<交通锥：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_TrafficCone = 9;
+  ///<桶：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Barrel = 10;
+  ///<未知标志：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_YieldMark = 11;
+  ///<限速牌：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_SpeedMark = 12;
+  ///<目标车车牌号：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Character = 13;
+  ///<停止线：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_StopLine = 14;
+  ///<人行横道预警标志：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Diamond = 15;
+  ///<自行车标识：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_BicycleSign = 16;
+  ///<减速带：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_SpeedBumps = 17;
+  ///<骑车人：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Cyclist = 18;
+  ///<驻车锁：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_ParkingLock = 19;
+  ///<测速摄像头：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_SpeedCamera = 20;
+  ///<小灯泡：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_TrafficLightLens = 21;
+  ///<未知：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Unknown = 50;
+  ///<动物：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Animal = 51;
+  ///<警示牌：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_WarningTriangle = 52;
+  ///<栅栏：[/],(0,/,/),[/],(1,0),/
+  ObstacleType_Fence = 53;
+}
+
+/**
+*@brief   车辆类型
+*@detail  机动车类型
+*/
+enum VehicleType{
+  ///<未知类型：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Unknown = 0;
+  ///<小汽车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Car = 1;
+  ///<SUV：[/],(0,/,/),[/],(1,0),/
+  VehicleType_SUV = 2;
+  ///<厢式货车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Van = 3;
+  ///<公共汽车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Bus = 4;
+  ///<卡车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Truck = 5;
+  ///<救护车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Ambulance = 6;
+  ///<警车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_PoliceCar = 7;
+  ///<救火车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_FireTruck = 8;
+  ///<三轮车：[/],(0,/,/),[/],(1,0),/
+  VehicleType_Tricycle = 9;
+  ///<特殊车辆：[/],(0,/,/),[/],(1,0),/
+  VehicleType_SpecialCar = 10;
+}
+
+/**
+*@brief   目标观测点类型
+*@detail  目标测距测速点的类型
+*/
+enum WorldSpaceInfoPositionType {
+    ///<未知：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_Unknown = 0;
+	///<尾框左下角点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_RearLeft = 1;
+	///<尾框中点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_RearCenter = 2;
+	///<尾框右下角点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_RearRight = 3;
+	///<头框左下角点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_FrontLeft = 4;
+	///<头框中点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_FrontCenter = 5;
+	///<头框右下角点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_FrontRight = 6;
+	///<左侧中点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_LeftCenter = 7;
+	///<右侧中点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_RightCenter = 8;
+	///<整框中点：[/],(0,/,/),[/],(1,0),/
+	WorldSpaceInfoPositionType_Center = 9;
+}
+/**
+*@brief   目标压线类型
+*@detail  目标与车道线的关系
+*/
+enum ObjCutInFlagType {
+  ///<不截断不压当前车道线：[/],(0,/,/),[/],(1,0),/
+  ObjCutIn_Default = 0;
+  ///<非截断车辆压线进入车道：[/],(0,/,/),[/],(1,0),/
+  ObjCutIn_CutInHostLaneNoFov = 1;
+  ///<截断车辆，未压线：[/],(0,/,/),[/],(1,0),/
+  ObjCutIn_CutInFovNoHostLane = 2;
+  ///截断车辆，压线
+  ObjCutIn_CutInHostLaneAndFov = 3;
+}
+
+/**
+*@brief   目标压线线类型
+*@detail  目标压线的线的类型
+*/
+enum ObjCutInLaneType {
+
+  ///<默认值，初始化后不输出该状态：[/],(0,/,/),[/],(1,0),/
+  ObjCutInLane_Default = 0;
+
+  ///<压线类型为观测线：[/],(0,/,/),[/],(1,0),/
+  ObjCutInLane_Measured = 1;
+
+  ///<压线类型为预测线或虚线：[/],(0,/,/),[/],(1,0),/
+  ObjCutInLane_Predicted = 2;
+}
+
+/**
+*@brief   目标车辆cut in时角点属性信息
+*@detail  cut in的速度等信息
+*/
+message ObjCornerPoint {
+  ///<目标车辆cut in角点x方向坐标值：[m],(0,/,/),[/],(1,0),/
+  float objcorner_point_x = 1;
+
+  ///<目标车辆cut in角点y方向坐标值：[m],(0,/,/),[/],(1,0),/
+  float objcorner_point_y = 2;
+
+  ///<目标车辆cut in与目标车道的距离：[m],(0,/,/),[/],(1,0),侵入车道为正，未进入为负
+  float objdist_inlane = 3;
+
+  ///<目标车辆cut in角点y方向坐标值：[m],(0,/,/),[/],(1,0),/
+  int32 objcut_inflag = 4;
+
+  ///<目标车辆cut inflag：[m],(0,/,/),[/],(1,0),枚举类型详见ObjCutInFlagType
+  int32 objcut_inlane = 5;
+
+  ///<目标车辆切入左车道线的类型：[m],(0,/,/),[/],(1,0),枚举类型详见ObjCutInLaneType
+  int32 ll_type = 6;
+
+  ///<目标车辆切入右车道线的类型：[m],(0,/,/),[/],(1,0),枚举类型详见ObjCutInLaneType
+  int32 rr_type = 7;
+
+  ///<目标车辆切入右车道线与左车道线的距离：[m],(0,/,/),[/],(1,0),/
+  float distance_to_ll = 8;
+
+  ///<目标车辆切入右车道线与右车道线的距离：[m],(0,/,/),[/],(1,0),/
+  float distance_to_rr = 9;
+
+  ///<目标车辆切入速度：[m],(0,/,/),[/],(1,0),/ 
+  float cutin_speed = 10;
+
+  ///<目标车辆切入速度有效值：[m],(0,/,/),[/],(1,0),/ 
+  int32 cutin_speed_valid = 11;
+}
+/**
+*@brief   目标车辆压线状态
+*@detail  目标车辆压线及最近最远的点等信息
+*/
+message CutLaneStatus {
+  ///<目标车辆压线id：[m],(0,/,/),[/],(1,0),/
+  int32 id = 1;  // lane_id
+  ///<目标车辆压线的线上位置：[m],(0,/,/),[/],(1,0),/
+  int32 position = 2;  // refer to LANEV2::POSITION
+  ///<目标车辆压线的线上位置：[m],(0,/,/),[/],(1,0),/
+  bool have_img_measure = 3;
+  ///<目标车辆外边与车道线最近的横向距离的点：[m],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Point nearest_pt = 4;
+  ///<目标车辆外边与车道线最远的横向距离的点：[m],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Point farthest_pt = 5;
+  ///<目标车辆外边与车道线最近的横向距离：[m],(0,/,/),[/],(1,0),/
+  float nearest_distance = 6;
+  ///<目标车辆外边与车道线最远的横向距离：[m],(0,/,/),[/],(1,0),/
+  float farthest_distance = 7;
+}
+/**
+*@brief   经纬度位置
+*@detail  /
+*/
+message GNSSPosition {
+  ///<目标所处位置的经度：[/],(0,/,/),[/],(1,0),/
+  double longitude = 1;
+  ///<目标所处位置的纬度：[/],(0,/,/),[/],(1,0),/
+  double latitude = 2;
+}
+/**
+*@brief   UTM位置
+*@detail  /
+*/
+message UTMPosition {
+  ///<UTM位置横坐标：[/],(0,/,/),[/],(1,0),/
+  double x = 1;
+  ///<UTM位置纵坐标：[/],(0,/,/),[/],(1,0),/
+  double y = 2;
+}
+/**
+*@brief   目标的车道线归属相关属性
+*@detail  目标车辆压线及最近最远的点等信息
+*/
+message ChangingLaneStatus {
+  ///<换道标志位：[m],(0,/,/),[/],(1,0),/
+  bool is_changing_lane = 1;
+  ///<当前目标所处车道：[m],(0,/,/),[/],(1,0),/
+  int32 src = 2;  // refer to OBJ_LANE_ASSIGN, same with curr_lane
+  ///<当前目标所处车道：[m],(0,/,/),[/],(1,0),/
+  int32 dest = 3;  // refer to OBJ_LANE_ASSIGN, same with curr_lane
+}
+/**
+*@brief   描述自车与目标车辆各个面的夹角信息
+*@detail  描述自车与目标车辆各个面的夹角信息，夹角以自车后轴中心为原点，并以自车为基准区分左右
+*/
+message ObjectAngle {
+  ///<目标车辆车头/车尾（最近距离）左侧点跟自车中轴线的夹角是否有效：[m],(0,/,/),[/],(1,0),0：无效，1：有效 
+  bool angle_left_v = 1;  // left angle validity
+  ///<目标车辆车头/车尾（最近距离）左侧点跟自车中轴线的夹角：[rad],(0,/,/),[/],(1,0),方向为左正右负
+  float angle_left = 2;  // left angle value
+  ///<目标车辆车头/车尾（最近距离）中心点跟自车中轴线的夹角是否有效：[m],(0,/,/),[/],(1,0),0：无效，1：有效 
+  bool angle_middle_v = 3;   // middle angle validity
+  ///<目标车辆车头/车尾（最近距离）中心点跟自车中轴线的夹角：[rad],(0,/,/),[/],(1,0),方向为左正右负
+  float angle_middle = 4;  // middle angle value
+  ///<目标车辆车头/车尾（最近距离）右侧点跟自车中轴线的夹角是否有效：[m],(0,/,/),[/],(1,0),0：无效，1：有效
+  bool angle_right_v = 5;  // right angle validity
+  ///<目标车辆车头/车尾（最近距离）右侧点跟自车中轴线的夹角：[rad],(0,/,/),[/],(1,0),方向为左正右负
+  float angle_right = 6;  // right angle value
+  ///<目标车辆车头/车尾（最远距离）点跟自车中轴线的夹角是否有效：[m],(0,/,/),[/],(1,0),0：无效，1：有效
+  bool angle_side_v = 7;  // side angle validity
+  ///<目标车辆车头/车尾（最远距离）点跟自车中轴线的夹角： [rad],(0,/,/),[/],(1,0),方向为左正右负
+  float angle_side = 8;  // side angle value
+}
+
+/**
+*@brief   目标基于位置的输出基本属性
+*@detail  属性包括长宽高航向角位置等
+*/
+message WorldSpaceInfo {
+  ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+  ///<航向角：[rad],(0,/,/),[/],(1,0),vcs坐标系目标车辆航向角
+  float yaw = 1;         // rad
+  ///<速度：[m/s],(0,/,/),[/],(1,0),vcs坐标系目标车辆相对速度，x,y方向
+  Velocity vel = 2;      // m/s
+  ///<车长：[m],(0,0,/),[/],(1,0),车辆长度
+  float length = 3;      // m
+  ///<车宽：[m],(4,0,/),[/],(1,0),车辆宽度
+  float width = 4;       // m
+  ///<车高：[m],(5,0,/),[/],(1,0),车辆高度
+  float height = 5;      // m
+  ///<多边形框：[m],(5,0,/),[/],(1,0),目标多边形框
+  VpPerceptionBaseProto.Polygon poly = 6;      // polygon points
+  ///<vcs坐标系下位置：[m],(5,0,/),[/],(1,0),目标vcs坐标系下位置
+  VpPerceptionBaseProto.Point position = 7;    // position in vcs
+  ///<可通过标志位：[m],(5,0,/),[/],(1,0),目标可通过标志位
+  int32 traversable = 8;
+  ///<车间时距：[ms],(0,0,/),[/],(1,0),(自车距目标的时间，两车相对距离/自车车速) 【仅用于前视】
+  float hmw = 9;
+  ///<碰撞时间：[ms],(-1000,/,/),[/],(1,0),(两车碰撞所需时间，两车相对距离/两车相对速度) 【仅用于前视】
+  float ttc = 10;
+  ///<目标输出当前车道：[ms],(-1,-1,5),[/],(1,0),(目标车所处车道包括未知左右，左左，右右车道)
+  int32 curr_lane = 11;
+  ///<vcs的目标坐标信息：[m],(0,/,/),[/],(1,0),(vcs坐标系下的原始相对位置信息(观测的，无滤波))
+  VpPerceptionBaseProto.Point position_obs = 12;    // position in vcs
+  ///<强化碰撞时间：[ms],(-1000,/,/),[/],(1,0),(考虑加速度因素计算的两车碰撞所需时间) 【仅用于前视】
+  float ettc = 13;
+  ///<加速度：[m/s^2],(0,/,/),[/],(1,0),(目标车行驶方向相对加速度)
+  float acc = 14;
+  ///<目标位置状态：[/],(0,/,/),[/],(1,0),(目标车位置状态包括以缓慢移动，移动，静止等)
+  int32 motion_state = 15;  //  moving, stopped
+  ///<目标绝对速度：[m/s],(0,/,/),[/],(1,0),(目标车vcs方向相当于地面的速度)
+  Velocity vel_abs_world = 16;      // m/s
+  ///<目标绝对加速度：[m/s^2],(0,/,/),[/],(1,0),(目标车vcs方向相当于地面的加速度)
+  Accelerate acc_abs_world = 17;      // m/s
+  ///<目标车运动类别：[/],(0,/,/),[/],(1,0),(同向，对向，cutin等)
+  int32 motion_category = 18;   //  passing in, moving in, cut in
+  ///<目标车辆测距点类型：[/],(0,/,/),[/],(1,0),(目标车测距点类型包括尾框中点，左边中点,右边中点等)
+  int32 position_type = 19; // WorldSpaceInfoPositionType
+  ///<目标车辆在vcs坐标系下的角速度：[rad/s],(0,/,/),[/],(1,0),(角速度)
+  float yaw_rate = 20;
+  ///<车道曲率：[1/m],(0,/,/),[/],(1,0),(车道某点曲率)
+  float curvature = 21;
+  ///<航向角方差：[rad^2],(0,/,/),[/],(1,0),(统计量，航向角方差)
+  float sigma_yaw = 30;
+  ///<相对速度方差：[(m/s)^2],(0,/,/),[/],(1,0),(3*3)
+  repeated float sigma_vel = 31;  // 3 * 3
+  ///<宽度方差：[m^2],(0,/,/),[/],(1,0),(统计量)
+  float sigma_width = 32;
+  ///<高度方差：[m^2],(0,/,/),[/],(1,0),(统计量)
+  float sigma_height = 33;
+  ///<位置方差：[m^2],(0,/,/),[/],(1,0),(3*3)
+  repeated float sigma_position = 34;  // 3 * 3
+  ///<长度方差：[m^2],(0,/,/),[/],(1,0),(统计量)
+  float sigma_length = 35;
+  ///<航向角置信度：[/],(0,/,/),[/],(1,0),(/)
+  float conf_yaw = 36;
+  ///<cipv标志位：[/],(0,/,/),[/],(1,0),(目标为cipv置1)
+  int32 cipv = 37;   //  is cipv flag
+  ///<可预测状态：[/],(0,/,/),[/],(1,0),(目标是否为预测得到的目标，目标状态分为无效的，检测到的，预测的)
+  int32 measurement_status = 38;   //1 old/new, 2 predict/det, 3 valid or not
+  ///<目标车辆车尾底边中点相对于自车中轴线的角度：[rad],(0,/,/),[/],(1,0),(方向和vcs坐标系一致，左正右负，即逆时针正，顺时针负【仅前视有效】)
+  float mid_angle = 39;
+  ///<目标车辆在vcs下cut in时的角点属性信息：[/],(0,/,/),[/],(1,0),(详见ObjCornerPoint描述)
+  ObjCornerPoint obj_corner_point = 40;
+  ///<目标位置信息：[m],(0,/,/),[/],(1,0),(目标相对于自车世界坐标起点的位置)
+  VpPerceptionBaseProto.Point position_world = 41;
+  ///<障碍物置信度：[/],(0,/,/),[/],(1,0),(输出为障碍物的置信度)
+  ObjectConf obj_conf = 42;
+  ///<相对加速度：[m/s^2],(0,/,/),[/],(1,0),(在vcs坐标系x,y方向的相对加速度)
+  Accelerate acc_ref = 43;   // acc
+  ///<vcs坐标系下观测点：[m],(0,/,/),[/],(1,0),(根据freespace及角点获取)
+  repeated VpPerceptionBaseProto.Point multi_pts_vcs = 44;
+  ///<图像坐标系下观测点：[/],(0,/,/),[/],(1,0),(根据freespace及角点获取)
+  repeated VpPerceptionBaseProto.Point multi_pts_img = 45;
+  ///<紧急行人：[/],(0,0,1),[/],(1,0),(选取为紧急行人置1)
+  int32 mcp = 46;   //  is mcp flag
+  ///<当前路径：[/],(0,/,/),[/],(1,0),(分配的预测路径)
+  int32 curr_path = 47;  // predict_path assign
+  ///<cipv的debug信息：[/],(0,/,/),[/],(1,0),(/)
+  int32 cipv_debug_info_a = 48;
+  ///<目标换道标志位：[/],(0,0,1),[/],(1,0),(/)
+  ChangingLaneStatus changing_lane_status = 49;
+  ///<目标截断车道线标志位：[/],(0,0,1),[/],(1,0),(/)
+  repeated CutLaneStatus cut_lane_status = 50;
+  ///<目标车辆在vcs坐标系下的角速度方差：[(rad/s)^2],(0,/,/),[/],(1,0),(统计量)
+  float sigma_yaw_rate = 51;  // yaw rate sigma
+  ///<头框尾框种类：[/],(0,/,/),[/],(1,0),(初始化，头框，尾框)
+  int32 head_rear_type = 52;  // head & rear type
+  ///<目标车辆vcs相对加速度方差：[(m/s^2)^2],(0,/,/),[/],(1,0),(统计量)
+  repeated float sigma_acc_ref = 53;   // acc ref sigma
+  ///<运动曲率：[rad],(0,/,/),[/],(1,0),(目标运动的曲率半径)
+  float r_abc_world = 54;   // radius of curvature
+  ///<目标遮挡率：[/],(0,/,/),[/],(1,0),(/)
+  float cover_ratio = 55;   // obj cover ratio
+  ///<自车与目标车各个面的夹角：[/],(0,/,/),[/],(1,0),(（left、middle、right、side共4个角度，每个角度包括value和valid状态），夹角以自车后轴中心为原点，详细可见ObjectAngle描述，方向左正右负)
+  ObjectAngle obj_angle = 56;  // four surface angle
+  ///<延伸的cipv：[rad],(0,/,/),[/],(1,0),(/)
+  int32 extend_cipv = 57;
+  ///<障碍物属性：[(/],(0,/,/),[/],(1,0),(包含：是否在道路边界外, 是否被遮挡等，其中pro_flag按照bitmap方式填充)
+  int32 pro_flag = 58;
+  ///<压线状态：[/],(0,1,1),[/],(1,0),(/)
+  int32 cut_in_flag = 59;
+}
+
+/**
+*@brief   目标输出图像的属性
+*@detail  目标框相关属性
+*/
+message ImageSpaceInfo {
+  ///<矩形框：[/],(0,/,/),[/],(1,0),(障碍物在图像中的矩形位置，无滤波)
+  VpPerceptionBaseProto.Rect rect = 1;
+  ///<矩形框：[/],(0,/,/),[/],(1,0),(障碍物在图像中的矩形位置，滤波后)
+  VpPerceptionBaseProto.Rect rect_sta = 2;
+  ///</：[rad],(0,/,/),[/],(1,0),(/)
+  VpSkeletonProto.Skeleton skeleton = 10;
+  ///<长方体：[/],(0,/,/),[/],(1,0),(障碍物在图像中的3d box)
+  VpPerceptionBaseProto.Box3D box = 11;
+  ///<多边形：[/],(0,/,/),[/],(1,0),(多边形：障碍物在图像中的位置)
+  VpPerceptionBaseProto.Polygon poly = 12;
+  ///<图像系宽度方差：[/],(0,/,/),[/],(1,0),(统计量)
+  float sigma_width = 20;
+  ///<图像系高度方差：[/],(0,/,/),[/],(1,0),(统计量)
+  float sigma_height = 21;
+  ///<图像系底边中点x坐标方差：[/],(0,/,/),[/],(1,0),(统计量)
+  float sigma_x = 22;  // bottom center point
+  ///<图像系底边中点y坐标方差：[/],(0,/,/),[/],(1,0),(统计量)
+  float sigma_y = 23;
+}
+
+/**
+*@brief   全局空间信息的属性
+*@detail  全局空间信息相关属性
+*/
+message GlobalSpaceInfo {
+  ///<odo位置信息：[/],(0,/,/),[/],(1,0),(x,y,roll,pitch等信息)
+  VpAdBaseProto.Pose odom_pose = 1;
+  ///<odo速度信息：[m/s],(0,/,/),[/],(1,0),(本车速度)
+  VpAdBaseProto.Vector3 odom_speed = 2;
+  ///<odo加速度信息：[m/s^2],(0,/,/),[/],(1,0),(本车加速度)
+  VpAdBaseProto.Vector3 odom_acceleration = 3;
+  ///<车道限速：[/],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 lane_speed = 4;
+  ///<车道限加速度：[/],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 lane_acceleration = 5;
+  ///<未知信号：[/],(0,/,/),[/],(1,0),(/)
+  float odom_s = 6;
+  ///<未知信号：[/],(0,/,/),[/],(1,0),(/)
+  float lane_s = 7;
+  ///<未知信号：[/],(0,/,/),[/],(1,0),(/)
+  float lane_l = 8;
+  ///<左侧车道的距离：[m],(0,/,/),[/],(1,0),(/)
+  float left_line_dist = 9;
+  ///<右侧车道的距离：[m],(0,/,/),[/],(1,0),(/)
+  float right_line_dist = 10;
+  ///<斜率：[m],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 shape = 11;
+  ///<静止标志位：[m],(0,/,/),[/],(1,0),(/)
+  bool static_flag = 12;
+  ///<cutin标志位：[/],(0,/,/),[/],(1,0),(0：没有cutin 1：发生cutin)
+  bool cutin_flag = 13;
+  ///<预测cutin标志位：[/],(0,/,/),[/],(1,0),(0：预测不会发生cutin 1：预测发生cutin)
+  bool pre_cutin_flag = 14;
+  ///<预测cutin置信度：[/],(0,/,/),[/],(1,0),(cutin预测置信度)
+  float pre_cutin_conf = 15;
+  ///<预测轨迹：[/],(0,/,/),[/],(1,0),(cutin预测置信度)
+  repeated PredictedTraj pred_trajectories = 16;
+  ///<cipv标志位：[m/s^2],(0,/,/),[/],(1,0),(/)
+  bool cipv_flag = 17;
+  ///<有效标志位：[m/s^2],(0,/,/),[/],(1,0),(/)
+  bool valid_flag = 18;
+  ///<车道线来源类型：[/],(0,/,/),[/],(1,0),(/)
+  string source = 19;
+  ///<车道线未知信号：[/],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.LaneBehavior lane_behavior = 20;
+  ///<运动类型：[m/s^2],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.MotionState motion_state = 21;
+  ///<观测状态：[m/s^2],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.MeasState meas_state = 22;
+  ///<未知ID：[m/s^2],(0,/,/),[/],(1,0),(/)
+  int32 reference_id = 23;
+  ///<切入车道线的编号：[m/s^2],(0,/,/),[/],(1,0),(/)
+  int32 cut_in_line_index = 24;
+  ///<切入车道线的距离：[m/s^2],(0,/,/),[/],(1,0),(/)
+  float cut_in_dist = 25;
+  ///</：[/],(/,/,/),[/],(1,0),(/)
+  repeated string association_ids = 26;
+  ///<GNS位置横坐标：[/],(0,/,/),[/],(1,0),/
+  GNSSPosition position_gnss = 27;
+  ///<UTM坐标系横坐标：[/],(0,/,/),[/],(1,0),/
+  UTMPosition position_utm = 28;
+  ///<utput target heading relative to north：[/],(0,/,/),[/],(1,0),/
+  double heading = 29;
+  ///<预测轨迹状态：[/],(0,/,/),[/],(1,0),(/)
+  TrajPredStatusType traj_pred_status = 30;
+  ///<parsing_rles:[/],(/,/,/),[/],(1,0),(/),静态目标在语义分割图上的所有像素区域
+  repeated VpLineV2.RLE parsing_rles = 31;
+}
+
+/**
+*@brief   颜色的属性
+*@detail  颜色相关属性
+*/
+message PropertyInfo {
+  ///<目标颜色：[/],(0,/,/),[/],(1,0),(/)
+  VpAdBaseProto.CommonColor color = 1;
+}
+
+/**
+*@brief   目标车辆模型类型属性
+*@detail  目标车辆调用2pe模型类型
+*/
+enum VehProperty {
+  ///<车辆类别属性：[/],(0,/,/),[/],(1,0),(SUV,BUS,CAR等车型信息)
+  VehProperty_Type = 0;    // SUV, Bus, etc.
+  ///<特殊车辆类别属性：[/],(0,/,/),[/],(1,0),(救护车，警车等车型信息)
+  VehProperty_Classification = 1;  // ambulance, police car, etc.
+  ///<车灯类别属性：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_Light = 2;
+  ///<目标3D框属性：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_3DBox = 3;
+  ///<目标关键点属性：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_KeyPoints = 4;
+  ///<检测框：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_VehBBox = 5;
+  ///<未使用：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_KeyPointsConf = 6;
+  ///<未使用：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_BigSmallCls = 7;
+  ///<未使用：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_PoliceLight = 8;
+  ///<目标遮挡分类属性：[/],(0,/,/),[/],(1,0),(/)
+  VehProperty_Occlusion = 9;
+  ///<模型类型计数：[/],(0,/,/),[/],(1,0),(模型类型的总数为10个)
+  VehProperty_Cnt = 10;
+}
+/**
+*@brief   感知框类型
+*@detail  包括车牌框和车轮框
+*/
+enum VehPropertyPerceptionType{
+  ///<感知框类型：[/],(0,/,/),[/],(1,0),(车牌框)
+  Veh_PerceptionType_LicensePlate = 0;
+  ///<感知框类型：[/],(0,/,/),[/],(1,0),(车轮框)
+  Veh_PerceptionType_Wheel = 1;
+  ///<感知框类型枚举数量：[/],(0,/,/),[/],(1,0),(2)
+  Veh_PerceptionType_Cnt = 2;
+}
+/**
+*@brief   交通灯2pe模型类别
+*@detail  包括交通灯类别和颜色
+*/
+enum TrafficLightProperty {
+  ///<交通灯类型：[/],(0,/,/),[/],(1,0),(/)
+  TlProperty_Type = 0;
+  ///<交通灯颜色：[/],(0,/,/),[/],(1,0),(/)
+  TlProperty_Color = 1;
+}
+/**
+*@brief   交通标识2pe模型类别
+*@detail  包括交通标识类别
+*/
+enum TrafficSignProperty {
+  ///<交通标识类型：[/],(0,/,/),[/],(1,0),(/)
+  TsProperty_Type = 0;
+}
+/**
+*@brief   道路标识2pe模型类别
+*@detail  包括道路标识类别
+*/
+enum RoadSignProperty {
+  ///<道路标识类型：[/],(0,/,/),[/],(1,0),(/)
+  RsProperty_Type = 0;
+}
+/**
+*@brief   featuremap类别
+*@detail
+*/
+enum FeatureMapType {
+  ///<跟踪的featureMap：[/],(0,/,/),[/],(1,0),(/)
+  FeatureMapTracking = 0;
+  ///<FeatureMap置信度：[/],(0,/,/),[/],(1,0),(/)
+  FeatureMapConf = 1;
+}
+
+/**
+*@brief   跟踪类别
+*@detail  跟踪类别属性
+*/
+message TrackingFeatureMap {
+  ///<featureMap数据：[/],(0,/,/),[/],(1,0),(/)
+  bytes data = 1;
+  ///<featureMap种类：[/],(0,/,/),[/],(1,0),(/)
+  int32 type = 2;
+}
+
+/**
+*@brief   车道线关系相关种类
+*@detail
+*/
+enum LaneRelationType{
+  ///<车道线关系DEFAULT：[/],(0,/,/),[/],(1,0),(/)
+  LaneRelationType_DEFAULT = 0;
+  ///<车道线关系未知：[/],(0,/,/),[/],(1,0),(/)
+  LaneRelationType_Unknow = 1;
+  ///<车道线无关：[/],(0,/,/),[/],(1,0),(/)
+  LaneRelationType_Irrelevant = 2;
+  ///<车道线相关：[/],(0,/,/),[/],(1,0),(/)
+  LaneRelationType_Relevant = 3;
+}
+
+/**
+*@brief   车道线关系相关种类
+*@detail
+*/
+message ReleWithObst{
+  ///<车道线关系种类：[/],(0,/,/),[/],(1,0),(/)
+  LaneRelationType relation_type = 1;
+  ///<左侧车道线关系种类：[/],(0,/,/),[/],(1,0),(/)
+  VpPerceptionBaseProto.LineType left_type = 2;
+  ///<右侧车道线关系种类：[/],(0,/,/),[/],(1,0),(/)
+  VpPerceptionBaseProto.LineType right_type = 3;
+}
+/**
+*@brief   目标本身属性
+*@detail  每一目标的基本属性
+*/
+message Obstacle {
+  ///<目标id：[/],(-1,/,/),[/],(1,0),(目标跟踪id)
+  int32 id = 1;
+  ///<目标类别id：[/],(0,0,8),[/],(1,0),(目标类型，包括car,truck，等)
+  int32 type = 2;      // ObstacleType
+  ///<目标置信度：[/],(0,0,100),[/],(1,0),(目标置信度)
+  int32 conf = 3;       // confidence, 0~100
+  ///<目标跟踪时间：[ms],(0,0,/),[/],(1,0),(目标跟踪时间)
+  int32 life_time = 4; // ms
+  ///<目标跟踪周期：[/],(0,0,/),[/],(1,0),(目标跟踪周期)
+  int32 age = 5;       // frame count
+  ///<图像信息：[/],(0,0,/),[/],(1,0),(图像相关信息，详见ImageSpaceInfo)
+  ImageSpaceInfo img_info = 6;
+  ///<位置相关信息：[/],(0,0,/),[/],(1,0),(图像相关信息，WorldSpaceInfo)
+  WorldSpaceInfo world_info = 7;
+  ///<odo等其他信息：[/],(0,0,/),[/],(1,0),(通用odo信息，GlobalSpaceInfo)
+  GlobalSpaceInfo global_info = 8;
+  ///<属性信息：[/],(0,/,/),[/],(1,0),(颜色等信息)
+  PropertyInfo prop_info = 9;
+  ///<属性状态：[/],(0,/,/),[/],(1,0),(交通灯状态，标识牌类别)
+  repeated int32 property = 13; // e.g. traffic light/sign properties(light status/sign types)
+  ///<属性名称：[/],(0,/,/),[/],(1,0),(/)
+  repeated string property_name = 14;
+  ///<属性类别：[/],(0,/,/),[/],(1,0),(/)
+  repeated int32 property_type = 15;
+  ///<属性置信度：[/],(0,/,/),[/],(1,0),(/)
+  repeated float property_conf = 16;
+  ///<跟踪的feature_map：[/],(0,/,/),[/],(1,0),交通灯状态，标识牌类别
+  repeated TrackingFeatureMap tracking_fmap = 17;
+  ///<目标框状态：[/],(0,/,/),[/],(1,0),(/)
+  int32 rec_status = 18;
+  ///<有效信息：[/],(0,/,/),[/],(1,0),目标各属性有效标志位，采取bitmap的方式
+  int32 valid_info = 19;
+  ///<车道线相关信息：[/],(0,/,/),[/],(1,0),包括车道线关联属性，左右车道属性
+  ReleWithObst lane_relevance = 20;
+  ///<目标跟踪id：[/],(0,/,/),[/],(1,0),(按照区域划分的目标id，主车道，左车道，右车道各最近的两个)
+  int32 serial_number = 21;
+  ///<目标选择调用等级：[/],(-1,/,/),[/],(1,0),(根据目标选择确定目标调用等级，根据目标重要度设置)
+  int32 select_level = 22;
+  ///</：[/],(-1,/,/),[/],(1,0),(/)
+  repeated int32 child_id = 23;
+  ///<行人被选取为紧急行人flag：[/],(-1,/,/),[/],(1,0),(若有mcp则置1，若没有mcp则置0)
+  int32 mcp = 24;
+  ///<动态障碍物的子属性以及子属性具有的枚举类型：[/],(-1,/,/),[/],(1,0),()
+  repeated VpPerceptionBaseProto.Category category = 25;
+  ///<类型：[/],(-1,/,/),[/],(1,0),(车辆类型等)
+  int32 sub_type = 26;  // VehicleType, etc.
+  ///<车辆预测时间：[ms],(0,/,/),[/],(1,0),(预测车辆开启时，预测车辆输出时间)
+  int64 predict_time = 27;
+  ///<车辆预测时间：[/],(0,/,/),[/],(1,0),(预测车辆开启时，预测车辆输出周期)
+  int32 predict_frame = 28;
+  ///<传感器id：[/],(0,/,/),[/],(1,0),(/)
+  int32 sensor_id = 29;
+  ///<匹配相机id：[/],(0,/,/),[/],(1,0),(/)
+  int32 matched_vision_id = 30;
+  ///<匹配前雷达id：[/],(0,/,/),[/],(1,0),(/)
+  int32 matched_frontradar_id = 31;
+  ///<有效输出信息：[/],(0,/,/),[/],(1,0),(目标输出有关属性有效标志位，采取bitmap的方式，新增加)
+  int32 output_info = 32;
+  ///<目标跟踪id：[/],(0,/,/),[/],(1,0),(目标跟踪原始id，新增加)
+  int32 raw_id = 33;
+  ///<目标实际来源相机id：[/],(0,/,/),[/],(1,0),(/)
+  int32 cam_source = 34;
+}
+/**
+*@brief   传感器来源
+*@detail  输入的来源对应的传感器种类
+*/
+enum SensorSourceType {
+  ///<未知传感器：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_UNKNOWN = 0;
+  ///<摄像头：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_CAMERA = 1;
+  ///<激光雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_LIDAR = 2;
+  ///<雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_RADAR = 3;
+  ///<前视摄像头：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_FRONT_CAMERA = 10;
+  ///<多摄像头：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_MULTI_CAMERA = 19;
+  ///<前雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_FRONT_RADAR = 30;
+  ///<左前雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_LEFT_FRONT_RADAR = 31;
+  ///<右前雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_RIGHT_FRONT_RADAR = 32;
+  ///<后雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_REAR_RADAR = 33;
+  ///<左雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_LEFT_REAR_RADAR = 34;
+  ///<右后雷达：[/],(/,/,/),[/],(1,0),(/)
+  SENSOR_SOURCE_TYPE_RIGHT_REAR_RADAR = 35;
+  ///<多传感器：[/],(/,/,/),[/],(1,0),(/)
+  SSMSENSOR_SOURCE_TYPE_MULTI_SENSOR = 40;
+}
+/**
+*@brief   多传感器融合状态
+*@detail  自车多传感器的融合状态
+*/
+message MultSensorObsFusionStatus {
+  ///<时间戳：[/],(/,/,/),[/],(1,0),(/)
+  int64 time_stamp = 1;
+  ///<来源：[/],(/,/,/),[/],(1,0),(/)
+  string source = 2;
+  ///<正常状态标志位：[/],(0,0,1),[/],(1,0),(/)
+  bool is_normal = 3;
+  ///<融合状态：[/],(0,0,1),[/],(1,0),(是否融合的标志位)
+  bool is_fusion = 4;
+  ///<融合模式：[/],(0,0,3),[/],(1,0),(那些传感器进行融合的信号)
+  int32 fusion_mode = 5;  // 0: 1V1R 1: 1V5R 2: 6V1R 3: 6V5R
+  ///<无效传感器：[/],(/,/,/),[/],(1,0),(表示哪些传感器是无效的)
+  repeated string invalid_sensor = 6;
+  ///<融合状态：[/],(/,/,/),[/],(1,0),(/)
+  int32 fusion_status = 7;
+}
+/**
+*@brief   描述当前帧包含的所有动态障碍物
+*@detail  描述当前图像帧包含的所有动态障碍物（车辆、行人和骑车人）信息
+*/
+message Obstacles {
+  ///<动态障碍物基础信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header header = 20;
+  ///<摄像头编号：[/],(/,/,/),[/],(1,0),(/)
+  int32 cam_id = 1;
+  ///<目标基本信息：[/],(/,/,/),[/],(1,0),(详见Obstacle，包括目标位置，航向角等)
+  repeated Obstacle obstacle = 2;
+  ///<目标置信度：[/],(/,/,/),[/],(1,0),(/)
+  float conf_scale = 3;  // confidence value scale factor
+  ///<cipv目标id：[/],(/,/,/),[/],(1,0),(被选为cipv目标的id)
+  int32 cipv_id = 4;
+  ///<同步时间戳：[/],(/,/,/),[/],(1,0),(/)
+  int64 asyn_time_stamp = 5;
+  ///<车辆目标时间：[/],(/,/,/),[/],(1,0),(/)
+  int64 vec_src_time = 6;
+  ///<行人目标时间：[/],(/,/,/),[/],(1,0),(/)
+  int64 ped_src_time = 7;
+  ///<紧急行人id：[/],(/,/,/),[/],(1,0),(/)
+  int32 mcp_id = 8;
+  ///<帧数：[/],(/,/,/),[/],(1,0),(/)
+  int32 frame_id = 9;
+  ///<目标数量：[/],(/,/,/),[/],(1,0),(/)
+  int32 obstacle_num = 10;
+  ///<来源传感器的种类：[/],(/,/,/),[/],(1,0),(/)
+  SensorSourceType source_type = 11;
+  ///<多传感器融合状态：[/],(/,/,/),[/],(1,0),(/)
+  MultSensorObsFusionStatus mult_sensor_obs_fusion_status = 12;
+  ///<来源：[/],(/,/,/),[/],(1,0),(/)
+  string source = 13;
+}
+/**
+*@brief   预测轨迹相关属性
+*@detail  
+*/
+message PredictedTrajPoint {
+  ///<目标预测轨迹：[/],(/,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 trajectory = 1;
+  ///<目标预测轨迹方差：[/],(/,/,/),[/],(1,0),(/)
+  repeated float covariance = 2;  // 2x2 covariance matrix
+  ///<目标预测轨迹速度：[/],(/,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 velocity = 3;
+  ///<目标预测轨迹加速度：[/],(/,/,/),[/],(1,0),(/)
+  VpAdBaseProto.Vector3 acceleration = 4;
+  ///<目标预测航向角：[/],(/,/,/),[/],(1,0),(/)
+  float yaw_vcs = 5;
+}
+/**
+*@brief   预测轨迹相关属性
+*@detail  /
+*/
+message PredictedTraj {
+  ///<目标预测轨迹：[/],(/,/,/),[/],(1,0),(/)
+  repeated PredictedTrajPoint trajectory = 1;
+  ///<目标预测轨迹概率：[/],(/,/,/),[/],(1,0),(/)
+  float probability = 2;  // 0~1
+  ///<目标预测轨迹index：[/],(/,/,/),[/],(1,0),(/)
+  int32 anchor_idx = 3;
+  ///<步长时间：[/],(/,/,/),[/],(1,0),(/)
+  float step_time = 4;
+}
+/**
+*@brief   预测轨迹状态
+*@detail  /
+*/
+enum TrajPredStatusType {
+  ///<目标预测轨迹正常：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_NORMAL = 0;
+  ///<只根据本车预测：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_EGO_ONLY = 1;
+  ///<只根据前车预测：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_VEHICLE_ONLY = 2;
+  ///<历史帧不够预测：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_HISTORY_FRAME_NOT_ENOUGH = 3;
+  ///<未知：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_FUTURE_FRAME_NOT_ENOUGH = 4;
+  ///<标签不稳定：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_PED_LABEL_UNSTABLE = 5;
+  ///<目标车太远：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_OBSTACLE_TOO_FAR = 6;
+  ///<目标车静止：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_OBSTACLE_STATIONARY = 7;
+  ///<目标车跳动：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_OBSTACLE_DRIFTING = 8;
+  ///<航向角弹跳：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_OBSTACLE_YAW_BOUNCING = 9;
+  ///<目标车限制数目：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_REACH_MODEL_LIMIT_NUM = 10;
+  ///<目标车停止：[/],(/,/,/),[/],(1,0),(/)
+  TRAJ_PRED_STATUS_TYPE_DENSE_PARKING_VEHICLE = 11;
+}
+/**
+*@brief   跟踪使用的观测帧
+*@detail  /
+*/
+message UsedInput {  // 跟踪使用的观测帧
+  ///<观测帧基础信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header header = 1;  // 观测帧基础信息
+  ///<上一次使用的观测的基础信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header prev_input = 2;  // 上一次使用的观测的基础信息
+}
+/**
+*@brief   障碍物跟踪运行信息
+*@detail  /
+*/
+message ObstacleTrackRun {  // 障碍物跟踪运行信息
+  ///<跟踪基础信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header header = 1;  // 跟踪基础信息
+  ///<跟踪所使用的状态信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header used_state = 2;  // 跟踪所使用的状态信息
+  ///<跟踪使用的观测信息：[/],(0,/,/),[/],(1,0),/
+  repeated UsedInput used_inputs = 3;  // 跟踪使用的观测信息
+  ///<丢弃的观测信息：[/],(0,/,/),[/],(1,0),/
+  repeated VpPerceptionBaseProto.Header removed_inputs = 4;  // 丢弃的观测信息
+  ///<跟踪整体耗时：[/],(0,/,/),[/],(1,0),/
+  int64 track_time = 10;  // 跟踪整体耗时
+  ///<车辆传感器内跟踪耗时：[/],(0,/,/),[/],(1,0),/
+  int64 veh_sensor_time = 11;  // 车辆传感器内跟踪耗时
+  ///<车辆跨传感器跟踪耗时：[/],(0,/,/),[/],(1,0),/
+  int64 veh_cross_time = 12;  // 车辆跨传感器跟踪耗时
+  ///<行人传感器内跟踪耗时：[/],(0,/,/),[/],(1,0),/
+  int64 ped_sensor_time = 13;  // 行人传感器内跟踪耗时
+  ///<行人跨传感器跟踪耗时：[/],(0,/,/),[/],(1,0),/
+  int64 ped_cross_time = 14;  // 行人跨传感器跟踪耗时
+}
+/**
+*@brief   障碍物状态估计运行信息
+*@detail  /
+*/
+message ObstacleStateRun {  // 障碍物状态估计运行信息
+  ///<状态估计基础信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header header = 1;  // 状态估计基础信息
+  ///<所使用的跟踪信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header used_track = 2;  // 所使用的跟踪信息
+  ///<所使用的车道线信息：[/],(0,/,/),[/],(1,0),/
+  VpPerceptionBaseProto.Header used_lane = 3;  // 所使用的车道线信息
+  ///<状态估计整体耗时：[/],(0,/,/),[/],(1,0),/
+  int64 state_time = 10;  // 状态估计整体耗时
+  ///<车辆状态估计耗时：[/],(0,/,/),[/],(1,0),/
+  int64 veh_state_time = 11;  // 车辆状态估计耗时
+  ///<车辆全局状态估计耗时：[/],(0,/,/),[/],(1,0),/
+  int64 veh_glbstate_time = 12;  // 车辆全局状态估计耗时
+  ///<行人状态估计耗时：[/],(0,/,/),[/],(1,0),/
+  int64 ped_state_time = 13;  // 行人状态估计耗时
+  ///<行人全局状态估计耗时：[/],(0,/,/),[/],(1,0),/
+  int64 ped_glbstate_time = 14;  // 行人全局状态估计耗时
+}
+

@@ -1,0 +1,41 @@
+/**
+* @file     throass.proto
+* @author   张茂林
+* @details  前/后向误加速保护控制
+* @date     2023-09-12
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2023.9.12       <th>1.0                   <th>张茂林 
+* <table>
+**********************************************************************************
+*/
+syntax="proto3"; 
+package	ThroAssProto;
+
+/**
+* @brief 油门辅助
+* @detail xxxxxxxx
+*/
+
+message ThroAssStatus{ 
+
+///<油门辅助激活状态:[/],(/,/,/),[/],(1,0),油门辅助激活状态
+///<0x0: 关闭 0x1: 开启
+uint32 accr_pedal_frnt_actv_sts = 1;
+  
+///<挡位辅助激活状态:[/],(/,/,/),[/],(1,0),挡位辅助激活状态
+///<0x0: 关闭 0x1: 开启
+uint32 accr_pedal_rear_actv_sts = 2;
+
+///<油门开度抑制值:[/],(/,0,100),[/],(1,0),油门开度抑制值
+float thro_open_inhibi_val = 3;
+
+///<影子功能模式:[/],(/,/,/),[/],(1,0),影子功能模式
+///<0x0: 关闭  0x1: 开启
+uint32 accr_pedal_frnt_rear_shadow_sts = 4;
+} 

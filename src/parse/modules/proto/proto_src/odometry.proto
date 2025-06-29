@@ -1,0 +1,122 @@
+/**
+* @file     odometry.proto
+* @author   yangzhao
+* @details  定位输出接口定义
+* @date     2022-03-11
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.2          <th>1.0                 <th>yangzhao
+* <tr><th>2022.3.11         <th>2.0                 <th>yangzhao
+* <table>
+**********************************************************************************
+*/
+syntax = "proto3";
+package localization;
+import "ca_appendix.proto";
+import "header.proto";
+
+/**
+* @brief Point信息
+* @detail xxxxxxxx
+*/
+message Point {
+  ///< Point.x:[/],(/,/,/),[/],(/,/),标识Point.x
+  ///< 表示x轴坐标:m
+  ///< 表示GPS经度:°，正为E，范围-180~180
+  ///< 表示x轴线速度:m/s
+  ///< 表示x轴角速度:rad/s
+  double x = 1;
+
+  ///< Point.y:[/],(/,/,/),[/],(/,/),标识Point.y
+  ///< 表示y轴坐标:m
+  ///< 表示GPS纬度:°，正为N，范围-90~90
+  ///< 表示y轴线速度:m/s
+  ///< 表示y轴角速度:rad/s
+  double y = 2;
+
+  ///< Point.z:[/],(/,/,/),[/],(/,/),标识Point.z
+  ///< 表示z轴坐标:m
+  ///< 表示GPS高程:m
+  ///< 表示z轴线速度:m/s
+  ///< 表示z轴角速度:rad/s
+  double z = 3;
+}
+
+/**
+* @brief Hamilton单位四元数信息
+* @detail xxxxxxxx
+*/
+message Quaternion {
+  ///< q.x:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q.x
+  double x = 1;
+
+  ///< q.y:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q.y
+  double y = 2;
+
+  ///< q.z:[/],(0，-1，1),[/],(/,/),标识Hamilton单位四元数的q.z
+  double z = 3;
+
+  ///< q.w:[/],(1，-1，1),[/],(/,/),标识Hamilton单位四元数的q.w
+  double w = 4;
+}
+
+/**
+* @brief 位置姿态信息
+* @detail xxxxxxxx
+*/
+message Pose {
+  ///< 位置信息:[/],(/,/,/),[/],(/,/),标识经纬度高程坐标、局部坐标系下基于原点的XYZ坐标
+  Point position = 1;
+
+  ///< Hamilton单位四元数:[/],(/,/,/),[/],(/,/),标识Hamilton四元数(q.x, q.y, q.z, q.w)
+  Quaternion quaternion = 2;
+
+  ///< 协方差:[/],(/,/,/),[36],(/,/),标识协方差,一维数组表示6x6协方差矩阵
+  repeated double covariance = 3;
+}
+
+/**
+* @brief 速度信息
+* @detail xxxxxxxx
+*/
+message Twist {
+  ///< 三轴线速度:[m/s],(/,/,/),[/],(/,/),标识X、Y、Z轴线速度
+  Point linear = 1;
+
+  ///< 三轴角速度:[rad/s],(/,/,/),[/],(/,/),标识X、Y、Z轴角速度
+  Point angular = 2;
+
+  ///< 协方差:[/],(/,/,/),[36],(/,/),标识协方差,一维数组表示6x6协方差矩阵
+  repeated double covariance = 3;
+}
+
+/**
+* @brief 定位输出信息
+* @detail xxxxxxxx
+*/
+message Odometry {
+  ///< 数据头信息:[/],(/,/,/),[/],(/,/),标识数据头信息
+  Header header = 1;
+
+  ///< 速度的坐标系:[/],(/,/,/),[/],(/,/),标识Twist的坐标系
+  string child_frame_id = 2;
+
+  ///< 位置姿态信息:[/],(/,/,/),[/],(/,/),标识位置姿态信息
+  Pose pose = 3;
+
+  ///< 速度信息:[/],(/,/,/),[/],(/,/),标识速度信息
+  Twist twist = 4;
+
+  ///< 长安附加字段:[/],(/,/,/),[/],(/,/),包含航向、置信度、定位类型、诊断校验
+  CaAppendix ca_related = 5;
+}

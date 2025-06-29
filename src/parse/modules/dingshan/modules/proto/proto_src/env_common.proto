@@ -1,0 +1,157 @@
+/**
+
+* @file     env_common.proto
+* @author   Yifei Kang, Zhaofeng Tang
+* @details  静态环境通用类型、枚举类型
+* @date     2024-01-22
+* @version  1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、(因数，偏移量)、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version          <th>author
+* <tr><th>2024.1.22         <th>1.0             <th>Yifei Kang, Zhaofeng Tang
+* <table>
+**********************************************************************************
+
+*/
+
+syntax = "proto3";
+
+// SOP2 统一改为env
+package localization;
+
+/**
+* @brief 地图状态
+* @details 表示地图的来源
+*/
+enum MapStatus
+{
+  ///< 未知
+  kMSUnknown = 0;
+
+  ///< 高精地图
+  kHdmap = 1;
+
+  ///< 众包地图
+  kUexmap = 2;
+
+  ///< SD地图
+  kSdmap = 3;
+}
+
+/**
+* @brief 车道通行类型
+* @details 表示直行、左右转车道、虚拟车道等
+*/
+enum PassageType
+{
+  ///< 未知
+  kPTUnknown = 0;
+
+  ///< 直行
+  kStraight = 1;
+
+  ///< 左转
+  kLeft = 2;
+
+  ///< 右转
+  kRight = 3;
+
+  ///< 左转直行
+  kLeftStraight = 4;
+
+  ///< 右转直行
+  kRightStraight = 5;
+
+  ///< 左转+右转
+  kLeftRight = 6;
+
+  ///< 直行+左转+右转
+  kStraightLeftRight = 7;
+
+  ///< 掉头
+  kUturn = 8;
+
+  ///< 直行+掉头
+  kStraightUturn = 9;
+
+  ///< 左转+掉头
+  kLeftUturn = 10;
+
+  ///< 右转+掉头
+  kRightUturn = 11;
+
+  ///< 直行+左转+掉头
+  kStraightLeftUturn = 12;
+
+  ///< 左转+右转+掉头
+  kLeftRightUturn = 13;
+
+  ///< 虚拟车道
+  kVirtualLane = 14;
+}
+
+/**
+* @brief 车道通行方向
+* @details 顺、逆、双向通行
+*/
+enum LaneDirection
+{
+  ///< 未知
+  kLDUnknown = 0;
+
+  ///< 顺向车道
+  kForward = 1;
+
+  ///< 逆向车道
+  kReverse = 2;
+
+  ///< 双向车道
+  kBothWay = 3;
+}
+
+/**
+* @brief 可通行状态
+* @details 根据交通灯车道是否可通行
+*/
+enum Passability
+{
+  ///< 未知
+  kPUnknown = 0;
+
+  ///< 可通行
+  kPassable = 1;
+
+  ///< 不可通行
+  kImpassable = 2;
+}
+
+/**
+* @brief 停车位方向
+* @details 开口对应道路的相对方向
+*/
+enum SlotDirection
+{
+  ///< 无效
+  kSDInvalid = 0;
+
+  ///< 未知
+  kSDUnknown = 1;
+
+  ///< 垂直式
+  kVertical = 2;
+
+  ///< 平行式
+  kParallel = 3;
+
+  ///< 倾斜式
+  kTilting = 4;
+}

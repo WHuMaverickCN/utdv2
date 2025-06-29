@@ -1,0 +1,133 @@
+/**
+* @file     vp_odometry_fc.proto
+* @author   liufuyu
+* @details  描述odo信息
+* @date     2022-07-13
+* @version  V1.0
+* @copyright(C),CA,2022
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.7.28          <th>1.0                 <th>liufuyu
+* <table>
+**********************************************************************************
+*/
+
+// [START declaration]
+syntax = "proto2";
+package VpOdometryFcProto;
+
+
+/**
+*@brief   odo来源类型
+*@detail  描述odo信息来源类型
+*/
+enum OdometrySource{
+  ///< OdometrySource_TWOWHEEL：[/],(/,/,/),[/],(1,0),two wheels odo (1 << 0)
+  OdometrySource_TWOWHEEL = 1;         // Mode， two wheels odo (1 << 0)
+  
+  ///< OdometrySource_FOURWHEEL：[/],(/,/,/),[/],(1,0),four wheels odo (1 << 1)
+  OdometrySource_FOURWHEEL = 2;        // Mode， four wheels odo (1 << 1)
+
+  ///< OdometrySource_SPEED：[/],(/,/,/),[/],(1,0),Used Signal, speed (1 << 6)
+  OdometrySource_SPEED = 64;           // Used Signal, speed (1 << 6)
+  
+  ///< OdometrySource_YAWRATE：[/],(/,/,/),[/],(1,0),Used Signal, yawrate (1 << 7) 
+  OdometrySource_YAWRATE = 128;        // Used Signal，yawrate (1 << 7)
+  
+  ///< OdometrySource_STEERING_ANGLE：[/],(/,/,/),[/],(1,0),Used Signal, steering angle (1 << 8)
+  OdometrySource_STEERING_ANGLE = 256;  // Used Signal，steering angle (1 << 8)
+  
+  ///< OdometrySource_WHEEL_SPEED：[/],(/,/,/),[/],(1,0),Used Signal, wheel speed (1 << 9)
+  OdometrySource_WHEEL_SPEED = 512;    // Used Signal，wheel speed (1 << 9)
+  
+  ///< OdometrySource_WHEEL_PULSE：[/],(/,/,/),[/],(1,0),Used Signal, wheel pulse (1 << 10)
+  OdometrySource_WHEEL_PULSE = 1024;    // Used Signal，wheel pulse (1 << 10)
+  
+  ///< OdometrySource_GEAR：[/],(/,/,/),[/],(1,0),Used Signal, gear (1 << 11)
+  OdometrySource_GEAR = 2048;           // Used Signal，gear (1 << 11)
+}
+
+/**
+*@brief   pitch信息
+*@detail  描述pitch信息
+*/
+message StablePitch{
+  ///< pitch：[/],(/,/,/),[/],(1,0),pitch信息
+  optional float pitch = 1;
+  
+  ///< is_valid：[/],(/,/,/),[/],(1,0),pitch有效标志位
+  optional bool is_valid = 2;
+  
+  ///< is_jitter：[/],(/,/,/),[/],(1,0),pitch抖动标志位
+  optional bool is_jitter = 3;
+}
+
+/**
+*@brief   odo信息
+*@detail  描述本车车辆在VCS坐标系下的odo信息
+*/
+message OdometryFrame {
+  ///< x：[m],(/,/,/),[/],(1,0),纵向距离
+  optional float x = 1;
+  
+  ///< y：[m],(/,/,/),[/],(1,0),横向距离
+  optional float y = 2;
+  
+  ///< z：[/],(/,/,/),[/],(1,0),z向（离地面的方向）距离
+  optional float z = 7;
+    
+  ///< roll：[/],(/,/,/),[/],(1,0),横滚角
+  optional float roll = 8;
+    
+  ///< pitch：[/],(/,/,/),[/],(1,0),俯仰角
+  optional float pitch = 9;
+    
+  ///< yaw：[/],(/,/,/),[/],(1,0),偏航角
+  optional float yaw = 3;
+    
+  ///< speed：[/],(/,/,/),[/],(1,0),速度
+  optional float speed = 4;
+    
+  ///< yaw_rate：[/],(/,/,/),[/],(1,0),偏航角速度
+  optional float yaw_rate = 5;
+    
+  ///< time_stamp：[/],(/,/,/),[/],(1,0),时间戳
+  optional int64 time_stamp = 6;
+    
+  ///< source：[/],(/,/,/),[/],(1,0),odo来源类型
+  optional int32 source = 10;
+    
+  ///< ax：[/],(/,/,/),[/],(1,0),x方向加速度
+  optional float ax = 11;
+    
+  ///< ay：[/],(/,/,/),[/],(1,0),y方向加速度
+  optional float ay = 12;
+    
+  ///< wheel_angle：[/],(/,/,/),[/],(1,0),车轮角度
+  optional float wheel_angle = 13;
+    
+  ///< gear：[/],(/,/,/),[/],(1,0),档位信息
+  optional int32 gear = 14;
+    
+  ///< stable_pitch：[/],(/,/,/),[/],(1,0),pitch信息
+  optional StablePitch stable_pitch = 15;
+    
+  ///< frame_id：[/],(/,/,/),[/],(1,0),帧ID
+  optional int32 frame_id = 16;
+  
+    ///< whl_spd_le_re：[/],(/,/,/),[/],(1,0),左后轮轮速
+  optional double whl_spd_le_re = 17;
+  
+  ///< whl_spd_ri_re：[/],(/,/,/),[/],(1,0),右后轮轮速
+  optional double whl_spd_ri_re = 18;  
+}
+
+// [END messages]

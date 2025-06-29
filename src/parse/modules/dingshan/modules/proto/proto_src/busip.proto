@@ -1,0 +1,78 @@
+/**
+* @file     busip.proto
+* @author   ganlichu
+* @details
+* @date     2022-03-18
+* @version  V1.0
+* @copyright(C),changan,2050
+**********************************************************************************
+* @attention 信号注释规则：
+* ///<name ：[uint],(default,min,max),[max_number],(factor,offset),description 
+* ///<信号名称：[单位],(默认值、最小值、最大值),[repeated最大值],（因数，偏移量）,信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE 
+* ///<车辆坐标系 原点：车辆后轴 定义：右手法则
+*
+* @par      修改日志：
+* <table>
+* <tr><th>date              <th>version             <th>author
+* <tr><th>2022.3.18          <th>1.0                 <th>ganlichu 
+* <table>
+**********************************************************************************
+*/
+
+syntax="proto3"; 
+package	BusipProto;
+/**
+* @brief BusIP
+* @detail BusIP 50ms
+*/
+message BusIP{
+	///< 仪表故障：[/],(0x0,0,1),[/],(1,0),0x0:no error 0x1:error
+    uint32 ip_dis_fail = 1;
+	
+	///< 驾驶侧警告灯状态：[/],(0x0,0,1),[/],(1,0),0x0:no error 0x1:error
+    uint32 ip_driver_lcdaled_sts = 2;
+	
+	///< 乘员侧警告灯状态：[/],(0x0,0,1),[/],(1,0),0x0:no error 0x1:error
+    uint32 ip_passenger_lcdaled_sts = 3;
+	
+	///< 仪表检测到ACC发出的信息有误（例如timeout）：[/],(0x0,0,3),[/],(1,0),0x0:no error 0x1:error 0x2:reserved 0x3:reserved
+    uint32 ip_q_dash_acc_fail = 4;
+	
+	///< 数据服务模块收到本数据包时的系统时间戳：[秒],(0x0,0,/),[/],(/,/),0x0:UTC1970-1-1 0:0:0
+	double time_stamp = 5;
+
+	///< cdc_totmilg:[秒],(0x0,0,/),[/],(/,/),cdc_totmilg,0xFFFFFF:invalid(E2E/signalvalid)
+	double cdc_totmilg = 6;
+	
+	///< ipju_ads_sts_e2e_faout:[/],(0x0,0,3),[/],(1,0),ipju_ads_sts_e2e_faout,0x0:noerror 0x1:error 0xFF:invalid(E2E/signalvalid)
+    uint32 ipju_ads_sts_e2e_faout = 7;
+	
+	///< ipju_ads_show_infa:[/],(0x0,0,/),[/],(/,/),ipju_ads_show_infa,0x0:noerror 0x1:error 0xFF:invalid(E2E/signalvalid)
+	uint32 ipju_ads_show_infa = 8;
+
+	///< ipju_ads_show_outfa:[/],(0x0,0,/),[/],(/,/),ipju_ads_show_outfa,0x0:noerror 0x1:error 0xFF:invalid(E2E/signalvalid)
+	uint32 ipju_ads_show_outfa = 9;
+
+	///< 数据服务诊断message是否有效：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 message_valid = 10;
+	
+	///< 预留信号1：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved0 = 11;	
+	
+	///< 预留信号2：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved1 = 12;	
+	
+	///< 预留信号3：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved2 = 13;	
+	
+	///< 预留信号4：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved3 = 14;	
+	
+	///< 预留信号5：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved4 = 15;	
+	
+	///< 预留信号6：[/],(0x0,0,/),[/],(/,/),0x0:Initial 0x1:Valid 0x2:Error
+    uint32 reserved5 = 16;	
+	
+} 

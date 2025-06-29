@@ -1,0 +1,141 @@
+/**
+
+* @file     hmi_basic_roadscene.proto
+* @author   HMITEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义
+* @date     2022-08-22
+* @version  V1.0
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///</<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///</<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///</<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///</<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+/**
+* @brief AmbientLight
+* @detail AmbientLightdata
+*/
+message AmbientLight
+{
+	///<换道状态 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	换道状态
+	///<1:初始化INIT_ACTIVE
+	///<2:请求换道REQUEST_LANE_CHANGE
+	///<3:立即换道IMMEDIATE_LANE_CHANGE
+	///<4:换道回退FALLBACK_LANE_CHANGE
+	///<5:换道成功LANE_CHANGE_SUCCESS
+	///<6:0X5~0X9保留状态ACTIVE_RESERVED
+	uint32 activelanechangestate = 1;
+	///<udlc左侧换道状态 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	udlc左侧换道状态
+	///<1:关闭状态LEFT_NOT_READY
+	///<2:准备状态LEFT_READY
+	///<3:左侧激活等待状态ACTIVE_WAIT_LEFT
+	///<4:左侧激活延迟状态ACTIVE_DELAY_LEFT
+	///<5:向左激活换道状态LEFT_LANE_CHANGE_ACTIVE
+	///<6:激活退出状态LEFT_NOT_ACTIVE_BY_OBJ
+	///<7:无效状态LEFT_INVALID
+	///<8:保留位LEFT_STATUS_RESERVED
+	uint32 udlcleftstatus = 2;
+	///<udlc hmi信息 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	udlc hmi信息
+	///<1:不显示NOT_DISPLAY
+	///<2:用户开启转向灯TURN_ON_LIGTH
+	///<3:道路条件不满足，无车道NOT_LANES
+	///<4:道路条件不满足，车道为实线SOLID_LINE
+	///<5:交通条件不满足换道条件（比如目标车位、前、后方车辆不满足TRAFFIC_CONDITIONS_ERROR
+	///<6:驾驶员状态不满足（比如驾驶员不在环）DRIVER_STATE_ERROR
+	///<7:车辆状态不满足换道条件（比如当前处于报警阶段）VEHICLE_STATE_ERROR
+	///<8:暂时不满足换道条件，不尝试换道OUT_OF_ODD
+	///<9:雨量过大，自动换道条件不满足EXCESSIVE_RAINFALL
+	///<10:触发式换道系统故障UDLC_SYSTEM_ERROR
+	///<11:胎压异常，暂不支持辅助换道TIRE_PRESSURE_ABNORMAL
+	///<12:车速过高，暂不支持辅助换道VELOCITY_EXCESSIVE
+	///<13:当前急弯，暂不支持辅助换道CURRENT_SHARP_BEND
+	///<14:换道条件不满足车辆保持准备换道状态继续等待LANE_CHANGE_CONDITION_ERROR
+	///<15:换道尝试超时中止WAIT_OVER_TIME
+	///<16:满足换道条件，开始换道START_LANE_CHANGE
+	///<17:因用户原因（关闭转向灯）导致换道中断回退UDLC_RETURN_BY_TURN_OFF_LIGHT
+	///<18:因用户原因（关闭转向灯）但换道无法中断回退UDLC_RETURN_FAILURE_BY_TURN_OFF_LIGHT
+	///<19:因用户原因（开启反向转向灯）导致换道中断回退UDLC_RETURN_BY_REVERSE_TURN_ON_LIGHT
+	///<20:因用户原因（开启反向转向灯）但换道无法中断回退UDLC_RETURN_FAILURE_BY_REVERSE_TURN_ON_LIGHT
+	///<21:道路或交通环境不满足换道到目标车道导致换道中断回退UDLC_RETURN_BY_ROAD
+	///<22:道路或交通环境不满足换道到目标车道导致换道中断回退UDLC_RETURN_FAILURE_BY_ROAD
+	///<23:换道完成，请关闭转向灯UDLC_FINISH
+	///<24:0X23~0X30保留状态RESERVED
+	uint32 udlclanechangehmiinfo = 3;
+	///<alc hmi信息 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	alc hmi信息
+	///<1:前方接近匝道，即将换道LANE_CHANGE_TO_LEFT_FOR_PATH_THROUGH_RAMP
+	///<2:前方接近匝道，即将向右换道LANE_CHANGE_TO_RIGHT_FOR_PATH_THROUGH_RAMP
+	///<3:即将汇入主路LANE_CHANGE_FOR_QUICK_ROAD
+	///<4:即将向左换道LANE_CHANGE_TO_LEFT
+	///<5:即将向右换道LANE_CHANGE_TO_RIGHT
+	///<6:即将向左超车当前车静止，或者缓行，临车道畅通LANE_CHANGE_TO_LEFT_FOR_SURPASS_THE_CAR
+	///<7:当前车静止，或者缓行，临车道畅通LANE_CHANGE_TO_RIGHT_FOR_SURPASS_THE_CAR
+	///<8:前方道路有合流点或分流点，即将向左换道LANE_CHANGE_TO_LEFT_FOR_AVOIDING_CONFLUENCE
+	///<9:前方道路有合流点或分流点，即将向右换道LANE_CHANGE_TO_RIGHT_FOR_AVOIDING_CONFLUENCE
+	///<10:前方道路施工，即将向左换道LANE_CHANGE_TO_LEFT_FOR_CONSTRUCTION
+	///<11:前方道路施工，即将向右换道LANE_CHANGE_TO_RIGHT_FOR_CONSTRUCTION
+	///<12:前方交通事故，即将向左换道LANE_CHANGE_TO_LEFT_FOR_TRAFFIC_ACCIDENT
+	///<13:前方交通事故，即将向右换道LANE_CHANGE_TO_RIGHT_FOR_TRAFFIC_ACCIDENT
+	///<14:前方有障碍物，即将向左换道LANE_CHANGE_TO_LEFT_FOR_OBSTACLE
+	///<15:前方有障碍物，即将向右换道LANE_CHANGE_TO_RIGHT_FORO_BSTACLE
+	///<16:远离大车向左换道STAY_AWAY_FROM_BIG_CAR_TO_LEFT
+	///<17:远离大车向右换道STAY_AWAY_FROM_BIG_CAR_TO_RIGHT
+	///<18:车道换道至高通行效率车道LANE_CHANGE_INCREASES_EFFICIENCY_TO_LEFT
+	///<19:车道换道至高通行效率车道LANE_CHANGE_INCREASES_EFFICIENCY_TO_RIGHT
+	///<20:按导航路径长度换道LANE_CHANGE_FOLLOW_PATH_LEN_TO_LEFT
+	///<21:按导航路径长度换道LANE_CHANGE_FOLLOW_PATH_LEN_TO_RIGHT
+	///<22:0X21~0X28保留状态LANE_CHANGE_RESERVED
+	uint32 autolanechangehmiinfo = 4;
+	///<udlc换道状态 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	udlc换道状态
+	///<1:关闭状态OFF
+	///<2:待机状态PASSIVE
+	///<3:激活状态ACTIVE
+	///<4:驾驶员触发回退状态RETURN_TO_LANE_BY_DRIVER
+	///<5:系统触发回退状态RETURN_TO_LANE_BY_SYSTEM
+	///<6:超越状态MAUAL_OVERRIDE
+	///<7:故障状态FAILURE
+	///<8:变道完成状态LANE_CHANGE_COMPLETE
+	///<9:接管状态TAKE_OVER
+	///<10:0x9~0xF保留状态UDLC_RESERVED
+	uint32 udlcstatus = 5;
+	///<udlc右侧换道状态 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	udlc右侧换道状态
+	///<1:关闭状态RIGHT_NOT_READY
+	///<2:准备状态RIGHT_READY
+	///<3:右侧激活等待状态ACTIVE_WAIT_RIGHT
+	///<4:右侧激活延迟状态ACTIVE_DELAY_RIGHT
+	///<5:向右激活换道状态RIGHT_LANE_CHANGE_ACTIVE
+	///<6:激活退出状态NOT_ACTIVE_BY_OBJ
+	///<7:无效状态RIGHT_INVALID
+	///<8:保留位RIGHT_RESERVED
+	uint32 udlcrightstatus = 6;
+	
+}
+
+/**
+* @brief 座舱需要信息输出
+* @details 封装所有信号，包括目标、车道线、交通灯等
+*/
+message BasicAmbientLight
+{
+	 ///<自动灯光相关信息 :[/],(0,0,/),[/],(1,0),  周期触发	20ms	自动灯光相关信息 
+	 AmbientLight ambientlight = 1;    
+}
+
+

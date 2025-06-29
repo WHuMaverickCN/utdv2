@@ -1,0 +1,280 @@
+/**
+
+* @file     hmi_basic_trafficlightscene.proto
+* @author   HMI TEAM
+* @details  SDA-S驾驶-座舱交互-输出信号接口定义 	Basic_TrafficSign - Ntf_TrafficSign
+* @date     2023-06-12
+* @version  V1.6
+* @copyright(C),changan,2050
+
+**********************************************************************************
+
+* @attention 信号注释规则：
+* ///<name:[uint],(default,min,max),[max_number],(factor,offset),description
+* ///<信号名称：[单位]、(默认值、最小值、最大值)、[repeated最大值]、（因数，偏移量）、信号描述
+* ///<coordinate:  COORDINATE_SYSTEM_VEHICLE_BASE
+* ///<车辆坐标系 原点：车辆后轴 右手法则
+
+* @par      修改日志：
+* <table>
+* <tr><th>date               <th>version             <th>author
+* <tr><th>2022.08.22         <th>1.0                 <th>HMITEAM
+* <table>
+
+*********************************************************************************
+
+*/
+
+syntax = "proto3";
+package HmiInterface;
+
+
+/**
+* @brief YellowGLine
+* @detail 黄色停止线距离
+*/
+message YellowGLine
+{
+	///<黄色停止线距离R7:[/],(0,0,/),[/],(1,0), 黄色停止线距离
+	///<备注：R8需求删除
+	float yellowglinerange = 1;		
+}
+
+/**
+* @brief StopLine
+* @detail 本车道停止线距离
+*/
+message StopLine
+{
+	///<本车道停止线距离:[/],(0,0,/),[/],(1,0), 本车道停止线距离
+	float stoplinelngrange = 1;		
+}
+
+/**
+* @brief Crosswork
+* @detail 人形横道距离
+*/
+message Crosswork
+{
+	///<距离人行横道距离: [/],(0,0,/),[/],(1,0), 距离人行横道距离
+	float crossworklngrange = 1;		
+}
+
+/**
+* @brief RoadSign
+* @detail 路面标志信息
+*/
+message RoadSign
+{
+	///<左车道标识类型:[/],(0,0,/),[/],(1,0),    左车道标识类型
+	///<备注：保留未使用
+	uint32 leftsigntype = 1;
+
+	///<左车道路面标识中心纵向距离 :[/],(0,0,/),[/],(1,0),    左车道路面标识中心纵向距离 
+	///<备注：保留保留未使用
+	float leftsignlngrange = 2;
+
+	///<本车道路面标识类型:[/],(0,0,/),[/],(1,0),    本车道路面标识类型
+	///<备注：保留保留未使用
+	uint32 hostsigntype = 3; 
+
+	///<本车道路面标识中心纵向距离:[/],(0,0,/),[/],(1,0),    本车道路面标识中心纵向距离
+	///<备注：保留保留未使用
+	float hostsignlngrange = 4;
+
+	///<右车道路面标识类型 :[/],(0,0,/),[/],(1,0),    右车道路面标识类型 
+	///<备注：保留保留未使用
+	uint32 rightsigntype = 5; 
+
+	///<右车道路面标识中心纵向距离 :[/],(0,0,/),[/],(1,0),    右车道路面标识中心纵向距离 
+	///<备注：保留保留未使用
+	float rightsignlngrange = 6; 
+
+}
+
+/**
+* @brief HostLaneTRCLight
+* @detail 本车道交通灯信息
+*/
+message HostLaneTRCLight
+{
+	///<交通灯识别情况:[/],(0,0,1),[/],(1,0),    交通灯识别情况
+	///<0x0:不显示
+	///<0x1:显示
+	uint32 hostlightsituation = 1;
+
+	///<交通灯颜色 :[/],(0,0,3),[/],(1,0),    交通灯颜色 
+	///<0x0:无效值
+	///<0x1:红色
+	///<0x2:黄色
+	///<0x3:绿色
+	uint32 hostlightcolour = 2;
+
+	///<交通灯类型 :[/],(0,0,7),[/],(1,0),    交通灯类型
+	///<0x0:无效值
+	///<0x1:圆形
+	///<0x2:箭头
+	///<0x3:掉头
+	///<0x4:禁行
+	///<0x5:直行加转向
+	///<0x6-0x7:预留
+	uint32 hostlighttype = 3;
+
+	///<交通灯状态 :[/],(0,0,3),[/],(1,0),    交通灯状态 
+	///<0x0:无效值
+	///<0x1:常亮
+	///<0x2:闪烁
+	///<0x3:即将消失、闪烁
+	uint32 hostlightstatus = 4;
+
+	///<本车道交通灯方向:[/],(0,0,7),[/],(1,0),    交通灯方向
+	///<0x0:无效值
+	///<0x1:直行
+	///<0x2:左转或者左掉头
+	///<0x3:直行+左转/左掉头
+	///<0x4:右转
+	///<0x5:直行+右转
+	///<0x6:左转+右转
+	///<0x7:直行+左转+右转
+	uint32 hostlightdirection = 5; 
+
+	///<交通灯辅助系统报警等级: [/],(0,0,/),[/],(1,0),    交通灯辅助系统报警等级
+	uint32 hostlightwarninglevel = 6; 
+
+}
+
+/**
+* @brief RightLaneTRCLight
+* @detail 右车道交通信号灯信息
+*/
+message RightLaneTRCLight
+{
+	///<交通灯识别情况:[/],(0,0,1),[/],(1,0),    交通灯识别情况
+	///<0x0:不显示
+	///<0x1:显示
+	uint32 rightlightsituation = 1;
+
+	///<交通灯颜色 :[/],(0,0,3),[/],(1,0),    交通灯颜色 
+	///<0x0:无效值
+	///<0x1:红色
+	///<0x2:黄色
+	///<0x3:绿色 
+	uint32 rightlightcolour = 2;
+
+	///<交通灯类型 :[/],(0,0,7),[/],(1,0),    交通灯类型
+	///<0x0:无效值
+	///<0x1:圆形
+	///<0x2:箭头
+	///<0x3:掉头
+	///<0x4:禁行
+	///<0x5:直行加转向
+	///<0x6-0x7:预留 
+	uint32 rightlighttype = 3;
+
+	///<交通灯状态 :[/],(0,0,3),[/],(1,0),    交通灯状态 
+	///<0x0:无效值
+	///<0x1:常亮
+	///<0x2:闪烁
+	///<0x3:即将消失、闪烁
+	uint32 rightlightstatus = 4;
+
+	///<本车道交通灯方向:[/],(0,0,7),[/],(1,0),    交通灯方向
+	///<0x0:无效值
+	///<0x1:直行
+	///<0x2:左转或者左掉头
+	///<0x3:直行+左转/左掉头
+	///<0x4:右转
+	///<0x5:直行+右转
+	///<0x6:左转+右转
+	///<0x7:直行+左转+右转
+	uint32 rightlightdirection = 5; 
+
+}
+
+/**
+* @brief LeftLaneTRCLight
+* @detail 左车道交通信号灯信息
+*/
+message LeftLaneTRCLight
+{
+	///<交通灯识别情况:[/],(0,0,1),[/],(1,0),    交通灯识别情况
+	///<0x0:不显示
+	///<0x1:显示
+	uint32 leftlightsituation = 1;
+
+	///<交通灯颜色 :[/],(0,0,3),[/],(1,0),    交通灯颜色 
+	///<0x0:无效值
+	///<0x1:红色
+	///<0x2:黄色
+	///<0x3:绿色 
+	uint32 leftlightcolor = 2;
+
+	///<交通灯类型 :[/],(0,0,7),[/],(1,0),    交通灯类型
+	///<0x0:无效值
+	///<0x1:圆形
+	///<0x2:箭头
+	///<0x3:掉头
+	///<0x4:禁行
+	///<0x5:直行加转向
+	///<0x6-0x7:预留 
+	uint32 leftlighttype = 3;
+
+	///<交通灯状态 :[/],(0,0,3),[/],(1,0),    交通灯状态 
+	///<0x0:无效值
+	///<0x1:常亮
+	///<0x2:闪烁
+	///<0x3:即将消失、闪烁
+	uint32 leftlightstatus = 4;
+
+	///<本车道交通灯方向:[/],(0,0,7),[/],(1,0),    交通灯方向
+	///<0x0:无效值
+	///<0x1:直行
+	///<0x2:左转或者左掉头
+	///<0x3:直行+左转/左掉头
+	///<0x4:右转
+	///<0x5:直行+右转
+	///<0x6:左转+右转
+	///<0x7:直行+左转+右转
+	uint32 leftlightdirection = 5; 
+}
+
+/**
+* @brief TrafficLightScene
+* @detail 交通灯场景信息
+*/
+message TrafficLightScene
+{
+	///<左车道交通灯:[/],(0,0,/),[/],(1,0),    左车道交通灯信息
+	LeftLaneTRCLight lefttrcdata = 1; 
+
+	///<右车道交通灯:[/],(0,0,/),[/],(1,0),    右车道交通灯信息
+	RightLaneTRCLight righttrcdata = 2; 
+
+	///<本车道交通灯:[/],(0,0,/),[/],(1,0),    本车道交通灯信息
+	HostLaneTRCLight hosttrcdata = 3; 
+
+	///<路面标识:[/],(0,0,/),[/],(1,0),    路面标识
+	RoadSign roadsigndata = 4; 
+
+	///<人行横道:[/],(0,0,/),[/],(1,0),    人行横道
+	Crosswork crossworkdata = 5; 
+
+	///<停止线:[/],(0,0,/),[/],(1,0),    停止线
+	StopLine stoplinedata = 6; 
+
+	///<距离黄色网格线距离:[/],(0,0,/),[/],(1,0),    距离黄色网格线距离
+	YellowGLine yellowglinedata = 7; 
+   
+}
+
+
+/**
+* @brief BasicTrafficLightScene
+* @details 封装所有信号，包括目标、车道线、交通灯等
+*/
+message BasicTrafficLightScene
+{
+	///<交通灯场景:[/],(0,0,/),[/],(1,0),	100ms	交通灯场景重构
+	TrafficLightScene trafficlight = 1;	 
+}
+
