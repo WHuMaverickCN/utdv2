@@ -1,0 +1,48 @@
+# DataProcessingConfig.yaml
+# YAML configuration for various data processing steps.
+
+conda_path: /home/gyx/anaconda3/etc/profile.d/conda.sh
+
+utdv2_settings:
+  target_dataset: /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326
+
+train_setting:
+  dataset_paths:
+    - /home/gyx/data/cqc/processed/clips_1101_3rd_0724
+    - /home/gyx/data/cqc/processed/clips_d1114_l17_v619
+    - /data/gyx/cqc_p2_test_case/clips_d1106_l35_v727
+    - /data/gyx/clips_1020_2nd
+
+#新环境正常执行
+wrap_setting: 
+  target_folder: /data/gyx/cqc_p2_test_case/clips_AA1
+  target_vec: /data/gyx/cqc_p2_cd701_raw/datasets_AA1_0319/features/2024-03-19/000052/VecJsonData
+  vehicle_type: "CD701" # 在视觉数据匹配时，需要根据车型指定不同的匹配参数
+  data_root: /data/gyx/cqc_p2_cd701_raw/datasets_AA1_0319/
+  feature_file_path: "features"
+  # feature file / folder path
+  location_file_path: "location"
+  # location data path
+  vision_file_path: "vision"
+
+#新环境正常执行
+segment_setting: 
+  segment_tool_path: /home/gyx/projects/myolop2
+  # target_seg_files_path: ${wrap_setting.target_folder}
+
+#新环境正常执行
+reconstruction_setting:
+  if_need_transform: true
+  
+infer_setting:
+  dataset_paths: 
+    - /data/gyx/cqc_p2_test_case/clips_realAA1/
+  result_path: ./inference
+
+gt_label_setting_CD701:
+  slice_to_label: 
+    - /data/gyx/cqc_p2_test_case/clips_realAA1
+  # gt_file_path: /data/gyx/cqc_p2_test_case/gt/ground_truth
+  # gt_tile: /data/gyx/cqc_p2_test_case/gt/
+  gt_file_path: data/gt/ground_truth
+  gt_tile: data/gt/
