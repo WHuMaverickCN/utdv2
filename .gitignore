@@ -16,3 +16,7 @@ src/parse/*.py[cod]
 
 # 忽略 src/parse/ 下的 common 模块目录
 src/parse/common/
+
+.vscode
+
+__pycache__/

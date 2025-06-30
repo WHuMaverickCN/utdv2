@@ -184,20 +184,46 @@ class EgoviewReconsRouteScale:
             return common_matches
         common_matches = get_dats_list(location_path, vision_path)
         # Use the first match (or iterate through all matches if needed)
-        target_name = next(iter(common_matches))
-        location_file = os.path.join(location_path, f"{target_name}.csv")
-        location_dir = os.path.join(location_path, target_name)
-        vision_file = os.path.join(vision_path, f"{target_name}.csv")
-        vision_dir = os.path.join(vision_path, target_name)
+        # target_name = next(iter(common_matches))
 
-        location_exists = os.path.exists(location_file) or os.path.exists(location_dir)
-        vision_exists = os.path.exists(vision_file) or os.path.exists(vision_dir)
+        def get_full_path(target_name):
+            location_file = os.path.join(location_path, f"{target_name}.csv")
+            second_vis_folder = os.listdir(vision_path)[0]
+            vision_dir = os.path.join(vision_path, second_vis_folder,target_name)
 
-        if not location_exists or not vision_exists:
-            print(f"Error: Required file or folder '{target_name}' not found in location or vision directories")
+            second_loc_folder = os.listdir(location_path)[0]
+            location_file = os.path.join(location_path, second_loc_folder,f"{target_name}.csv")
+            location_exists = os.path.exists(location_file)
+            vision_exists = os.path.exists(vision_dir)
+        
+            if not location_exists or not vision_exists:
+                print(f"Error: Required file or folder '{target_name}' not found in location or vision directories")
+                return
+
+            print(f"Validation successful: Base path and required files/folders exist for {target_name}")
+            return location_exists,vision_exists
+        # Check if we have valid matches
+        if not common_matches:
+            print(f"Error: No matching datasets found")
             return
-
-        print(f"Validation successful: Base path and required files/folders exist for {target_name}")
+            
+        # Verify each match has both location and vision data
+        valid_matches = []
+        for match in common_matches:
+            location_exists, vision_exists = get_full_path(match)
+            if location_exists and vision_exists:
+                valid_matches.append(match)
+            else:
+                print(f"Warning: Missing data for {match}, skipping")
+            
+        if not valid_matches:
+            print(f"Error: No valid matches with both location and vision data")
+            return
+            
+        # Use the first valid match
+        target_name = valid_matches[0]
+        print(f"Selected dataset: {target_name}")
+        
 class EgoviewReconstruction:
     def __init__(self, config_path,OPTIMIZE = True,Car_Type = "C385"):
         self.OPTIMIZE = OPTIMIZE
