@@ -193,6 +193,7 @@ def read_sample_geojson_file(geojson_path):
     return gdf_vec
 
 def read_sample_location_file(location_paths):
+    location_paths = [location_paths] if isinstance(location_paths, str) else location_paths
     df_loc_set = {}
     for _index in range(len(location_paths)):
         df_loc = pd.read_csv(location_paths[_index])

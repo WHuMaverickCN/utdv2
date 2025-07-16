@@ -4,8 +4,15 @@
 conda_path: /home/gyx/anaconda3/etc/profile.d/conda.sh
 
 utdv2_settings:
-  target_dataset: /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326
-
+  # target_dataset: /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326
+  # target_dataset: /data/gyx/cqc_p2_cd701_raw/datasets_A2_0322
+  # target_dataset: /data/gyx/cqc_p2_cd701_raw/datasets_AA4_0326
+  target_dataset: 
+    - /data/gyx/cqc_p2_cd701_raw/datasets_C7_0501
+  target_maplearn_data_dir: /data/gyx/cqc_p3_raw/map_learin_datasets/CD701-000052-20240412对应云端数据/24年第24周/制图
+  candidate_recons_data_path:
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326
+    - /data/gyx/cqc_p2_cd701_raw/datasets_A4_0326
 train_setting:
   dataset_paths:
     - /home/gyx/data/cqc/processed/clips_1101_3rd_0724
@@ -15,7 +22,7 @@ train_setting:
 
 #新环境正常执行
 wrap_setting: 
-  target_folder: /data/gyx/cqc_p2_test_case/clips_AA1
+  target_folder: /home/gyx/projects/utdv2/temp_data/cam_0
   target_vec: /data/gyx/cqc_p2_cd701_raw/datasets_AA1_0319/features/2024-03-19/000052/VecJsonData
   vehicle_type: "CD701" # 在视觉数据匹配时，需要根据车型指定不同的匹配参数
   data_root: /data/gyx/cqc_p2_cd701_raw/datasets_AA1_0319/
@@ -27,7 +34,7 @@ wrap_setting:
 
 #新环境正常执行
 segment_setting: 
-  segment_tool_path: /home/gyx/projects/myolop2
+  segment_tool_path: /home/gyx/projects/utdv2/src/seg
   # target_seg_files_path: ${wrap_setting.target_folder}
 
 #新环境正常执行

@@ -394,9 +394,9 @@ def draw_colored_instances(mask, \
     return colored_mask
 # @print_run_time('单帧重建')
 def get_averaged_pose_data(df, \
-                                   pic_value, \
-                                   comparison_field="pic_0", \
-                                   mask_mode="pkl"):
+                        pic_value, \
+                        comparison_field="pic_0", \
+                        mask_mode="pkl"):
     """
     从数据框中获取与指定图片对应的四元数、坐标和姿态角信息
     

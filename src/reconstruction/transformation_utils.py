@@ -5,6 +5,7 @@ import numpy as np
 from pathlib import Path
 import pandas as pd
 from pyproj import Transformer
+from src.common_utils import CoordProcessor
 from scipy.spatial.transform import Rotation as sciR
 np.set_printoptions(precision=6, suppress=True)
 from math import pi, \
@@ -309,6 +310,34 @@ def trans_instance_to_shape():
 # from_wgs84_to_target_proj(_lat,_lon)
 # trans_ego_to_world_coord((0,0,0))
 # @print_run_time("match_trajectory_to_insdata")
+def ins_trans_util(ins_data_file:pd.DataFrame):
+    """
+    将ins数据文件转换为适合匹配的格式
+    """
+    # 读取ins数据文件
+    ins_data_df = pd.read_csv(ins_data_file)
+    
+    # 提取需要的列
+    # Extract the needed columns
+    ins_data_df = ins_data_df[["sec_of_week", "utc", "latitude", "longitude"]]
+    
+    # # Create new fields with values from latitude and longitude
+    # ins_data_df["new_latitude"] = ins_data_df["latitude"]
+    # ins_data_df["new_longitude"] = ins_data_df["longitude"]
+
+    def convert_row(row):
+        new_lng, new_lat = CoordProcessor.gcj02towgs84_point_level(row['longitude'], row['latitude'])
+        return pd.Series([new_lng, new_lat], index=['new_longitude', 'new_latitude'])
+    ins_data_df[['new_longitude', 'new_latitude']] = ins_data_df.apply(convert_row, axis=1)
+    # Swap the order of new_longitude and new_latitude columns
+    cols = list(ins_data_df.columns)
+    lng_idx = cols.index('new_longitude')
+    lat_idx = cols.index('new_latitude')
+    cols[lng_idx], cols[lat_idx] = cols[lat_idx], cols[lng_idx]
+    ins_data_df = ins_data_df[cols]
+    # 返回处理后的DataFrame
+    return ins_data_df
+
 def match_trajectory_to_insdata(trajectory:str,
                                 ins_data_file:pd.DataFrame):
     print(trajectory)

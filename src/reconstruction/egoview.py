@@ -13,15 +13,13 @@ from dataclasses import dataclass
 from .landmark_utils import *    
 import re
 
-# from src.reconstruction.vanishing_point_utils import get_vanishing_point
 from .transformation_utils import *
-# from .landmark_utils import *
-# from .TransformGround2Image import TransformGround2Image
-# from .TransformImage2Ground import TransformImage2Ground
-# from ..utils import print_run_time
+from .seg_utils import run_segmentation
+from .wrap_utils import DataSamplePathWrapper
 
-# from ..io import input
-# from ..io.output import write_reconstructed_result
+
+from src.io import m_input as input
+from src.io.m_output import write_reconstructed_result
 
 from src.common_utils import CoordProcessor
 
@@ -122,10 +120,12 @@ class EgoviewReconstructionCD701:
         })
 '''
 # Define regex pattern for CD701 files
-PATTERN_701 = r"CD701_\d{6}__\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}"
+PATTERN_701 = r"CD701_\d{6}_{1,2}\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}"
 
 class EgoviewReconsRouteScale:
-    def __init__(self, config_path,OPTIMIZE = True,Car_Type = "CD701"):
+    def __init__(self, config_path,OPTIMIZE = False,Car_Type = "CD701",_dataset_index:int=0):
+        self.Car_Type = Car_Type
+        self.id_flag = True
         self.OPTIMIZE = OPTIMIZE
         self.config_path = config_path
         with open(config_path, 'r') as f:
@@ -133,7 +133,7 @@ class EgoviewReconsRouteScale:
 
         # Extract paths from config
         try:
-            self.target_dataset = self.config['utdv2_settings']['target_dataset']
+            self.target_dataset = self.config['utdv2_settings']['target_dataset'][_dataset_index]
             self.base_path = self.target_dataset
         except KeyError as e:
             print(f"Missing required path in config: {e}")
@@ -219,11 +219,489 @@ class EgoviewReconsRouteScale:
         if not valid_matches:
             print(f"Error: No valid matches with both location and vision data")
             return
-            
-        # Use the first valid match
-        target_name = valid_matches[0]
-        print(f"Selected dataset: {target_name}")
         
+        # Create dictionaries to store complete paths for each valid match
+        self.location_files = {}
+        self.vision_dirs = {}
+
+        # For each valid match, find and store the complete paths
+        for match in valid_matches:
+            # Find the subdirectory in location that contains this match
+            for loc_subdir in os.listdir(location_path):
+                loc_subdir_path = os.path.join(location_path, loc_subdir)
+                if os.path.isdir(loc_subdir_path):
+                    csv_file = os.path.join(loc_subdir_path, f"{match}.csv")
+                    if os.path.exists(csv_file):
+                        self.location_files[match] = csv_file
+                        break
+            
+            # Find the subdirectory in vision that contains this match
+            for vis_subdir in os.listdir(vision_path):
+                vis_subdir_path = os.path.join(vision_path, vis_subdir)
+                if os.path.isdir(vis_subdir_path):
+                    vis_dir = os.path.join(vis_subdir_path, match)
+                    if os.path.exists(vis_dir):
+                        self.vision_dirs[match] = vis_dir
+                        break
+
+        print(f"Found {len(self.location_files)} location files and {len(self.vision_dirs)} vision directories")
+        self.valid_matches = valid_matches
+        self.camera_paras_setting()
+    def camera_paras_setting(self):
+        if self.Car_Type == "C385":
+            self.dist_coeffs_cam0 = np.array([
+                0.639999986,
+                -0.0069,
+                0.00065445,
+                0.000117648,
+                -0.0057,
+                1.003900051,
+                0.131899998,
+                -0.020199999
+            ])
+
+            self.K_cam0 = np.array([[1907.819946, 0, 1903.890015],
+                                    [0, 1907.670044, 1065.380005],
+                                    [0, 0, 1]]) 
+            self.cameraInfo = Info({
+                "focalLengthX": int(1907.819946),   # focal length x
+                "focalLengthY": int(1907.670044),   # focal length y
+                "opticalCenterX": int(1903.890015), # optical center x
+                "opticalCenterY": int(1065.380005), # optical center y
+                "cameraHeight": 1340,    # camera height in `mm`
+                "pitch": -0.030369*(180/pi),    # rotation degree around x
+                "yaw": 0.028274*(180/pi),   # rotation degree around y
+                "roll": -0.006632*(180/pi),  # rotation degree around z
+                "k1":0.639999986,
+                "k2":-0.0069,
+                "p1":0.00065445,
+                "p2":0.000117648,
+                "k3":-0.0057,
+                "k4":1.003900051,
+                "k5":0.131899998,
+                "k6":-0.020199999,
+                "tx":1.77,
+                "ty":0.07,
+                "tz":1.34,
+                # "rx":-0.03037,
+                # "ry":0.028274,
+                # "rz":-0.006632
+                # "rx":-0.03037-pi/2,
+                # "ry":0.028274,
+                # "rz":-0.006632-pi/2
+                "rx":-0.03037,
+                "ry":0.028274+pi/2,
+                "rz":-0.006632-pi/2
+            })
+        elif self.Car_Type == "CD701":
+            self.dist_coeffs_cam0 = np.array([0.272893995,
+                                            -0.138833001,
+                                            -0.000043,
+                                            0.000081,
+                                            -0.008432,
+                                            0.634904981,
+                                            -0.129685998,
+                                            -0.042598002,
+                                            ])
+            
+            self.K_cam0 = np.array([[1908.79, 0, 1926.01],
+                                    [0, 1908.71, 1075.9],
+                                    [0, 0, 1]])
+
+            self.cameraInfo = Info({
+                "focalLengthX": int(1908.79),   # focal length x #沿用C385
+                "focalLengthY": int(1908.71),   # focal length y 沿用C385
+                "opticalCenterX": int(1926.01), # optical center x 沿用C385
+                "opticalCenterY": int(1075.9), # optical center y 沿用C385
+                "cameraHeight": 1480,    # camera height in `mm`  改动，使用"valid_height"字段值但存疑
+                "pitch": -0.011868*(180/pi),    # rotation degree around x  改动，使用新pitch值
+                "yaw": 0.003491*(180/pi),   # rotation degree around y 改动，使用新yaw值
+                "roll": 0.002793*(180/pi),  # rotation degree around z 改动，使用新roll值
+                "k1":0.272893995, # 畸变系数，基本沿用C385
+                "k2":-0.138833001, # 畸变系数，基本沿用C385
+                "p1":-0.000043, # 畸变系数，基本沿用C385
+                "p2":0.000081, # 畸变系数，基本沿用C385
+                "k3":-0.008432, # 畸变系数，基本沿用C385
+                "k4":0.634904981, # 畸变系数，基本沿用C385
+                "k5":-0.129685998, # 畸变系数，基本沿用C385 
+                "k6":-0.042598002, # 畸变系数，基本沿用C385
+                "tx":2.26,
+                "ty":-0.001381,
+                "tz":1.48,
+                "rx":-0.011868,
+                "ry":0.003491+pi/2,
+                "rz":0.002793-pi/2
+            })
+
+        self.six_dof_data = np.array([self.cameraInfo.tx, 
+                                 self.cameraInfo.ty, 
+                                 self.cameraInfo.tz, 
+                                 self.cameraInfo.rx, 
+                                 self.cameraInfo.ry, 
+                                 self.cameraInfo.rz])
+        
+        rot_mat_ca,trans_vec_ca = self.get_camera_pose()
+        self.extrinsic_matrix = camera_pose_to_extrinsic(rot_mat_ca,trans_vec_ca)
+        print("extrinsic_matrix:\n",self.extrinsic_matrix)
+        self.extrinsic_rotation_matrix = self.extrinsic_matrix[:3,:3]
+        self.extrinsic_transaction_vector = self.extrinsic_matrix[:3,3]
+
+    def get_camera_pose(self):
+        rot_ca = sciR.from_euler('zyx',[
+                                self.cameraInfo.rz,\
+                                self.cameraInfo.ry,\
+                                self.cameraInfo.rx
+                                ])
+        trans_ca = [
+            self.cameraInfo.tx,
+            self.cameraInfo.ty,
+            self.cameraInfo.tz
+        ]
+        trans_vec_ca = np.array(trans_ca)
+        rot_mat_ca = rot_ca.as_matrix()
+        self.pose_rotation_matrix = rot_mat_ca
+        self.pose_transaction_vector = trans_vec_ca
+        pose_matrix = np.hstack((rot_mat_ca, \
+                                 trans_vec_ca.reshape(3, 1)))
+        return rot_mat_ca,trans_vec_ca
+    
+    def batch_recons_for_single_rao_dat(self):
+        # def batch_recons_for_single_rao_dat(self):
+        total_matches = len(self.valid_matches)
+        for idx, match in enumerate(self.valid_matches):
+            progress = (idx + 1) / total_matches * 100
+            print(f"******Processing {match}... [{idx+1}/{total_matches}] ({progress:.1f}%)******")
+            location_file = self.location_files[match]
+            vision_dir = self.vision_dirs[match]
+                # Call the reconstruction method for each match
+            self.recons_for_single_rao_dat(location_file, vision_dir,match)
+    # @staticmethod
+    def recons_for_single_rao_dat(self,location_file,vision_dir,dat_name):
+        print(f"Reconstructing for {location_file} and {vision_dir}...")
+
+        #第一步，批量执行语义分割，将目标目录中的所有图片进行分割提取
+        run_segmentation(vision_dir)
+        
+        #第二步，执行定位和矢量关系
+        _current_sample = DataSamplePathWrapper(
+            loc_path=location_file,
+            vis_path=vision_dir,
+            dat_name=dat_name,
+        )
+
+        target_processing_folder = os.path.join(self.target_dataset,'recons_preprocessing')
+        # Check if target folder exists, create if it doesn't
+        self.target_processing_folder = target_processing_folder
+        if not os.path.exists(self.target_processing_folder):
+            os.makedirs(self.target_processing_folder, exist_ok=True)
+            print(f"Created directory: {self.target_processing_folder}")
+
+        _current_sample.write_sample_to_target_folder(self.target_processing_folder,self.id_flag,_current_sample.dat_name)
+
+        #第三步，执行重建
+        target_result_folder = os.path.join(self.target_dataset,'recons_result')
+        self.target_result_folder = target_result_folder
+        self.main_reconstruction(_current_sample)
+
+
+    def main_reconstruction(self,_current_sample:DataSamplePathWrapper,mask_mode:str="pkl"):
+        dat_name = _current_sample.dat_name
+        target_dir = self.target_result_folder
+        _current_slice_output_folder = os.path.join(target_dir, dat_name)
+
+        # 获取分割结果路径
+        temp_data_root = os.path.dirname(os.path.dirname(_current_slice_output_folder))
+        # Create path to the vision directory
+        vision_path = os.path.join(temp_data_root, "vision")
+        if os.path.exists(vision_path):
+            # Get the list of subdirectories
+            subdirs = [d for d in os.listdir(vision_path) if os.path.isdir(os.path.join(vision_path, d))]
+            if subdirs:
+                # Assuming there's only one subdirectory
+                vision_subfolder = os.path.join(vision_path, subdirs[0])
+                if_already_trans = True
+            else:
+                print(f"No subdirectories found in {vision_path}")
+                return -1
+        else:
+            print(f"Vision directory does not exist at {vision_path}")
+            return -1
+        if mask_mode=="pkl":
+            temp_mask_path = os.path.join(vision_subfolder, dat_name+'_seg')
+            if os.path.exists(temp_mask_path):
+                print(f"Mask directory exists at {temp_mask_path}")
+        
+        temp_loc_file = _current_sample.loc2vis_path 
+            
+        # temp_traj_file = glob.glob(os.path.join(temp_data_root, "trajectory*"))
+        # geojson_files = glob.glob(os.path.join(temp_data_root, "*.geojson"))
+        # geojson_files = [f for f in geojson_files if re.match(r'\d+_\d+\.geojson', os.path.basename(f))]
+        # if len(temp_traj_file) > 0:
+        #     temp_traj_file = temp_traj_file[0]
+        # else:
+        #     temp_traj_file = ''
+
+        # if len(geojson_files) > 0:
+        #     geojson_file = geojson_files[0]
+        # else:
+        #     geojson_file = ''
+        # if self.if_need_transform and if_already_trans==False:
+        #     # 因为需要重建两次，因此标注一下if_already_trans为False时候，才执行坐标转换
+        #     print(f"run trans to file:{geojson_file},{temp_traj_file}")
+        #     CoordProcessor.trans_gcj02towgs84_replace(temp_traj_file)
+        #     CoordProcessor.trans_gcj02towgs84_replace(geojson_file)
+        traj_correction_dict = ins_trans_util(temp_loc_file)
+        # traj_correction_dict = match_trajectory_to_insdata(temp_traj_file,\
+        #                                                             temp_loc_file)
+            
+        self.transation_instance(
+                mask_dir_path=temp_mask_path,
+                location_data_path=temp_loc_file,
+                traj_correction_dict=traj_correction_dict,
+                output_file_name=dat_name,
+                mask_mode = mask_mode,
+                default_output_path=target_dir
+            )
+
+    def transation_instance(self,
+                            mask_dir_path: str, # 分割得到的pkl文件目录
+                            location_data_path: str, # 定位关联图片的文件（loc2vis.csv）
+                            traj_correction_dict: dict,
+                            output_file_name: str, # 输出结果的路径
+                            mask_mode = "pkl",  #此处默认的分割类型应当是pkl二进制文件类型
+                            default_output_path = "reconstruction_clip1_1109/"):
+        camera_matrix = self.K_cam0
+        # dist_coeffs = np.zeros(5)  # assuming no distortion
+        dist_coeffs = self.dist_coeffs_cam0
+        # R = np.eye(3)  # replace with actual rotation matrix from camera to vehicle
+        # t = np.array([0, 0, vehicle_height])  # replace with actual translation vector
+        R = self.extrinsic_rotation_matrix  # replace with actual rotation matrix from camera to vehicle
+        t = self.extrinsic_transaction_vector  # replace with actual translation vector
+        vehicle_height = t[-1]  # example camera height from ground
+
+        format_str = "Camera matrix:\n{}\nDistortion coefficients: {}"
+        print(format_str.format(camera_matrix, dist_coeffs))
+
+        mask_path = str(Path(mask_dir_path).absolute())
+        if os.path.isdir(mask_path):
+            files = sorted(glob.glob(os.path.join(mask_path, '*.*'))) 
+        else:
+            return
+        fixed_param = {
+            "camera_matrix": camera_matrix,
+            "dist_coeffs": dist_coeffs,
+            "R": self.pose_rotation_matrix,
+            "t": self.pose_transaction_vector,
+            "vehicle_height": vehicle_height
+        }
+        features = []
+
+        features_uncertainty = []
+        #读取包含定位数据
+        _loc_path = str(Path(location_data_path).absolute())
+        loc_data_df = input.read_loc_data(_loc_path)
+        
+        for file in files:
+            # 从定位数据中获取四元数、世界坐标、欧拉角
+            quat,\
+            world_coords_from_ins,\
+            rph,\
+            vel = get_averaged_pose_data(loc_data_df,\
+                                                    file,\
+                                                    "pic_0",\
+                                                    mask_mode)
+            if quat is None and world_coords_from_ins is None and rph is None and vel is None:
+                continue
+            if vel<-0.01:
+                vel = 0.01
+            rot_param = [quat, \
+                        rph]
+            # print("rph:",rph)
+            if quat == None and world_coords_from_ins==None:
+                continue
+            # print(file)
+            def find_closest_point(target_point, dataframe):
+                """
+                找到与目标点距离最近的DataFrame中的点
+
+                参数:
+                target_point : tuple
+                    目标点的经纬度 (latitude, longitude)。
+                dataframe : pd.DataFrame
+                    包含经纬度数据的DataFrame。
+
+                返回:
+                pd.Series
+                    距离目标点最近的DataFrame中的行。
+                """
+                # 计算目标点与DataFrame中每个点的欧几里得距离
+                distances = dataframe.apply(lambda row: euclidean((row['new_longitude'], \
+                                                                row['new_latitude']), \
+                                                                target_point), \
+                                                                axis=1)
+                
+                # 找到距离最近的点的索引
+                closest_index = distances.idxmin()
+                
+                # 返回距离最近的那行数据
+                return dataframe.loc[closest_index]
+            
+            closest_point = find_closest_point(world_coords_from_ins, \
+                                               traj_correction_dict)
+
+            if self.OPTIMIZE==True:
+                # 执行优化，即采用new_longitude和new_latitude
+                world_coords_from_ins=(closest_point.iloc[5],\
+                                    closest_point.iloc[4])
+            elif self.OPTIMIZE==False:
+                # 执行非优化，即采用原始的经纬度
+                world_coords_from_ins=(closest_point.iloc[3],\
+                                    closest_point.iloc[2])
+            # print(world_coords_from_ins)
+
+            # 此处是从pickle数据读取分割结果，此处应当替换为图片效率更高
+            if mask_mode == "jpg":
+                sem_seg = read_segmentation_mask_from_image(file)
+            else:
+                sem_seg = read_segmentation_mask_from_pickle(file)
+
+
+            instance_edge_points_list = segment_mask_to_utilized_field_mask(sem_seg,\
+                                                                            fixed_param)
+            # ins_seg = semantic_to_instance_segmentation(sem_seg)
+            # print(instance_edge_points_list)
+            
+            for _edge_points_for_one_instance in instance_edge_points_list:
+                # print(len(instance_edge_points_list))
+                coordinates = []
+                for pixel in _edge_points_for_one_instance:
+                    point_camera, point_vehicle = self.pixel_to_world_new(pixel[0],\
+                                                                        pixel[1], \
+                                                                        camera_matrix, \
+                                                                        dist_coeffs, \
+                                                                        self.pose_rotation_matrix, \
+                                                                        self.pose_transaction_vector, \
+                                                                        vehicle_height)
+                
+                    _fx = camera_matrix[0][0]
+                    _fy = camera_matrix[1][1]
+                    _f = math.sqrt(_fx*_fy)
+                    [_x,_y,_z] = point_camera
+
+                    _pdop_value = UncertaintyCalculator.calculate_PDOP(
+                                                                        _f, \
+                                                                        _z, \
+                                                                        _x, \
+                                                                        _y, \
+                                                                        10, \
+                                                                        vel/30
+                                                                        )
+                    # _l = _velocity / _frame_rate
+
+                    # pdop_value = UncertaintyCalculator.calculate_pdop(_f,\
+                    #                                                   )
+                    # 将自车坐标转化为世界坐标
+                    point_world = trans_ego_to_world_coord(point_vehicle = point_vehicle, 
+                                                           quanternion = rot_param, 
+                                                           geographical_coords=world_coords_from_ins)
+
+                    # q,world_coords_from_ins
+                    # coordinates.append((point_vehicle[0], point_vehicle[1],0))  # 添加点坐标到坐标列表中
+                    # coordinates.append((point_world[0], point_world[1],0.0))  # 添加点坐标到坐标列表中
+                    coordinates.append((point_world[0], point_world[1]))  # 添加点坐标到坐标列表中
+                    
+                    feat_uncertainty = geojson.Feature(
+                        geometry=geojson.Point([float(point_world[0]), float(point_world[1])]),
+                        properties={"uncertainty": float(_pdop_value)}
+                    )
+
+                    features_uncertainty.append(feat_uncertainty)
+                    # print(
+                    #     "point_camera:",\
+                    #     point_camera,\
+                    #     "\npoint_vehicle:",\
+                    #     point_vehicle,"\n",
+                    #     "point_world:",\
+                    #     point_world)
+                # coordinates = simplify_polygon(coordinates)
+                
+                
+                feature = geojson.Feature(
+                    geometry=geojson.Polygon([coordinates]),  # 使用Polygon表示该实例的边界
+                    properties={"file_name": os.path.basename(file)}  # 将文件名作为属性
+                )
+                features.append(feature)
+        feature_collection = geojson.FeatureCollection(features)
+        feature_collection_uncertainty = geojson.FeatureCollection(features_uncertainty)
+
+        if os.path.exists(default_output_path)==False:
+            os.mkdir(default_output_path)
+
+        _log = calculate_average_movement(df=traj_correction_dict,
+                                   uuid=output_file_name)
+        # import math
+        # import json
+
+        def clean_inf_nan(data):
+            """递归遍历 JSON 结构，将 `inf` 和 `nan` 替换为 None"""
+            if isinstance(data, dict):
+                return {k: clean_inf_nan(v) for k, v in data.items()}
+            elif isinstance(data, list):
+                return [clean_inf_nan(v) for v in data]
+            elif isinstance(data, float):
+                return None if math.isinf(data) or math.isnan(data) else data
+            else:
+                return data
+
+        feature_collection_uncertainty = clean_inf_nan(feature_collection_uncertainty)
+        # 将重建结果写入文件
+        write_reconstructed_result(
+            default_output_path,\
+            output_file_name,\
+            feature_collection_uncertainty,\
+            recons_log = _log,\
+            IF_OPTIMIZE=self.OPTIMIZE)
+        # with open(os.path.join(default_output_path, output_file_name+".geojson"), 'w') as f:
+        #     geojson.dump(feature_collection, f)
+  
+        return
+
+    @staticmethod
+    def pixel_to_world_new(u, v, camera_matrix, dist_coeffs, R, T, vehicle_height):
+        # 将像素坐标转化为图像坐标
+        uv = np.array([[u, v]], dtype=np.float32)
+
+        # 去畸变并归一化
+        uv_undistorted = cv2.undistortPoints(uv, camera_matrix, dist_coeffs, P=camera_matrix)
+        uv_undistorted = cv2.undistortPoints(uv, camera_matrix, dist_coeffs)
+        # tips此处P参数如果不赋值，该该函数返回的结果
+
+        # 归一化相机坐标系
+        u_n, v_n = uv_undistorted[0][0]
+
+        # 形成归一化的相机坐标
+        normalized_camera_coords = np.array([u_n, v_n, 1.0])
+
+        # 计算比例因子，假设平面高度Z=0,即每个像素换算为世界坐标系对应的距离，以米为单位
+        # 这里，直接利用外参进行变换之前计算比例因子是关键步骤
+        scale_factor = vehicle_height / (R[2, 0] * normalized_camera_coords[0] + 
+                                        R[2, 1] * normalized_camera_coords[1] + 
+                                        R[2, 2])
+        # scale_factor = vehicle_height / np.dot(R[2], normalized_camera_coords)
+
+        # 乘以比例因子得到相机坐标系中的点
+        camera_coords_scaled = normalized_camera_coords * scale_factor
+
+        # 应用外参变换，将相机坐标系坐标转换到世界坐标系
+        world_coords = np.dot(R, camera_coords_scaled) + T
+
+        # print("camera:",camera_coords_scaled, \
+        #         "world:",world_coords)
+        # 返回世界坐标
+        return camera_coords_scaled,world_coords
+        # return camera_coords_scaled,world_coords[:2]  # 通常假设z=0，返回x和y坐标
+
+@dataclass
 class EgoviewReconstruction:
     def __init__(self, config_path,OPTIMIZE = True,Car_Type = "C385"):
         self.OPTIMIZE = OPTIMIZE

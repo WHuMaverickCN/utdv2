@@ -17,3 +17,5 @@ src/parse/*.py[cod]
 .vscode
 
 __pycache__/
+
+temp_data/

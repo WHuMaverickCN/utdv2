@@ -1,5 +1,9 @@
 import json
+import os
 import math
+from rtree import index
+from shapely.geometry import shape
+from tqdm import tqdm
 
 x_pi = 3.14159265358979324 * 3000.0 / 180.0
 pi = 3.1415926535897932384626  # π
@@ -166,3 +170,48 @@ class CoordProcessor:
         with open(bias_json_path, 'w') as output_file:
             json.dump(geojson_data, output_file, indent=2)
         # input("已转换坐标，并保存到 _trans.geojson 文件中")
+
+# 用于构建空间索引，加速车端数据的遍历过程
+def ST_build_index(vehicle_data_items, index_path='spatial_index'):
+    print("[实时状态] -- 索引构建开始")
+    idx_dict = {}
+    
+    num_runs = len(vehicle_data_items.items())
+    for _name in range(num_runs):
+        print(index_path+'_'+str(_name))
+        index_name = index_path+'_'+str(_name)
+        if os.path.exists(index_name+'.dat'):
+            p = index.Property()
+            p.storage = index.RT_Disk
+            p.filename = index_name
+            idx_dict[_name] = index.Index(index_name, properties=p)
+    if not idx_dict:
+        print(f"[实时状态] -- 保存当前索引到{index_path}")
+        p = index.Property()
+        p.storage = index.RT_Disk
+        p.filename = index_path
+
+        for _key, vehicle_data in vehicle_data_items.items(): 
+            p = index.Property()
+            p.storage = index.RT_Disk
+            p.filename = index_path+'_'+str(_key)
+            
+            oid_list = []
+            __count = 0
+            idx = index.Index(p.filename,properties=p)
+            for target_vec in tqdm(vehicle_data, desc="Building index"):
+                feature = target_vec['feature']
+                geometry = shape(feature['geometry'])
+                if feature['properties']['oid'] in oid_list:
+                    oid_list.append(int(feature['properties']['oid']))
+                else:
+                    oid_list.append(-1)
+                __count += 1
+                idx.insert(int(feature['properties']['oid']), geometry.bounds)
+            idx_dict[_key] = idx
+            # idx.close()
+        return idx_dict
+    else:
+        print(f"[实时状态] -- 读取已存在的索引{index_path}")
+        return idx_dict
+    
