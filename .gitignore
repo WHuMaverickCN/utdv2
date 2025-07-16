@@ -19,3 +19,7 @@ src/parse/*.py[cod]
 __pycache__/
 
 temp_data/
+
+# 排除分割模型权重文件
+src/seg/data/weights/seg_model.pt
+
